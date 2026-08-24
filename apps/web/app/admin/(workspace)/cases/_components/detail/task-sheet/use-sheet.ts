@@ -44,6 +44,7 @@ export function useCaseTaskSheet({
         : {
             ...emptyCaseTaskDraft,
             endDate: defaultDate ?? emptyCaseTaskDraft.endDate,
+            notificationDate: defaultDate ?? emptyCaseTaskDraft.notificationDate,
             startDate: defaultDate ?? emptyCaseTaskDraft.startDate
           }
     );
@@ -92,6 +93,12 @@ function mapTaskToDraft(task: CaseTaskDto): CaseTaskFormValues {
     endDate: task.endDate ?? "",
     name: task.name,
     notes: task.notes ?? "",
+    notificationDate: task.notificationDate ?? "",
+    notificationEnabled: task.notificationEnabled,
+    notificationMembershipIds: task.notificationMembershipIds,
+    notificationPracticeAreaId: task.notificationPracticeAreaId ?? "",
+    notificationRecipientMode: task.notificationRecipientMode,
+    notificationTime: task.notificationTime ?? "",
     startDate: task.startDate ?? "",
     status: task.status
   };

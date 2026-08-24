@@ -1,12 +1,13 @@
 "use client";
 
-import { Bell, Menu, PanelLeftClose, PanelLeftOpen } from "lucide-react";
+import { Menu, PanelLeftClose, PanelLeftOpen } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { AdminHeaderProps } from "../../_types/admin";
 import { AdminUserMenu } from "../user/admin-user-menu";
 import { AdminHeaderBreadcrumbs } from "./admin-header-breadcrumbs";
 import { HeaderActionButton } from "./header-action-button";
 import { HeaderSearchButton } from "./header-search-button";
+import { NotificationsBell } from "./notifications-bell";
 
 export function AdminHeader({
   onOpenCommand,
@@ -46,17 +47,7 @@ export function AdminHeader({
       <div className="flex min-w-0 items-center gap-2">
         <HeaderSearchButton onOpenCommand={onOpenCommand} />
 
-        <HeaderActionButton
-          label="Notificaciones"
-          className="relative grid size-8 place-items-center rounded-full border border-[var(--dropdown-border)] bg-[var(--dropdown-bg)] text-foreground backdrop-blur-xl hover:bg-[var(--dropdown-item-hover)]"
-        >
-          <Bell className="h-4 w-4" strokeWidth={1.9} aria-hidden="true" />
-          <span
-            className="absolute -right-0.5 -top-0.5 flex size-4 items-center justify-center rounded-full bg-destructive font-mono text-[9px] font-semibold leading-none text-white ring-2 ring-[var(--admin-page-bg)]"
-          >
-            0
-          </span>
-        </HeaderActionButton>
+        <NotificationsBell />
 
         <div className="flex items-center shrink-0">
           <AdminUserMenu collapsed session={session} triggerVariant="pill" />

@@ -25,9 +25,7 @@ export function useCaseHearingSheet({
   const [draft, setDraft] = useState<CaseHearingFormValues>(emptyCaseHearingDraft);
   const [errors, setErrors] = useState<CaseHearingFieldErrors>({});
   const [uncontrolledOpen, setUncontrolledOpen] = useState(false);
-  const mutation = useCasesMutation(
-    casesMutations.saveHearing({ caseId, hearingId: hearing?.id })
-  );
+  const mutation = useCasesMutation(casesMutations.saveHearing({ caseId, hearingId: hearing?.id }));
   const router = useRouter();
   const open = controlledOpen ?? uncontrolledOpen;
 
@@ -47,7 +45,8 @@ export function useCaseHearingSheet({
         ? mapHearingToDraft(hearing)
         : {
             ...emptyCaseHearingDraft,
-            date: defaultDate ?? emptyCaseHearingDraft.date
+            date: defaultDate ?? emptyCaseHearingDraft.date,
+            notificationDate: defaultDate ?? emptyCaseHearingDraft.notificationDate
           }
     );
   }, [defaultDate, hearing, open]);
@@ -97,6 +96,12 @@ function mapHearingToDraft(hearing: CaseHearingDto): CaseHearingFormValues {
   return {
     date: hearing.date,
     description: hearing.description,
+    notificationDate: hearing.notificationDate ?? "",
+    notificationEnabled: hearing.notificationEnabled,
+    notificationMembershipIds: hearing.notificationMembershipIds,
+    notificationPracticeAreaId: hearing.notificationPracticeAreaId ?? "",
+    notificationRecipientMode: hearing.notificationRecipientMode,
+    notificationTime: hearing.notificationTime ?? "",
     notificationsEnabled: hearing.notificationsEnabled,
     time: hearing.time,
     type: hearing.type

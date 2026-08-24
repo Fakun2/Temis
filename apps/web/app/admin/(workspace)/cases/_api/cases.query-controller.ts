@@ -9,6 +9,7 @@ import type {
   CaseExpensesListResponse,
   CaseExpensesSummaryDto,
   CaseHearingsListResponse,
+  NotificationOptions,
   CasePickerOptionsQueryParams,
   CasePickerOptionsResponse,
   CaseTasksListResponse,
@@ -32,6 +33,7 @@ import {
   listCasePickerOptions,
   listCaseTasks,
   listCatalogOptions,
+  listNotificationOptions,
   listTaskAssignees
 } from "./cases.api";
 import { listCaseDocuments, listDocumentCategories } from "./case-documents.api";
@@ -89,6 +91,14 @@ export const casesQueries = {
       permission: "staff:read",
       queryKey: caseKeys.taskAssignees(),
       queryFn: listTaskAssignees
+    };
+  },
+
+  notificationOptions(): CasesQuerySpec<NotificationOptions> {
+    return {
+      permission: "staff:read",
+      queryKey: caseKeys.notificationOptions(),
+      queryFn: listNotificationOptions
     };
   },
 

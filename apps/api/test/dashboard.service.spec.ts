@@ -143,6 +143,39 @@ describe("Dashboard use cases", () => {
     assert.equal(response.pageInfo.hasNextPage, false);
   });
 
+  it("localizes cashbox movement search fallbacks", async () => {
+    const queryCalls: unknown[] = [];
+    const useCase = new DashboardSearchUseCase(
+      createPrismaMock({
+        caseWhere: null,
+        cashboxWheres: [],
+        expenseWhere: null,
+        queryCalls,
+        rows: [
+          makeSearchRow("cashbox_movement", "00000000-0000-4000-8000-000000000012", "2026-08-20", {
+            case_caption: null,
+            case_id: null,
+            case_number: null,
+            movement_name: "income",
+            movement_type: "income",
+            title: "income"
+          })
+        ],
+        taskWhere: null
+      }) as never
+    );
+
+    const response = await useCase.execute(
+      tenantId,
+      { limit: 8, offset: 0, search: "ingresos" },
+      { ...noSearchPermissions, canReadFinance: true }
+    );
+
+    assert.equal(response.items[0]?.title, "Ingreso");
+    assert.equal(response.items[0]?.movementName, "Ingreso");
+    assert.match(JSON.stringify(queryCalls[0]), /Ingreso Ingresos/);
+  });
+
   it("rejects a global search cursor created for a different search term", async () => {
     const useCase = new DashboardSearchUseCase(
       createPrismaMock({
@@ -320,6 +353,7 @@ function makeSearchRow(
     movement_type: "income" | "expense" | "conversion_in" | "conversion_out" | null;
     status: string | null;
     time: string | null;
+    title: string;
   }> = {}
 ) {
   return {

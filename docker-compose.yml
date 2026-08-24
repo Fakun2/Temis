@@ -1,5 +1,32 @@
+x-resource-limits:
+  postgres: &postgres-resource-limits
+    mem_limit: ${POSTGRES_MEMORY_LIMIT:-512m}
+    cpus: ${POSTGRES_CPUS:-0.35}
+  redis: &redis-resource-limits
+    mem_limit: ${REDIS_MEMORY_LIMIT:-128m}
+    cpus: ${REDIS_CPUS:-0.10}
+  rabbitmq: &rabbitmq-resource-limits
+    mem_limit: ${RABBITMQ_MEMORY_LIMIT:-384m}
+    cpus: ${RABBITMQ_CPUS:-0.20}
+  minio: &minio-resource-limits
+    mem_limit: ${MINIO_MEMORY_LIMIT:-384m}
+    cpus: ${MINIO_CPUS:-0.20}
+  api: &api-resource-limits
+    mem_limit: ${API_MEMORY_LIMIT:-512m}
+    cpus: ${API_CPUS:-0.35}
+  worker: &worker-resource-limits
+    mem_limit: ${WORKER_MEMORY_LIMIT:-384m}
+    cpus: ${WORKER_CPUS:-0.25}
+  web: &web-resource-limits
+    mem_limit: ${WEB_MEMORY_LIMIT:-384m}
+    cpus: ${WEB_CPUS:-0.25}
+  nginx: &nginx-resource-limits
+    mem_limit: ${NGINX_MEMORY_LIMIT:-128m}
+    cpus: ${NGINX_CPUS:-0.10}
+
 services:
   postgres:
+    <<: *postgres-resource-limits
     image: pgvector/pgvector:pg16
     container_name: ${CONTAINER_PREFIX:-bogaap}-postgres
     environment:
@@ -17,6 +44,7 @@ services:
       retries: 5
 
   redis:
+    <<: *redis-resource-limits
     image: redis:7-alpine
     container_name: ${CONTAINER_PREFIX:-bogaap}-redis
     ports:
@@ -29,7 +57,27 @@ services:
       timeout: 5s
       retries: 5
 
+  rabbitmq:
+    <<: *rabbitmq-resource-limits
+    image: heidiks/rabbitmq-delayed-message-exchange:3.13.3-management
+    container_name: ${CONTAINER_PREFIX:-bogaap}-rabbitmq
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER:-bogaap}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASSWORD:-bogaap_rabbitmq_dev_12345}
+      RABBITMQ_SERVER_ADDITIONAL_ERL_ARGS: ${RABBITMQ_SERVER_ADDITIONAL_ERL_ARGS:--rabbit vm_memory_high_watermark.relative 0.4}
+    ports:
+      - "${RABBITMQ_PORT:-5672}:5672"
+      - "${RABBITMQ_MANAGEMENT_PORT:-15672}:15672"
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
   minio:
+    <<: *minio-resource-limits
     image: quay.io/minio/minio:latest
     container_name: ${CONTAINER_PREFIX:-bogaap}-minio
     command: server /data --console-address ":9001"
@@ -57,19 +105,27 @@ services:
       "
 
   api:
+    <<: *api-resource-limits
     build:
       context: .
       dockerfile: Dockerfile.api
     container_name: ${CONTAINER_PREFIX:-bogaap}-api
     environment:
       NODE_ENV: production
+      NODE_OPTIONS: ${API_NODE_OPTIONS:---max-old-space-size=384}
       API_CORS_MODE: strict
       API_HOST: 0.0.0.0
       API_PORT: 3001
       FRONTEND_PUBLIC_URL: http://localhost
       API_CORS_ALLOWED_ORIGINS: http://localhost,http://127.0.0.1,http://localhost:3000,http://127.0.0.1:3000
-      DATABASE_URL: postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@postgres:5432/${POSTGRES_DB:-bogaap}?schema=public
+      DATABASE_URL: postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@postgres:5432/${POSTGRES_DB:-bogaap}?schema=public&connection_limit=${API_DATABASE_CONNECTION_LIMIT:-3}&pool_timeout=${DATABASE_POOL_TIMEOUT:-20}
       REDIS_URL: redis://redis:6379
+      RABBITMQ_ENABLED: "true"
+      RABBITMQ_URL: amqp://${RABBITMQ_USER:-bogaap}:${RABBITMQ_PASSWORD:-bogaap_rabbitmq_dev_12345}@rabbitmq:5672
+      ASYNC_OUTBOX_PUBLISHER_ENABLED: "false"
+      DOCUMENT_CLEANUP_INLINE_PROCESSING_ENABLED: "false"
+      DOCUMENT_CLEANUP_SCHEDULER_ENABLED: "false"
+      NOTIFICATIONS_SCHEDULER_ENABLED: "false"
       JWT_ACCESS_SECRET: ${JWT_ACCESS_SECRET:-dev-access-secret-change-me}
       JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET:-dev-refresh-secret-change-me}
       JWT_ACCESS_TTL: ${JWT_ACCESS_TTL:-15m}
@@ -99,16 +155,61 @@ services:
         condition: service_healthy
       redis:
         condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+      minio-init:
+        condition: service_completed_successfully
+
+  worker:
+    <<: *worker-resource-limits
+    build:
+      context: .
+      dockerfile: Dockerfile.worker
+    container_name: ${CONTAINER_PREFIX:-bogaap}-worker
+    environment:
+      NODE_ENV: production
+      NODE_OPTIONS: ${WORKER_NODE_OPTIONS:---max-old-space-size=256}
+      DATABASE_URL: postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@postgres:5432/${POSTGRES_DB:-bogaap}?schema=public&connection_limit=${WORKER_DATABASE_CONNECTION_LIMIT:-2}&pool_timeout=${DATABASE_POOL_TIMEOUT:-20}
+      REDIS_URL: redis://redis:6379
+      RABBITMQ_ENABLED: "true"
+      RABBITMQ_URL: amqp://${RABBITMQ_USER:-bogaap}:${RABBITMQ_PASSWORD:-bogaap_rabbitmq_dev_12345}@rabbitmq:5672
+      RABBITMQ_PREFETCH: ${RABBITMQ_PREFETCH:-3}
+      RABBITMQ_CONSUMER_RETRY_INTERVAL_MS: ${RABBITMQ_CONSUMER_RETRY_INTERVAL_MS:-5000}
+      ASYNC_OUTBOX_PUBLISHER_ENABLED: "true"
+      ASYNC_OUTBOX_PUBLISHER_INTERVAL_MS: ${ASYNC_OUTBOX_PUBLISHER_INTERVAL_MS:-5000}
+      ASYNC_OUTBOX_PUBLISHER_BATCH_SIZE: ${ASYNC_OUTBOX_PUBLISHER_BATCH_SIZE:-25}
+      ASYNC_OUTBOX_DATABASE_RETRY_ATTEMPTS: ${ASYNC_OUTBOX_DATABASE_RETRY_ATTEMPTS:-5}
+      ASYNC_OUTBOX_DATABASE_RETRY_BASE_DELAY_MS: ${ASYNC_OUTBOX_DATABASE_RETRY_BASE_DELAY_MS:-250}
+      DOCUMENT_CLEANUP_INLINE_PROCESSING_ENABLED: "false"
+      DOCUMENT_CLEANUP_SCHEDULER_ENABLED: "false"
+      DOCUMENT_CLEANUP_RECOVERY_INTERVAL_MS: ${DOCUMENT_CLEANUP_RECOVERY_INTERVAL_MS:-600000}
+      NOTIFICATIONS_SCHEDULER_ENABLED: "false"
+      STORAGE_DRIVER: ${STORAGE_DRIVER:-minio}
+      STORAGE_BUCKET: ${STORAGE_BUCKET:-bogaap-dev}
+      STORAGE_REGION: ${STORAGE_REGION:-us-east-1}
+      STORAGE_ENDPOINT: http://minio:9000
+      STORAGE_ACCESS_KEY_ID: ${STORAGE_ACCESS_KEY_ID:-bogaap_minio}
+      STORAGE_SECRET_ACCESS_KEY: ${STORAGE_SECRET_ACCESS_KEY:-bogaap_minio_dev_12345}
+      STORAGE_FORCE_PATH_STYLE: ${STORAGE_FORCE_PATH_STYLE:-true}
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
       minio-init:
         condition: service_completed_successfully
 
   web:
+    <<: *web-resource-limits
     build:
       context: .
       dockerfile: Dockerfile.web
     container_name: ${CONTAINER_PREFIX:-bogaap}-web
     environment:
       NODE_ENV: production
+      NODE_OPTIONS: ${WEB_NODE_OPTIONS:---max-old-space-size=256}
       FRONTEND_PUBLIC_URL: http://localhost
       AUTH_COOKIE_SECURE: "false"
       NEXT_PUBLIC_API_BASE_URL: /api
@@ -117,9 +218,11 @@ services:
       REDIS_URL: redis://redis:6379
     depends_on:
       - api
+      - worker
       - redis
 
   nginx:
+    <<: *nginx-resource-limits
     image: nginx:1.27-alpine
     container_name: ${CONTAINER_PREFIX:-bogaap}-nginx
     ports:
@@ -132,5 +235,6 @@ services:
 
 volumes:
   postgres_data:
+  rabbitmq_data:
   redis_data:
   minio_data:

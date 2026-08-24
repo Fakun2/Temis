@@ -11,6 +11,7 @@
     "dev": "node scripts/with-root-env.cjs turbo dev --parallel",
     "dev:lan": "node scripts/with-root-env.cjs turbo dev:lan --parallel",
     "dev:api": "node scripts/with-root-env.cjs npm run dev --workspace @bogaap/api",
+    "dev:worker": "node scripts/with-root-env.cjs npm run build --workspace @bogaap/worker && node scripts/with-root-env.cjs npm run start --workspace @bogaap/worker",
     "dev:web": "node scripts/with-root-env.cjs npm run dev --workspace @bogaap/web",
     "build": "turbo build",
     "start": "turbo start --parallel",

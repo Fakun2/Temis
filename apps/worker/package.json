@@ -1,0 +1,24 @@
+{
+  "name": "@bogaap/worker",
+  "version": "0.1.0",
+  "private": true,
+  "type": "commonjs",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "dev": "tsc -w -p tsconfig.json",
+    "start": "node dist/index.js",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "dependencies": {
+    "@aws-sdk/client-s3": "^3.1096.0",
+    "@prisma/client": "^6.19.0",
+    "amqplib": "^2.0.1",
+    "dotenv": "^16.4.0"
+  },
+  "devDependencies": {
+    "@types/amqplib": "^0.10.8",
+    "@types/node": "^24.0.0",
+    "typescript": "^5.9.0"
+  }
+}

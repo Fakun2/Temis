@@ -1,6 +1,7 @@
 import { BadRequestException, Injectable, NotFoundException } from "@nestjs/common";
 import { Prisma } from "@prisma/client";
 import { PrismaService } from "../../database/prisma.service";
+import { NotificationsService } from "../../notifications/notifications.service";
 import type {
   CreateCaseTaskInput,
   ListCaseTasksQuery,
@@ -9,7 +10,10 @@ import type {
 
 @Injectable()
 export class CaseTasksUseCase {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly notifications: NotificationsService
+  ) {}
 
   async list(tenantId: string, caseId: string, query: ListCaseTasksQuery) {
     const cursor = decodeTasksCursor(query.cursor);
@@ -28,8 +32,14 @@ export class CaseTasksUseCase {
     const lastItem = pageItems.at(-1);
     const hasNextPage = tasks.length > query.limit;
 
+    const reminderConfigs = await this.notifications.getReminderConfigs(
+      tenantId,
+      "case_task",
+      pageItems.map((task) => task.id)
+    );
+
     return {
-      items: pageItems.map(toCaseTaskDto),
+      items: pageItems.map((task) => toCaseTaskDto(task, reminderConfigs.get(task.id))),
       pageInfo: {
         limit: query.limit,
         offset: 0,
@@ -43,7 +53,7 @@ export class CaseTasksUseCase {
     };
   }
 
-  async create(tenantId: string, caseId: string, input: CreateCaseTaskInput) {
+  async create(tenantId: string, caseId: string, actorUserId: string, input: CreateCaseTaskInput) {
     await this.findTenantCaseOrThrow(tenantId, caseId);
     await this.assertAssignableMembership(tenantId, input.assignedMembershipId);
     const createdTask = await this.prisma.caseTask.create({
@@ -54,11 +64,19 @@ export class CaseTasksUseCase {
       },
       select: caseTaskSelect
     });
+    await this.syncReminder(tenantId, caseId, actorUserId, createdTask, input);
 
-    return toCaseTaskDto(createdTask);
+    const reminderConfig = await this.getReminderConfig(tenantId, createdTask.id);
+    return toCaseTaskDto(createdTask, reminderConfig);
   }
 
-  async update(tenantId: string, caseId: string, taskId: string, input: UpdateCaseTaskInput) {
+  async update(
+    tenantId: string,
+    caseId: string,
+    taskId: string,
+    actorUserId: string,
+    input: UpdateCaseTaskInput
+  ) {
     await this.findTenantTaskOrThrow(tenantId, caseId, taskId);
     await this.assertAssignableMembership(tenantId, input.assignedMembershipId);
     const updatedTask = await this.prisma.caseTask.update({
@@ -66,8 +84,10 @@ export class CaseTasksUseCase {
       data: toCaseTaskWriteData(input, { includeMissingAssignment: false }),
       select: caseTaskSelect
     });
+    await this.syncReminder(tenantId, caseId, actorUserId, updatedTask, input);
 
-    return toCaseTaskDto(updatedTask);
+    const reminderConfig = await this.getReminderConfig(tenantId, updatedTask.id);
+    return toCaseTaskDto(updatedTask, reminderConfig);
   }
 
   async markSeen(tenantId: string, caseId: string, taskId: string) {
@@ -78,11 +98,13 @@ export class CaseTasksUseCase {
       select: caseTaskSelect
     });
 
-    return toCaseTaskDto(updatedTask);
+    const reminderConfig = await this.getReminderConfig(tenantId, updatedTask.id);
+    return toCaseTaskDto(updatedTask, reminderConfig);
   }
 
   async delete(tenantId: string, caseId: string, taskId: string) {
     await this.findTenantTaskOrThrow(tenantId, caseId, taskId);
+    await this.notifications.cancelForResource(tenantId, "case_task", taskId);
     await this.prisma.caseTask.delete({ where: { id: taskId } });
 
     return { status: "ok" as const };
@@ -127,6 +149,35 @@ export class CaseTasksUseCase {
     if (!membership) {
       throw new BadRequestException("El asignado no pertenece al staff activo del workspace.");
     }
+  }
+
+  private async syncReminder(
+    tenantId: string,
+    caseId: string,
+    actorUserId: string,
+    task: CaseTaskWithSelect,
+    input: CreateCaseTaskInput | UpdateCaseTaskInput
+  ) {
+    if (task.status === "completed" || task.status === "cancelled") {
+      await this.notifications.cancelForResource(tenantId, "case_task", task.id);
+      return;
+    }
+
+    await this.notifications.scheduleForResource({
+      actorUserId,
+      body: task.notes,
+      caseId,
+      resourceId: task.id,
+      resourceType: "case_task",
+      settings: input,
+      tenantId,
+      title: `Tarea: ${task.name}`
+    });
+  }
+
+  private async getReminderConfig(tenantId: string, taskId: string) {
+    const configs = await this.notifications.getReminderConfigs(tenantId, "case_task", [taskId]);
+    return configs.get(taskId);
   }
 }
 
@@ -188,7 +239,7 @@ function toCaseTaskWriteData(
   return data;
 }
 
-function toCaseTaskDto(item: CaseTaskWithSelect) {
+function toCaseTaskDto(item: CaseTaskWithSelect, reminderConfig?: ReminderConfig) {
   return {
     id: item.id,
     caseId: item.caseId,
@@ -207,9 +258,26 @@ function toCaseTaskDto(item: CaseTaskWithSelect) {
     endDate: item.endDate ? item.endDate.toISOString().slice(0, 10) : null,
     status: item.status,
     notes: item.notes,
+    ...toNotificationSettingsDto(reminderConfig),
     lastSeenAt: item.lastSeenAt ? item.lastSeenAt.toISOString() : null,
     createdAt: item.createdAt.toISOString(),
     updatedAt: item.updatedAt.toISOString()
+  };
+}
+
+type ReminderConfig =
+  Awaited<ReturnType<NotificationsService["getReminderConfigs"]>> extends Map<string, infer T>
+    ? T
+    : never;
+
+function toNotificationSettingsDto(config?: ReminderConfig) {
+  return {
+    notificationEnabled: config?.notificationEnabled ?? false,
+    notificationDate: config?.notificationDate ?? null,
+    notificationTime: config?.notificationTime ?? null,
+    notificationRecipientMode: config?.notificationRecipientMode ?? "self",
+    notificationPracticeAreaId: config?.notificationPracticeAreaId ?? null,
+    notificationMembershipIds: config?.notificationMembershipIds ?? []
   };
 }
 

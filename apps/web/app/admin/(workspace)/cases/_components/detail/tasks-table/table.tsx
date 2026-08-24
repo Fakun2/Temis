@@ -37,7 +37,8 @@ export function CaseTasksTable({
   canReadExpense,
   canUpdate,
   canUpdateExpense,
-  caseId
+  caseId,
+  focusedTaskId
 }: {
   canCreate: boolean;
   canCreateExpense: boolean;
@@ -47,6 +48,7 @@ export function CaseTasksTable({
   canUpdate: boolean;
   canUpdateExpense: boolean;
   caseId: string;
+  focusedTaskId?: string | null;
 }) {
   const hasActions = canDelete || canUpdate || canCreateExpense || canReadExpense;
   const assigneesQuery = useCasesQuery(casesQueries.taskAssignees());
@@ -111,6 +113,7 @@ export function CaseTasksTable({
               tasks={tasks}
               visibleColumns={visibleColumns}
               errorMessage={tasksQuery.error?.message}
+              focusedTaskId={focusedTaskId}
             />
           </Table>
         </section>
@@ -163,6 +166,7 @@ function TasksTableBody({
   caseId,
   columnCount,
   errorMessage,
+  focusedTaskId,
   hasActions,
   isLoading,
   permissionDenied,
@@ -179,6 +183,7 @@ function TasksTableBody({
   caseId: string;
   columnCount: number;
   errorMessage?: string;
+  focusedTaskId?: string | null;
   hasActions: boolean;
   isLoading: boolean;
   permissionDenied: boolean;
@@ -230,7 +235,12 @@ function TasksTableBody({
   return (
     <TableBody className="[&_tr:last-child]:border-0">
       {tasks.map((task) => (
-        <TableRow className="h-16 border-border/40 hover:bg-secondary/30" key={task.id}>
+        <TableRow
+          className={`h-16 border-border/40 hover:bg-secondary/30 ${
+            focusedTaskId === task.id ? "bg-primary/10 ring-1 ring-inset ring-primary/25" : ""
+          }`}
+          key={task.id}
+        >
           {visibleColumns.map((column) => (
             <TableCell className="px-3 py-3" key={column}>
               <TaskTableCell column={column} task={task} />

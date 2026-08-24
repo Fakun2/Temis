@@ -25,6 +25,7 @@ import type {
   CasesListResponse,
   CasesQueryParams,
   CatalogResponse,
+  NotificationOptions,
   TaskAssigneeOption
 } from "../_types/cases.types";
 
@@ -32,6 +33,7 @@ export const caseKeys = {
   all: ["cases"] as const,
   detail: (caseId: string) => [...caseKeys.all, "detail", caseId] as const,
   metrics: () => [...caseKeys.all, "metrics"] as const,
+  notificationOptions: () => [...caseKeys.all, "notification-options"] as const,
   taskAssignees: () => [...caseKeys.all, "task-assignees"] as const,
   list: (params: CasesQueryParams) => [...caseKeys.all, "list", params] as const,
   pickerOptions: (params: CasePickerOptionsQueryParams) =>
@@ -199,7 +201,33 @@ export async function markCaseTaskSeen({
 }
 
 export async function listTaskAssignees(): Promise<TaskAssigneeOption[]> {
+  const response = await getStaffOptionsResponse();
+
+  return response.workers.filter((worker) => worker.status === "active").map(toTaskAssigneeOption);
+}
+
+export async function listNotificationOptions(): Promise<NotificationOptions> {
+  const response = await getStaffOptionsResponse();
+
+  return {
+    members: response.workers
+      .filter((worker) => worker.status === "active")
+      .map(toTaskAssigneeOption),
+    practiceAreas: response.filterOptions.practiceAreas.map((practiceArea) => ({
+      id: practiceArea.id,
+      name: practiceArea.name
+    }))
+  };
+}
+
+async function getStaffOptionsResponse() {
   const response = await dashboardHttpClient.request<{
+    filterOptions: {
+      practiceAreas: Array<{
+        id: string;
+        name: string;
+      }>;
+    };
     workers: Array<{
       id: string;
       userId: string;
@@ -218,15 +246,23 @@ export async function listTaskAssignees(): Promise<TaskAssigneeOption[]> {
     path: "/staff"
   });
 
-  return response.workers
-    .filter((worker) => worker.status === "active")
-    .map((worker) => ({
-      id: worker.id,
-      userId: worker.userId,
-      fullName: worker.fullName,
-      email: worker.email,
-      roleName: worker.role?.name ?? null
-    }));
+  return response;
+}
+
+function toTaskAssigneeOption(worker: {
+  email: string;
+  fullName: string;
+  id: string;
+  role: { name: string } | null;
+  userId: string;
+}): TaskAssigneeOption {
+  return {
+    id: worker.id,
+    userId: worker.userId,
+    fullName: worker.fullName,
+    email: worker.email,
+    roleName: worker.role?.name ?? null
+  };
 }
 
 export async function deleteCaseTask({

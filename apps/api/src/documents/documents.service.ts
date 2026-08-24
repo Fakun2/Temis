@@ -9,6 +9,9 @@ import {
 import { DocumentStorageCleanupJobStatus, Prisma } from "@prisma/client";
 import type { OnModuleDestroy, OnModuleInit } from "@nestjs/common";
 import { PrismaService, type TenantPrismaClient } from "../database/prisma.service";
+import { AsyncOutboxService } from "../queue/async-outbox.service";
+import { documentCleanupRoutingKey } from "../queue/queue.constants";
+import { shouldUseRabbitMq } from "../queue/rabbitmq.service";
 import { ObjectStorageService } from "../storage/object-storage.service";
 import type {
   BulkDeleteDocumentsInput,
@@ -91,10 +94,16 @@ export class DocumentsService implements OnModuleInit, OnModuleDestroy {
 
   constructor(
     private readonly prisma: PrismaService,
+    private readonly outbox: AsyncOutboxService,
     private readonly storage: ObjectStorageService
   ) {}
 
   onModuleInit() {
+    if (process.env.DOCUMENT_CLEANUP_SCHEDULER_ENABLED === "false") {
+      this.logger.log("Document storage cleanup scheduler disabled.");
+      return;
+    }
+
     this.scheduleNextCleanupRun(1_000);
   }
 
@@ -183,7 +192,10 @@ export class DocumentsService implements OnModuleInit, OnModuleDestroy {
     };
   }
 
-  async listCategories(tenantId: string, query: { active?: boolean; cursor?: string; limit: number }) {
+  async listCategories(
+    tenantId: string,
+    query: { active?: boolean; cursor?: string; limit: number }
+  ) {
     const cursor = decodeCategoriesCursor(query.cursor);
     const categories = await this.prisma.documentCategory.findMany({
       orderBy: [{ displayOrder: "asc" }, { name: "asc" }, { id: "asc" }],
@@ -255,8 +267,7 @@ export class DocumentsService implements OnModuleInit, OnModuleDestroy {
       return await this.prisma.runWithTenant(tenantId, async (tx) => {
         await lockTenant(tx, tenantId);
         await this.findTenantFolderOrThrow(tenantId, folderId, tx);
-        const parentId =
-          "parentId" in input ? normalizeNullableUuid(input.parentId) : undefined;
+        const parentId = "parentId" in input ? normalizeNullableUuid(input.parentId) : undefined;
 
         if (parentId !== undefined) {
           if (parentId === folderId) {
@@ -408,7 +419,12 @@ export class DocumentsService implements OnModuleInit, OnModuleDestroy {
   }
 
   async readObject(tenantId: string, documentId: string, caseId?: string) {
-    const document = await this.findTenantDocumentOrThrow(tenantId, documentId, this.prisma, caseId);
+    const document = await this.findTenantDocumentOrThrow(
+      tenantId,
+      documentId,
+      this.prisma,
+      caseId
+    );
     const object = await this.storage.getObject(document.objectKey);
 
     return {
@@ -419,13 +435,17 @@ export class DocumentsService implements OnModuleInit, OnModuleDestroy {
 
   async delete(tenantId: string, documentId: string) {
     await this.deleteFoldersAndDocuments(tenantId, { documentIds: [documentId], folderIds: [] });
-    await this.processDueCleanupJobs(1);
+    if (shouldProcessCleanupInline()) {
+      await this.processDueCleanupJobs(1);
+    }
     return { status: "ok" as const };
   }
 
   async bulkDelete(tenantId: string, input: BulkDeleteDocumentsInput) {
     await this.deleteFoldersAndDocuments(tenantId, input);
-    await this.processDueCleanupJobs(3);
+    if (shouldProcessCleanupInline()) {
+      await this.processDueCleanupJobs(3);
+    }
     return { status: "ok" as const };
   }
 
@@ -544,14 +564,27 @@ export class DocumentsService implements OnModuleInit, OnModuleDestroy {
       if (currentJob.status === "canceled") {
         break;
       }
-      await this.processImportFile(tenantId, currentJob, relativePaths[index] ?? file.originalname, file);
+      await this.processImportFile(
+        tenantId,
+        currentJob,
+        relativePaths[index] ?? file.originalname,
+        file
+      );
     }
 
-    const updatedJob = await this.refreshImportJobProgress(tenantId, importJobId, input.isFinalBatch);
+    const updatedJob = await this.refreshImportJobProgress(
+      tenantId,
+      importJobId,
+      input.isFinalBatch
+    );
     return toDocumentImportJobDto(updatedJob);
   }
 
-  async listCaseDocuments(tenantId: string, caseId: string, query: { categoryId?: string; cursor?: string; limit: number }) {
+  async listCaseDocuments(
+    tenantId: string,
+    caseId: string,
+    query: { categoryId?: string; cursor?: string; limit: number }
+  ) {
     return this.list(tenantId, {
       caseId,
       categoryId: query.categoryId,
@@ -571,7 +604,9 @@ export class DocumentsService implements OnModuleInit, OnModuleDestroy {
     input: { categoryId?: string; notes?: string },
     file?: UploadedDocumentFile
   ) {
-    return this.create(tenantId, uploadedByUserId, { ...input, caseId }, file).then(toCaseDocumentDto);
+    return this.create(tenantId, uploadedByUserId, { ...input, caseId }, file).then(
+      toCaseDocumentDto
+    );
   }
 
   async readCaseDocumentObject(tenantId: string, caseId: string, documentId: string) {
@@ -598,7 +633,7 @@ export class DocumentsService implements OnModuleInit, OnModuleDestroy {
     });
 
     for (const document of documents) {
-      await enqueueCleanupJob(tx, {
+      await enqueueCleanupJob(tx, this.outbox, {
         bucket: document.bucket,
         objectKey: document.objectKey,
         reason: "case_deleted",
@@ -630,6 +665,36 @@ export class DocumentsService implements OnModuleInit, OnModuleDestroy {
     }
   }
 
+  async processCleanupJobMessage(input: { jobId: string; nextRunAt: string; tenantId: string }) {
+    const expectedNextRunAt = new Date(input.nextRunAt);
+    if (Number.isNaN(expectedNextRunAt.getTime())) {
+      throw new BadRequestException("La fecha del mensaje de limpieza no es valida.");
+    }
+
+    const claimed = await this.prisma.$transaction(async (tx) => {
+      await tx.$executeRaw`SELECT set_config('app.document_cleanup_worker', 'on', true)`;
+      return tx.documentStorageCleanupJob.updateMany({
+        data: {
+          status: "processing",
+          updatedAt: new Date()
+        },
+        where: {
+          AND: [{ nextRunAt: expectedNextRunAt }, { nextRunAt: { lte: new Date() } }],
+          id: input.jobId,
+          status: { in: ["pending", "failed"] },
+          tenantId: input.tenantId
+        }
+      });
+    });
+
+    if (claimed.count === 0) {
+      return { processed: false };
+    }
+
+    await this.processCleanupJob(input.jobId);
+    return { processed: true };
+  }
+
   private async getMetrics(tenantId: string) {
     const [folders, documents, storage] = await Promise.all([
       this.prisma.documentFolder.count({ where: { tenantId } }),
@@ -652,13 +717,19 @@ export class DocumentsService implements OnModuleInit, OnModuleDestroy {
     const folderId = normalizeNullableUuid(input.folderId);
     const caseId = normalizeNullableUuid(input.caseId);
     const categoryId = normalizeNullableUuid(input.categoryId);
-    const notes = normalizeOptionalString(input.notes, 500, "Las notas no pueden superar 500 caracteres.");
+    const notes = normalizeOptionalString(
+      input.notes,
+      500,
+      "Las notas no pueden superar 500 caracteres."
+    );
 
     const [folder, caseItem, category, membership] = await Promise.all([
       folderId
         ? tx.documentFolder.findFirst({ select: { id: true }, where: { id: folderId, tenantId } })
         : Promise.resolve(null),
-      caseId ? tx.case.findFirst({ select: { id: true }, where: { id: caseId, tenantId } }) : Promise.resolve(null),
+      caseId
+        ? tx.case.findFirst({ select: { id: true }, where: { id: caseId, tenantId } })
+        : Promise.resolve(null),
       categoryId
         ? tx.documentCategory.findFirst({
             select: { id: true },
@@ -757,7 +828,7 @@ export class DocumentsService implements OnModuleInit, OnModuleDestroy {
       }
 
       for (const document of documents) {
-        await enqueueCleanupJob(tx, {
+        await enqueueCleanupJob(tx, this.outbox, {
           bucket: document.bucket,
           documentId: document.id,
           objectKey: document.objectKey,
@@ -884,7 +955,13 @@ export class DocumentsService implements OnModuleInit, OnModuleDestroy {
       return;
     }
 
-    const prepared = await this.prepareImportDestination(tenantId, job, relativePath, file, checksum);
+    const prepared = await this.prepareImportDestination(
+      tenantId,
+      job,
+      relativePath,
+      file,
+      checksum
+    );
     if (prepared.status !== "ready") {
       return;
     }
@@ -1108,9 +1185,7 @@ export class DocumentsService implements OnModuleInit, OnModuleDestroy {
           completedFiles,
           failedFiles,
           lastError:
-            failedFiles + rejectedFiles > 0
-              ? "Algunos archivos no pudieron importarse."
-              : null,
+            failedFiles + rejectedFiles > 0 ? "Algunos archivos no pudieron importarse." : null,
           processedFiles,
           rejectedFiles,
           skippedFiles,
@@ -1208,32 +1283,53 @@ export class DocumentsService implements OnModuleInit, OnModuleDestroy {
       const retryDelayMinutes = Math.min(60, 2 ** attempts);
       await this.prisma.$transaction(async (tx) => {
         await tx.$executeRaw`SELECT set_config('app.document_cleanup_worker', 'on', true)`;
-        await tx.documentStorageCleanupJob.update({
+        const nextRunAt = addMinutes(new Date(), retryDelayMinutes);
+        const status =
+          attempts >= maxCleanupAttempts
+            ? DocumentStorageCleanupJobStatus.failed
+            : DocumentStorageCleanupJobStatus.pending;
+        const updatedJob = await tx.documentStorageCleanupJob.update({
           data: {
             attempts,
             lastError: getStorageCleanupErrorMessage(error),
-            nextRunAt: addMinutes(new Date(), retryDelayMinutes),
-            status:
-              attempts >= maxCleanupAttempts
-                ? DocumentStorageCleanupJobStatus.failed
-                : DocumentStorageCleanupJobStatus.pending
+            nextRunAt,
+            status
           },
+          select: { id: true, nextRunAt: true, tenantId: true },
           where: { id: job.id }
         });
+        if (status === DocumentStorageCleanupJobStatus.pending) {
+          await enqueueCleanupOutbox(tx, this.outbox, updatedJob);
+        }
       });
     }
   }
 
-  private async recoverStaleCleanupJobs() {
+  async recoverStaleCleanupJobs() {
     await this.prisma.$transaction(async (tx) => {
       await tx.$executeRaw`SELECT set_config('app.document_cleanup_worker', 'on', true)`;
-      await tx.documentStorageCleanupJob.updateMany({
-        data: { nextRunAt: new Date(), status: "pending" },
+      const staleJobs = await tx.documentStorageCleanupJob.findMany({
+        select: { id: true, tenantId: true },
         where: {
           status: "processing",
           updatedAt: { lt: new Date(Date.now() - cleanupProcessingTimeoutMs) }
         }
       });
+      const nextRunAt = new Date();
+      await tx.documentStorageCleanupJob.updateMany({
+        data: { nextRunAt, status: "pending" },
+        where: {
+          status: "processing",
+          updatedAt: { lt: new Date(Date.now() - cleanupProcessingTimeoutMs) }
+        }
+      });
+      for (const job of staleJobs) {
+        await enqueueCleanupOutbox(tx, this.outbox, {
+          id: job.id,
+          nextRunAt,
+          tenantId: job.tenantId
+        });
+      }
     });
   }
 
@@ -1243,12 +1339,14 @@ export class DocumentsService implements OnModuleInit, OnModuleDestroy {
     } catch (error) {
       await this.prisma.$transaction(async (tx) => {
         await tx.$executeRaw`SELECT set_config('app.document_cleanup_worker', 'on', true)`;
-        await enqueueCleanupJob(tx, {
+        await enqueueCleanupJob(tx, this.outbox, {
           ...input,
           lastError: getStorageCleanupErrorMessage(error)
         });
       });
-      await this.processDueCleanupJobs(1);
+      if (shouldProcessCleanupInline()) {
+        await this.processDueCleanupJobs(1);
+      }
     }
   }
 
@@ -1475,9 +1573,10 @@ export function isPreviewableDocumentMimeType(mimeType: string) {
 
 async function enqueueCleanupJob(
   prisma: PrismaService | Prisma.TransactionClient,
+  outbox: AsyncOutboxService,
   input: CleanupJobInput
 ) {
-  await prisma.documentStorageCleanupJob.upsert({
+  const job = await prisma.documentStorageCleanupJob.upsert({
     create: {
       bucket: input.bucket,
       documentId: input.documentId,
@@ -1503,8 +1602,37 @@ async function enqueueCleanupJob(
         objectKey: input.objectKey,
         storageProvider: input.storageProvider
       }
-    }
+    },
+    select: { id: true, nextRunAt: true, tenantId: true }
   });
+  await enqueueCleanupOutbox(prisma, outbox, job);
+}
+
+async function enqueueCleanupOutbox(
+  prisma: PrismaService | Prisma.TransactionClient,
+  outbox: AsyncOutboxService,
+  job: { id: string; nextRunAt: Date; tenantId: string }
+) {
+  const nextRunAt = job.nextRunAt.toISOString();
+  await outbox.enqueue(prisma as Prisma.TransactionClient, {
+    payload: {
+      deliverAt: nextRunAt,
+      jobId: job.id,
+      nextRunAt,
+      tenantId: job.tenantId
+    },
+    routingKey: documentCleanupRoutingKey,
+    tenantId: job.tenantId,
+    topic: "document.cleanup.requested"
+  });
+}
+
+function shouldProcessCleanupInline() {
+  if (process.env.DOCUMENT_CLEANUP_INLINE_PROCESSING_ENABLED) {
+    return process.env.DOCUMENT_CLEANUP_INLINE_PROCESSING_ENABLED === "true";
+  }
+
+  return !shouldUseRabbitMq();
 }
 
 async function lockTenant(tx: TenantPrismaClient, tenantId: string) {
@@ -1644,11 +1772,17 @@ async function ensureImportFolderPath(
 }
 
 function normalizeImportRelativePaths(value: string | string[]) {
-  return (Array.isArray(value) ? value : [value]).map((path) => normalizeImportRelativePath(path, path));
+  return (Array.isArray(value) ? value : [value]).map((path) =>
+    normalizeImportRelativePath(path, path)
+  );
 }
 
 function getSelectedMimeGroups(query: ListDocumentsQuery) {
-  return [...new Set(query.mimeGroups?.length ? query.mimeGroups : query.mimeGroup ? [query.mimeGroup] : [])];
+  return [
+    ...new Set(
+      query.mimeGroups?.length ? query.mimeGroups : query.mimeGroup ? [query.mimeGroup] : []
+    )
+  ];
 }
 
 function normalizeImportRelativePath(value: string, fallbackName: string) {
@@ -1716,9 +1850,7 @@ function normalizeOptionalString(value: unknown, maxLength: number, message: str
 }
 
 function isUuid(value: string) {
-  return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(
-    value
-  );
+  return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(value);
 }
 
 function handleFolderWriteError(error: unknown): never | void {
@@ -1737,9 +1869,9 @@ function isUniqueConstraintError(error: unknown, indexName: string) {
 }
 
 function encodeDocumentsCursor(cursor: DocumentsCursor) {
-  return Buffer.from(JSON.stringify({ createdAt: cursor.createdAt.toISOString(), id: cursor.id })).toString(
-    "base64url"
-  );
+  return Buffer.from(
+    JSON.stringify({ createdAt: cursor.createdAt.toISOString(), id: cursor.id })
+  ).toString("base64url");
 }
 
 function decodeDocumentsCursor(cursor?: string): DocumentsCursor | null {

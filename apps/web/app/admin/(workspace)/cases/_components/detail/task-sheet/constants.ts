@@ -10,6 +10,12 @@ export const emptyCaseTaskDraft: CaseTaskFormValues = {
   endDate: "",
   name: "",
   notes: "",
+  notificationDate: "",
+  notificationEnabled: false,
+  notificationMembershipIds: [],
+  notificationPracticeAreaId: "",
+  notificationRecipientMode: "self",
+  notificationTime: "",
   startDate: "",
   status: "pending"
 };

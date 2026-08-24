@@ -113,7 +113,7 @@ export const adminCommandSections: AdminCommandSection[] = [
       },
       {
         href: "/admin/cashbox",
-        label: "Ir a Caja",
+        label: "Ir a Ingresos / Egresos",
         icon: Banknote,
         requiredPermissions: ["finance:read"]
       },

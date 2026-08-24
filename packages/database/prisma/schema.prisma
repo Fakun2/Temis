@@ -205,6 +205,41 @@ enum DocumentImportItemStatus {
   canceled
 }
 
+enum NotificationReminderResourceType {
+  case_task
+  case_expense
+  case_hearing
+  meeting
+}
+
+enum NotificationRecipientMode {
+  self
+  tenant
+  practice_area
+  members
+}
+
+enum NotificationReminderStatus {
+  pending
+  processing
+  delivered
+  cancelled
+  failed
+}
+
+enum NotificationRecipientStatus {
+  pending
+  delivered
+  read
+}
+
+enum AsyncOutboxEventStatus {
+  pending
+  publishing
+  published
+  failed
+}
+
 model Tenant {
   id                         String                      @id @default(uuid()) @db.Uuid
   name                       String
@@ -237,6 +272,9 @@ model Tenant {
   tenantCurrencies           TenantCurrency[]
   financeCategories          TenantFinanceCategory[]
   cashboxMovements           CashboxMovement[]
+  notificationReminders      NotificationReminder[]
+  notificationRecipients     NotificationReminderRecipient[]
+  asyncOutboxEvents          AsyncOutboxEvent[]
   createdAt                  DateTime                    @default(now()) @map("created_at") @db.Timestamptz(6)
   updatedAt                  DateTime                    @updatedAt @map("updated_at") @db.Timestamptz(6)
 
@@ -488,6 +526,7 @@ model Case {
   tasks                 CaseTask[]
   expenses              CaseExpense[]
   hearings              CaseHearing[]
+  notificationReminders NotificationReminder[]
   expenseAttachments    CaseExpenseAttachment[]
   documents             Document[]
   aiChatRuns            AiChatRun[]
@@ -497,6 +536,8 @@ model Case {
   @@index([tenantId])
   @@index([tenantId, status])
   @@index([tenantId, caption])
+  @@index([caseNumber(ops: raw("gin_trgm_ops"))], type: Gin, map: "cases_case_number_trgm_idx")
+  @@index([caption(ops: raw("gin_trgm_ops"))], type: Gin, map: "cases_caption_trgm_idx")
   @@index([tenantId, filingDate])
   @@index([provinceId])
   @@index([forumTemplateId])
@@ -1145,12 +1186,91 @@ model TenantMembership {
   practiceAreas    TenantMembershipPracticeArea[]
   responsibleCases Case[]
   assignedTasks    CaseTask[]                     @relation("CaseTaskAssignee")
+  notificationRecipients NotificationReminderRecipient[]
 
   @@unique([tenantId, userId])
   @@index([tenantId, status])
   @@index([tenantId, roleId])
   @@index([userId])
   @@map("tenant_memberships")
+}
+
+model NotificationReminder {
+  id                    String                           @id @default(uuid()) @db.Uuid
+  tenantId              String                           @map("tenant_id") @db.Uuid
+  caseId                String                           @map("case_id") @db.Uuid
+  resourceType          NotificationReminderResourceType @map("resource_type")
+  resourceId            String                           @map("resource_id") @db.Uuid
+  recipientMode         NotificationRecipientMode        @map("recipient_mode")
+  practiceAreaId        String?                          @map("practice_area_id") @db.Uuid
+  scheduledAt           DateTime                         @map("scheduled_at") @db.Timestamptz(6)
+  title                 String
+  body                  String?
+  status                NotificationReminderStatus       @default(pending)
+  attempts              Int                              @default(0)
+  nextRunAt             DateTime                         @map("next_run_at") @db.Timestamptz(6)
+  lastError             String?                          @map("last_error")
+  createdByMembershipId String?                          @map("created_by_membership_id") @db.Uuid
+  deliveredAt           DateTime?                        @map("delivered_at") @db.Timestamptz(6)
+  cancelledAt           DateTime?                        @map("cancelled_at") @db.Timestamptz(6)
+  createdAt             DateTime                         @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt             DateTime                         @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  tenant     Tenant                          @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  case       Case                            @relation(fields: [caseId], references: [id], onDelete: Cascade)
+  recipients NotificationReminderRecipient[]
+
+  @@unique([tenantId, resourceType, resourceId])
+  @@index([status, nextRunAt])
+  @@index([tenantId, status])
+  @@index([tenantId, caseId])
+  @@index([tenantId, resourceType, resourceId])
+  @@index([tenantId, practiceAreaId])
+  @@map("notification_reminders")
+}
+
+model NotificationReminderRecipient {
+  id                    String                      @id @default(uuid()) @db.Uuid
+  reminderId            String                      @map("reminder_id") @db.Uuid
+  tenantId              String                      @map("tenant_id") @db.Uuid
+  recipientMembershipId String                      @map("recipient_membership_id") @db.Uuid
+  status                NotificationRecipientStatus @default(pending)
+  deliveredAt           DateTime?                   @map("delivered_at") @db.Timestamptz(6)
+  readAt                DateTime?                   @map("read_at") @db.Timestamptz(6)
+  createdAt             DateTime                    @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt             DateTime                    @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  reminder            NotificationReminder @relation(fields: [reminderId], references: [id], onDelete: Cascade)
+  tenant              Tenant               @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  recipientMembership TenantMembership     @relation(fields: [recipientMembershipId], references: [id], onDelete: Cascade)
+
+  @@unique([reminderId, recipientMembershipId])
+  @@index([tenantId, recipientMembershipId, readAt])
+  @@index([tenantId, status])
+  @@index([tenantId, reminderId])
+  @@map("notification_reminder_recipients")
+}
+
+model AsyncOutboxEvent {
+  id           String                 @id @default(uuid()) @db.Uuid
+  tenantId     String?                @map("tenant_id") @db.Uuid
+  topic        String
+  routingKey   String                 @map("routing_key")
+  payload      Json
+  status       AsyncOutboxEventStatus @default(pending)
+  availableAt  DateTime               @default(now()) @map("available_at") @db.Timestamptz(6)
+  attempts     Int                    @default(0)
+  lastError    String?                @map("last_error")
+  publishedAt  DateTime?              @map("published_at") @db.Timestamptz(6)
+  createdAt    DateTime               @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt    DateTime               @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  tenant Tenant? @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@index([status, availableAt])
+  @@index([tenantId, status])
+  @@index([topic, status])
+  @@map("async_outbox_events")
 }
 
 model TenantMembershipPracticeArea {

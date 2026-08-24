@@ -3,7 +3,6 @@
 import { useEffect, useState, type FormEvent } from "react";
 import { Banknote, Paperclip } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import {
   Select,
@@ -16,16 +15,18 @@ import { Textarea } from "@/components/ui/textarea";
 import type { CaseExpenseFormValues } from "@/lib/validation/cases";
 import {
   caseInputClassName,
-  caseNativeDateTimeInputClassName,
   caseSelectTriggerClassName,
   caseTextareaClassName
 } from "../../../_constants/cases.constants";
+import { casesQueries } from "../../../_api/cases.query-controller";
+import { useCasesQuery } from "../../../_hooks/use-cases-query";
 import { useTenantCurrenciesQuery } from "../../../../currencies/_hooks/use-currencies-query";
 import { CasePickerField } from "../../case-picker-field";
 import { CaseActionSheet } from "../case-action-sheet";
 import { CaseDateInput } from "../../sheet/case-date-input";
 import { CaseField } from "../../sheet/case-field";
 import { CaseExpenseAttachmentsPopup } from "../case-expense-attachments-popup";
+import { NotificationSettingsField } from "../notification-settings-field";
 import { caseExpenseStatusOptions, noCaseExpenseTaskValue } from "./constants";
 import type { CaseExpenseSheetProps } from "./types";
 import { useCaseExpenseSheet } from "./use-sheet";
@@ -51,6 +52,7 @@ export function CaseExpenseSheet({
     status: "active"
   });
   const currencies = currenciesQuery.data?.items ?? [];
+  const notificationOptionsQuery = useCasesQuery(casesQueries.notificationOptions());
   const defaultCurrencyCode =
     currencies.find((currency) => currency.code === "ARS")?.code ?? currencies[0]?.code;
   const {
@@ -240,55 +242,12 @@ export function CaseExpenseSheet({
           </div>
         ) : null}
 
-        <div className="rounded-2xl border border-border/40 bg-background/35 p-4">
-          <div className="flex items-start gap-3">
-            <Checkbox
-              checked={draft.alertEnabled}
-              className="mt-0.5"
-              onCheckedChange={(checked) => {
-                const enabled = checked === true;
-                updateDraft("alertEnabled", enabled);
-                if (!enabled) {
-                  updateDraft("alertDate", "");
-                  updateDraft("alertTime", "");
-                }
-              }}
-            />
-            <div className="min-w-0">
-              <p className="text-sm font-medium text-foreground">Alerta</p>
-              <p className="mt-1 text-xs leading-5 text-muted-foreground">
-                Programa un recordatorio interno para revisar este gasto antes o cerca de su pago.
-              </p>
-            </div>
-          </div>
-
-          <div
-            className={`grid transition-[grid-template-rows,opacity] duration-300 ease-out ${
-              draft.alertEnabled ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"
-            }`}
-          >
-            <div className="min-h-0 overflow-hidden">
-              <div className="grid gap-4 pt-4 md:grid-cols-2">
-                <CaseField error={errors.alertDate} label="Fecha de alerta" required>
-                  <CaseDateInput
-                    autoComplete="off"
-                    value={draft.alertDate ?? ""}
-                    onChange={(event) => updateDraft("alertDate", event.target.value)}
-                  />
-                </CaseField>
-                <CaseField error={errors.alertTime} label="Hora de alerta" required>
-                  <Input
-                    autoComplete="off"
-                    className={caseNativeDateTimeInputClassName}
-                    type="time"
-                    value={draft.alertTime ?? ""}
-                    onChange={(event) => updateDraft("alertTime", event.target.value)}
-                  />
-                </CaseField>
-              </div>
-            </div>
-          </div>
-        </div>
+        <NotificationSettingsField
+          draft={draft}
+          errors={errors}
+          options={notificationOptionsQuery.data}
+          updateDraft={updateDraft}
+        />
 
         <CaseField error={errors.notes} label="Observaciones">
           <Textarea

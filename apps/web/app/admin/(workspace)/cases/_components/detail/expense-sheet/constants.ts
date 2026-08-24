@@ -9,14 +9,17 @@ export const caseExpenseStatusOptions = mapRecordToOptions({
 export const noCaseExpenseTaskValue = "none";
 
 export const emptyCaseExpenseDraft: CaseExpenseFormValues = {
-  alertDate: "",
-  alertEnabled: false,
-  alertTime: "",
   amount: 0,
   concept: "",
   currencyCode: "",
   expenseDate: "",
   notes: "",
+  notificationDate: "",
+  notificationEnabled: false,
+  notificationMembershipIds: [],
+  notificationPracticeAreaId: "",
+  notificationRecipientMode: "self",
+  notificationTime: "",
   paymentDate: "",
   status: "pending",
   taskId: ""
