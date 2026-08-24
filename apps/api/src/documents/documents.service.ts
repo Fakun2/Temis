@@ -1628,8 +1628,9 @@ async function enqueueCleanupOutbox(
 }
 
 function shouldProcessCleanupInline() {
-  if (process.env.DOCUMENT_CLEANUP_INLINE_PROCESSING_ENABLED) {
-    return process.env.DOCUMENT_CLEANUP_INLINE_PROCESSING_ENABLED === "true";
+  const configuredValue = process.env.DOCUMENT_CLEANUP_INLINE_PROCESSING_ENABLED?.trim();
+  if (configuredValue) {
+    return configuredValue.toLowerCase() === "true";
   }
 
   return !shouldUseRabbitMq();

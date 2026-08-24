@@ -112,14 +112,46 @@ describe("NotificationsService", () => {
     assert.equal(prisma.__recipientUpdates[0]?.data.status, "delivered");
     assert.equal(prisma.__reminderUpdates[0]?.data.status, "delivered");
   });
+
+  it("does not return delivered reminders as active settings", async () => {
+    const { outbox, prisma } = makePrisma({
+      reminderConfigs: [
+        {
+          practiceAreaId: null,
+          recipientMode: "self",
+          recipients: [{ recipientMembershipId: actorMembershipId }],
+          resourceId,
+          scheduledAt: new Date("2000-01-01T12:30:00.000Z"),
+          status: "delivered"
+        }
+      ]
+    });
+    const service = new NotificationsService(prisma, outbox);
+
+    const configs = await service.getReminderConfigs(tenantId, "case_task", [resourceId]);
+
+    assert.equal(configs.has(resourceId), false);
+    assert.deepEqual(prisma.__reminderFindManyWheres[0]?.status, {
+      in: ["pending", "processing"]
+    });
+  });
 });
 
 function makePrisma({
   activeMembershipIds = [actorMembershipId, otherMembershipId],
-  claimedReminders = []
+  claimedReminders = [],
+  reminderConfigs = []
 }: {
   activeMembershipIds?: string[];
   claimedReminders?: Array<{ id: string; tenant_id: string }>;
+  reminderConfigs?: Array<{
+    practiceAreaId: string | null;
+    recipientMode: "self" | "tenant" | "practice_area" | "members";
+    recipients: Array<{ recipientMembershipId: string }>;
+    resourceId: string;
+    scheduledAt: Date;
+    status: "pending" | "processing" | "delivered" | "cancelled" | "failed";
+  }>;
 } = {}) {
   const upserts: Array<{
     create: Record<string, unknown> & { nextRunAt: Date };
@@ -130,6 +162,7 @@ function makePrisma({
     reminderId: string;
     tenantId: string;
   }> = [];
+  const reminderFindManyWheres: Array<Record<string, unknown>> = [];
   const recipientUpdates: Array<{ data: Record<string, unknown>; where: Record<string, unknown> }> =
     [];
   const reminderUpdates: Array<{ data: Record<string, unknown>; where: Record<string, unknown> }> =
@@ -137,12 +170,21 @@ function makePrisma({
 
   const prisma = {
     __createdRecipients: createdRecipients,
+    __reminderFindManyWheres: reminderFindManyWheres,
     __recipientUpdates: recipientUpdates,
     __reminderUpdates: reminderUpdates,
     __upserts: upserts,
     $transaction: async (callback: (tx: unknown) => Promise<unknown>) => callback(prisma),
     $queryRaw: async () => claimedReminders,
     notificationReminder: {
+      findMany: async ({ where }: { where: Record<string, unknown> }) => {
+        reminderFindManyWheres.push(where);
+
+        return reminderConfigs.filter((reminder) => {
+          const statusFilter = where.status as { in?: string[] } | undefined;
+          return !statusFilter?.in || statusFilter.in.includes(reminder.status);
+        });
+      },
       update: async ({
         data,
         where
@@ -208,6 +250,7 @@ function makePrisma({
     },
     prisma: prisma as unknown as PrismaService & {
       __createdRecipients: typeof createdRecipients;
+      __reminderFindManyWheres: typeof reminderFindManyWheres;
       __recipientUpdates: typeof recipientUpdates;
       __reminderUpdates: typeof reminderUpdates;
       __upserts: typeof upserts;

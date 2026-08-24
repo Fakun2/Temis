@@ -1,6 +1,7 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { createZodDto } from "nestjs-zod";
 import { z } from "zod";
+import { booleanInputSchema } from "../common/boolean.schemas";
 import { CatalogPageInfoDto } from "../legal-catalogs/pagination.schemas";
 
 const optionalTrimmedString = z.preprocess(
@@ -9,7 +10,7 @@ const optionalTrimmedString = z.preprocess(
 );
 
 export const listForumsQuerySchema = z.object({
-  includeInactive: z.coerce.boolean().default(false),
+  includeInactive: booleanInputSchema(false),
   limit: z.coerce.number().int().min(1).max(50).default(8),
   offset: z.coerce.number().int().min(0).default(0),
   judicialCenterId: optionalTrimmedString.pipe(z.string().uuid().optional()),

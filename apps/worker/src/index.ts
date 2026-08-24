@@ -25,10 +25,11 @@ const outbox = new AsyncOutbox(prisma);
 const notifications = new NotificationsWorker(prisma, outbox);
 const documentCleanup = new DocumentCleanupWorker(prisma, outbox, new ObjectStorage());
 const publisher = new AsyncOutboxPublisher(outbox, rabbitMq);
+let isShuttingDown = false;
 
 async function bootstrap() {
   await prisma.$connect();
-  await startConsumersWithRetry();
+  startConsumersSupervisor();
 
   if (getBooleanEnv("ASYNC_OUTBOX_PUBLISHER_ENABLED", true)) {
     publisher.start();
@@ -38,35 +39,58 @@ async function bootstrap() {
   logger.info("BogApp lightweight worker started.");
 }
 
-async function startConsumersWithRetry() {
+function startConsumersSupervisor() {
+  void superviseConsumers();
+}
+
+async function superviseConsumers() {
   const retryIntervalMs = getPositiveNumberEnv("RABBITMQ_CONSUMER_RETRY_INTERVAL_MS", 5_000);
 
-  while (true) {
+  while (!isShuttingDown) {
+    const disconnectWaiter = rabbitMq.waitForDisconnect();
+
     try {
-      await rabbitMq.bindDefaultQueues();
-      await rabbitMq.consume<NotificationReminderDueMessage>(
-        notificationQueueName,
-        notificationReminderRoutingKey,
-        async (payload) => {
-          await notifications.processReminderMessage(payload);
-        }
-      );
-      await rabbitMq.consume<DocumentCleanupRunMessage>(
-        documentCleanupQueueName,
-        documentCleanupRoutingKey,
-        async (payload) => {
-          await documentCleanup.processCleanupJobMessage(payload);
-        }
-      );
-      return;
+      await registerConsumers();
+      logger.info("RabbitMQ consumers are active.");
+      await disconnectWaiter.promise;
+
+      if (!isShuttingDown) {
+        logger.warn("RabbitMQ consumers disconnected. Reconnecting soon.");
+      }
     } catch (error) {
-      logger.error("RabbitMQ consumers failed to start. Retrying soon.", error);
+      if (!isShuttingDown) {
+        logger.error("RabbitMQ consumers failed. Retrying soon.", error);
+      }
+    } finally {
+      disconnectWaiter.dispose();
+    }
+
+    if (!isShuttingDown) {
       await sleep(retryIntervalMs);
     }
   }
 }
 
+async function registerConsumers() {
+  await rabbitMq.bindDefaultQueues();
+  await rabbitMq.consume<NotificationReminderDueMessage>(
+    notificationQueueName,
+    notificationReminderRoutingKey,
+    async (payload) => {
+      await notifications.processReminderMessage(payload);
+    }
+  );
+  await rabbitMq.consume<DocumentCleanupRunMessage>(
+    documentCleanupQueueName,
+    documentCleanupRoutingKey,
+    async (payload) => {
+      await documentCleanup.processCleanupJobMessage(payload);
+    }
+  );
+}
+
 async function shutdown() {
+  isShuttingDown = true;
   logger.info("Stopping BogApp lightweight worker.");
   publisher.stop();
   await rabbitMq.close();

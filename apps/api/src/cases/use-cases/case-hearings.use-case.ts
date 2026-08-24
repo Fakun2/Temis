@@ -46,7 +46,8 @@ export class CaseHearingsUseCase {
     const reminderConfigs = await this.notifications.getReminderConfigs(
       tenantId,
       "case_hearing",
-      pageItems.map((hearing) => hearing.id)
+      pageItems.map((hearing) => hearing.id),
+      prisma
     );
 
     return {
@@ -91,9 +92,9 @@ export class CaseHearingsUseCase {
       },
       select: caseHearingSelect
     });
-    await this.syncReminder(tenantId, caseId, actorUserId, createdHearing, input);
+    await this.syncReminder(prisma, tenantId, caseId, actorUserId, createdHearing, input);
 
-    const reminderConfig = await this.getReminderConfig(tenantId, createdHearing.id);
+    const reminderConfig = await this.getReminderConfig(prisma, tenantId, createdHearing.id);
     return toCaseHearingDto(createdHearing, reminderConfig);
   }
 
@@ -123,9 +124,9 @@ export class CaseHearingsUseCase {
       data: toCaseHearingWriteData(input),
       select: caseHearingSelect
     });
-    await this.syncReminder(tenantId, caseId, actorUserId, updatedHearing, input);
+    await this.syncReminder(prisma, tenantId, caseId, actorUserId, updatedHearing, input);
 
-    const reminderConfig = await this.getReminderConfig(tenantId, updatedHearing.id);
+    const reminderConfig = await this.getReminderConfig(prisma, tenantId, updatedHearing.id);
     return toCaseHearingDto(updatedHearing, reminderConfig);
   }
 
@@ -142,7 +143,7 @@ export class CaseHearingsUseCase {
     hearingId: string
   ) {
     await this.findTenantHearingOrThrow(prisma, tenantId, caseId, hearingId);
-    await this.notifications.cancelForResource(tenantId, "case_hearing", hearingId);
+    await this.notifications.cancelForResource(tenantId, "case_hearing", hearingId, prisma);
     await prisma.caseHearing.delete({ where: { id: hearingId } });
 
     return { status: "ok" as const };
@@ -222,28 +223,39 @@ export class CaseHearingsUseCase {
   }
 
   private async syncReminder(
+    prisma: TenantPrismaClient,
     tenantId: string,
     caseId: string,
     actorUserId: string,
     hearing: CaseHearingWithSelect,
     input: CreateCaseHearingInput | UpdateCaseHearingInput
   ) {
-    await this.notifications.scheduleForResource({
-      actorUserId,
-      body: hearing.description,
-      caseId,
-      resourceId: hearing.id,
-      resourceType: "case_hearing",
-      settings: input,
-      tenantId,
-      title: `Audiencia: ${hearing.description}`
-    });
+    await this.notifications.scheduleForResource(
+      {
+        actorUserId,
+        body: hearing.description,
+        caseId,
+        resourceId: hearing.id,
+        resourceType: "case_hearing",
+        settings: input,
+        tenantId,
+        title: `Audiencia: ${hearing.description}`
+      },
+      prisma
+    );
   }
 
-  private async getReminderConfig(tenantId: string, hearingId: string) {
-    const configs = await this.notifications.getReminderConfigs(tenantId, "case_hearing", [
-      hearingId
-    ]);
+  private async getReminderConfig(
+    prisma: TenantPrismaClient,
+    tenantId: string,
+    hearingId: string
+  ) {
+    const configs = await this.notifications.getReminderConfigs(
+      tenantId,
+      "case_hearing",
+      [hearingId],
+      prisma
+    );
     return configs.get(hearingId);
   }
 }

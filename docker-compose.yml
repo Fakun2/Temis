@@ -62,12 +62,12 @@ services:
     image: heidiks/rabbitmq-delayed-message-exchange:3.13.3-management
     container_name: ${CONTAINER_PREFIX:-bogaap}-rabbitmq
     environment:
-      RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER:-bogaap}
-      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASSWORD:-bogaap_rabbitmq_dev_12345}
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER:?Set RABBITMQ_USER in your environment file}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASSWORD:?Set RABBITMQ_PASSWORD in your environment file}
       RABBITMQ_SERVER_ADDITIONAL_ERL_ARGS: ${RABBITMQ_SERVER_ADDITIONAL_ERL_ARGS:--rabbit vm_memory_high_watermark.relative 0.4}
     ports:
-      - "${RABBITMQ_PORT:-5672}:5672"
-      - "${RABBITMQ_MANAGEMENT_PORT:-15672}:15672"
+      - "${RABBITMQ_BIND_HOST:-127.0.0.1}:${RABBITMQ_PORT:-5672}:5672"
+      - "${RABBITMQ_MANAGEMENT_BIND_HOST:-127.0.0.1}:${RABBITMQ_MANAGEMENT_PORT:-15672}:15672"
     volumes:
       - rabbitmq_data:/var/lib/rabbitmq
     healthcheck:
@@ -121,7 +121,7 @@ services:
       DATABASE_URL: postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@postgres:5432/${POSTGRES_DB:-bogaap}?schema=public&connection_limit=${API_DATABASE_CONNECTION_LIMIT:-3}&pool_timeout=${DATABASE_POOL_TIMEOUT:-20}
       REDIS_URL: redis://redis:6379
       RABBITMQ_ENABLED: "true"
-      RABBITMQ_URL: amqp://${RABBITMQ_USER:-bogaap}:${RABBITMQ_PASSWORD:-bogaap_rabbitmq_dev_12345}@rabbitmq:5672
+      RABBITMQ_URL: amqp://${RABBITMQ_USER:?Set RABBITMQ_USER in your environment file}:${RABBITMQ_PASSWORD:?Set RABBITMQ_PASSWORD in your environment file}@rabbitmq:5672
       ASYNC_OUTBOX_PUBLISHER_ENABLED: "false"
       DOCUMENT_CLEANUP_INLINE_PROCESSING_ENABLED: "false"
       DOCUMENT_CLEANUP_SCHEDULER_ENABLED: "false"
@@ -172,7 +172,7 @@ services:
       DATABASE_URL: postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@postgres:5432/${POSTGRES_DB:-bogaap}?schema=public&connection_limit=${WORKER_DATABASE_CONNECTION_LIMIT:-2}&pool_timeout=${DATABASE_POOL_TIMEOUT:-20}
       REDIS_URL: redis://redis:6379
       RABBITMQ_ENABLED: "true"
-      RABBITMQ_URL: amqp://${RABBITMQ_USER:-bogaap}:${RABBITMQ_PASSWORD:-bogaap_rabbitmq_dev_12345}@rabbitmq:5672
+      RABBITMQ_URL: amqp://${RABBITMQ_USER:?Set RABBITMQ_USER in your environment file}:${RABBITMQ_PASSWORD:?Set RABBITMQ_PASSWORD in your environment file}@rabbitmq:5672
       RABBITMQ_PREFETCH: ${RABBITMQ_PREFETCH:-3}
       RABBITMQ_CONSUMER_RETRY_INTERVAL_MS: ${RABBITMQ_CONSUMER_RETRY_INTERVAL_MS:-5000}
       ASYNC_OUTBOX_PUBLISHER_ENABLED: "true"

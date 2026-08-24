@@ -1,6 +1,7 @@
 import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
 import { createZodDto } from "nestjs-zod";
 import { z } from "zod";
+import { booleanInputSchema } from "../common/boolean.schemas";
 
 export const notificationRecipientModeSchema = z.enum([
   "self",
@@ -11,10 +12,14 @@ export const notificationRecipientModeSchema = z.enum([
 
 export const notificationSettingsSchema = z
   .object({
-    notificationEnabled: z.coerce.boolean().default(false),
+    notificationEnabled: booleanInputSchema(false),
     notificationDate: z.preprocess(
       (value) => (typeof value === "string" && value.trim() === "" ? undefined : value),
-      z.string().trim().optional()
+      z
+        .string()
+        .trim()
+        .regex(/^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])$/)
+        .optional()
     ),
     notificationTime: z.preprocess(
       (value) => (typeof value === "string" && value.trim() === "" ? undefined : value),
@@ -91,7 +96,7 @@ export const notificationSettingsSchema = z
 
 export const listNotificationsQuerySchema = z.object({
   limit: z.coerce.number().int().min(1).max(50).default(20),
-  unreadOnly: z.coerce.boolean().default(true)
+  unreadOnly: booleanInputSchema(true)
 });
 
 export class ListNotificationsQueryDto extends createZodDto(listNotificationsQuerySchema) {}
@@ -165,6 +170,24 @@ export type NotificationSettingsInput = z.infer<typeof notificationSettingsSchem
 export type ListNotificationsQuery = z.infer<typeof listNotificationsQuerySchema>;
 
 function toBuenosAiresDateTime(date: string, time: string) {
+  if (!isValidDateString(date)) {
+    return null;
+  }
+
   const scheduledAt = new Date(`${date}T${time}:00.000-03:00`);
   return Number.isNaN(scheduledAt.getTime()) ? null : scheduledAt;
+}
+
+function isValidDateString(date: string) {
+  const [yearValue, monthValue, dayValue] = date.split("-");
+  const year = Number(yearValue);
+  const month = Number(monthValue);
+  const day = Number(dayValue);
+  const parsed = new Date(Date.UTC(year, month - 1, day));
+
+  return (
+    parsed.getUTCFullYear() === year &&
+    parsed.getUTCMonth() === month - 1 &&
+    parsed.getUTCDate() === day
+  );
 }

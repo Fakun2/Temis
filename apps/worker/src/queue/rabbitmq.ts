@@ -11,19 +11,41 @@ import {
 import type { QueuePayload } from "./types";
 
 type MessageHandler<TPayload extends QueuePayload> = (payload: TPayload) => Promise<void>;
+type DisconnectListener = () => void;
+type DisconnectWaiter = {
+  dispose: () => void;
+  promise: Promise<void>;
+};
 
 export class RabbitMq {
   private readonly logger = createLogger("RabbitMQ");
   private channel: Channel | null = null;
+  private closed = false;
   private connection: ChannelModel | null = null;
   private connecting: Promise<Channel> | null = null;
+  private readonly disconnectListeners = new Set<DisconnectListener>();
 
   async close() {
+    this.closed = true;
+    this.disconnectListeners.clear();
     await this.channel?.close().catch(() => undefined);
     await this.connection?.close().catch(() => undefined);
     this.channel = null;
     this.connection = null;
     this.connecting = null;
+  }
+
+  waitForDisconnect(): DisconnectWaiter {
+    let listener: DisconnectListener = () => undefined;
+    const promise = new Promise<void>((resolve) => {
+      listener = resolve;
+      this.disconnectListeners.add(listener);
+    });
+
+    return {
+      dispose: () => this.disconnectListeners.delete(listener),
+      promise
+    };
   }
 
   async publishDelayed(routingKey: string, payload: QueuePayload, delayMs = 0) {
@@ -91,6 +113,7 @@ export class RabbitMq {
   }
 
   private async connect() {
+    this.closed = false;
     const url = getEnv("RABBITMQ_URL", "amqp://localhost:5672");
     const connection = await amqp.connect(url);
     const channel = await connection.createChannel();
@@ -111,13 +134,35 @@ export class RabbitMq {
   }
 
   private resetConnection(message: string, error?: unknown) {
+    const channel = this.channel;
+    const connection = this.connection;
+    const connecting = this.connecting;
+
+    this.channel = null;
+    this.connection = null;
+    this.connecting = null;
+
+    if (this.closed) {
+      return;
+    }
+
+    if (!channel && !connection && !connecting) {
+      return;
+    }
+
     if (error) {
       this.logger.error(message, error);
     } else {
       this.logger.warn(message);
     }
-    this.channel = null;
-    this.connection = null;
-    this.connecting = null;
+
+    void channel?.close().catch(() => undefined);
+    void connection?.close().catch(() => undefined);
+
+    if (!this.closed) {
+      for (const listener of [...this.disconnectListeners]) {
+        listener();
+      }
+    }
   }
 }

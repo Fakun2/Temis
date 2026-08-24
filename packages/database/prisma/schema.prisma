@@ -1189,6 +1189,7 @@ model TenantMembership {
   notificationRecipients NotificationReminderRecipient[]
 
   @@unique([tenantId, userId])
+  @@unique([tenantId, id])
   @@index([tenantId, status])
   @@index([tenantId, roleId])
   @@index([userId])
@@ -1217,10 +1218,11 @@ model NotificationReminder {
   updatedAt             DateTime                         @updatedAt @map("updated_at") @db.Timestamptz(6)
 
   tenant     Tenant                          @relation(fields: [tenantId], references: [id], onDelete: Cascade)
-  case       Case                            @relation(fields: [caseId], references: [id], onDelete: Cascade)
+  case       Case                            @relation(fields: [tenantId, caseId], references: [tenantId, id], onDelete: Cascade)
   recipients NotificationReminderRecipient[]
 
   @@unique([tenantId, resourceType, resourceId])
+  @@unique([tenantId, id])
   @@index([status, nextRunAt])
   @@index([tenantId, status])
   @@index([tenantId, caseId])
@@ -1240,9 +1242,9 @@ model NotificationReminderRecipient {
   createdAt             DateTime                    @default(now()) @map("created_at") @db.Timestamptz(6)
   updatedAt             DateTime                    @updatedAt @map("updated_at") @db.Timestamptz(6)
 
-  reminder            NotificationReminder @relation(fields: [reminderId], references: [id], onDelete: Cascade)
+  reminder            NotificationReminder @relation(fields: [tenantId, reminderId], references: [tenantId, id], onDelete: Cascade)
   tenant              Tenant               @relation(fields: [tenantId], references: [id], onDelete: Cascade)
-  recipientMembership TenantMembership     @relation(fields: [recipientMembershipId], references: [id], onDelete: Cascade)
+  recipientMembership TenantMembership     @relation(fields: [tenantId, recipientMembershipId], references: [tenantId, id], onDelete: Cascade)
 
   @@unique([reminderId, recipientMembershipId])
   @@index([tenantId, recipientMembershipId, readAt])

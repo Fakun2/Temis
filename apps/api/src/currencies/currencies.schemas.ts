@@ -1,6 +1,7 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { createZodDto } from "nestjs-zod";
 import { z } from "zod";
+import { optionalBooleanInputSchema } from "../common/boolean.schemas";
 
 const optionalTrimmedString = z.preprocess(
   (value) => (typeof value === "string" && value.trim() === "" ? undefined : value),
@@ -12,20 +13,9 @@ const currencyCodeSchema = z
   .trim()
   .regex(/^[A-Za-z]{3}$/)
   .transform((value) => value.toUpperCase());
-const optionalBooleanQuerySchema = z.preprocess((value) => {
-  if (value === undefined || value === "") {
-    return undefined;
-  }
-
-  if (typeof value === "string") {
-    return value.toLowerCase() === "true";
-  }
-
-  return value;
-}, z.boolean().optional());
 
 export const listCurrenciesQuerySchema = z.object({
-  active: optionalBooleanQuerySchema,
+  active: optionalBooleanInputSchema,
   limit: z.coerce.number().int().min(1).max(100).default(12),
   offset: z.coerce.number().int().min(0).default(0),
   search: optionalTrimmedString,
@@ -34,7 +24,7 @@ export const listCurrenciesQuerySchema = z.object({
 });
 
 export const listTenantCurrenciesQuerySchema = z.object({
-  active: optionalBooleanQuerySchema,
+  active: optionalBooleanInputSchema,
   cursor: optionalTrimmedString,
   limit: z.coerce.number().int().min(1).max(50).default(12),
   search: optionalTrimmedString,
@@ -54,7 +44,7 @@ export const createCurrencySchema = z.object({
 });
 
 export const updateCurrencySchema = z.object({
-  active: z.coerce.boolean().optional(),
+  active: optionalBooleanInputSchema,
   name: z.string().trim().min(2).max(80),
   symbol: z.string().trim().min(1).max(8)
 });

@@ -66,19 +66,25 @@ CREATE TABLE "notification_reminder_recipients" (
   CONSTRAINT "notification_reminder_recipients_pkey" PRIMARY KEY ("id")
 );
 
+CREATE UNIQUE INDEX "tenant_memberships_tenant_id_id_key"
+  ON "tenant_memberships"("tenant_id", "id");
+
+CREATE UNIQUE INDEX "notification_reminders_tenant_id_id_key"
+  ON "notification_reminders"("tenant_id", "id");
+
 ALTER TABLE "notification_reminders"
   ADD CONSTRAINT "notification_reminders_tenant_id_fkey"
   FOREIGN KEY ("tenant_id") REFERENCES "tenants"("id")
   ON DELETE CASCADE ON UPDATE CASCADE;
 
 ALTER TABLE "notification_reminders"
-  ADD CONSTRAINT "notification_reminders_case_id_fkey"
-  FOREIGN KEY ("case_id") REFERENCES "cases"("id")
+  ADD CONSTRAINT "notification_reminders_tenant_id_case_id_fkey"
+  FOREIGN KEY ("tenant_id", "case_id") REFERENCES "cases"("tenant_id", "id")
   ON DELETE CASCADE ON UPDATE CASCADE;
 
 ALTER TABLE "notification_reminder_recipients"
-  ADD CONSTRAINT "notification_reminder_recipients_reminder_id_fkey"
-  FOREIGN KEY ("reminder_id") REFERENCES "notification_reminders"("id")
+  ADD CONSTRAINT "notification_reminder_recipients_tenant_id_reminder_id_fkey"
+  FOREIGN KEY ("tenant_id", "reminder_id") REFERENCES "notification_reminders"("tenant_id", "id")
   ON DELETE CASCADE ON UPDATE CASCADE;
 
 ALTER TABLE "notification_reminder_recipients"
@@ -87,8 +93,8 @@ ALTER TABLE "notification_reminder_recipients"
   ON DELETE CASCADE ON UPDATE CASCADE;
 
 ALTER TABLE "notification_reminder_recipients"
-  ADD CONSTRAINT "notification_reminder_recipients_recipient_membership_id_fkey"
-  FOREIGN KEY ("recipient_membership_id") REFERENCES "tenant_memberships"("id")
+  ADD CONSTRAINT "notification_reminder_recipients_tenant_id_recipient_membership_id_fkey"
+  FOREIGN KEY ("tenant_id", "recipient_membership_id") REFERENCES "tenant_memberships"("tenant_id", "id")
   ON DELETE CASCADE ON UPDATE CASCADE;
 
 CREATE UNIQUE INDEX "notification_reminders_tenant_id_resource_type_resource_id_key"
@@ -122,6 +128,7 @@ CREATE INDEX "notification_reminder_recipients_tenant_id_reminder_id_idx"
   ON "notification_reminder_recipients"("tenant_id", "reminder_id");
 
 INSERT INTO "notification_reminders" (
+  "id",
   "tenant_id",
   "case_id",
   "resource_type",
@@ -131,9 +138,11 @@ INSERT INTO "notification_reminders" (
   "title",
   "body",
   "status",
-  "next_run_at"
+  "next_run_at",
+  "updated_at"
 )
 SELECT
+  gen_random_uuid(),
   ce."tenant_id",
   ce."case_id",
   'case_expense'::"NotificationReminderResourceType",
@@ -146,21 +155,26 @@ SELECT
     WHEN ce."alert_at" < CURRENT_TIMESTAMP THEN 'pending'::"NotificationReminderStatus"
     ELSE 'pending'::"NotificationReminderStatus"
   END,
-  ce."alert_at"
+  ce."alert_at",
+  CURRENT_TIMESTAMP
 FROM "case_expenses" ce
 WHERE ce."alert_enabled" = true
   AND ce."alert_at" IS NOT NULL
 ON CONFLICT ("tenant_id", "resource_type", "resource_id") DO NOTHING;
 
 INSERT INTO "notification_reminder_recipients" (
+  "id",
   "reminder_id",
   "tenant_id",
-  "recipient_membership_id"
+  "recipient_membership_id",
+  "updated_at"
 )
 SELECT
+  gen_random_uuid(),
   nr."id",
   nr."tenant_id",
-  tm."id"
+  tm."id",
+  CURRENT_TIMESTAMP
 FROM "notification_reminders" nr
 INNER JOIN "tenant_memberships" tm
   ON tm."tenant_id" = nr."tenant_id"

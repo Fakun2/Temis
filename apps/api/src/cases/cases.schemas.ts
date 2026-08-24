@@ -1,6 +1,7 @@
 import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
 import { createZodDto } from "nestjs-zod";
 import { z } from "zod";
+import { optionalBooleanInputSchema } from "../common/boolean.schemas";
 import { notificationSettingsSchema } from "../notifications/notifications.schemas";
 
 const optionalTrimmedString = z.preprocess(
@@ -140,7 +141,7 @@ const caseHearingInputSchema = z
       .trim()
       .regex(/^([01]\d|2[0-3]):[0-5]\d$/),
     description: z.string().trim().min(3).max(500),
-    notificationsEnabled: z.coerce.boolean().optional()
+    notificationsEnabled: optionalBooleanInputSchema
   })
   .and(notificationSettingsSchema);
 
@@ -201,7 +202,7 @@ export const listCaseDocumentsQuerySchema = z.object({
 export const listDocumentCategoriesQuerySchema = z.object({
   limit: z.coerce.number().int().min(1).max(50).default(50),
   cursor: optionalTrimmedString,
-  active: z.coerce.boolean().optional()
+  active: optionalBooleanInputSchema
 });
 
 export const createCaseDocumentBodySchema = z.object({

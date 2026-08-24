@@ -54,6 +54,7 @@ export function NotificationSettingsField<TDraft extends NotificationDraft>({
   const members = options?.members ?? [];
   const practiceAreas = options?.practiceAreas ?? [];
   const today = getBuenosAiresTodayDateString();
+  const notificationsDisabled = !draft.notificationEnabled;
 
   function updateEnabled(enabled: boolean) {
     updateDraft("notificationEnabled", enabled as TDraft["notificationEnabled"]);
@@ -114,6 +115,7 @@ export function NotificationSettingsField<TDraft extends NotificationDraft>({
       </div>
 
       <div
+        aria-hidden={notificationsDisabled}
         className={`grid transition-[grid-template-rows,opacity] duration-300 ease-out ${
           draft.notificationEnabled ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"
         }`}
@@ -123,6 +125,7 @@ export function NotificationSettingsField<TDraft extends NotificationDraft>({
             <CaseField error={errors.notificationDate} label="Fecha de notificacion" required>
               <CaseDateInput
                 autoComplete="off"
+                disabled={notificationsDisabled}
                 min={today}
                 value={draft.notificationDate ?? ""}
                 onChange={(event) =>
@@ -134,6 +137,7 @@ export function NotificationSettingsField<TDraft extends NotificationDraft>({
               <Input
                 autoComplete="off"
                 className={caseNativeDateTimeInputClassName}
+                disabled={notificationsDisabled}
                 type="time"
                 value={draft.notificationTime ?? ""}
                 onChange={(event) =>
@@ -145,7 +149,11 @@ export function NotificationSettingsField<TDraft extends NotificationDraft>({
 
           <div className="grid gap-4 pt-4 md:grid-cols-2">
             <CaseField label="Destinatarios" required>
-              <Select value={draft.notificationRecipientMode} onValueChange={updateRecipientMode}>
+              <Select
+                disabled={notificationsDisabled}
+                value={draft.notificationRecipientMode}
+                onValueChange={updateRecipientMode}
+              >
                 <SelectTrigger className={caseSelectTriggerClassName}>
                   <SelectValue />
                 </SelectTrigger>
@@ -162,6 +170,7 @@ export function NotificationSettingsField<TDraft extends NotificationDraft>({
             {draft.notificationRecipientMode === "practice_area" ? (
               <CaseField error={errors.notificationPracticeAreaId} label="Area de trabajo" required>
                 <Select
+                  disabled={notificationsDisabled}
                   value={draft.notificationPracticeAreaId ?? ""}
                   onValueChange={(value) =>
                     updateDraft(
@@ -196,6 +205,7 @@ export function NotificationSettingsField<TDraft extends NotificationDraft>({
                     >
                       <Checkbox
                         checked={draft.notificationMembershipIds.includes(member.id)}
+                        disabled={notificationsDisabled}
                         onCheckedChange={(checked) => toggleMember(member.id, checked === true)}
                       />
                       <span className="min-w-0">

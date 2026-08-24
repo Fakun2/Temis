@@ -1,6 +1,6 @@
 import { BadRequestException, Injectable, Logger, NotFoundException } from "@nestjs/common";
 import { Prisma } from "@prisma/client";
-import { PrismaService } from "../database/prisma.service";
+import { PrismaService, type TenantPrismaClient } from "../database/prisma.service";
 import { AsyncOutboxService } from "../queue/async-outbox.service";
 import { notificationReminderRoutingKey } from "../queue/queue.constants";
 import type { ListNotificationsQuery, NotificationSettingsInput } from "./notifications.schemas";
@@ -17,6 +17,8 @@ type ScheduleReminderInput = {
   tenantId: string;
   title: string;
 };
+
+type NotificationPrismaClient = PrismaService | TenantPrismaClient;
 
 type ReminderConfig = {
   notificationDate: string;
@@ -36,13 +38,26 @@ export class NotificationsService {
     private readonly outbox: AsyncOutboxService
   ) {}
 
-  async scheduleForResource(input: ScheduleReminderInput) {
+  async scheduleForResource(input: ScheduleReminderInput, prisma?: TenantPrismaClient) {
+    if (prisma) {
+      await this.scheduleForResourceWithClient(prisma, input);
+      return;
+    }
+
+    await this.prisma.$transaction((tx) => this.scheduleForResourceWithClient(tx, input));
+  }
+
+  private async scheduleForResourceWithClient(
+    prisma: TenantPrismaClient,
+    input: ScheduleReminderInput
+  ) {
     if (!input.settings.notificationEnabled) {
-      await this.cancelForResource(input.tenantId, input.resourceType, input.resourceId);
+      await this.cancelForResource(input.tenantId, input.resourceType, input.resourceId, prisma);
       return;
     }
 
     const actorMembership = await this.findActiveMembershipForUser(
+      prisma,
       input.tenantId,
       input.actorUserId
     );
@@ -50,77 +65,81 @@ export class NotificationsService {
       input.settings.notificationDate,
       input.settings.notificationTime
     );
-    const recipientMembershipIds = await this.resolveRecipients(input.tenantId, input.settings, {
-      actorMembershipId: actorMembership.id
-    });
+    const recipientMembershipIds = await this.resolveRecipients(
+      input.tenantId,
+      input.settings,
+      {
+        actorMembershipId: actorMembership.id
+      },
+      prisma
+    );
 
-    await this.prisma.$transaction(async (tx) => {
-      const reminder = await tx.notificationReminder.upsert({
-        create: {
-          body: input.body ?? null,
-          caseId: input.caseId,
-          createdByMembershipId: actorMembership.id,
-          nextRunAt: scheduledAt,
-          practiceAreaId: input.settings.notificationPracticeAreaId ?? null,
-          recipientMode: input.settings.notificationRecipientMode,
+    const reminder = await prisma.notificationReminder.upsert({
+      create: {
+        body: input.body ?? null,
+        caseId: input.caseId,
+        createdByMembershipId: actorMembership.id,
+        nextRunAt: scheduledAt,
+        practiceAreaId: input.settings.notificationPracticeAreaId ?? null,
+        recipientMode: input.settings.notificationRecipientMode,
+        resourceId: input.resourceId,
+        resourceType: input.resourceType,
+        scheduledAt,
+        status: "pending",
+        tenantId: input.tenantId,
+        title: input.title
+      },
+      update: {
+        attempts: 0,
+        body: input.body ?? null,
+        cancelledAt: null,
+        caseId: input.caseId,
+        deliveredAt: null,
+        lastError: null,
+        nextRunAt: scheduledAt,
+        practiceAreaId: input.settings.notificationPracticeAreaId ?? null,
+        recipientMode: input.settings.notificationRecipientMode,
+        scheduledAt,
+        status: "pending",
+        title: input.title
+      },
+      where: {
+        tenantId_resourceType_resourceId: {
           resourceId: input.resourceId,
           resourceType: input.resourceType,
-          scheduledAt,
-          status: "pending",
-          tenantId: input.tenantId,
-          title: input.title
-        },
-        update: {
-          attempts: 0,
-          body: input.body ?? null,
-          cancelledAt: null,
-          caseId: input.caseId,
-          deliveredAt: null,
-          lastError: null,
-          nextRunAt: scheduledAt,
-          practiceAreaId: input.settings.notificationPracticeAreaId ?? null,
-          recipientMode: input.settings.notificationRecipientMode,
-          scheduledAt,
-          status: "pending",
-          title: input.title
-        },
-        where: {
-          tenantId_resourceType_resourceId: {
-            resourceId: input.resourceId,
-            resourceType: input.resourceType,
-            tenantId: input.tenantId
-          }
-        },
-        select: { id: true }
-      });
-
-      await tx.notificationReminderRecipient.deleteMany({
-        where: { reminderId: reminder.id, tenantId: input.tenantId }
-      });
-      await tx.notificationReminderRecipient.createMany({
-        data: recipientMembershipIds.map((recipientMembershipId) => ({
-          recipientMembershipId,
-          reminderId: reminder.id,
           tenantId: input.tenantId
-        })),
-        skipDuplicates: true
-      });
+        }
+      },
+      select: { id: true }
+    });
 
-      await this.enqueueReminderOutbox(tx, {
-        deliverAt: scheduledAt,
+    await prisma.notificationReminderRecipient.deleteMany({
+      where: { reminderId: reminder.id, tenantId: input.tenantId }
+    });
+    await prisma.notificationReminderRecipient.createMany({
+      data: recipientMembershipIds.map((recipientMembershipId) => ({
+        recipientMembershipId,
         reminderId: reminder.id,
-        scheduledAt,
         tenantId: input.tenantId
-      });
+      })),
+      skipDuplicates: true
+    });
+
+    await this.enqueueReminderOutbox(prisma, {
+      deliverAt: scheduledAt,
+      reminderId: reminder.id,
+      scheduledAt,
+      tenantId: input.tenantId
     });
   }
 
   async cancelForResource(
     tenantId: string,
     resourceType: ReminderResourceType,
-    resourceId: string
+    resourceId: string,
+    prisma: NotificationPrismaClient = this.prisma
   ) {
-    await this.prisma.notificationReminder.updateMany({
+    await prisma.notificationReminder.updateMany({
       data: {
         cancelledAt: new Date(),
         status: "cancelled"
@@ -137,13 +156,14 @@ export class NotificationsService {
   async getReminderConfigs(
     tenantId: string,
     resourceType: ReminderResourceType,
-    resourceIds: string[]
+    resourceIds: string[],
+    prisma: NotificationPrismaClient = this.prisma
   ) {
     if (!resourceIds.length) {
       return new Map<string, ReminderConfig>();
     }
 
-    const reminders = await this.prisma.notificationReminder.findMany({
+    const reminders = await prisma.notificationReminder.findMany({
       include: {
         recipients: {
           select: {
@@ -154,7 +174,7 @@ export class NotificationsService {
       where: {
         resourceId: { in: resourceIds },
         resourceType,
-        status: { in: ["pending", "processing", "delivered"] },
+        status: { in: ["pending", "processing"] },
         tenantId
       }
     });
@@ -164,7 +184,7 @@ export class NotificationsService {
         reminder.resourceId,
         {
           notificationDate: toBuenosAiresDateParts(reminder.scheduledAt).date,
-          notificationEnabled: reminder.status !== "cancelled",
+          notificationEnabled: reminder.status === "pending" || reminder.status === "processing",
           notificationMembershipIds: reminder.recipients.map(
             (recipient) => recipient.recipientMembershipId
           ),
@@ -177,7 +197,7 @@ export class NotificationsService {
   }
 
   async listForUser(tenantId: string, actorUserId: string, query: ListNotificationsQuery) {
-    const membership = await this.findActiveMembershipForUser(tenantId, actorUserId);
+    const membership = await this.findActiveMembershipForUser(this.prisma, tenantId, actorUserId);
     const [items, unreadCount] = await Promise.all([
       this.prisma.notificationReminderRecipient.findMany({
         orderBy: [{ deliveredAt: "desc" }, { createdAt: "desc" }],
@@ -211,7 +231,7 @@ export class NotificationsService {
   }
 
   async markRead(tenantId: string, actorUserId: string, notificationId: string) {
-    const membership = await this.findActiveMembershipForUser(tenantId, actorUserId);
+    const membership = await this.findActiveMembershipForUser(this.prisma, tenantId, actorUserId);
     const notification = await this.prisma.notificationReminderRecipient.findFirst({
       where: {
         id: notificationId,
@@ -377,8 +397,12 @@ export class NotificationsService {
     });
   }
 
-  private async findActiveMembershipForUser(tenantId: string, userId: string) {
-    const membership = await this.prisma.tenantMembership.findFirst({
+  private async findActiveMembershipForUser(
+    prisma: NotificationPrismaClient,
+    tenantId: string,
+    userId: string
+  ) {
+    const membership = await prisma.tenantMembership.findFirst({
       where: {
         status: "active",
         tenantId,
@@ -397,14 +421,15 @@ export class NotificationsService {
   private async resolveRecipients(
     tenantId: string,
     settings: NotificationSettingsInput,
-    context: { actorMembershipId: string }
+    context: { actorMembershipId: string },
+    prisma: NotificationPrismaClient = this.prisma
   ) {
     if (settings.notificationRecipientMode === "self") {
       return [context.actorMembershipId];
     }
 
     if (settings.notificationRecipientMode === "tenant") {
-      const memberships = await this.prisma.tenantMembership.findMany({
+      const memberships = await prisma.tenantMembership.findMany({
         where: { status: "active", tenantId },
         select: { id: true }
       });
@@ -417,7 +442,7 @@ export class NotificationsService {
         throw new BadRequestException("Selecciona un area de trabajo para notificar.");
       }
 
-      const practiceArea = await this.prisma.practiceArea.findFirst({
+      const practiceArea = await prisma.practiceArea.findFirst({
         where: { active: true, id: practiceAreaId, tenantId },
         select: { id: true }
       });
@@ -426,7 +451,7 @@ export class NotificationsService {
         throw new BadRequestException("El area de trabajo no pertenece al estudio activo.");
       }
 
-      const memberships = await this.prisma.tenantMembership.findMany({
+      const memberships = await prisma.tenantMembership.findMany({
         where: {
           practiceAreas: { some: { practiceAreaId } },
           status: "active",
@@ -439,7 +464,7 @@ export class NotificationsService {
     }
 
     const membershipIds = [...new Set(settings.notificationMembershipIds)];
-    const memberships = await this.prisma.tenantMembership.findMany({
+    const memberships = await prisma.tenantMembership.findMany({
       where: {
         id: { in: membershipIds },
         status: "active",
