@@ -13,6 +13,16 @@ export type CaseHearingType =
   | "debate"
   | "investigative_statement"
   | "other";
+export type NotificationRecipientMode = "self" | "tenant" | "practice_area" | "members";
+
+export type NotificationSettingsDto = {
+  notificationEnabled: boolean;
+  notificationDate: string | null;
+  notificationTime: string | null;
+  notificationRecipientMode: NotificationRecipientMode;
+  notificationPracticeAreaId: string | null;
+  notificationMembershipIds: string[];
+};
 
 export type ProvinceDto = {
   caseCatalogStrategy: CaseCatalogStrategy;
@@ -79,7 +89,7 @@ export type CaseDto = {
   updatedAt: string;
 };
 
-export type CaseTaskDto = {
+export type CaseTaskDto = NotificationSettingsDto & {
   id: string;
   caseId: string;
   assignedMembershipId: string | null;
@@ -102,7 +112,17 @@ export type TaskAssigneeOption = {
   roleName: string | null;
 };
 
-export type CaseExpenseDto = {
+export type PracticeAreaOption = {
+  id: string;
+  name: string;
+};
+
+export type NotificationOptions = {
+  members: TaskAssigneeOption[];
+  practiceAreas: PracticeAreaOption[];
+};
+
+export type CaseExpenseDto = NotificationSettingsDto & {
   id: string;
   caseId: string;
   taskId: string | null;
@@ -146,7 +166,7 @@ export type CaseDocumentDto = {
   createdAt: string;
 };
 
-export type CaseHearingDto = {
+export type CaseHearingDto = NotificationSettingsDto & {
   id: string;
   caseId: string;
   type: CaseHearingType;

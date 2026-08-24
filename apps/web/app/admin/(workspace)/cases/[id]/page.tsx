@@ -3,8 +3,17 @@ import { getCasesServerSession } from "../_api/cases.server-api";
 import { CaseDetailView } from "./_components/case-detail-view";
 import { loadCaseDetail } from "./_utils/case-detail-loader";
 import { getCaseDetailPermissions } from "./_utils/case-detail-permissions";
+import type { CaseDetailCalendarFocus, CaseDetailCalendarTarget } from "./_types/case-detail-page.types";
 
-export default async function CaseDetailPage({ params }: { params: Promise<{ id: string }> }) {
+type CaseDetailPageSearchParams = Promise<Record<string, string | string[] | undefined>>;
+
+export default async function CaseDetailPage({
+  params,
+  searchParams
+}: {
+  params: Promise<{ id: string }>;
+  searchParams: CaseDetailPageSearchParams;
+}) {
   const session = await getCasesServerSession();
   const permissions = session ? getCaseDetailPermissions(session) : null;
 
@@ -13,6 +22,7 @@ export default async function CaseDetailPage({ params }: { params: Promise<{ id:
   }
 
   const { id } = await params;
+  const calendarTarget = parseCalendarTarget(await searchParams);
   const caseResult = await loadCaseDetail(id);
 
   if (caseResult.error || !caseResult.data) {
@@ -26,5 +36,32 @@ export default async function CaseDetailPage({ params }: { params: Promise<{ id:
     );
   }
 
-  return <CaseDetailView caseItem={caseResult.data} permissions={permissions} />;
+  return (
+    <CaseDetailView
+      calendarTarget={calendarTarget}
+      caseItem={caseResult.data}
+      permissions={permissions}
+    />
+  );
+}
+
+function parseCalendarTarget(
+  searchParams: Awaited<CaseDetailPageSearchParams>
+): CaseDetailCalendarTarget {
+  const focus = getSingleSearchParam(searchParams.calendarFocus);
+  const eventId = getSingleSearchParam(searchParams.eventId);
+
+  if (!eventId || !isCalendarFocus(focus)) {
+    return null;
+  }
+
+  return { eventId, focus };
+}
+
+function getSingleSearchParam(value: string | string[] | undefined) {
+  return Array.isArray(value) ? value[0] : value;
+}
+
+function isCalendarFocus(value: string | undefined): value is CaseDetailCalendarFocus {
+  return value === "expense" || value === "hearing" || value === "task";
 }

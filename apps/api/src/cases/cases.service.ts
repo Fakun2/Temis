@@ -368,12 +368,23 @@ export class CasesService {
     return this.caseTasksUseCase.list(tenantId, caseId, query);
   }
 
-  async createTask(tenantId: string, caseId: string, input: CreateCaseTaskInput) {
-    return this.caseTasksUseCase.create(tenantId, caseId, input);
+  async createTask(
+    tenantId: string,
+    caseId: string,
+    actorUserId: string,
+    input: CreateCaseTaskInput
+  ) {
+    return this.caseTasksUseCase.create(tenantId, caseId, actorUserId, input);
   }
 
-  async updateTask(tenantId: string, caseId: string, taskId: string, input: UpdateCaseTaskInput) {
-    return this.caseTasksUseCase.update(tenantId, caseId, taskId, input);
+  async updateTask(
+    tenantId: string,
+    caseId: string,
+    taskId: string,
+    actorUserId: string,
+    input: UpdateCaseTaskInput
+  ) {
+    return this.caseTasksUseCase.update(tenantId, caseId, taskId, actorUserId, input);
   }
 
   async markTaskSeen(tenantId: string, caseId: string, taskId: string) {
@@ -447,17 +458,23 @@ export class CasesService {
     return this.caseHearingsUseCase.list(tenantId, caseId, query);
   }
 
-  async createHearing(tenantId: string, caseId: string, input: CreateCaseHearingInput) {
-    return this.caseHearingsUseCase.create(tenantId, caseId, input);
+  async createHearing(
+    tenantId: string,
+    caseId: string,
+    actorUserId: string,
+    input: CreateCaseHearingInput
+  ) {
+    return this.caseHearingsUseCase.create(tenantId, caseId, actorUserId, input);
   }
 
   async updateHearing(
     tenantId: string,
     caseId: string,
     hearingId: string,
+    actorUserId: string,
     input: UpdateCaseHearingInput
   ) {
-    return this.caseHearingsUseCase.update(tenantId, caseId, hearingId, input);
+    return this.caseHearingsUseCase.update(tenantId, caseId, hearingId, actorUserId, input);
   }
 
   async deleteHearing(tenantId: string, caseId: string, hearingId: string) {

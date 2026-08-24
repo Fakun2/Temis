@@ -107,7 +107,16 @@ export class DashboardSearchUseCase {
         SELECT
           'cashbox_movement'::text AS type,
           cashbox_movements.id::text AS id,
-          COALESCE(cashbox_movements.description, cashbox_movements.type::text)::text AS title,
+          COALESCE(
+            cashbox_movements.description,
+            CASE cashbox_movements.type::text
+              WHEN 'income' THEN 'Ingreso'
+              WHEN 'expense' THEN 'Egreso'
+              WHEN 'conversion_in' THEN 'Conversion entrada'
+              WHEN 'conversion_out' THEN 'Conversion salida'
+              ELSE 'Movimiento'
+            END
+          )::text AS title,
           cashbox_movements.occurred_at::date AS date,
           NULL::text AS status,
           cashbox_movements.amount AS amount,
@@ -120,13 +129,29 @@ export class DashboardSearchUseCase {
           NULL::text AS file_name,
           NULL::text AS file_type,
           NULL::integer AS file_size_bytes,
-          COALESCE(cashbox_movements.description, cashbox_movements.type::text)::text AS movement_name,
+          COALESCE(
+            cashbox_movements.description,
+            CASE cashbox_movements.type::text
+              WHEN 'income' THEN 'Ingreso'
+              WHEN 'expense' THEN 'Egreso'
+              WHEN 'conversion_in' THEN 'Conversion entrada'
+              WHEN 'conversion_out' THEN 'Conversion salida'
+              ELSE 'Movimiento'
+            END
+          )::text AS movement_name,
           cashbox_movements.type::text AS movement_type
         FROM cashbox_movements
         WHERE cashbox_movements.tenant_id = ${tenantId}::uuid
           AND ${toDashboardSearchTermsSql(terms, [
             Prisma.sql`cashbox_movements.description`,
             Prisma.sql`cashbox_movements.type`,
+            Prisma.sql`CASE cashbox_movements.type::text
+              WHEN 'income' THEN 'Ingreso Ingresos'
+              WHEN 'expense' THEN 'Egreso Egresos'
+              WHEN 'conversion_in' THEN 'Conversion entrada Ingresos'
+              WHEN 'conversion_out' THEN 'Conversion salida Egresos'
+              ELSE 'Movimiento'
+            END`,
             Prisma.sql`cashbox_movements.currency_code`,
             Prisma.sql`cashbox_movements.category_origin`
           ])}
@@ -341,10 +366,13 @@ function toDashboardSearchResponse(
 }
 
 function toDashboardSearchItem(row: DashboardSearchRow) {
+  const title = getDashboardSearchTitle(row);
+  const movementName = getDashboardSearchMovementName(row);
+
   return {
     type: row.type,
     id: row.id,
-    title: row.title,
+    title,
     date: toIsoDateString(row.date),
     href: toDashboardSearchHref(row),
     ...(row.case_id ? { caseId: row.case_id } : {}),
@@ -358,9 +386,46 @@ function toDashboardSearchItem(row: DashboardSearchRow) {
     ...(row.file_name ? { fileName: row.file_name } : {}),
     ...(row.file_type ? { fileType: row.file_type } : {}),
     ...(row.file_size_bytes !== null ? { fileSizeBytes: row.file_size_bytes } : {}),
-    ...(row.movement_name ? { movementName: row.movement_name } : {}),
+    ...(movementName ? { movementName } : {}),
     ...(row.movement_type ? { movementType: row.movement_type } : {})
   };
+}
+
+function getDashboardSearchTitle(row: DashboardSearchRow) {
+  if (row.type === "cashbox_movement" && row.movement_type && row.title === row.movement_type) {
+    return getCashboxMovementTypeLabel(row.movement_type);
+  }
+
+  return row.title;
+}
+
+function getDashboardSearchMovementName(row: DashboardSearchRow) {
+  if (!row.movement_name) {
+    return null;
+  }
+
+  if (
+    row.type === "cashbox_movement" &&
+    row.movement_type &&
+    row.movement_name === row.movement_type
+  ) {
+    return getCashboxMovementTypeLabel(row.movement_type);
+  }
+
+  return row.movement_name;
+}
+
+function getCashboxMovementTypeLabel(
+  type: NonNullable<DashboardSearchRow["movement_type"]>
+) {
+  const labels: Record<NonNullable<DashboardSearchRow["movement_type"]>, string> = {
+    conversion_in: "Conversion entrada",
+    conversion_out: "Conversion salida",
+    expense: "Egreso",
+    income: "Ingreso"
+  };
+
+  return labels[type];
 }
 
 function toDashboardSearchHref(row: DashboardSearchRow) {

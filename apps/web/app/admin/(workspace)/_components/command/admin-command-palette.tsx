@@ -284,20 +284,21 @@ function DashboardSearchResultItem({
   query: string;
 }) {
   const Icon = getDashboardSearchIcon(item);
+  const title = getDashboardSearchTitle(item);
   const metadata = getDashboardSearchMetadata(item);
   const secondaryText = getDashboardSearchSecondaryText(item);
   const descriptionText = getDashboardSearchDescriptionText(item);
 
   return (
     <CommandItem
-      value={`${item.title} ${item.description ?? ""} ${item.caseNumber ?? ""} ${item.caseCaption ?? ""} ${item.fileName ?? ""} ${item.fileType ?? ""} ${item.movementName ?? ""} ${item.movementType ?? ""}`}
+      value={getDashboardSearchResultValue(item)}
       onSelect={onSelect}
       className="min-h-16 cursor-pointer items-start rounded-[14px] px-2.5 py-2 text-left text-foreground transition-colors data-[selected=true]:bg-secondary/70 data-[selected=true]:text-foreground"
     >
       <Icon className="mt-0.5 h-[18px] w-[18px] shrink-0 text-foreground" aria-hidden="true" />
       <span className="grid min-w-0 flex-1 gap-0.5">
         <span className="truncate text-sm font-medium leading-5">
-          <SearchHighlight query={query} text={item.title} />
+          <SearchHighlight query={query} text={title} />
         </span>
         {secondaryText ? (
           <span className="truncate text-xs leading-5 text-muted-foreground">
@@ -315,6 +316,34 @@ function DashboardSearchResultItem({
       </span>
     </CommandItem>
   );
+}
+
+function getDashboardSearchResultValue(item: DashboardSearchItemDto) {
+  const movementTypeSearchText = getMovementTypeSearchText(item.movementType);
+
+  return [
+    item.type,
+    item.id,
+    item.href,
+    getDashboardSearchTitle(item),
+    item.description,
+    item.caseNumber,
+    item.caseCaption,
+    item.fileName,
+    item.fileType,
+    item.movementName,
+    movementTypeSearchText
+  ]
+    .filter(Boolean)
+    .join(" ");
+}
+
+function getDashboardSearchTitle(item: DashboardSearchItemDto) {
+  if (item.type === "cashbox_movement" && item.movementType && item.title === item.movementType) {
+    return getMovementTypeLabel(item.movementType);
+  }
+
+  return item.title;
 }
 
 function getDashboardSearchIcon(item: DashboardSearchItemDto) {
@@ -406,6 +435,26 @@ function getMovementTypeLabel(type: DashboardSearchItemDto["movementType"]) {
   }
 
   return "Movimiento";
+}
+
+function getMovementTypeSearchText(type: DashboardSearchItemDto["movementType"]) {
+  if (type === "income") {
+    return "Ingreso Ingresos";
+  }
+
+  if (type === "expense") {
+    return "Egreso Egresos";
+  }
+
+  if (type === "conversion_in") {
+    return "Conversion entrada Ingresos";
+  }
+
+  if (type === "conversion_out") {
+    return "Conversion salida Egresos";
+  }
+
+  return null;
 }
 
 function formatDashboardSearchDate(date: string) {

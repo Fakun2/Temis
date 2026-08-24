@@ -159,9 +159,15 @@ export class CasesController {
   createTask(
     @ActiveTenant() tenantId: string,
     @Param("caseId") caseId: string,
-    @Body() input: CreateCaseTaskDto
+    @Body() input: CreateCaseTaskDto,
+    @Req() request: AuthenticatedRequest
   ) {
-    return this.casesService.createTask(tenantId, caseId, input);
+    return this.casesService.createTask(
+      tenantId,
+      caseId,
+      request.user?.sub ?? missingAuthenticatedUser(),
+      input
+    );
   }
 
   @Patch(":caseId/tasks/:taskId")
@@ -171,9 +177,16 @@ export class CasesController {
     @ActiveTenant() tenantId: string,
     @Param("caseId") caseId: string,
     @Param("taskId") taskId: string,
-    @Body() input: UpdateCaseTaskDto
+    @Body() input: UpdateCaseTaskDto,
+    @Req() request: AuthenticatedRequest
   ) {
-    return this.casesService.updateTask(tenantId, caseId, taskId, input);
+    return this.casesService.updateTask(
+      tenantId,
+      caseId,
+      taskId,
+      request.user?.sub ?? missingAuthenticatedUser(),
+      input
+    );
   }
 
   @Patch(":caseId/tasks/:taskId/seen")
@@ -340,9 +353,15 @@ export class CasesController {
   createHearing(
     @ActiveTenant() tenantId: string,
     @Param("caseId") caseId: string,
-    @Body() input: CreateCaseHearingDto
+    @Body() input: CreateCaseHearingDto,
+    @Req() request: AuthenticatedRequest
   ) {
-    return this.casesService.createHearing(tenantId, caseId, input);
+    return this.casesService.createHearing(
+      tenantId,
+      caseId,
+      request.user?.sub ?? missingAuthenticatedUser(),
+      input
+    );
   }
 
   @Patch(":caseId/hearings/:hearingId")
@@ -352,9 +371,16 @@ export class CasesController {
     @ActiveTenant() tenantId: string,
     @Param("caseId") caseId: string,
     @Param("hearingId") hearingId: string,
-    @Body() input: UpdateCaseHearingDto
+    @Body() input: UpdateCaseHearingDto,
+    @Req() request: AuthenticatedRequest
   ) {
-    return this.casesService.updateHearing(tenantId, caseId, hearingId, input);
+    return this.casesService.updateHearing(
+      tenantId,
+      caseId,
+      hearingId,
+      request.user?.sub ?? missingAuthenticatedUser(),
+      input
+    );
   }
 
   @Delete(":caseId/hearings/:hearingId")

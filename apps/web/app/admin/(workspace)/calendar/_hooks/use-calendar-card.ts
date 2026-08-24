@@ -1,6 +1,8 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
+import type { CaseCalendarEventDto } from "../../cases/_types/cases.types";
 import { casesQueries } from "../../cases/_api/cases.query-controller";
 import { useCasesQuery } from "../../cases/_hooks/use-cases-query";
 import {
@@ -14,23 +16,22 @@ import {
   getCurrentMonthKey,
   shiftMonth
 } from "../_utils/calendar-date-utils";
+import { buildCalendarEventHref } from "../_utils/calendar-event-navigation";
 
 export function useCalendarCard({
   caseId,
   canCreateTask,
   taskSheetOpen = false,
-  canUpdateExpense,
   scope = "case"
 }: {
   caseId?: string;
   canCreateTask: boolean;
   taskSheetOpen?: boolean;
-  canUpdateExpense: boolean;
   scope?: "case" | "tenant";
 }) {
+  const router = useRouter();
   const [month, setMonth] = useState(() => getCurrentMonthKey());
   const [listPageIndex, setListPageIndex] = useState(0);
-  const [selectedExpenseId, setSelectedExpenseId] = useState<string | null>(null);
   const [view, setView] = useState<CalendarView>("month");
   const [visibleEventTypes, setVisibleEventTypes] = useState<CalendarEventType[]>([
     ...defaultCalendarEventTypes
@@ -49,13 +50,6 @@ export function useCalendarCard({
     ...casesQueries.taskAssignees(),
     enabled: canCreateTask && taskSheetOpen
   });
-  const selectedExpenseQuery = useCasesQuery(
-    casesQueries.expense({
-      caseId: caseId ?? "",
-      enabled: Boolean(selectedExpenseId && caseId),
-      expenseId: selectedExpenseId ?? "00000000-0000-0000-0000-000000000000"
-    })
-  );
   const visibleMonthEvents = useMemo(
     () => filterCalendarEvents(calendarQuery.data?.events ?? [], visibleEventTypes),
     [calendarQuery.data?.events, visibleEventTypes]
@@ -92,9 +86,14 @@ export function useCalendarCard({
     setMonth((currentMonth) => shiftMonth(currentMonth, direction));
   }
 
-  function selectCalendarEvent(event: { id: string; type: string }) {
-    if (event.type === "payment_due" && canUpdateExpense && caseId) {
-      setSelectedExpenseId(event.id);
+  function canSelectCalendarEvent(event: CaseCalendarEventDto) {
+    return Boolean(buildCalendarEventHref(event, caseId));
+  }
+
+  function selectCalendarEvent(event: CaseCalendarEventDto) {
+    const href = buildCalendarEventHref(event, caseId);
+    if (href) {
+      router.push(href);
     }
   }
 
@@ -125,14 +124,12 @@ export function useCalendarCard({
     },
     assignees: assigneesQuery.data ?? [],
     assigneesQuery,
+    canSelectCalendarEvent,
     clearEventTypes,
     goToToday,
     month,
     navigateMonth,
     selectCalendarEvent,
-    selectedExpenseId,
-    selectedExpenseQuery,
-    setSelectedExpenseId,
     setView,
     toggleEventType,
     view,

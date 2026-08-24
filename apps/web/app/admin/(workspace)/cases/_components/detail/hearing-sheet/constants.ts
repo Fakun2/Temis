@@ -7,6 +7,12 @@ export const caseHearingTypeOptions = mapRecordToOptions(caseHearingTypeLabels);
 export const emptyCaseHearingDraft: CaseHearingFormValues = {
   date: "",
   description: "",
+  notificationDate: "",
+  notificationEnabled: false,
+  notificationMembershipIds: [],
+  notificationPracticeAreaId: "",
+  notificationRecipientMode: "self",
+  notificationTime: "",
   notificationsEnabled: false,
   time: "",
   type: "preliminary"

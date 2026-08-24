@@ -22,7 +22,6 @@ export function CalendarCard({
   canCreateExpense,
   canCreateHearing,
   canCreateTask,
-  canUpdateExpense,
   caseId,
   caseFiltersDisabled,
   onClearCaseFilter,
@@ -30,7 +29,6 @@ export function CalendarCard({
   selectedCase = null,
   scope = "case"
 }: CalendarCardProps) {
-  const canUseCaseActions = Boolean(caseId);
   const [createAction, setCreateAction] = useState<{
     date: string;
     day: number;
@@ -40,7 +38,6 @@ export function CalendarCard({
   const openSheetTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const calendar = useCalendarCard({
     canCreateTask,
-    canUpdateExpense,
     caseId,
     scope,
     taskSheetOpen: activeCreateSheet === "task"
@@ -116,8 +113,10 @@ export function CalendarCard({
             canCreateTask={canCreateTask}
             events={calendar.visibleMonthEvents}
             isFetching={calendar.calendarQuery.isFetching}
+            isEventSelectable={calendar.canSelectCalendarEvent}
             month={calendar.month}
             onCreateRequest={openCreateActions}
+            onEventSelect={calendar.selectCalendarEvent}
           />
         ) : (
           <CalendarEventList
@@ -126,26 +125,13 @@ export function CalendarCard({
             events={calendar.visibleListEvents}
             goBack={calendar.calendarListPagination.goBack}
             goForward={calendar.calendarListPagination.goForward}
+            isEventSelectable={calendar.canSelectCalendarEvent}
             onEventSelect={calendar.selectCalendarEvent}
             pageIndex={calendar.calendarListPagination.pageIndex}
             totalEvents={calendar.visibleEventsCount}
           />
         )}
       </CardContent>
-      {canUseCaseActions && canUpdateExpense && caseId && calendar.selectedExpenseQuery.data ? (
-        <CaseExpenseSheet
-          caseId={caseId}
-          expense={calendar.selectedExpenseQuery.data}
-          hideTaskSelect
-          onOpenChange={(open) => {
-            if (!open) {
-              calendar.setSelectedExpenseId(null);
-            }
-          }}
-          open={Boolean(calendar.selectedExpenseId)}
-          tasks={[]}
-        />
-      ) : null}
       {createAction ? (
         <CalendarEmptyDayActions
           canCreateExpense={canCreateExpense}

@@ -47,6 +47,9 @@ los modelos MVP esten completos.
 - `CaseExpense` -> `case_expenses`
 - `CaseExpenseAttachment` -> `case_expense_attachments`
 - `CaseExpenseCashboxSyncJob` -> `case_expense_cashbox_sync_jobs`
+- `NotificationReminder` -> `notification_reminders`
+- `NotificationReminderRecipient` -> `notification_reminder_recipients`
+- `AsyncOutboxEvent` -> `async_outbox_events`
 - `Currency` -> `currencies`
 - `GlobalFinanceCategory` -> `global_finance_categories`
 - `TenantFinanceCategory` -> `tenant_finance_categories`
@@ -67,7 +70,6 @@ MVP:
 
 - `opposing_parties`
 - `task_responsibles`
-- `notifications`
 
 Post-MVP o despues del core legal:
 
@@ -108,7 +110,7 @@ Post-MVP o despues del core legal:
   metadata tenant-scoped, carpeta opcional, expediente opcional, categoria
   opcional y referencia privada S3-compatible; upload, preview y download se
   resuelven por API proxy sin exponer bucket/key al frontend. `status =
-  deleting` oculta documentos cuyo borrado definitivo esta esperando cleanup de
+deleting` oculta documentos cuyo borrado definitivo esta esperando cleanup de
   storage.
 - `document_storage_cleanup_jobs` es el outbox durable para borrar objetos del
   storage externo sin depender de una transaccion distribuida con PostgreSQL.
@@ -123,6 +125,14 @@ Post-MVP o despues del core legal:
   por `case_expense_id`; los fallos guardan `last_error`, incrementan
   `attempts` y quedan disponibles para reintento sin bloquear la edicion del
   gasto.
+- `notification_reminders` es el outbox persistente tenant-scoped para
+  recordatorios in-app de tareas, gastos, audiencias y futuras reuniones. Cada
+  recurso tiene como maximo un recordatorio activo por tenant, programado con
+  `scheduled_at`/`next_run_at`, estado operativo, intentos y error normalizado.
+- `notification_reminder_recipients` materializa los destinatarios al momento de
+  programar el recordatorio. Soporta destinatarios por creador, tenant completo,
+  area de trabajo o miembros especificos; el inbox consulta por
+  `tenant_id`, `recipient_membership_id` y `read_at`.
 - `ai_chat_runs` registra auditoria minima tenant-scoped de ejecuciones IA.
   Guarda metadata operativa, modelo, herramienta, tokens, estado y error
   normalizado; no guarda prompts ni respuestas completas.

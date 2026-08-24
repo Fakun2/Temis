@@ -17,8 +17,11 @@ import {
   caseSelectTriggerClassName,
   caseTextareaClassName
 } from "../../../_constants/cases.constants";
+import { casesQueries } from "../../../_api/cases.query-controller";
+import { useCasesQuery } from "../../../_hooks/use-cases-query";
 import { CasePickerField } from "../../case-picker-field";
 import { CaseActionSheet } from "../case-action-sheet";
+import { NotificationSettingsField } from "../notification-settings-field";
 import { CaseDateInput } from "../../sheet/case-date-input";
 import { CaseField } from "../../sheet/case-field";
 import { caseTaskStatusOptions, unassignedTaskAssigneeValue } from "./constants";
@@ -46,6 +49,7 @@ export function CaseTaskSheet({
   });
   const canSelectCase = !task && !caseId;
   const isMissingCase = !selectedCaseId;
+  const notificationOptionsQuery = useCasesQuery(casesQueries.notificationOptions());
 
   useEffect(() => {
     if (open) {
@@ -155,6 +159,13 @@ export function CaseTaskSheet({
           onChange={(event) => updateDraft("notes", event.target.value)}
         />
       </CaseField>
+
+      <NotificationSettingsField
+        draft={draft}
+        errors={errors}
+        options={notificationOptionsQuery.data}
+        updateDraft={updateDraft}
+      />
     </CaseActionSheet>
   );
 }

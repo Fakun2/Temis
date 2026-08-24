@@ -45,10 +45,11 @@ switch (command) {
       "--force-recreate",
       "postgres",
       "redis",
+      "rabbitmq",
       "minio",
       "minio-init"
     ]);
-    compose(["stop", "api", "web", "nginx"]);
+    compose(["stop", "api", "worker", "web", "nginx"]);
     break;
   case "infra:down":
     compose(["stop"]);
@@ -84,9 +85,11 @@ function removeConflictingContainers() {
   const containerNames = [
     "postgres",
     "redis",
+    "rabbitmq",
     "minio",
     "minio-init",
     "api",
+    "worker",
     "web",
     "nginx"
   ].map((service) => `${getContainerPrefix()}-${service}`);

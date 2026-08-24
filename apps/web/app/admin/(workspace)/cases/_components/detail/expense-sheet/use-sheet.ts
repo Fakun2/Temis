@@ -54,10 +54,11 @@ export function useCaseExpenseSheet({
     setErrors({});
     const nextDraft = expense
       ? mapExpenseToDraft(expense)
-        : {
+      : {
           ...emptyCaseExpenseDraft,
           currencyCode: defaultCurrencyCode ?? emptyCaseExpenseDraft.currencyCode,
           expenseDate: defaultDate ?? emptyCaseExpenseDraft.expenseDate,
+          notificationDate: defaultDate ?? emptyCaseExpenseDraft.notificationDate,
           paymentDate: defaultDate ?? emptyCaseExpenseDraft.paymentDate,
           taskId: defaultTaskId ?? ""
         };
@@ -133,42 +134,21 @@ export function useCaseExpenseSheet({
 }
 
 function mapExpenseToDraft(expense: CaseExpenseDto): CaseExpenseFormValues {
-  const alertParts = getAlertParts(expense.alertAt);
-
   return {
-    alertDate: alertParts.date,
-    alertEnabled: expense.alertEnabled,
-    alertTime: alertParts.time,
     amount: expense.amount,
     concept: expense.concept,
     currencyCode: expense.currencyCode,
     expenseDate: expense.expenseDate,
     notes: expense.notes ?? "",
+    notificationDate: expense.notificationDate ?? "",
+    notificationEnabled: expense.notificationEnabled,
+    notificationMembershipIds: expense.notificationMembershipIds,
+    notificationPracticeAreaId: expense.notificationPracticeAreaId ?? "",
+    notificationRecipientMode: expense.notificationRecipientMode,
+    notificationTime: expense.notificationTime ?? "",
     paymentDate: expense.paymentDate,
     status: expense.status === "overdue" ? "pending" : expense.status,
     taskId: expense.taskId ?? ""
-  };
-}
-
-function getAlertParts(alertAt: string | null) {
-  if (!alertAt) {
-    return { date: "", time: "" };
-  }
-
-  const parts = new Intl.DateTimeFormat("en-CA", {
-    day: "2-digit",
-    hour: "2-digit",
-    hour12: false,
-    minute: "2-digit",
-    month: "2-digit",
-    timeZone: "America/Buenos_Aires",
-    year: "numeric"
-  }).formatToParts(new Date(alertAt));
-  const partMap = Object.fromEntries(parts.map((part) => [part.type, part.value]));
-
-  return {
-    date: `${partMap.year}-${partMap.month}-${partMap.day}`,
-    time: `${partMap.hour}:${partMap.minute}`
   };
 }
 

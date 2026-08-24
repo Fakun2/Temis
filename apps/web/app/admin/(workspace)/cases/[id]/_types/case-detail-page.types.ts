@@ -19,3 +19,10 @@ export type CaseDetailPermissions = {
 };
 
 export type CaseDetailSession = NonNullable<BogaapSession>;
+
+export type CaseDetailCalendarFocus = "expense" | "hearing" | "task";
+
+export type CaseDetailCalendarTarget = {
+  eventId: string;
+  focus: CaseDetailCalendarFocus;
+} | null;

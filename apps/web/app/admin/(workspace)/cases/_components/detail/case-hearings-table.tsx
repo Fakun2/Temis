@@ -25,12 +25,14 @@ export function CaseHearingsTable({
   canCreate,
   canDelete,
   canUpdate,
-  caseId
+  caseId,
+  focusedHearingId
 }: {
   canCreate: boolean;
   canDelete: boolean;
   canUpdate: boolean;
   caseId: string;
+  focusedHearingId?: string | null;
 }) {
   const hearingsQuery = useCaseHearingsQuery(caseId);
   const hearings = hearingsQuery.data?.items ?? [];
@@ -86,6 +88,7 @@ export function CaseHearingsTable({
               caseId={caseId}
               columnCount={4 + (hasActions ? 1 : 0)}
               errorMessage={hearingsQuery.error?.message}
+              focusedHearingId={focusedHearingId}
               hasActions={hasActions}
               hearings={hearings}
               isLoading={hearingsQuery.isLoading}
@@ -125,6 +128,7 @@ function HearingsTableBody({
   caseId,
   columnCount,
   errorMessage,
+  focusedHearingId,
   hasActions,
   hearings,
   isLoading,
@@ -135,6 +139,7 @@ function HearingsTableBody({
   caseId: string;
   columnCount: number;
   errorMessage?: string;
+  focusedHearingId?: string | null;
   hasActions: boolean;
   hearings: CaseHearingDto[];
   isLoading: boolean;
@@ -166,7 +171,14 @@ function HearingsTableBody({
   return (
     <TableBody className="[&_tr:last-child]:border-0">
       {hearings.map((hearing) => (
-        <TableRow className="h-16 border-border/40 hover:bg-secondary/30" key={hearing.id}>
+        <TableRow
+          className={`h-16 border-border/40 hover:bg-secondary/30 ${
+            focusedHearingId === hearing.id
+              ? "bg-primary/10 ring-1 ring-inset ring-primary/25"
+              : ""
+          }`}
+          key={hearing.id}
+        >
           <TableCell className="px-3 py-3 font-medium">
             {caseHearingTypeLabels[hearing.type]}
           </TableCell>

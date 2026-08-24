@@ -23,6 +23,7 @@ export function CalendarEventList({
   events,
   goBack,
   goForward,
+  isEventSelectable,
   onEventSelect,
   pageIndex,
   totalEvents
@@ -32,6 +33,7 @@ export function CalendarEventList({
   events: CaseCalendarEventDto[];
   goBack: () => void;
   goForward: () => void;
+  isEventSelectable: (event: CaseCalendarEventDto) => boolean;
   onEventSelect: (event: CaseCalendarEventDto) => void;
   pageIndex: number;
   totalEvents: number;
@@ -50,38 +52,41 @@ export function CalendarEventList({
       aria-label="Eventos del calendario"
     >
       <ul className="grid min-h-0 content-start gap-2 overflow-auto p-2">
-        {events.map((event) => (
-          <li
-            key={`${event.type}-${event.id}`}
-          >
-            <button
-              type="button"
-              className="grid min-h-[58px] w-full gap-2 rounded-xl border border-border/40 bg-card px-3 py-2.5 text-left shadow-[0_10px_24px_-24px_rgba(15,23,42,0.45)] transition-colors hover:bg-secondary/25 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/30 sm:grid-cols-[112px_1fr_auto] sm:items-center sm:px-4"
-              onClick={() => onEventSelect(event)}
-            >
-              <time className="text-sm font-medium text-muted-foreground" dateTime={event.date}>
-                {formatCaseDate(event.date)}
-              </time>
-              <span className="min-w-0">
-                <span className="flex min-w-0 items-center gap-2">
-                  <span
-                    className={`h-2 w-2 shrink-0 rounded-full ${calendarEventTypeDotClassNames[event.type]}`}
-                    aria-hidden="true"
-                  />
-                  <span className="truncate text-sm font-semibold text-foreground">
-                    {event.title}
+        {events.map((event) => {
+          const selectable = isEventSelectable(event);
+
+          return (
+            <li key={`${event.type}-${event.id}`}>
+              <button
+                type="button"
+                className="grid min-h-[58px] w-full gap-2 rounded-xl border border-border/40 bg-card px-3 py-2.5 text-left shadow-[0_10px_24px_-24px_rgba(15,23,42,0.45)] transition-colors hover:bg-secondary/25 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/30 disabled:cursor-not-allowed disabled:opacity-55 disabled:hover:bg-card sm:grid-cols-[112px_1fr_auto] sm:items-center sm:px-4"
+                disabled={!selectable}
+                onClick={() => onEventSelect(event)}
+              >
+                <time className="text-sm font-medium text-muted-foreground" dateTime={event.date}>
+                  {formatCaseDate(event.date)}
+                </time>
+                <span className="min-w-0">
+                  <span className="flex min-w-0 items-center gap-2">
+                    <span
+                      className={`h-2 w-2 shrink-0 rounded-full ${calendarEventTypeDotClassNames[event.type]}`}
+                      aria-hidden="true"
+                    />
+                    <span className="truncate text-sm font-semibold text-foreground">
+                      {event.title}
+                    </span>
+                  </span>
+                  <span className="mt-1 block text-xs text-muted-foreground">
+                    {event.caseNumber
+                      ? `${event.caseNumber} - ${event.caseCaption ?? "Expediente"}`
+                      : calendarEventTypeShortLabels[event.type]}
                   </span>
                 </span>
-                <span className="mt-1 block text-xs text-muted-foreground">
-                  {event.caseNumber
-                    ? `${event.caseNumber} - ${event.caseCaption ?? "Expediente"}`
-                    : calendarEventTypeShortLabels[event.type]}
-                </span>
-              </span>
-              <EventListMeta event={event} />
-            </button>
-          </li>
-        ))}
+                <EventListMeta event={event} />
+              </button>
+            </li>
+          );
+        })}
       </ul>
       <CalendarEventListPagination
         canGoBack={canGoBack}

@@ -1,6 +1,8 @@
 import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
 import { createZodDto } from "nestjs-zod";
 import { z } from "zod";
+import { optionalBooleanInputSchema } from "../common/boolean.schemas";
+import { notificationSettingsSchema } from "../notifications/notifications.schemas";
 
 const optionalTrimmedString = z.preprocess(
   (value) => (typeof value === "string" && value.trim() === "" ? undefined : value),
@@ -106,23 +108,17 @@ const caseInputSchema = z.object({
 export const createCaseSchema = caseInputSchema;
 export const updateCaseSchema = caseInputSchema;
 
-const caseTaskInputSchema = z.object({
-  name: z.string().trim().min(2).max(160),
-  assignedMembershipId: optionalNullableUuid,
-  startDate: optionalTrimmedString,
-  endDate: optionalTrimmedString,
-  status: caseTaskStatusSchema.default("pending"),
-  notes: optionalTrimmedString
-});
+const caseTaskInputSchema = z
+  .object({
+    name: z.string().trim().min(2).max(160),
+    assignedMembershipId: optionalNullableUuid,
+    startDate: optionalTrimmedString,
+    endDate: optionalTrimmedString,
+    status: caseTaskStatusSchema.default("pending"),
+    notes: optionalTrimmedString
+  })
+  .and(notificationSettingsSchema);
 
-const alertTimeSchema = z.preprocess(
-  (value) => (typeof value === "string" && value.trim() === "" ? undefined : value),
-  z
-    .string()
-    .trim()
-    .regex(/^([01]\d|2[0-3]):[0-5]\d$/)
-    .optional()
-);
 const caseExpenseInputSchema = z
   .object({
     concept: z.string().trim().min(3).max(160),
@@ -132,43 +128,22 @@ const caseExpenseInputSchema = z
     paymentDate: requiredDateString,
     status: caseExpenseEditableStatusSchema,
     notes: optionalTrimmedString.pipe(z.string().max(100).optional()),
-    alertEnabled: z.coerce.boolean().default(false),
-    alertDate: optionalTrimmedString,
-    alertTime: alertTimeSchema,
     taskId: optionalUuid
   })
-  .superRefine((input, context) => {
-    if (!input.alertEnabled) {
-      return;
-    }
+  .and(notificationSettingsSchema);
 
-    if (!input.alertDate) {
-      context.addIssue({
-        code: z.ZodIssueCode.custom,
-        message: "La fecha de alerta es obligatoria.",
-        path: ["alertDate"]
-      });
-    }
-
-    if (!input.alertTime) {
-      context.addIssue({
-        code: z.ZodIssueCode.custom,
-        message: "La hora de alerta es obligatoria.",
-        path: ["alertTime"]
-      });
-    }
-  });
-
-const caseHearingInputSchema = z.object({
-  type: caseHearingTypeSchema,
-  date: requiredDateString,
-  time: z
-    .string()
-    .trim()
-    .regex(/^([01]\d|2[0-3]):[0-5]\d$/),
-  description: z.string().trim().min(3).max(500),
-  notificationsEnabled: z.coerce.boolean().default(false)
-});
+const caseHearingInputSchema = z
+  .object({
+    type: caseHearingTypeSchema,
+    date: requiredDateString,
+    time: z
+      .string()
+      .trim()
+      .regex(/^([01]\d|2[0-3]):[0-5]\d$/),
+    description: z.string().trim().min(3).max(500),
+    notificationsEnabled: optionalBooleanInputSchema
+  })
+  .and(notificationSettingsSchema);
 
 export const listCasesQuerySchema = z.object({
   limit: z.coerce.number().int().min(1).max(50).default(8),
@@ -227,7 +202,7 @@ export const listCaseDocumentsQuerySchema = z.object({
 export const listDocumentCategoriesQuerySchema = z.object({
   limit: z.coerce.number().int().min(1).max(50).default(50),
   cursor: optionalTrimmedString,
-  active: z.coerce.boolean().optional()
+  active: optionalBooleanInputSchema
 });
 
 export const createCaseDocumentBodySchema = z.object({
@@ -456,6 +431,24 @@ export class CaseTaskDto {
   @ApiProperty({ nullable: true, type: String })
   notes!: string | null;
 
+  @ApiProperty({ example: false })
+  notificationEnabled!: boolean;
+
+  @ApiProperty({ nullable: true, type: String, format: "date" })
+  notificationDate!: string | null;
+
+  @ApiProperty({ nullable: true, type: String, example: "09:30" })
+  notificationTime!: string | null;
+
+  @ApiProperty({ enum: ["self", "tenant", "practice_area", "members"], example: "self" })
+  notificationRecipientMode!: "self" | "tenant" | "practice_area" | "members";
+
+  @ApiProperty({ nullable: true, type: String, format: "uuid" })
+  notificationPracticeAreaId!: string | null;
+
+  @ApiProperty({ type: [String], format: "uuid" })
+  notificationMembershipIds!: string[];
+
   @ApiProperty({ nullable: true, type: String, format: "date-time" })
   lastSeenAt!: string | null;
 
@@ -568,6 +561,24 @@ export class CaseExpenseDto {
   @ApiProperty({ nullable: true, type: String, format: "date-time" })
   alertAt!: string | null;
 
+  @ApiProperty({ example: false })
+  notificationEnabled!: boolean;
+
+  @ApiProperty({ nullable: true, type: String, format: "date" })
+  notificationDate!: string | null;
+
+  @ApiProperty({ nullable: true, type: String, example: "09:30" })
+  notificationTime!: string | null;
+
+  @ApiProperty({ enum: ["self", "tenant", "practice_area", "members"], example: "self" })
+  notificationRecipientMode!: "self" | "tenant" | "practice_area" | "members";
+
+  @ApiProperty({ nullable: true, type: String, format: "uuid" })
+  notificationPracticeAreaId!: string | null;
+
+  @ApiProperty({ type: [String], format: "uuid" })
+  notificationMembershipIds!: string[];
+
   @ApiProperty({ type: [CaseExpenseAttachmentDto] })
   attachments!: CaseExpenseAttachmentDto[];
 
@@ -599,6 +610,24 @@ export class CaseHearingDto {
 
   @ApiProperty({ example: true })
   notificationsEnabled!: boolean;
+
+  @ApiProperty({ example: false })
+  notificationEnabled!: boolean;
+
+  @ApiProperty({ nullable: true, type: String, format: "date" })
+  notificationDate!: string | null;
+
+  @ApiProperty({ nullable: true, type: String, example: "09:30" })
+  notificationTime!: string | null;
+
+  @ApiProperty({ enum: ["self", "tenant", "practice_area", "members"], example: "self" })
+  notificationRecipientMode!: "self" | "tenant" | "practice_area" | "members";
+
+  @ApiProperty({ nullable: true, type: String, format: "uuid" })
+  notificationPracticeAreaId!: string | null;
+
+  @ApiProperty({ type: [String], format: "uuid" })
+  notificationMembershipIds!: string[];
 
   @ApiProperty({ format: "date-time" })
   createdAt!: string;

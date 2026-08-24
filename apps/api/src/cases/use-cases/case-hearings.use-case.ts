@@ -1,6 +1,7 @@
 import { Injectable, NotFoundException } from "@nestjs/common";
 import { Prisma } from "@prisma/client";
 import { PrismaService, type TenantPrismaClient } from "../../database/prisma.service";
+import { NotificationsService } from "../../notifications/notifications.service";
 import type {
   CreateCaseHearingInput,
   ListCaseHearingsQuery,
@@ -9,7 +10,10 @@ import type {
 
 @Injectable()
 export class CaseHearingsUseCase {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly notifications: NotificationsService
+  ) {}
 
   async list(tenantId: string, caseId: string, query: ListCaseHearingsQuery) {
     return this.prisma.runWithTenant(tenantId, (tx) =>
@@ -39,8 +43,15 @@ export class CaseHearingsUseCase {
     const lastItem = pageItems.at(-1);
     const hasNextPage = hearings.length > query.limit;
 
+    const reminderConfigs = await this.notifications.getReminderConfigs(
+      tenantId,
+      "case_hearing",
+      pageItems.map((hearing) => hearing.id),
+      prisma
+    );
+
     return {
-      items: pageItems.map(toCaseHearingDto),
+      items: pageItems.map((hearing) => toCaseHearingDto(hearing, reminderConfigs.get(hearing.id))),
       pageInfo: {
         limit: query.limit,
         offset: 0,
@@ -54,9 +65,14 @@ export class CaseHearingsUseCase {
     };
   }
 
-  async create(tenantId: string, caseId: string, input: CreateCaseHearingInput) {
+  async create(
+    tenantId: string,
+    caseId: string,
+    actorUserId: string,
+    input: CreateCaseHearingInput
+  ) {
     return this.prisma.runWithTenant(tenantId, (tx) =>
-      this.createWithClient(tx, tenantId, caseId, input)
+      this.createWithClient(tx, tenantId, caseId, actorUserId, input)
     );
   }
 
@@ -64,6 +80,7 @@ export class CaseHearingsUseCase {
     prisma: TenantPrismaClient,
     tenantId: string,
     caseId: string,
+    actorUserId: string,
     input: CreateCaseHearingInput
   ) {
     await this.findTenantCaseOrThrow(prisma, tenantId, caseId);
@@ -75,13 +92,21 @@ export class CaseHearingsUseCase {
       },
       select: caseHearingSelect
     });
+    await this.syncReminder(prisma, tenantId, caseId, actorUserId, createdHearing, input);
 
-    return toCaseHearingDto(createdHearing);
+    const reminderConfig = await this.getReminderConfig(prisma, tenantId, createdHearing.id);
+    return toCaseHearingDto(createdHearing, reminderConfig);
   }
 
-  async update(tenantId: string, caseId: string, hearingId: string, input: UpdateCaseHearingInput) {
+  async update(
+    tenantId: string,
+    caseId: string,
+    hearingId: string,
+    actorUserId: string,
+    input: UpdateCaseHearingInput
+  ) {
     return this.prisma.runWithTenant(tenantId, (tx) =>
-      this.updateWithClient(tx, tenantId, caseId, hearingId, input)
+      this.updateWithClient(tx, tenantId, caseId, hearingId, actorUserId, input)
     );
   }
 
@@ -90,6 +115,7 @@ export class CaseHearingsUseCase {
     tenantId: string,
     caseId: string,
     hearingId: string,
+    actorUserId: string,
     input: UpdateCaseHearingInput
   ) {
     await this.findTenantHearingOrThrow(prisma, tenantId, caseId, hearingId);
@@ -98,8 +124,10 @@ export class CaseHearingsUseCase {
       data: toCaseHearingWriteData(input),
       select: caseHearingSelect
     });
+    await this.syncReminder(prisma, tenantId, caseId, actorUserId, updatedHearing, input);
 
-    return toCaseHearingDto(updatedHearing);
+    const reminderConfig = await this.getReminderConfig(prisma, tenantId, updatedHearing.id);
+    return toCaseHearingDto(updatedHearing, reminderConfig);
   }
 
   async delete(tenantId: string, caseId: string, hearingId: string) {
@@ -115,6 +143,7 @@ export class CaseHearingsUseCase {
     hearingId: string
   ) {
     await this.findTenantHearingOrThrow(prisma, tenantId, caseId, hearingId);
+    await this.notifications.cancelForResource(tenantId, "case_hearing", hearingId, prisma);
     await prisma.caseHearing.delete({ where: { id: hearingId } });
 
     return { status: "ok" as const };
@@ -192,6 +221,43 @@ export class CaseHearingsUseCase {
 
     return hearing;
   }
+
+  private async syncReminder(
+    prisma: TenantPrismaClient,
+    tenantId: string,
+    caseId: string,
+    actorUserId: string,
+    hearing: CaseHearingWithSelect,
+    input: CreateCaseHearingInput | UpdateCaseHearingInput
+  ) {
+    await this.notifications.scheduleForResource(
+      {
+        actorUserId,
+        body: hearing.description,
+        caseId,
+        resourceId: hearing.id,
+        resourceType: "case_hearing",
+        settings: input,
+        tenantId,
+        title: `Audiencia: ${hearing.description}`
+      },
+      prisma
+    );
+  }
+
+  private async getReminderConfig(
+    prisma: TenantPrismaClient,
+    tenantId: string,
+    hearingId: string
+  ) {
+    const configs = await this.notifications.getReminderConfigs(
+      tenantId,
+      "case_hearing",
+      [hearingId],
+      prisma
+    );
+    return configs.get(hearingId);
+  }
 }
 
 const caseHearingSelect = {
@@ -226,13 +292,13 @@ function toCaseHearingWriteData(input: CreateCaseHearingInput | UpdateCaseHearin
   return {
     date: new Date(`${input.date}T00:00:00.000Z`),
     description: input.description,
-    notificationsEnabled: input.notificationsEnabled,
+    notificationsEnabled: input.notificationEnabled || input.notificationsEnabled === true,
     time: input.time,
     type: input.type
   };
 }
 
-function toCaseHearingDto(item: CaseHearingWithSelect) {
+function toCaseHearingDto(item: CaseHearingWithSelect, reminderConfig?: ReminderConfig) {
   return {
     id: item.id,
     caseId: item.caseId,
@@ -241,8 +307,25 @@ function toCaseHearingDto(item: CaseHearingWithSelect) {
     time: item.time,
     description: item.description,
     notificationsEnabled: item.notificationsEnabled,
+    ...toNotificationSettingsDto(reminderConfig),
     createdAt: item.createdAt.toISOString(),
     updatedAt: item.updatedAt.toISOString()
+  };
+}
+
+type ReminderConfig =
+  Awaited<ReturnType<NotificationsService["getReminderConfigs"]>> extends Map<string, infer T>
+    ? T
+    : never;
+
+function toNotificationSettingsDto(config?: ReminderConfig) {
+  return {
+    notificationEnabled: config?.notificationEnabled ?? false,
+    notificationDate: config?.notificationDate ?? null,
+    notificationTime: config?.notificationTime ?? null,
+    notificationRecipientMode: config?.notificationRecipientMode ?? "self",
+    notificationPracticeAreaId: config?.notificationPracticeAreaId ?? null,
+    notificationMembershipIds: config?.notificationMembershipIds ?? []
   };
 }
 

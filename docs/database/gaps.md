@@ -77,8 +77,6 @@ Implementado en Prisma y presente en ERD:
 Presente en ERD y no implementado en Prisma:
 
 - `opposing_parties`
-- `notifications`
-- `tasks`
 - `task_responsibles`
 - `expense_categories`
 - `expenses`
@@ -112,8 +110,9 @@ Implementado en Prisma y no conflictivo:
   quedar integrado con una continuacion clara hacia onboarding.
 - `IdentityController` expone respuestas minimas; falta modelo de usuario/tenant
   mas rico para dashboard.
-- No existen modulos completos de `notifications`, `tasks` operativas globales
-  ni `audit-logs`.
+- No existen modulos completos de `tasks` operativas globales ni `audit-logs`.
+  Las notificaciones in-app de tareas, gastos y audiencias existen como outbox
+  persistente del modulo operativo.
 
 ## Gaps de frontend
 

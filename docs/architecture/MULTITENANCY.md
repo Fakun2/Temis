@@ -57,6 +57,8 @@ Implementadas:
 - `tenant_memberships`
 - `tenant_finance_categories`
 - `cashbox_movements`
+- `notification_reminders`
+- `notification_reminder_recipients`
 
 Pendientes:
 
@@ -68,7 +70,6 @@ Pendientes:
 - `documents`
 - `tasks`
 - `task_responsibles`
-- `notifications`
 - entidades financieras restantes.
 
 ## Criterios de aceptacion futuros

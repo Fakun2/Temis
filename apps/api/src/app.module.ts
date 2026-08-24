@@ -16,6 +16,7 @@ import { IdentityModule } from "./identity/identity.module";
 import { ForumsModule } from "./forums/forums.module";
 import { JudicialCentersModule } from "./judicial-centers/judicial-centers.module";
 import { OnboardingModule } from "./onboarding/onboarding.module";
+import { NotificationsModule } from "./notifications/notifications.module";
 import { PracticeAreaTemplatesModule } from "./practice-area-templates/practice-area-templates.module";
 import { ProvincesModule } from "./provinces/provinces.module";
 import { RedisModule } from "./redis/redis.module";
@@ -42,6 +43,7 @@ import { TenancyModule } from "./tenancy/tenancy.module";
     CashboxModule,
     CategoriesModule,
     DocumentsModule,
+    NotificationsModule,
     CasesModule,
     CurrenciesModule,
     DashboardModule,

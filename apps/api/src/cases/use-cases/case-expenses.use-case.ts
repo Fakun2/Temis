@@ -1,6 +1,7 @@
 import { BadRequestException, Injectable, NotFoundException, Optional } from "@nestjs/common";
 import { Prisma } from "@prisma/client";
 import { PrismaService } from "../../database/prisma.service";
+import { NotificationsService } from "../../notifications/notifications.service";
 import type {
   CaseCalendarQuery,
   CreateCaseExpenseInput,
@@ -14,6 +15,7 @@ import { CaseExpenseCashboxSyncUseCase } from "./case-expense-cashbox-sync.use-c
 export class CaseExpensesUseCase {
   constructor(
     private readonly prisma: PrismaService,
+    private readonly notifications: NotificationsService,
     @Optional() private readonly cashboxSync?: CaseExpenseCashboxSyncUseCase
   ) {}
 
@@ -37,8 +39,14 @@ export class CaseExpensesUseCase {
     const lastItem = pageItems.at(-1);
     const hasNextPage = expenses.length > query.limit;
 
+    const reminderConfigs = await this.notifications.getReminderConfigs(
+      tenantId,
+      "case_expense",
+      pageItems.map((expense) => expense.id)
+    );
+
     return {
-      items: pageItems.map(toCaseExpenseDto),
+      items: pageItems.map((expense) => toCaseExpenseDto(expense, reminderConfigs.get(expense.id))),
       pageInfo: {
         limit: query.limit,
         offset: 0,
@@ -63,7 +71,8 @@ export class CaseExpensesUseCase {
       throw new NotFoundException("El gasto no existe en el expediente activo.");
     }
 
-    return toCaseExpenseDto(expense);
+    const reminderConfig = await this.getReminderConfig(tenantId, expense.id);
+    return toCaseExpenseDto(expense, reminderConfig);
   }
 
   async summary(tenantId: string, caseId: string) {
@@ -520,8 +529,10 @@ export class CaseExpensesUseCase {
       select: caseExpenseSelect
     });
     await this.enqueueCashboxSyncForExpense(tenantId, actorUserId, createdExpense);
+    await this.syncReminder(tenantId, actorUserId, createdExpense, input);
 
-    return toCaseExpenseDto(createdExpense);
+    const reminderConfig = await this.getReminderConfig(tenantId, createdExpense.id);
+    return toCaseExpenseDto(createdExpense, reminderConfig);
   }
 
   async update(
@@ -539,13 +550,16 @@ export class CaseExpensesUseCase {
       select: caseExpenseSelect
     });
     await this.enqueueCashboxSyncForExpense(tenantId, actorUserId, updatedExpense);
+    await this.syncReminder(tenantId, actorUserId, updatedExpense, input);
 
-    return toCaseExpenseDto(updatedExpense);
+    const reminderConfig = await this.getReminderConfig(tenantId, updatedExpense.id);
+    return toCaseExpenseDto(updatedExpense, reminderConfig);
   }
 
   async delete(tenantId: string, caseId: string, expenseId: string) {
     await this.findTenantExpenseOrThrow(tenantId, caseId, expenseId);
     await this.cashboxSync?.enqueueDelete({ caseExpenseId: expenseId, caseId, tenantId });
+    await this.notifications.cancelForResource(tenantId, "case_expense", expenseId);
     await this.prisma.caseExpense.delete({ where: { id: expenseId } });
 
     return { status: "ok" as const };
@@ -640,6 +654,36 @@ export class CaseExpensesUseCase {
       caseId: expense.caseId,
       tenantId
     });
+  }
+
+  private async syncReminder(
+    tenantId: string,
+    actorUserId: string,
+    expense: CaseExpenseWithSelect,
+    input: CreateCaseExpenseInput | UpdateCaseExpenseInput
+  ) {
+    if (expense.status === "paid" || expense.status === "cancelled") {
+      await this.notifications.cancelForResource(tenantId, "case_expense", expense.id);
+      return;
+    }
+
+    await this.notifications.scheduleForResource({
+      actorUserId,
+      body: expense.notes,
+      caseId: expense.caseId,
+      resourceId: expense.id,
+      resourceType: "case_expense",
+      settings: input,
+      tenantId,
+      title: `Pago: ${expense.concept}`
+    });
+  }
+
+  private async getReminderConfig(tenantId: string, expenseId: string) {
+    const configs = await this.notifications.getReminderConfigs(tenantId, "case_expense", [
+      expenseId
+    ]);
+    return configs.get(expenseId);
   }
 }
 
@@ -995,8 +1039,10 @@ function toCaseExpenseUpdateData(
 
 function toCaseExpenseWriteData(input: CreateCaseExpenseInput | UpdateCaseExpenseInput) {
   return {
-    alertAt: input.alertEnabled ? toBuenosAiresDateTime(input.alertDate, input.alertTime) : null,
-    alertEnabled: input.alertEnabled,
+    alertAt: input.notificationEnabled
+      ? toBuenosAiresDateTime(input.notificationDate, input.notificationTime)
+      : null,
+    alertEnabled: input.notificationEnabled,
     amount: input.amount,
     concept: input.concept,
     currencyCode: input.currencyCode,
@@ -1022,7 +1068,7 @@ function assertPaidExpensePaymentDateIsToday(
   }
 }
 
-function toCaseExpenseDto(item: CaseExpenseWithSelect) {
+function toCaseExpenseDto(item: CaseExpenseWithSelect, reminderConfig?: ReminderConfig) {
   return {
     id: item.id,
     caseId: item.caseId,
@@ -1038,8 +1084,25 @@ function toCaseExpenseDto(item: CaseExpenseWithSelect) {
     paymentDate: item.paymentDate.toISOString().slice(0, 10),
     status: item.status,
     notes: item.notes,
+    ...toNotificationSettingsDto(reminderConfig),
     createdAt: item.createdAt.toISOString(),
     updatedAt: item.updatedAt.toISOString()
+  };
+}
+
+type ReminderConfig =
+  Awaited<ReturnType<NotificationsService["getReminderConfigs"]>> extends Map<string, infer T>
+    ? T
+    : never;
+
+function toNotificationSettingsDto(config?: ReminderConfig) {
+  return {
+    notificationEnabled: config?.notificationEnabled ?? false,
+    notificationDate: config?.notificationDate ?? null,
+    notificationTime: config?.notificationTime ?? null,
+    notificationRecipientMode: config?.notificationRecipientMode ?? "self",
+    notificationPracticeAreaId: config?.notificationPracticeAreaId ?? null,
+    notificationMembershipIds: config?.notificationMembershipIds ?? []
   };
 }
 

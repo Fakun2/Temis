@@ -12,16 +12,20 @@ function CalendarMonthGridComponent({
   canCreateTask,
   events,
   isFetching,
+  isEventSelectable,
   month,
-  onCreateRequest
+  onCreateRequest,
+  onEventSelect
 }: {
   canCreateExpense: boolean;
   canCreateHearing: boolean;
   canCreateTask: boolean;
   events: CaseCalendarEventDto[];
   isFetching: boolean;
+  isEventSelectable: (event: CaseCalendarEventDto) => boolean;
   month: string;
   onCreateRequest: (date: string, day: number) => void;
+  onEventSelect: (event: CaseCalendarEventDto) => void;
 }) {
   const days = useMemo(() => getCalendarDays(month), [month]);
   const eventsByDate = useMemo(() => groupEventsByDate(events), [events]);
@@ -46,8 +50,10 @@ function CalendarMonthGridComponent({
               day={day.day}
               events={eventsByDate[day.date] ?? []}
               inCurrentMonth={day.inCurrentMonth}
+              isEventSelectable={isEventSelectable}
               key={`${day.date}-${index}`}
               onCreateRequest={onCreateRequest}
+              onEventSelect={onEventSelect}
             />
           ))}
         </ol>

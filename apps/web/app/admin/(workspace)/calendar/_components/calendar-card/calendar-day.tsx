@@ -22,7 +22,9 @@ function CalendarDayComponent({
   day,
   events,
   inCurrentMonth,
-  onCreateRequest
+  isEventSelectable,
+  onCreateRequest,
+  onEventSelect
 }: {
   canCreateExpense: boolean;
   canCreateHearing: boolean;
@@ -31,7 +33,9 @@ function CalendarDayComponent({
   day: number;
   events: CaseCalendarEventDto[];
   inCurrentMonth: boolean;
+  isEventSelectable: (event: CaseCalendarEventDto) => boolean;
   onCreateRequest: (date: string, day: number) => void;
+  onEventSelect: (event: CaseCalendarEventDto) => void;
 }) {
   const hasEvents = events.length > 0;
   const [open, setOpen] = useState(false);
@@ -97,7 +101,14 @@ function CalendarDayComponent({
           </span>
         ) : null}
       </button>
-      {hasEvents && open ? <CalendarDayTooltip date={date} events={events} /> : null}
+      {hasEvents && open ? (
+        <CalendarDayTooltip
+          date={date}
+          events={events}
+          isEventSelectable={isEventSelectable}
+          onEventSelect={onEventSelect}
+        />
+      ) : null}
     </li>
   );
 }

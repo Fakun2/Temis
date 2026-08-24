@@ -13,6 +13,4 @@ export type CaseHearingSheetProps = {
   trigger?: ReactNode;
 };
 
-export type CaseHearingFieldErrors = Partial<
-  Record<keyof CaseHearingFormValues, string>
->;
+export type CaseHearingFieldErrors = Partial<Record<keyof CaseHearingFormValues, string>>;

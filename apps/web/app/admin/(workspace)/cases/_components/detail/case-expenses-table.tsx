@@ -45,13 +45,15 @@ export function CaseExpensesTable({
   canDelete,
   canRead,
   canUpdate,
-  caseId
+  caseId,
+  focusedExpenseId
 }: {
   canCreate: boolean;
   canDelete: boolean;
   canRead: boolean;
   canUpdate: boolean;
   caseId: string;
+  focusedExpenseId?: string | null;
 }) {
   const [statusFilter, setStatusFilter] = useState<CaseExpenseStatus | "all">("all");
   const [currencyFilter, setCurrencyFilter] = useState<string>("all");
@@ -177,6 +179,7 @@ export function CaseExpensesTable({
               errorMessage={expensesQuery.error?.message}
               expenses={expenses}
               hasActions={hasActions}
+              focusedExpenseId={focusedExpenseId}
               isLoading={expensesQuery.isLoading}
               permissionDenied={!expensesQuery.hasPermission}
               tasks={tasks}
@@ -237,6 +240,7 @@ function CaseExpensesTableBody({
   columnCount,
   errorMessage,
   expenses,
+  focusedExpenseId,
   hasActions,
   isLoading,
   permissionDenied,
@@ -249,6 +253,7 @@ function CaseExpensesTableBody({
   columnCount: number;
   errorMessage?: string;
   expenses: CaseExpenseDto[];
+  focusedExpenseId?: string | null;
   hasActions: boolean;
   isLoading: boolean;
   permissionDenied: boolean;
@@ -289,7 +294,14 @@ function CaseExpensesTableBody({
   return (
     <TableBody className="[&_tr:last-child]:border-0">
       {expenses.map((expense) => (
-        <TableRow className="h-16 border-border/40 hover:bg-secondary/30" key={expense.id}>
+        <TableRow
+          className={`h-16 border-border/40 hover:bg-secondary/30 ${
+            focusedExpenseId === expense.id
+              ? "bg-primary/10 ring-1 ring-inset ring-primary/25"
+              : ""
+          }`}
+          key={expense.id}
+        >
           <TableCell className="px-3 py-3">
             <span className="font-medium text-foreground">{expense.concept}</span>
           </TableCell>
@@ -379,6 +391,12 @@ function getTaskOptionsForExpense(tasks: CaseTaskDto[], expense: CaseExpenseDto)
       lastSeenAt: null,
       name: expense.task.name,
       notes: null,
+      notificationDate: null,
+      notificationEnabled: false,
+      notificationMembershipIds: [],
+      notificationPracticeAreaId: null,
+      notificationRecipientMode: "self",
+      notificationTime: null,
       startDate: null,
       status: "pending",
       updatedAt: expense.updatedAt

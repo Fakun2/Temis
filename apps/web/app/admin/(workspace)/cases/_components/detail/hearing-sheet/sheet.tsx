@@ -1,8 +1,7 @@
 "use client";
 
 import { useEffect, useState, type FormEvent } from "react";
-import { Bell, CalendarPlus } from "lucide-react";
-import { Checkbox } from "@/components/ui/checkbox";
+import { CalendarPlus } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import {
   Select,
@@ -18,8 +17,11 @@ import {
   caseSelectTriggerClassName,
   caseTextareaClassName
 } from "../../../_constants/cases.constants";
+import { casesQueries } from "../../../_api/cases.query-controller";
+import { useCasesQuery } from "../../../_hooks/use-cases-query";
 import { CasePickerField } from "../../case-picker-field";
 import { CaseActionSheet } from "../case-action-sheet";
+import { NotificationSettingsField } from "../notification-settings-field";
 import { CaseDateInput } from "../../sheet/case-date-input";
 import { CaseField } from "../../sheet/case-field";
 import { caseHearingTypeOptions } from "./constants";
@@ -48,6 +50,7 @@ export function CaseHearingSheet({
   );
   const canSelectCase = !hearing && !caseId;
   const isMissingCase = canSelectCase && !selectedCaseId;
+  const notificationOptionsQuery = useCasesQuery(casesQueries.notificationOptions());
 
   useEffect(() => {
     if (open) {
@@ -130,16 +133,12 @@ export function CaseHearingSheet({
         />
       </CaseField>
 
-      <label className="flex items-center gap-3 rounded-2xl border border-border/40 bg-card px-4 py-3 text-sm">
-        <Checkbox
-          checked={draft.notificationsEnabled}
-          onCheckedChange={(checked) => updateDraft("notificationsEnabled", checked === true)}
-        />
-        <span className="flex items-center gap-2 text-foreground">
-          <Bell className="h-4 w-4 text-muted-foreground" aria-hidden="true" />
-          Activar notificaciones
-        </span>
-      </label>
+      <NotificationSettingsField
+        draft={draft}
+        errors={errors}
+        options={notificationOptionsQuery.data}
+        updateDraft={updateDraft}
+      />
     </CaseActionSheet>
   );
 }
