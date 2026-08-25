@@ -34,6 +34,27 @@ services:
       timeout: 5s
       retries: 10
 
+  rabbitmq:
+    image: heidiks/rabbitmq-delayed-message-exchange:3.13.3-management
+    container_name: ${CONTAINER_PREFIX:-bogaap-prod}-rabbitmq
+    restart: unless-stopped
+    mem_limit: ${RABBITMQ_MEMORY_LIMIT:-384m}
+    cpus: ${RABBITMQ_CPUS:-0.20}
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER:?Set RABBITMQ_USER in your environment file}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASSWORD:?Set RABBITMQ_PASSWORD in your environment file}
+      RABBITMQ_SERVER_ADDITIONAL_ERL_ARGS: ${RABBITMQ_SERVER_ADDITIONAL_ERL_ARGS:--rabbit vm_memory_high_watermark.relative 0.4}
+    ports:
+      - "${RABBITMQ_BIND_HOST:-127.0.0.1}:${RABBITMQ_PORT:-5672}:5672"
+      - "${RABBITMQ_MANAGEMENT_BIND_HOST:-127.0.0.1}:${RABBITMQ_MANAGEMENT_PORT:-15672}:15672"
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
   minio:
     image: quay.io/minio/minio:latest
     container_name: ${CONTAINER_PREFIX:-bogaap-prod}-minio
@@ -99,15 +120,73 @@ services:
       STORAGE_FORCE_PATH_STYLE: ${STORAGE_FORCE_PATH_STYLE:-true}
       ATTACHMENT_UPLOAD_RATE_LIMIT_MAX: ${ATTACHMENT_UPLOAD_RATE_LIMIT_MAX:-20}
       ATTACHMENT_UPLOAD_RATE_LIMIT_WINDOW_MS: ${ATTACHMENT_UPLOAD_RATE_LIMIT_WINDOW_MS:-60000}
+      RABBITMQ_ENABLED: "true"
+      RABBITMQ_URL: amqp://${RABBITMQ_USER:?Set RABBITMQ_USER in your environment file}:${RABBITMQ_PASSWORD:?Set RABBITMQ_PASSWORD in your environment file}@rabbitmq:5672
+      RABBITMQ_EXCHANGE: ${RABBITMQ_EXCHANGE:-bogaap.jobs}
+      RABBITMQ_NOTIFICATIONS_QUEUE: ${RABBITMQ_NOTIFICATIONS_QUEUE:-bogaap.notifications}
+      RABBITMQ_DOCUMENT_CLEANUP_QUEUE: ${RABBITMQ_DOCUMENT_CLEANUP_QUEUE:-bogaap.document-cleanup}
+      ASYNC_OUTBOX_PUBLISHER_ENABLED: "false"
+      DOCUMENT_CLEANUP_INLINE_PROCESSING_ENABLED: ${DOCUMENT_CLEANUP_INLINE_PROCESSING_ENABLED:-false}
+      DOCUMENT_CLEANUP_SCHEDULER_ENABLED: ${DOCUMENT_CLEANUP_SCHEDULER_ENABLED:-false}
+      NOTIFICATIONS_SCHEDULER_ENABLED: ${NOTIFICATIONS_SCHEDULER_ENABLED:-false}
     depends_on:
       postgres:
         condition: service_healthy
       redis:
         condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
       minio-init:
         condition: service_completed_successfully
     expose:
       - "3001"
+
+  worker:
+    build:
+      context: .
+      dockerfile: Dockerfile.worker
+    image: ${WORKER_IMAGE:-bogaap-worker:prod}
+    container_name: ${CONTAINER_PREFIX:-bogaap-prod}-worker
+    restart: unless-stopped
+    mem_limit: ${WORKER_MEMORY_LIMIT:-384m}
+    cpus: ${WORKER_CPUS:-0.25}
+    environment:
+      NODE_ENV: production
+      NODE_OPTIONS: ${WORKER_NODE_OPTIONS:---max-old-space-size=256}
+      DATABASE_URL: postgresql://${POSTGRES_USER:?POSTGRES_USER is required}:${POSTGRES_PASSWORD:?POSTGRES_PASSWORD is required}@postgres:5432/${POSTGRES_DB:?POSTGRES_DB is required}?schema=public&connection_limit=${WORKER_DATABASE_CONNECTION_LIMIT:-2}&pool_timeout=${DATABASE_POOL_TIMEOUT:-20}
+      REDIS_URL: redis://redis:6379
+      RABBITMQ_ENABLED: "true"
+      RABBITMQ_URL: amqp://${RABBITMQ_USER:?Set RABBITMQ_USER in your environment file}:${RABBITMQ_PASSWORD:?Set RABBITMQ_PASSWORD in your environment file}@rabbitmq:5672
+      RABBITMQ_EXCHANGE: ${RABBITMQ_EXCHANGE:-bogaap.jobs}
+      RABBITMQ_NOTIFICATIONS_QUEUE: ${RABBITMQ_NOTIFICATIONS_QUEUE:-bogaap.notifications}
+      RABBITMQ_DOCUMENT_CLEANUP_QUEUE: ${RABBITMQ_DOCUMENT_CLEANUP_QUEUE:-bogaap.document-cleanup}
+      RABBITMQ_PREFETCH: ${RABBITMQ_PREFETCH:-3}
+      RABBITMQ_CONSUMER_RETRY_INTERVAL_MS: ${RABBITMQ_CONSUMER_RETRY_INTERVAL_MS:-5000}
+      ASYNC_OUTBOX_PUBLISHER_ENABLED: ${ASYNC_OUTBOX_PUBLISHER_ENABLED:-true}
+      ASYNC_OUTBOX_PUBLISHER_INTERVAL_MS: ${ASYNC_OUTBOX_PUBLISHER_INTERVAL_MS:-5000}
+      ASYNC_OUTBOX_PUBLISHER_BATCH_SIZE: ${ASYNC_OUTBOX_PUBLISHER_BATCH_SIZE:-25}
+      ASYNC_OUTBOX_DATABASE_RETRY_ATTEMPTS: ${ASYNC_OUTBOX_DATABASE_RETRY_ATTEMPTS:-5}
+      ASYNC_OUTBOX_DATABASE_RETRY_BASE_DELAY_MS: ${ASYNC_OUTBOX_DATABASE_RETRY_BASE_DELAY_MS:-250}
+      DOCUMENT_CLEANUP_INLINE_PROCESSING_ENABLED: ${DOCUMENT_CLEANUP_INLINE_PROCESSING_ENABLED:-false}
+      DOCUMENT_CLEANUP_SCHEDULER_ENABLED: ${DOCUMENT_CLEANUP_SCHEDULER_ENABLED:-false}
+      DOCUMENT_CLEANUP_RECOVERY_INTERVAL_MS: ${DOCUMENT_CLEANUP_RECOVERY_INTERVAL_MS:-600000}
+      NOTIFICATIONS_SCHEDULER_ENABLED: ${NOTIFICATIONS_SCHEDULER_ENABLED:-false}
+      STORAGE_DRIVER: ${STORAGE_DRIVER:-minio}
+      STORAGE_BUCKET: ${STORAGE_BUCKET:?STORAGE_BUCKET is required}
+      STORAGE_REGION: ${STORAGE_REGION:-us-east-1}
+      STORAGE_ENDPOINT: ${STORAGE_ENDPOINT:-http://minio:9000}
+      STORAGE_ACCESS_KEY_ID: ${STORAGE_ACCESS_KEY_ID:?STORAGE_ACCESS_KEY_ID is required}
+      STORAGE_SECRET_ACCESS_KEY: ${STORAGE_SECRET_ACCESS_KEY:?STORAGE_SECRET_ACCESS_KEY is required}
+      STORAGE_FORCE_PATH_STYLE: ${STORAGE_FORCE_PATH_STYLE:-true}
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+      minio-init:
+        condition: service_completed_successfully
 
   web:
     build:
@@ -157,6 +236,7 @@ services:
 
 volumes:
   postgres_data:
+  rabbitmq_data:
   redis_data:
   minio_data:
   certbot_www:
