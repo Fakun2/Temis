@@ -7,6 +7,7 @@ import { AiModule } from "./ai/ai.module";
 import { CashboxModule } from "./cashbox/cashbox.module";
 import { CategoriesModule } from "./categories/categories.module";
 import { CasesModule } from "./cases/cases.module";
+import { ClientsModule } from "./clients/clients.module";
 import { CurrenciesModule } from "./currencies/currencies.module";
 import { DashboardModule } from "./dashboard/dashboard.module";
 import { DatabaseModule } from "./database/database.module";
@@ -45,6 +46,7 @@ import { TenancyModule } from "./tenancy/tenancy.module";
     DocumentsModule,
     NotificationsModule,
     CasesModule,
+    ClientsModule,
     CurrenciesModule,
     DashboardModule,
     ForumsModule,

@@ -11,7 +11,8 @@ import {
   Home,
   Scale,
   Settings,
-  Tags
+  Tags,
+  UsersRound
 } from "lucide-react";
 import type { AdminNavSection, AdminPageTitle } from "../_types/admin";
 
@@ -20,6 +21,12 @@ export const adminNavSections: AdminNavSection[] = [
     title: "Navegacion",
     items: [
       { href: "/admin", label: "Dashboard", icon: Home, requiredPermissions: ["admin:access"] },
+      {
+        href: "/admin/clients",
+        label: "Clientes",
+        icon: UsersRound,
+        requiredPermissions: ["clients:read"]
+      },
       {
         href: "/admin/cases",
         label: "Expedientes",

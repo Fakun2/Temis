@@ -9,8 +9,7 @@ export const adminQuickLinks: AdminQuickLink[] = [
   {
     href: "/admin/clients",
     label: "Ver clientes",
-    description: "Personas, sociedades y contactos clave",
-    status: "soon"
+    description: "Personas, sociedades y contactos clave"
   },
   {
     href: "/admin/staff",
