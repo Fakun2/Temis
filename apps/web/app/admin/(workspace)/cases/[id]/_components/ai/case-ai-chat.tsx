@@ -180,10 +180,13 @@ function getInitialMessages(caseItem: CaseDetailDto): CaseAiMessage[] {
 }
 
 function buildSources(caseItem: CaseDetailDto): CaseAiSource[] {
+  const provinceName = caseItem.province?.name ?? caseItem.provinceText ?? "Sin provincia";
+  const forumName = caseItem.forum?.name ?? caseItem.jurisdictionText ?? "Sin fuero";
+
   return [
     {
       id: "case-summary",
-      detail: `${caseItem.caption} - ${caseItem.province.name} / ${caseItem.forum.name}`,
+      detail: `${caseItem.caption} - ${provinceName} / ${forumName}`,
       label: `Expediente ${caseItem.caseNumber}`,
       type: "case"
     },

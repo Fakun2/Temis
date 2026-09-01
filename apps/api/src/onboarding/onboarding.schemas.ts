@@ -5,6 +5,13 @@ import { z } from "zod";
 const roleCodeSchema = z.enum(["admin", "lawyer", "paralegal", "accounting", "viewer"]);
 const caseNumberingModeSchema = z.enum(["manual", "automatic"]);
 const documentStorageModeSchema = z.enum(["local", "s3"]);
+const onboardingChecklistStepIdSchema = z.enum([
+  "import_cases",
+  "configure_finance",
+  "configure_notifications",
+  "connect_calendar"
+]);
+const updateOnboardingChecklistStepStatusSchema = z.enum(["completed", "skipped"]);
 const optionalUrlSchema = z.preprocess(
   (value) => (typeof value === "string" && value.trim() === "" ? undefined : value),
   z.string().url().optional()
@@ -187,4 +194,65 @@ export class OnboardingStatusDto {
 
   @ApiProperty({ type: [String] })
   missingSteps!: string[];
+}
+
+export class OnboardingChecklistStepDto {
+  @ApiProperty({
+    enum: ["import_cases", "configure_finance", "configure_notifications", "connect_calendar"]
+  })
+  id!: OnboardingChecklistStepId;
+
+  @ApiProperty()
+  title!: string;
+
+  @ApiProperty()
+  description!: string;
+
+  @ApiProperty({ enum: ["pending", "completed", "skipped"] })
+  status!: OnboardingChecklistStepStatus;
+
+  @ApiProperty()
+  enabled!: boolean;
+
+  @ApiProperty({ required: false, nullable: true, type: String })
+  requiredPermission?: string | null;
+
+  @ApiProperty()
+  actionLabel!: string;
+}
+
+export class OnboardingChecklistResponseDto {
+  @ApiProperty({ example: 50 })
+  progress!: number;
+
+  @ApiProperty()
+  completedCount!: number;
+
+  @ApiProperty()
+  totalCount!: number;
+
+  @ApiProperty()
+  hidden!: boolean;
+
+  @ApiProperty({ type: [OnboardingChecklistStepDto] })
+  steps!: OnboardingChecklistStepDto[];
+}
+
+export class UpdateOnboardingChecklistStepDto extends createZodDto(
+  z.object({
+    status: updateOnboardingChecklistStepStatusSchema
+  })
+) {
+  @ApiProperty({ enum: ["completed", "skipped"] })
+  status!: UpdateOnboardingChecklistStepStatus;
+}
+
+export type OnboardingChecklistStepId = z.infer<typeof onboardingChecklistStepIdSchema>;
+export type OnboardingChecklistStepStatus = "pending" | "completed" | "skipped";
+export type UpdateOnboardingChecklistStepStatus = z.infer<
+  typeof updateOnboardingChecklistStepStatusSchema
+>;
+
+export function parseOnboardingChecklistStepId(value: string) {
+  return onboardingChecklistStepIdSchema.parse(value);
 }

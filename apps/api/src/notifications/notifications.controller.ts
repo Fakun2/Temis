@@ -1,5 +1,16 @@
-import { Controller, Get, Param, Patch, Query, Req, UseGuards } from "@nestjs/common";
+import {
+  Controller,
+  Get,
+  Param,
+  Patch,
+  Query,
+  Req,
+  Sse,
+  UseGuards,
+  type MessageEvent
+} from "@nestjs/common";
 import { ApiBearerAuth, ApiOkResponse, ApiSecurity, ApiTags } from "@nestjs/swagger";
+import type { Observable } from "rxjs";
 import type { AuthenticatedRequest } from "../auth/auth.types";
 import { JwtAuthGuard } from "../auth/jwt-auth.guard";
 import { PermissionsGuard } from "../auth/permissions.guard";
@@ -28,6 +39,14 @@ export class NotificationsController {
     @Query() query: ListNotificationsQueryDto
   ) {
     return this.notificationsService.listForUser(tenantId, getAuthenticatedUserId(request), query);
+  }
+
+  @Sse("stream")
+  stream(
+    @ActiveTenant() tenantId: string,
+    @Req() request: AuthenticatedRequest
+  ): Observable<MessageEvent> {
+    return this.notificationsService.streamForUser(tenantId, getAuthenticatedUserId(request));
   }
 
   @Patch(":id/read")

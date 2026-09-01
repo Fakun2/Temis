@@ -60,6 +60,7 @@ const permissions = [
   { code: "finance:create", resource: "finance", action: "create" },
   { code: "finance:update", resource: "finance", action: "update" },
   { code: "finance:delete", resource: "finance", action: "delete" },
+  { code: "integrations:sae_import", resource: "integrations", action: "sae_import" },
   { code: "billing:manage", resource: "billing", action: "manage" }
 ];
 
@@ -94,6 +95,7 @@ const systemRoles = [
         !permissionCode.startsWith("ai:") &&
         !permissionCode.startsWith("expenses:") &&
         !permissionCode.startsWith("hearings:") &&
+        !permissionCode.startsWith("integrations:") &&
         isTenantAssignablePermission(permissionCode)
     )
   },

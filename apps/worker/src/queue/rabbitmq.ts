@@ -1,5 +1,5 @@
 import amqp, { type Channel, type ChannelModel } from "amqplib";
-import { getEnv, getPositiveNumberEnv } from "../config";
+import { getPositiveNumberEnv } from "../config";
 import { createLogger } from "../logger";
 import {
   documentCleanupQueueName,
@@ -114,7 +114,7 @@ export class RabbitMq {
 
   private async connect() {
     this.closed = false;
-    const url = getEnv("RABBITMQ_URL", "amqp://localhost:5672");
+    const url = getRabbitMqUrl();
     const connection = await amqp.connect(url);
     const channel = await connection.createChannel();
 
@@ -165,4 +165,22 @@ export class RabbitMq {
       }
     }
   }
+}
+
+function getRabbitMqUrl() {
+  const explicitUrl = process.env.RABBITMQ_URL?.trim();
+  if (explicitUrl) {
+    return explicitUrl;
+  }
+
+  const user = process.env.RABBITMQ_USER?.trim();
+  const password = process.env.RABBITMQ_PASSWORD?.trim();
+  const host = process.env.RABBITMQ_HOST?.trim() || "localhost";
+  const port = process.env.RABBITMQ_PORT?.trim() || "5672";
+  const vhost = process.env.RABBITMQ_VHOST?.trim();
+  const credentials =
+    user && password ? `${encodeURIComponent(user)}:${encodeURIComponent(password)}@` : "";
+  const encodedVhost = vhost ? `/${encodeURIComponent(vhost)}` : "";
+
+  return `amqp://${credentials}${host}:${port}${encodedVhost}`;
 }

@@ -1,8 +1,10 @@
 "use client";
 
+import { useEffect, useRef, useState } from "react";
 import { Bell, Check, Clock3 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { cn } from "@/lib/utils";
 import type { NotificationDto } from "../../../_api/notifications.api";
 import { HeaderActionButton } from "../header-action-button";
 import { formatNotificationDate } from "./notifications-format";
@@ -20,17 +22,41 @@ export function NotificationsPopover({
   onRead,
   unreadCount
 }: NotificationsPopoverProps) {
+  const previousUnreadCountRef = useRef(unreadCount);
+  const [hasIncomingNotification, setHasIncomingNotification] = useState(false);
+
+  useEffect(() => {
+    const previousUnreadCount = previousUnreadCountRef.current;
+    previousUnreadCountRef.current = unreadCount;
+
+    if (unreadCount <= previousUnreadCount) {
+      return;
+    }
+
+    setHasIncomingNotification(true);
+    const timeoutId = window.setTimeout(() => setHasIncomingNotification(false), 920);
+
+    return () => window.clearTimeout(timeoutId);
+  }, [unreadCount]);
+
   return (
     <Popover>
       <PopoverTrigger asChild>
         <div>
           <HeaderActionButton
             label="Notificaciones"
-            className="relative grid size-8 place-items-center rounded-full border border-[var(--dropdown-border)] bg-[var(--dropdown-bg)] text-foreground backdrop-blur-xl hover:bg-[var(--dropdown-item-hover)]"
+            className={cn(
+              "justinia-notification-trigger relative grid size-8 place-items-center rounded-full border border-[var(--dropdown-border)] bg-[var(--dropdown-bg)] text-foreground backdrop-blur-xl hover:bg-[var(--dropdown-item-hover)]",
+              hasIncomingNotification && "justinia-notification-trigger-incoming"
+            )}
           >
-            <Bell className="h-4 w-4" strokeWidth={1.9} aria-hidden="true" />
+            <Bell
+              className="justinia-notification-bell h-4 w-4"
+              strokeWidth={1.9}
+              aria-hidden="true"
+            />
             {unreadCount > 0 ? (
-              <span className="absolute -right-0.5 -top-0.5 flex size-4 items-center justify-center rounded-full bg-destructive font-mono text-[9px] font-semibold leading-none text-white ring-2 ring-[var(--admin-page-bg)]">
+              <span className="justinia-notification-badge absolute -right-0.5 -top-0.5 flex size-4 items-center justify-center rounded-full bg-destructive font-mono text-[9px] font-semibold leading-none text-white ring-2 ring-[var(--admin-page-bg)]">
                 {Math.min(unreadCount, 9)}
               </span>
             ) : null}

@@ -336,7 +336,7 @@ export class CasesService {
     try {
       const createdCase = await this.prisma.case.create({
         data: {
-          ...toCaseData(input, relationContext.province.caseCatalogStrategy),
+          ...toCaseData(input, relationContext.caseCatalogStrategy),
           tenantId,
           participants: {
             create: input.participants.map(toParticipantData)
@@ -558,7 +558,7 @@ export class CasesService {
         return tx.case.update({
           where: { id: caseId },
           data: {
-            ...toCaseData(input, relationContext.province.caseCatalogStrategy),
+            ...toCaseData(input, relationContext.caseCatalogStrategy),
             participants: {
               create: input.participants.map(toParticipantData)
             }
@@ -649,18 +649,22 @@ export class CasesService {
       responsibleMembership,
       participantClients
     ] = await Promise.all([
-      this.prisma.province.findFirst({
-        where: { active: true, id: input.provinceId },
-        select: { caseCatalogStrategy: true, id: true }
-      }),
-      this.prisma.forumTemplate.findFirst({
-        where: {
-          active: true,
-          id: input.forumTemplateId,
-          provinceId: input.provinceId
-        },
-        select: { id: true }
-      }),
+      input.provinceId
+        ? this.prisma.province.findFirst({
+            where: { active: true, id: input.provinceId },
+            select: { caseCatalogStrategy: true, id: true }
+          })
+        : Promise.resolve(null),
+      input.provinceId && input.forumTemplateId
+        ? this.prisma.forumTemplate.findFirst({
+            where: {
+              active: true,
+              id: input.forumTemplateId,
+              provinceId: input.provinceId
+            },
+            select: { id: true }
+          })
+        : Promise.resolve(null),
       input.judicialCenterForumId
         ? this.prisma.judicialCenterForum.findFirst({
             where: {
@@ -699,22 +703,26 @@ export class CasesService {
         : Promise.resolve([])
     ]);
 
-    if (!province) {
+    if (input.provinceId && !province) {
       throw new BadRequestException("La provincia seleccionada no existe.");
     }
 
-    if (!forumTemplate) {
+    if (input.forumTemplateId && !forumTemplate) {
       throw new BadRequestException("El fuero seleccionado no pertenece a esa provincia.");
     }
 
-    if (province.caseCatalogStrategy === "center_forum" && !input.judicialCenterForumId) {
+    if (province?.caseCatalogStrategy === "center_forum" && !input.judicialCenterForumId) {
       throw new BadRequestException("Selecciona un centro judicial para esa provincia.");
     }
 
-    if (province.caseCatalogStrategy === "manual" && input.judicialCenterForumId) {
+    if (province?.caseCatalogStrategy === "manual" && input.judicialCenterForumId) {
       throw new BadRequestException(
         "La provincia seleccionada no usa centros judiciales catalogados."
       );
+    }
+
+    if (input.judicialCenterForumId && (!input.provinceId || !input.forumTemplateId)) {
+      throw new BadRequestException("El centro judicial requiere provincia y fuero catalogados.");
     }
 
     if (input.judicialCenterForumId && !judicialCenterForum) {
@@ -737,7 +745,7 @@ export class CasesService {
       throw new BadRequestException("Uno o mas participantes referencian clientes invalidos.");
     }
 
-    return { province };
+    return { caseCatalogStrategy: province?.caseCatalogStrategy ?? "manual" };
   }
 }
 
@@ -807,18 +815,21 @@ function toCaseData(
     court: input.court ?? null,
     description: input.description ?? null,
     filingDate: input.filingDate ? new Date(`${input.filingDate}T00:00:00.000Z`) : null,
-    forumTemplateId: input.forumTemplateId,
+    forumTemplateId: input.forumTemplateId ?? null,
     instance: input.instance,
     judicialCenterForumId:
       caseCatalogStrategy === "center_forum" ? (input.judicialCenterForumId ?? null) : null,
     judicialCenterText:
       caseCatalogStrategy === "manual" ? (input.judicialCenterText ?? null) : null,
+    jurisdictionText: input.jurisdictionText ?? null,
     practiceAreaId: input.practiceAreaId ?? null,
     primaryClientId: input.primaryClientId ?? null,
-    provinceId: input.provinceId,
+    provinceId: input.provinceId ?? null,
+    provinceText: input.provinceText ?? null,
     responsibleMembershipId: input.responsibleMembershipId ?? null,
     status: input.status,
-    subject: input.subject ?? null
+    subject: input.subject ?? null,
+    unitText: input.unitText ?? null
   };
 }
 
@@ -850,6 +861,9 @@ function toCaseDto(item: CaseWithInclude) {
     judicialCenter: item.judicialCenterForum?.judicialCenter ?? null,
     judicialCenterForumId: item.judicialCenterForumId,
     judicialCenterText: item.judicialCenterText,
+    provinceText: item.provinceText,
+    jurisdictionText: item.jurisdictionText,
+    unitText: item.unitText,
     court: item.court,
     instance: item.instance,
     status: item.status,

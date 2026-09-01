@@ -6,6 +6,141 @@
  * OpenAPI spec version: 0.1.0
  */
 import { bogaapFetch } from "../fetch-client";
+export interface AccountProfileDto {
+  id: string;
+  firstName: string;
+  lastName: string;
+  fullName: string;
+  email: string;
+  /** @nullable */
+  phone: string | null;
+  /** @nullable */
+  avatarUrl: string | null;
+  hasPassword: boolean;
+}
+
+export interface AccountStudioDto {
+  id: string;
+  name: string;
+  /** @nullable */
+  legalName: string | null;
+  /** @nullable */
+  taxId: string | null;
+  country: string;
+  province: string;
+  city: string;
+  /** @nullable */
+  address: string | null;
+  /** @nullable */
+  website: string | null;
+  /** @nullable */
+  logoUrl: string | null;
+}
+
+export type AccountMembershipDtoStatus =
+  (typeof AccountMembershipDtoStatus)[keyof typeof AccountMembershipDtoStatus];
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const AccountMembershipDtoStatus = {
+  invited: "invited",
+  active: "active",
+  suspended: "suspended"
+} as const;
+
+export interface AccountMembershipDto {
+  id: string;
+  /** @nullable */
+  roleCode: string | null;
+  /** @nullable */
+  roleName: string | null;
+  status: AccountMembershipDtoStatus;
+  accountPlan: string;
+  accountPlanStatus: string;
+  monthlyTokenLimit: number;
+}
+
+export interface AccountNotificationsDto {
+  inAppReminders: boolean;
+  emailReminders: boolean;
+  dailyDigest: boolean;
+  reminderLeadTime: number;
+}
+
+export interface AccountTokenUsageDto {
+  periodStart: string;
+  periodEnd: string;
+  usedTokens: number;
+  remainingTokens: number;
+}
+
+export interface AccountPermissionsDto {
+  canManageStudio: boolean;
+  canManageMembership: boolean;
+  canImportSae: boolean;
+}
+
+export interface AccountResponseDto {
+  profile: AccountProfileDto;
+  studio: AccountStudioDto;
+  membership: AccountMembershipDto;
+  notifications: AccountNotificationsDto;
+  tokenUsage: AccountTokenUsageDto;
+  permissions: AccountPermissionsDto;
+}
+
+export interface UpdateAccountProfileDto {
+  firstName: string;
+  lastName: string;
+  /** @nullable */
+  phone?: string | null;
+  /** @nullable */
+  avatarUrl?: string | null;
+}
+
+export interface UpdateAccountStudioDto {
+  name: string;
+  /** @nullable */
+  legalName?: string | null;
+  /** @nullable */
+  taxId?: string | null;
+  country: string;
+  province: string;
+  city: string;
+  /** @nullable */
+  address?: string | null;
+  /** @nullable */
+  website?: string | null;
+  /** @nullable */
+  logoUrl?: string | null;
+}
+
+export interface UpdateAccountNotificationsDto {
+  inAppReminders: boolean;
+  emailReminders: boolean;
+  dailyDigest: boolean;
+  reminderLeadTime: number;
+}
+
+export interface UpdateAccountMembershipDto {
+  accountPlan: string;
+  accountPlanStatus: string;
+  monthlyTokenLimit: number;
+}
+
+export interface UpdateAccountPasswordDto {
+  /** @maxLength 72 */
+  currentPassword?: string;
+  /**
+   * @minLength 8
+   * @maxLength 72
+   */
+  newPassword: string;
+}
+
+export interface UpdateAccountPasswordResponseDto {
+  status: string;
+}
+
 export interface CreateAccountDto {
   fullName: string;
   email: string;
@@ -22,12 +157,19 @@ export interface CreateAccountDto {
  */
 export type AuthUserDtoPhone = { [key: string]: unknown } | null;
 
+/**
+ * @nullable
+ */
+export type AuthUserDtoAvatarUrl = { [key: string]: unknown } | null;
+
 export interface AuthUserDto {
   id: string;
   email: string;
   fullName: string;
   /** @nullable */
   phone?: AuthUserDtoPhone;
+  /** @nullable */
+  avatarUrl?: AuthUserDtoAvatarUrl;
   status: string;
 }
 
@@ -51,6 +193,10 @@ export interface TokenPairDto {
 export interface LoginResponseDto {
   user: AuthUserDto;
   tokens: TokenPairDto;
+}
+
+export interface GoogleLoginDto {
+  idToken: string;
 }
 
 export interface RefreshTokenDto {
@@ -125,6 +271,18 @@ export interface UpdateRoleDto {
   active?: boolean;
   hierarchyLevel?: UpdateRoleDtoHierarchyLevel;
   permissions?: string[];
+}
+
+export interface AiToolsResponseDto {
+  [key: string]: unknown;
+}
+
+export interface AiChatDto {
+  [key: string]: unknown;
+}
+
+export interface AiChatResponseDto {
+  [key: string]: unknown;
 }
 
 /**
@@ -267,6 +425,483 @@ export interface OnboardingStatusDto {
   missingSteps: string[];
 }
 
+export interface SaePreviewDto {
+  username: string;
+  password: string;
+}
+
+export type SaePreviewItemDtoSuggestedStatus =
+  (typeof SaePreviewItemDtoSuggestedStatus)[keyof typeof SaePreviewItemDtoSuggestedStatus];
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const SaePreviewItemDtoSuggestedStatus = {
+  open: "open",
+  paused: "paused",
+  closed: "closed"
+} as const;
+
+export type SaePreviewItemDtoAction =
+  (typeof SaePreviewItemDtoAction)[keyof typeof SaePreviewItemDtoAction];
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const SaePreviewItemDtoAction = {
+  create: "create",
+  update: "update"
+} as const;
+
+export interface SaePreviewItemDto {
+  externalId: string;
+  caseNumber: string;
+  caption: string;
+  /** @nullable */
+  jurisdictionText: string | null;
+  /** @nullable */
+  unitText: string | null;
+  /** @nullable */
+  court: string | null;
+  /** @nullable */
+  provinceText: string | null;
+  suggestedStatus: SaePreviewItemDtoSuggestedStatus;
+  action: SaePreviewItemDtoAction;
+  warnings: string[];
+}
+
+export interface SaePreviewSummaryDto {
+  total: number;
+  createCount: number;
+  updateCount: number;
+  warningCount: number;
+}
+
+export interface SaePreviewResponseDto {
+  importSessionId: string;
+  expiresAt: string;
+  items: SaePreviewItemDto[];
+  summary: SaePreviewSummaryDto;
+}
+
+export interface SaeImportDto {
+  [key: string]: unknown;
+}
+
+export type SaeImportItemDtoStatus =
+  (typeof SaeImportItemDtoStatus)[keyof typeof SaeImportItemDtoStatus];
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const SaeImportItemDtoStatus = {
+  imported: "imported",
+  updated: "updated",
+  skipped: "skipped"
+} as const;
+
+export interface SaeImportItemDto {
+  externalId: string;
+  caseNumber: string;
+  /** @nullable */
+  caseId: string | null;
+  status: SaeImportItemDtoStatus;
+  /** @nullable */
+  message: string | null;
+}
+
+export interface SaeImportResponseDto {
+  importedCount: number;
+  updatedCount: number;
+  skippedCount: number;
+  items: SaeImportItemDto[];
+}
+
+export interface CashboxCurrencyDto {
+  name: string;
+  code: string;
+  symbol: string;
+}
+
+export interface CashboxHourlySummaryDto {
+  hour: string;
+  income: string;
+  expense: string;
+}
+
+export interface CashboxSummaryDto {
+  currency: CashboxCurrencyDto;
+  date: string;
+  balance: string;
+  incomeToday: string;
+  expenseToday: string;
+  hourly: CashboxHourlySummaryDto[];
+}
+
+export type CashboxMovementDtoType =
+  (typeof CashboxMovementDtoType)[keyof typeof CashboxMovementDtoType];
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const CashboxMovementDtoType = {
+  income: "income",
+  expense: "expense",
+  conversion_in: "conversion_in",
+  conversion_out: "conversion_out"
+} as const;
+
+export type CashboxMovementDtoCategoryOrigin =
+  (typeof CashboxMovementDtoCategoryOrigin)[keyof typeof CashboxMovementDtoCategoryOrigin];
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const CashboxMovementDtoCategoryOrigin = {
+  global: "global",
+  tenant: "tenant"
+} as const;
+
+export type CashboxMovementDtoSource = { [key: string]: unknown };
+
+export interface CashboxMovementDto {
+  id: string;
+  type: CashboxMovementDtoType;
+  currencyCode: string;
+  currencySymbol: string;
+  amount: string;
+  occurredAt: string;
+  description?: string;
+  categoryName?: string;
+  categoryId?: string;
+  categoryOrigin?: CashboxMovementDtoCategoryOrigin;
+  conversionGroupId?: string;
+  exchangeRate?: string;
+  source?: CashboxMovementDtoSource;
+  createdByName: string;
+}
+
+/**
+ * @nullable
+ */
+export type CashboxMovementsPageInfoDtoNextCursor = { [key: string]: unknown } | null;
+
+export interface CashboxMovementsPageInfoDto {
+  limit: number;
+  /** @nullable */
+  nextCursor: CashboxMovementsPageInfoDtoNextCursor;
+  hasNextPage: boolean;
+}
+
+export interface CashboxMovementsListResponseDto {
+  items: CashboxMovementDto[];
+  pageInfo: CashboxMovementsPageInfoDto;
+}
+
+export type CreateCashboxMovementDtoType =
+  (typeof CreateCashboxMovementDtoType)[keyof typeof CreateCashboxMovementDtoType];
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const CreateCashboxMovementDtoType = {
+  income: "income",
+  expense: "expense"
+} as const;
+
+export interface CreateCashboxMovementDto {
+  type: CreateCashboxMovementDtoType;
+  currencyCode: string;
+  amount: string;
+}
+
+export interface UpdateCashboxMovementDto {
+  amount?: string;
+}
+
+export interface CreateCashboxConversionDto {
+  fromCurrencyCode: string;
+  toCurrencyCode: string;
+  fromAmount: string;
+  quoteBaseCurrencyCode: string;
+  quoteCounterCurrencyCode: string;
+  quoteRate: string;
+}
+
+export interface CreateCashboxConversionResponseDto {
+  items: CashboxMovementDto[];
+}
+
+export type CategoryDtoKind = (typeof CategoryDtoKind)[keyof typeof CategoryDtoKind];
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const CategoryDtoKind = {
+  income: "income",
+  expense: "expense",
+  both: "both"
+} as const;
+
+export type CategoryDtoOrigin = (typeof CategoryDtoOrigin)[keyof typeof CategoryDtoOrigin];
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const CategoryDtoOrigin = {
+  global: "global",
+  tenant: "tenant"
+} as const;
+
+export interface CategoryDto {
+  id: string;
+  name: string;
+  kind: CategoryDtoKind;
+  active: boolean;
+  origin: CategoryDtoOrigin;
+  code?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface CategoryMetricsDto {
+  global: number;
+  tenant: number;
+  active: number;
+}
+
+/**
+ * @nullable
+ */
+export type CategoryPageInfoDtoNextCursor = { [key: string]: unknown } | null;
+
+export interface CategoryPageInfoDto {
+  limit: number;
+  /** @nullable */
+  nextCursor: CategoryPageInfoDtoNextCursor;
+  hasNextPage: boolean;
+}
+
+export interface CategoryListResponseDto {
+  items: CategoryDto[];
+  metrics: CategoryMetricsDto;
+  pageInfo: CategoryPageInfoDto;
+}
+
+export type CreateCategoryDtoKind =
+  (typeof CreateCategoryDtoKind)[keyof typeof CreateCategoryDtoKind];
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const CreateCategoryDtoKind = {
+  income: "income",
+  expense: "expense",
+  both: "both"
+} as const;
+
+export interface CreateCategoryDto {
+  /**
+   * @minLength 2
+   * @maxLength 80
+   */
+  name: string;
+  kind: CreateCategoryDtoKind;
+  active?: boolean;
+}
+
+export type UpdateCategoryDtoKind =
+  (typeof UpdateCategoryDtoKind)[keyof typeof UpdateCategoryDtoKind];
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const UpdateCategoryDtoKind = {
+  income: "income",
+  expense: "expense",
+  both: "both"
+} as const;
+
+export interface UpdateCategoryDto {
+  /**
+   * @minLength 2
+   * @maxLength 80
+   */
+  name: string;
+  kind: UpdateCategoryDtoKind;
+  active?: boolean;
+}
+
+export interface CategoryDeleteResponseDto {
+  status: string;
+}
+
+export interface DocumentFolderDto {
+  id: string;
+  /** @nullable */
+  parentId: string | null;
+  name: string;
+  /** @nullable */
+  notes: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface DocumentCaseSummaryDto {
+  id: string;
+  caseNumber: string;
+  caption: string;
+}
+
+export interface DocumentCategorySummaryDto {
+  id: string;
+  name: string;
+  /** @nullable */
+  description: string | null;
+}
+
+/**
+ * @nullable
+ */
+export type DocumentDtoCase = DocumentCaseSummaryDto | null;
+
+/**
+ * @nullable
+ */
+export type DocumentDtoCategory = DocumentCategorySummaryDto | null;
+
+export interface DocumentDto {
+  id: string;
+  /** @nullable */
+  caseId: string | null;
+  /** @nullable */
+  folderId: string | null;
+  /** @nullable */
+  case: DocumentDtoCase;
+  /** @nullable */
+  category: DocumentDtoCategory;
+  title: string;
+  originalName: string;
+  /** @nullable */
+  extension: string | null;
+  mimeType: string;
+  sizeBytes: number;
+  /** @nullable */
+  notes: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface DocumentsPageInfoDto {
+  limit: number;
+  /** @nullable */
+  nextCursor: string | null;
+  hasNextPage: boolean;
+  total: number;
+}
+
+export interface DocumentLibraryMetricsDto {
+  folders: number;
+  documents: number;
+  storageBytes: number;
+}
+
+export interface DocumentsListResponseDto {
+  folders: DocumentFolderDto[];
+  documents: DocumentDto[];
+  breadcrumbs: DocumentFolderDto[];
+  pageInfo: DocumentsPageInfoDto;
+  metrics: DocumentLibraryMetricsDto;
+}
+
+export interface CreateDocumentFolderDto {
+  [key: string]: unknown;
+}
+
+export interface UpdateDocumentFolderDto {
+  [key: string]: unknown;
+}
+
+export interface DeleteResponseDto {
+  status: string;
+}
+
+export interface CreateDocumentImportJobDto {
+  [key: string]: unknown;
+}
+
+export interface DocumentImportItemDto {
+  id: string;
+  relativePath: string;
+  originalName: string;
+  mimeType: string;
+  sizeBytes: number;
+  status: string;
+  /** @nullable */
+  error: string | null;
+  /** @nullable */
+  documentId: string | null;
+  /** @nullable */
+  folderId: string | null;
+  updatedAt: string;
+}
+
+export interface DocumentImportJobDto {
+  id: string;
+  /** @nullable */
+  folderId: string | null;
+  status: string;
+  totalFiles: number;
+  totalBytes: number;
+  processedFiles: number;
+  completedFiles: number;
+  skippedFiles: number;
+  rejectedFiles: number;
+  failedFiles: number;
+  /** @nullable */
+  lastError: string | null;
+  createdAt: string;
+  /** @nullable */
+  completedAt: string | null;
+  recentItems: DocumentImportItemDto[];
+}
+
+export interface UploadDocumentImportItemsDto {
+  files: Blob[];
+}
+
+export interface CreateDocumentBodyDto {
+  file: Blob;
+}
+
+export interface UpdateDocumentDto {
+  [key: string]: unknown;
+}
+
+export interface BulkDeleteDocumentsDto {
+  [key: string]: unknown;
+}
+
+export interface BulkMoveDocumentsDto {
+  [key: string]: unknown;
+}
+
+export type NotificationDtoResourceType =
+  (typeof NotificationDtoResourceType)[keyof typeof NotificationDtoResourceType];
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const NotificationDtoResourceType = {
+  case_task: "case_task",
+  case_expense: "case_expense",
+  case_hearing: "case_hearing",
+  meeting: "meeting"
+} as const;
+
+export interface NotificationDto {
+  id: string;
+  reminderId: string;
+  resourceType: NotificationDtoResourceType;
+  resourceId: string;
+  caseId: string;
+  title: string;
+  /** @nullable */
+  body: string | null;
+  scheduledAt: string;
+  /** @nullable */
+  deliveredAt: string | null;
+  /** @nullable */
+  readAt: string | null;
+}
+
+export interface NotificationsListResponseDto {
+  items: NotificationDto[];
+  unreadCount: number;
+}
+
+export interface NotificationReadResponseDto {
+  status: string;
+}
+
 export interface CaseProvinceDto {
   id: string;
   code: string;
@@ -333,6 +968,16 @@ export interface CaseParticipantDto {
 /**
  * @nullable
  */
+export type CaseDtoProvince = CaseProvinceDto | null;
+
+/**
+ * @nullable
+ */
+export type CaseDtoForum = CaseForumDto | null;
+
+/**
+ * @nullable
+ */
 export type CaseDtoJudicialCenter = CaseJudicialCenterDto | null;
 
 export type CaseDtoInstance = (typeof CaseDtoInstance)[keyof typeof CaseDtoInstance];
@@ -361,14 +1006,22 @@ export interface CaseDto {
   subject: string | null;
   /** @nullable */
   description: string | null;
-  province: CaseProvinceDto;
-  forum: CaseForumDto;
+  /** @nullable */
+  province: CaseDtoProvince;
+  /** @nullable */
+  forum: CaseDtoForum;
   /** @nullable */
   judicialCenterForumId: string | null;
   /** @nullable */
   judicialCenter: CaseDtoJudicialCenter;
   /** @nullable */
   judicialCenterText: string | null;
+  /** @nullable */
+  provinceText: string | null;
+  /** @nullable */
+  jurisdictionText: string | null;
+  /** @nullable */
+  unitText: string | null;
   /** @nullable */
   court: string | null;
   instance: CaseDtoInstance;
@@ -409,6 +1062,74 @@ export interface CasesMetricsDto {
   pendingTasks: number;
 }
 
+export type CaseCalendarEventDtoType =
+  (typeof CaseCalendarEventDtoType)[keyof typeof CaseCalendarEventDtoType];
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const CaseCalendarEventDtoType = {
+  payment_due: "payment_due",
+  hearing: "hearing",
+  task_due: "task_due"
+} as const;
+
+export type CaseCalendarEventDtoHearingType =
+  (typeof CaseCalendarEventDtoHearingType)[keyof typeof CaseCalendarEventDtoHearingType];
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const CaseCalendarEventDtoHearingType = {
+  preliminary: "preliminary",
+  trial_view: "trial_view",
+  conciliation: "conciliation",
+  mediation: "mediation",
+  testimonial: "testimonial",
+  confessional: "confessional",
+  debate: "debate",
+  investigative_statement: "investigative_statement",
+  other: "other"
+} as const;
+
+export interface CaseCalendarEventDto {
+  type: CaseCalendarEventDtoType;
+  id: string;
+  title: string;
+  date: string;
+  amount?: number;
+  currencyCode?: string;
+  status?: string;
+  hearingType?: CaseCalendarEventDtoHearingType;
+  time?: string;
+  caseId?: string;
+  caseNumber?: string;
+  caseCaption?: string;
+}
+
+export interface TenantCalendarMetricsDto {
+  totalTasks?: number;
+  pendingTasks?: number;
+  hearingsCount?: number;
+  pendingExpensesCount?: number;
+}
+
+export interface CaseCalendarResponseDto {
+  month: string;
+  events: CaseCalendarEventDto[];
+  pageInfo?: CasesPageInfoDto;
+  metrics?: TenantCalendarMetricsDto;
+}
+
+export interface CasePickerOptionDto {
+  id: string;
+  caseNumber: string;
+  caption: string;
+  /** @nullable */
+  subject: string | null;
+}
+
+export interface CasePickerOptionsResponseDto {
+  items: CasePickerOptionDto[];
+  pageInfo: CasesPageInfoDto;
+}
+
 export interface CreateCaseDto {
   [key: string]: unknown;
 }
@@ -420,6 +1141,16 @@ export interface CaseMetricsDto {
   totalTasks: number;
   pendingTasks: number;
 }
+
+/**
+ * @nullable
+ */
+export type CaseDetailDtoProvince = CaseProvinceDto | null;
+
+/**
+ * @nullable
+ */
+export type CaseDetailDtoForum = CaseForumDto | null;
 
 /**
  * @nullable
@@ -453,14 +1184,22 @@ export interface CaseDetailDto {
   subject: string | null;
   /** @nullable */
   description: string | null;
-  province: CaseProvinceDto;
-  forum: CaseForumDto;
+  /** @nullable */
+  province: CaseDetailDtoProvince;
+  /** @nullable */
+  forum: CaseDetailDtoForum;
   /** @nullable */
   judicialCenterForumId: string | null;
   /** @nullable */
   judicialCenter: CaseDetailDtoJudicialCenter;
   /** @nullable */
   judicialCenterText: string | null;
+  /** @nullable */
+  provinceText: string | null;
+  /** @nullable */
+  jurisdictionText: string | null;
+  /** @nullable */
+  unitText: string | null;
   /** @nullable */
   court: string | null;
   instance: CaseDetailDtoInstance;
@@ -503,6 +1242,17 @@ export const CaseTaskDtoStatus = {
   cancelled: "cancelled"
 } as const;
 
+export type CaseTaskDtoNotificationRecipientMode =
+  (typeof CaseTaskDtoNotificationRecipientMode)[keyof typeof CaseTaskDtoNotificationRecipientMode];
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const CaseTaskDtoNotificationRecipientMode = {
+  self: "self",
+  tenant: "tenant",
+  practice_area: "practice_area",
+  members: "members"
+} as const;
+
 export interface CaseTaskDto {
   id: string;
   caseId: string;
@@ -518,6 +1268,15 @@ export interface CaseTaskDto {
   status: CaseTaskDtoStatus;
   /** @nullable */
   notes: string | null;
+  notificationEnabled: boolean;
+  /** @nullable */
+  notificationDate: string | null;
+  /** @nullable */
+  notificationTime: string | null;
+  notificationRecipientMode: CaseTaskDtoNotificationRecipientMode;
+  /** @nullable */
+  notificationPracticeAreaId: string | null;
+  notificationMembershipIds: string[];
   /** @nullable */
   lastSeenAt: string | null;
   createdAt: string;
@@ -541,33 +1300,98 @@ export interface CaseDeleteResponseDto {
   status: string;
 }
 
-export interface CaseCalendarEventDto {
-  type: string;
+export interface DocumentCategoryDto {
   id: string;
-  title: string;
+  name: string;
+  /** @nullable */
+  description: string | null;
+}
+
+/**
+ * @nullable
+ */
+export type CaseDocumentDtoCategory = DocumentCategoryDto | null;
+
+export interface CaseDocumentDto {
+  id: string;
+  caseId: string;
+  /** @nullable */
+  category: CaseDocumentDtoCategory;
+  originalName: string;
+  mimeType: string;
+  sizeBytes: number;
+  /** @nullable */
+  notes: string | null;
+  createdAt: string;
+}
+
+export interface CaseDocumentsListResponseDto {
+  items: CaseDocumentDto[];
+  pageInfo: CasesPageInfoDto;
+}
+
+export interface CreateCaseDocumentBodyDto {
+  file: Blob;
+}
+
+export type CaseHearingDtoType = (typeof CaseHearingDtoType)[keyof typeof CaseHearingDtoType];
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const CaseHearingDtoType = {
+  preliminary: "preliminary",
+  trial_view: "trial_view",
+  conciliation: "conciliation",
+  mediation: "mediation",
+  testimonial: "testimonial",
+  confessional: "confessional",
+  debate: "debate",
+  investigative_statement: "investigative_statement",
+  other: "other"
+} as const;
+
+export type CaseHearingDtoNotificationRecipientMode =
+  (typeof CaseHearingDtoNotificationRecipientMode)[keyof typeof CaseHearingDtoNotificationRecipientMode];
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const CaseHearingDtoNotificationRecipientMode = {
+  self: "self",
+  tenant: "tenant",
+  practice_area: "practice_area",
+  members: "members"
+} as const;
+
+export interface CaseHearingDto {
+  id: string;
+  caseId: string;
+  type: CaseHearingDtoType;
   date: string;
-  amount?: number;
-  currencyCode?: string;
-  status?: string;
-  hearingType?: string;
-  time?: string;
-  caseId?: string;
-  caseNumber?: string;
-  caseCaption?: string;
+  time: string;
+  description: string;
+  notificationsEnabled: boolean;
+  notificationEnabled: boolean;
+  /** @nullable */
+  notificationDate: string | null;
+  /** @nullable */
+  notificationTime: string | null;
+  notificationRecipientMode: CaseHearingDtoNotificationRecipientMode;
+  /** @nullable */
+  notificationPracticeAreaId: string | null;
+  notificationMembershipIds: string[];
+  createdAt: string;
+  updatedAt: string;
 }
 
-export interface TenantCalendarMetricsDto {
-  totalTasks: number;
-  pendingTasks: number;
-  hearingsCount: number;
-  pendingExpensesCount: number;
+export interface CaseHearingsListResponseDto {
+  items: CaseHearingDto[];
+  pageInfo: CasesPageInfoDto;
 }
 
-export interface CaseCalendarResponseDto {
-  month: string;
-  events: CaseCalendarEventDto[];
-  pageInfo?: CasesPageInfoDto;
-  metrics?: TenantCalendarMetricsDto;
+export interface CreateCaseHearingDto {
+  [key: string]: unknown;
+}
+
+export interface UpdateCaseHearingDto {
+  [key: string]: unknown;
 }
 
 export interface CaseExpenseSummaryItemDto {
@@ -581,6 +1405,11 @@ export interface CaseExpensesSummaryDto {
   totalAmount: number;
   totalCount: number;
   items: CaseExpenseSummaryItemDto[];
+}
+
+export interface CaseExpensesOverdueRecalculationDto {
+  status: string;
+  updatedCount: number;
 }
 
 export interface CaseExpenseTaskDto {
@@ -611,6 +1440,17 @@ export const CaseExpenseDtoStatus = {
   overdue: "overdue"
 } as const;
 
+export type CaseExpenseDtoNotificationRecipientMode =
+  (typeof CaseExpenseDtoNotificationRecipientMode)[keyof typeof CaseExpenseDtoNotificationRecipientMode];
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const CaseExpenseDtoNotificationRecipientMode = {
+  self: "self",
+  tenant: "tenant",
+  practice_area: "practice_area",
+  members: "members"
+} as const;
+
 export interface CaseExpenseDto {
   id: string;
   caseId: string;
@@ -629,6 +1469,15 @@ export interface CaseExpenseDto {
   alertEnabled: boolean;
   /** @nullable */
   alertAt: string | null;
+  notificationEnabled: boolean;
+  /** @nullable */
+  notificationDate: string | null;
+  /** @nullable */
+  notificationTime: string | null;
+  notificationRecipientMode: CaseExpenseDtoNotificationRecipientMode;
+  /** @nullable */
+  notificationPracticeAreaId: string | null;
+  notificationMembershipIds: string[];
   attachments: CaseExpenseAttachmentDto[];
   createdAt: string;
   updatedAt: string;
@@ -654,6 +1503,203 @@ export interface CaseExpenseAttachmentsListResponseDto {
 
 export interface UpdateCaseDto {
   [key: string]: unknown;
+}
+
+export interface DocumentCategoriesListResponseDto {
+  items: DocumentCategoryDto[];
+  pageInfo: CasesPageInfoDto;
+}
+
+export interface CurrencyDto {
+  id: string;
+  name: string;
+  code: string;
+  symbol: string;
+  active: boolean;
+  cashboxBalance?: string;
+}
+
+export interface CurrencyMetricsDto {
+  total: number;
+  active: number;
+  inactive: number;
+}
+
+export interface CurrencyPageInfoDto {
+  limit: number;
+  offset: number;
+  total: number;
+  hasNextPage: boolean;
+  hasPreviousPage: boolean;
+}
+
+export interface CurrencyListResponseDto {
+  items: CurrencyDto[];
+  metrics: CurrencyMetricsDto;
+  pageInfo: CurrencyPageInfoDto;
+}
+
+export interface TenantCurrencyMetricsDto {
+  available: number;
+  active: number;
+}
+
+/**
+ * @nullable
+ */
+export type TenantCurrencyPageInfoDtoNextCursor = { [key: string]: unknown } | null;
+
+export interface TenantCurrencyPageInfoDto {
+  limit: number;
+  /** @nullable */
+  nextCursor: TenantCurrencyPageInfoDtoNextCursor;
+  hasNextPage: boolean;
+}
+
+export interface TenantCurrencyListResponseDto {
+  items: CurrencyDto[];
+  metrics: TenantCurrencyMetricsDto;
+  pageInfo: TenantCurrencyPageInfoDto;
+}
+
+export interface AddTenantCurrenciesDto {
+  /**
+   * @minItems 1
+   * @maxItems 25
+   */
+  currencyCodes: string[];
+}
+
+export interface AddTenantCurrenciesResponseDto {
+  items: CurrencyDto[];
+}
+
+export interface AvailableTenantCurrenciesResponseDto {
+  items: CurrencyDto[];
+}
+
+export interface CreateCurrencyDto {
+  /**
+   * @minLength 2
+   * @maxLength 80
+   */
+  name: string;
+  /**
+   * @minLength 3
+   * @maxLength 3
+   */
+  code: string;
+  /**
+   * @minLength 1
+   * @maxLength 8
+   */
+  symbol: string;
+}
+
+export interface UpdateCurrencyDto {
+  /**
+   * @minLength 2
+   * @maxLength 80
+   */
+  name: string;
+  /**
+   * @minLength 1
+   * @maxLength 8
+   */
+  symbol: string;
+  active?: boolean;
+}
+
+export interface CurrencyDeleteResponseDto {
+  status: string;
+}
+
+export interface DashboardCurrencyDto {
+  code: string;
+  name: string;
+  symbol: string;
+}
+
+export interface DashboardCashboxMetricDto {
+  balance: string;
+  currency: DashboardCurrencyDto;
+  date: string;
+  expenseToday: string;
+  incomeToday: string;
+}
+
+export interface DashboardDueTodayMetricDto {
+  paymentsCount: number;
+  tasksCount: number;
+}
+
+export interface DashboardMetricsDto {
+  activeCasesCount: number;
+  cashbox: DashboardCashboxMetricDto;
+  dueToday: DashboardDueTodayMetricDto;
+}
+
+export type DashboardSearchItemDtoType =
+  (typeof DashboardSearchItemDtoType)[keyof typeof DashboardSearchItemDtoType];
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const DashboardSearchItemDtoType = {
+  case: "case",
+  document: "document",
+  cashbox_movement: "cashbox_movement",
+  task_due: "task_due",
+  hearing: "hearing",
+  payment_due: "payment_due"
+} as const;
+
+export type DashboardSearchItemDtoMovementType =
+  (typeof DashboardSearchItemDtoMovementType)[keyof typeof DashboardSearchItemDtoMovementType];
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const DashboardSearchItemDtoMovementType = {
+  income: "income",
+  expense: "expense",
+  conversion_in: "conversion_in",
+  conversion_out: "conversion_out"
+} as const;
+
+export interface DashboardSearchItemDto {
+  type: DashboardSearchItemDtoType;
+  id: string;
+  title: string;
+  date: string;
+  href: string;
+  caseId?: string;
+  caseNumber?: string;
+  caseCaption?: string;
+  /** @nullable */
+  description?: string | null;
+  /** @nullable */
+  status?: string | null;
+  amount?: number;
+  currencyCode?: string;
+  time?: string;
+  fileName?: string;
+  fileType?: string;
+  fileSizeBytes?: number;
+  movementName?: string;
+  movementType?: DashboardSearchItemDtoMovementType;
+}
+
+export interface DashboardSearchPageInfoDto {
+  limit: number;
+  /** @deprecated */
+  offset: number;
+  /** @nullable */
+  nextCursor: string | null;
+  hasNextPage: boolean;
+  /** @deprecated */
+  total: number;
+}
+
+export interface DashboardSearchResponseDto {
+  items: DashboardSearchItemDto[];
+  pageInfo: DashboardSearchPageInfoDto;
 }
 
 export interface ForumProvinceDto {
@@ -840,7 +1886,7 @@ export interface CreateStaffDto {
    * @minLength 7
    * @maxLength 8
    */
-  dni: string;
+  dni?: string;
   email: string;
   /**
    * @minLength 8
@@ -850,6 +1896,10 @@ export interface CreateStaffDto {
   role: string;
   status?: CreateStaffDtoStatus;
   practiceAreaIds?: string[];
+  /**
+   * @minLength 0
+   * @maxLength 15
+   */
   phone?: string;
   avatarUrl?: string;
 }
@@ -909,7 +1959,7 @@ export interface UpdateStaffDto {
    * @minLength 7
    * @maxLength 8
    */
-  dni: string;
+  dni?: string;
   email: string;
   /**
    * @minLength 8
@@ -919,6 +1969,10 @@ export interface UpdateStaffDto {
   role: string;
   status?: UpdateStaffDtoStatus;
   practiceAreaIds?: string[];
+  /**
+   * @minLength 0
+   * @maxLength 15
+   */
   phone?: string;
   avatarUrl?: string;
 }
@@ -961,6 +2015,210 @@ export interface StaffDeleteResponseDto {
 
 export type CasesControllerCreateExpenseAttachmentBody = {
   file: Blob;
+};
+
+export type accountControllerGetAccountResponse200 = {
+  data: AccountResponseDto;
+  status: 200;
+};
+
+export type accountControllerGetAccountResponseSuccess = accountControllerGetAccountResponse200 & {
+  headers: Headers;
+};
+export type accountControllerGetAccountResponse = accountControllerGetAccountResponseSuccess;
+
+export const getAccountControllerGetAccountUrl = () => {
+  return `/api/account`;
+};
+
+export const accountControllerGetAccount = async (
+  options?: RequestInit
+): Promise<accountControllerGetAccountResponse> => {
+  return bogaapFetch<accountControllerGetAccountResponse>(getAccountControllerGetAccountUrl(), {
+    ...options,
+    method: "GET"
+  });
+};
+
+export type accountControllerUpdateProfileResponse200 = {
+  data: AccountResponseDto;
+  status: 200;
+};
+
+export type accountControllerUpdateProfileResponseSuccess =
+  accountControllerUpdateProfileResponse200 & {
+    headers: Headers;
+  };
+export type accountControllerUpdateProfileResponse = accountControllerUpdateProfileResponseSuccess;
+
+export const getAccountControllerUpdateProfileUrl = () => {
+  return `/api/account/profile`;
+};
+
+export const accountControllerUpdateProfile = async (
+  updateAccountProfileDto: UpdateAccountProfileDto,
+  options?: RequestInit
+): Promise<accountControllerUpdateProfileResponse> => {
+  return bogaapFetch<accountControllerUpdateProfileResponse>(
+    getAccountControllerUpdateProfileUrl(),
+    {
+      ...options,
+      method: "PATCH",
+      headers: { "Content-Type": "application/json", ...options?.headers },
+      body: JSON.stringify(updateAccountProfileDto)
+    }
+  );
+};
+
+export type accountControllerUpdateStudioResponse200 = {
+  data: AccountResponseDto;
+  status: 200;
+};
+
+export type accountControllerUpdateStudioResponseSuccess =
+  accountControllerUpdateStudioResponse200 & {
+    headers: Headers;
+  };
+export type accountControllerUpdateStudioResponse = accountControllerUpdateStudioResponseSuccess;
+
+export const getAccountControllerUpdateStudioUrl = () => {
+  return `/api/account/studio`;
+};
+
+export const accountControllerUpdateStudio = async (
+  updateAccountStudioDto: UpdateAccountStudioDto,
+  options?: RequestInit
+): Promise<accountControllerUpdateStudioResponse> => {
+  return bogaapFetch<accountControllerUpdateStudioResponse>(getAccountControllerUpdateStudioUrl(), {
+    ...options,
+    method: "PATCH",
+    headers: { "Content-Type": "application/json", ...options?.headers },
+    body: JSON.stringify(updateAccountStudioDto)
+  });
+};
+
+export type accountControllerUpdateNotificationsResponse200 = {
+  data: AccountResponseDto;
+  status: 200;
+};
+
+export type accountControllerUpdateNotificationsResponseSuccess =
+  accountControllerUpdateNotificationsResponse200 & {
+    headers: Headers;
+  };
+export type accountControllerUpdateNotificationsResponse =
+  accountControllerUpdateNotificationsResponseSuccess;
+
+export const getAccountControllerUpdateNotificationsUrl = () => {
+  return `/api/account/notifications`;
+};
+
+export const accountControllerUpdateNotifications = async (
+  updateAccountNotificationsDto: UpdateAccountNotificationsDto,
+  options?: RequestInit
+): Promise<accountControllerUpdateNotificationsResponse> => {
+  return bogaapFetch<accountControllerUpdateNotificationsResponse>(
+    getAccountControllerUpdateNotificationsUrl(),
+    {
+      ...options,
+      method: "PATCH",
+      headers: { "Content-Type": "application/json", ...options?.headers },
+      body: JSON.stringify(updateAccountNotificationsDto)
+    }
+  );
+};
+
+export type accountControllerUpdateMembershipResponse200 = {
+  data: AccountResponseDto;
+  status: 200;
+};
+
+export type accountControllerUpdateMembershipResponseSuccess =
+  accountControllerUpdateMembershipResponse200 & {
+    headers: Headers;
+  };
+export type accountControllerUpdateMembershipResponse =
+  accountControllerUpdateMembershipResponseSuccess;
+
+export const getAccountControllerUpdateMembershipUrl = () => {
+  return `/api/account/membership`;
+};
+
+export const accountControllerUpdateMembership = async (
+  updateAccountMembershipDto: UpdateAccountMembershipDto,
+  options?: RequestInit
+): Promise<accountControllerUpdateMembershipResponse> => {
+  return bogaapFetch<accountControllerUpdateMembershipResponse>(
+    getAccountControllerUpdateMembershipUrl(),
+    {
+      ...options,
+      method: "PATCH",
+      headers: { "Content-Type": "application/json", ...options?.headers },
+      body: JSON.stringify(updateAccountMembershipDto)
+    }
+  );
+};
+
+export type accountControllerValidatePasswordChangeResponse200 = {
+  data: UpdateAccountPasswordResponseDto;
+  status: 200;
+};
+
+export type accountControllerValidatePasswordChangeResponseSuccess =
+  accountControllerValidatePasswordChangeResponse200 & {
+    headers: Headers;
+  };
+export type accountControllerValidatePasswordChangeResponse =
+  accountControllerValidatePasswordChangeResponseSuccess;
+
+export const getAccountControllerValidatePasswordChangeUrl = () => {
+  return `/api/account/password/validate`;
+};
+
+export const accountControllerValidatePasswordChange = async (
+  updateAccountPasswordDto: UpdateAccountPasswordDto,
+  options?: RequestInit
+): Promise<accountControllerValidatePasswordChangeResponse> => {
+  return bogaapFetch<accountControllerValidatePasswordChangeResponse>(
+    getAccountControllerValidatePasswordChangeUrl(),
+    {
+      ...options,
+      method: "PATCH",
+      headers: { "Content-Type": "application/json", ...options?.headers },
+      body: JSON.stringify(updateAccountPasswordDto)
+    }
+  );
+};
+
+export type accountControllerUpdatePasswordResponse200 = {
+  data: UpdateAccountPasswordResponseDto;
+  status: 200;
+};
+
+export type accountControllerUpdatePasswordResponseSuccess =
+  accountControllerUpdatePasswordResponse200 & {
+    headers: Headers;
+  };
+export type accountControllerUpdatePasswordResponse =
+  accountControllerUpdatePasswordResponseSuccess;
+
+export const getAccountControllerUpdatePasswordUrl = () => {
+  return `/api/account/password`;
+};
+
+export const accountControllerUpdatePassword = async (
+  updateAccountPasswordDto: UpdateAccountPasswordDto,
+  options?: RequestInit
+): Promise<accountControllerUpdatePasswordResponse> => {
+  return bogaapFetch<accountControllerUpdatePasswordResponse>(
+    getAccountControllerUpdatePasswordUrl(),
+    {
+      ...options,
+      method: "PATCH",
+      headers: { "Content-Type": "application/json", ...options?.headers },
+      body: JSON.stringify(updateAccountPasswordDto)
+    }
+  );
 };
 
 export type authControllerCreateAccountResponse201 = {
@@ -1012,6 +2270,32 @@ export const authControllerLogin = async (
     method: "POST",
     headers: { "Content-Type": "application/json", ...options?.headers },
     body: JSON.stringify(loginDto)
+  });
+};
+
+export type authControllerGoogleLoginResponse200 = {
+  data: LoginResponseDto;
+  status: 200;
+};
+
+export type authControllerGoogleLoginResponseSuccess = authControllerGoogleLoginResponse200 & {
+  headers: Headers;
+};
+export type authControllerGoogleLoginResponse = authControllerGoogleLoginResponseSuccess;
+
+export const getAuthControllerGoogleLoginUrl = () => {
+  return `/api/auth/google`;
+};
+
+export const authControllerGoogleLogin = async (
+  googleLoginDto: GoogleLoginDto,
+  options?: RequestInit
+): Promise<authControllerGoogleLoginResponse> => {
+  return bogaapFetch<authControllerGoogleLoginResponse>(getAuthControllerGoogleLoginUrl(), {
+    ...options,
+    method: "POST",
+    headers: { "Content-Type": "application/json", ...options?.headers },
+    body: JSON.stringify(googleLoginDto)
   });
 };
 
@@ -1187,6 +2471,55 @@ export const rbacControllerDeleteRole = async (
   });
 };
 
+export type aiControllerListToolsResponse200 = {
+  data: AiToolsResponseDto;
+  status: 200;
+};
+
+export type aiControllerListToolsResponseSuccess = aiControllerListToolsResponse200 & {
+  headers: Headers;
+};
+export type aiControllerListToolsResponse = aiControllerListToolsResponseSuccess;
+
+export const getAiControllerListToolsUrl = () => {
+  return `/api/ai/tools`;
+};
+
+export const aiControllerListTools = async (
+  options?: RequestInit
+): Promise<aiControllerListToolsResponse> => {
+  return bogaapFetch<aiControllerListToolsResponse>(getAiControllerListToolsUrl(), {
+    ...options,
+    method: "GET"
+  });
+};
+
+export type aiControllerStartChatResponse200 = {
+  data: AiChatResponseDto;
+  status: 200;
+};
+
+export type aiControllerStartChatResponseSuccess = aiControllerStartChatResponse200 & {
+  headers: Headers;
+};
+export type aiControllerStartChatResponse = aiControllerStartChatResponseSuccess;
+
+export const getAiControllerStartChatUrl = () => {
+  return `/api/ai/chat`;
+};
+
+export const aiControllerStartChat = async (
+  aiChatDto: AiChatDto,
+  options?: RequestInit
+): Promise<aiControllerStartChatResponse> => {
+  return bogaapFetch<aiControllerStartChatResponse>(getAiControllerStartChatUrl(), {
+    ...options,
+    method: "POST",
+    headers: { "Content-Type": "application/json", ...options?.headers },
+    body: JSON.stringify(aiChatDto)
+  });
+};
+
 export type practiceAreaTemplatesControllerListResponse200 = {
   data: PracticeAreaTemplateDto[];
   status: 200;
@@ -1333,6 +2666,850 @@ export const identityControllerRoles = async (
   });
 };
 
+export type integrationsControllerPreviewSaeImportResponse200 = {
+  data: SaePreviewResponseDto;
+  status: 200;
+};
+
+export type integrationsControllerPreviewSaeImportResponseSuccess =
+  integrationsControllerPreviewSaeImportResponse200 & {
+    headers: Headers;
+  };
+export type integrationsControllerPreviewSaeImportResponse =
+  integrationsControllerPreviewSaeImportResponseSuccess;
+
+export const getIntegrationsControllerPreviewSaeImportUrl = () => {
+  return `/api/integrations/sae/preview`;
+};
+
+export const integrationsControllerPreviewSaeImport = async (
+  saePreviewDto: SaePreviewDto,
+  options?: RequestInit
+): Promise<integrationsControllerPreviewSaeImportResponse> => {
+  return bogaapFetch<integrationsControllerPreviewSaeImportResponse>(
+    getIntegrationsControllerPreviewSaeImportUrl(),
+    {
+      ...options,
+      method: "POST",
+      headers: { "Content-Type": "application/json", ...options?.headers },
+      body: JSON.stringify(saePreviewDto)
+    }
+  );
+};
+
+export type integrationsControllerImportSaeCasesResponse200 = {
+  data: SaeImportResponseDto;
+  status: 200;
+};
+
+export type integrationsControllerImportSaeCasesResponseSuccess =
+  integrationsControllerImportSaeCasesResponse200 & {
+    headers: Headers;
+  };
+export type integrationsControllerImportSaeCasesResponse =
+  integrationsControllerImportSaeCasesResponseSuccess;
+
+export const getIntegrationsControllerImportSaeCasesUrl = () => {
+  return `/api/integrations/sae/import`;
+};
+
+export const integrationsControllerImportSaeCases = async (
+  saeImportDto: SaeImportDto,
+  options?: RequestInit
+): Promise<integrationsControllerImportSaeCasesResponse> => {
+  return bogaapFetch<integrationsControllerImportSaeCasesResponse>(
+    getIntegrationsControllerImportSaeCasesUrl(),
+    {
+      ...options,
+      method: "POST",
+      headers: { "Content-Type": "application/json", ...options?.headers },
+      body: JSON.stringify(saeImportDto)
+    }
+  );
+};
+
+export type cashboxControllerSummaryResponse200 = {
+  data: CashboxSummaryDto;
+  status: 200;
+};
+
+export type cashboxControllerSummaryResponseSuccess = cashboxControllerSummaryResponse200 & {
+  headers: Headers;
+};
+export type cashboxControllerSummaryResponse = cashboxControllerSummaryResponseSuccess;
+
+export const getCashboxControllerSummaryUrl = () => {
+  return `/api/cashbox/summary`;
+};
+
+export const cashboxControllerSummary = async (
+  options?: RequestInit
+): Promise<cashboxControllerSummaryResponse> => {
+  return bogaapFetch<cashboxControllerSummaryResponse>(getCashboxControllerSummaryUrl(), {
+    ...options,
+    method: "GET"
+  });
+};
+
+export type cashboxControllerListMovementsResponse200 = {
+  data: CashboxMovementsListResponseDto;
+  status: 200;
+};
+
+export type cashboxControllerListMovementsResponseSuccess =
+  cashboxControllerListMovementsResponse200 & {
+    headers: Headers;
+  };
+export type cashboxControllerListMovementsResponse = cashboxControllerListMovementsResponseSuccess;
+
+export const getCashboxControllerListMovementsUrl = () => {
+  return `/api/cashbox/movements`;
+};
+
+export const cashboxControllerListMovements = async (
+  options?: RequestInit
+): Promise<cashboxControllerListMovementsResponse> => {
+  return bogaapFetch<cashboxControllerListMovementsResponse>(
+    getCashboxControllerListMovementsUrl(),
+    {
+      ...options,
+      method: "GET"
+    }
+  );
+};
+
+export type cashboxControllerCreateMovementResponse201 = {
+  data: CashboxMovementDto;
+  status: 201;
+};
+
+export type cashboxControllerCreateMovementResponseSuccess =
+  cashboxControllerCreateMovementResponse201 & {
+    headers: Headers;
+  };
+export type cashboxControllerCreateMovementResponse =
+  cashboxControllerCreateMovementResponseSuccess;
+
+export const getCashboxControllerCreateMovementUrl = () => {
+  return `/api/cashbox/movements`;
+};
+
+export const cashboxControllerCreateMovement = async (
+  createCashboxMovementDto: CreateCashboxMovementDto,
+  options?: RequestInit
+): Promise<cashboxControllerCreateMovementResponse> => {
+  return bogaapFetch<cashboxControllerCreateMovementResponse>(
+    getCashboxControllerCreateMovementUrl(),
+    {
+      ...options,
+      method: "POST",
+      headers: { "Content-Type": "application/json", ...options?.headers },
+      body: JSON.stringify(createCashboxMovementDto)
+    }
+  );
+};
+
+export type cashboxControllerUpdateMovementResponse200 = {
+  data: CashboxMovementDto;
+  status: 200;
+};
+
+export type cashboxControllerUpdateMovementResponseSuccess =
+  cashboxControllerUpdateMovementResponse200 & {
+    headers: Headers;
+  };
+export type cashboxControllerUpdateMovementResponse =
+  cashboxControllerUpdateMovementResponseSuccess;
+
+export const getCashboxControllerUpdateMovementUrl = (id: string) => {
+  return `/api/cashbox/movements/${id}`;
+};
+
+export const cashboxControllerUpdateMovement = async (
+  id: string,
+  updateCashboxMovementDto: UpdateCashboxMovementDto,
+  options?: RequestInit
+): Promise<cashboxControllerUpdateMovementResponse> => {
+  return bogaapFetch<cashboxControllerUpdateMovementResponse>(
+    getCashboxControllerUpdateMovementUrl(id),
+    {
+      ...options,
+      method: "PATCH",
+      headers: { "Content-Type": "application/json", ...options?.headers },
+      body: JSON.stringify(updateCashboxMovementDto)
+    }
+  );
+};
+
+export type cashboxControllerDeleteMovementResponse200 = {
+  data: void;
+  status: 200;
+};
+
+export type cashboxControllerDeleteMovementResponseSuccess =
+  cashboxControllerDeleteMovementResponse200 & {
+    headers: Headers;
+  };
+export type cashboxControllerDeleteMovementResponse =
+  cashboxControllerDeleteMovementResponseSuccess;
+
+export const getCashboxControllerDeleteMovementUrl = (id: string) => {
+  return `/api/cashbox/movements/${id}`;
+};
+
+export const cashboxControllerDeleteMovement = async (
+  id: string,
+  options?: RequestInit
+): Promise<cashboxControllerDeleteMovementResponse> => {
+  return bogaapFetch<cashboxControllerDeleteMovementResponse>(
+    getCashboxControllerDeleteMovementUrl(id),
+    {
+      ...options,
+      method: "DELETE"
+    }
+  );
+};
+
+export type cashboxControllerCreateConversionResponse201 = {
+  data: CreateCashboxConversionResponseDto;
+  status: 201;
+};
+
+export type cashboxControllerCreateConversionResponseSuccess =
+  cashboxControllerCreateConversionResponse201 & {
+    headers: Headers;
+  };
+export type cashboxControllerCreateConversionResponse =
+  cashboxControllerCreateConversionResponseSuccess;
+
+export const getCashboxControllerCreateConversionUrl = () => {
+  return `/api/cashbox/conversions`;
+};
+
+export const cashboxControllerCreateConversion = async (
+  createCashboxConversionDto: CreateCashboxConversionDto,
+  options?: RequestInit
+): Promise<cashboxControllerCreateConversionResponse> => {
+  return bogaapFetch<cashboxControllerCreateConversionResponse>(
+    getCashboxControllerCreateConversionUrl(),
+    {
+      ...options,
+      method: "POST",
+      headers: { "Content-Type": "application/json", ...options?.headers },
+      body: JSON.stringify(createCashboxConversionDto)
+    }
+  );
+};
+
+export type categoriesControllerListResponse200 = {
+  data: CategoryListResponseDto;
+  status: 200;
+};
+
+export type categoriesControllerListResponseSuccess = categoriesControllerListResponse200 & {
+  headers: Headers;
+};
+export type categoriesControllerListResponse = categoriesControllerListResponseSuccess;
+
+export const getCategoriesControllerListUrl = () => {
+  return `/api/categories`;
+};
+
+export const categoriesControllerList = async (
+  options?: RequestInit
+): Promise<categoriesControllerListResponse> => {
+  return bogaapFetch<categoriesControllerListResponse>(getCategoriesControllerListUrl(), {
+    ...options,
+    method: "GET"
+  });
+};
+
+export type categoriesControllerCreateResponse201 = {
+  data: CategoryDto;
+  status: 201;
+};
+
+export type categoriesControllerCreateResponseSuccess = categoriesControllerCreateResponse201 & {
+  headers: Headers;
+};
+export type categoriesControllerCreateResponse = categoriesControllerCreateResponseSuccess;
+
+export const getCategoriesControllerCreateUrl = () => {
+  return `/api/categories`;
+};
+
+export const categoriesControllerCreate = async (
+  createCategoryDto: CreateCategoryDto,
+  options?: RequestInit
+): Promise<categoriesControllerCreateResponse> => {
+  return bogaapFetch<categoriesControllerCreateResponse>(getCategoriesControllerCreateUrl(), {
+    ...options,
+    method: "POST",
+    headers: { "Content-Type": "application/json", ...options?.headers },
+    body: JSON.stringify(createCategoryDto)
+  });
+};
+
+export type categoriesControllerUpdateResponse200 = {
+  data: CategoryDto;
+  status: 200;
+};
+
+export type categoriesControllerUpdateResponseSuccess = categoriesControllerUpdateResponse200 & {
+  headers: Headers;
+};
+export type categoriesControllerUpdateResponse = categoriesControllerUpdateResponseSuccess;
+
+export const getCategoriesControllerUpdateUrl = (id: string) => {
+  return `/api/categories/${id}`;
+};
+
+export const categoriesControllerUpdate = async (
+  id: string,
+  updateCategoryDto: UpdateCategoryDto,
+  options?: RequestInit
+): Promise<categoriesControllerUpdateResponse> => {
+  return bogaapFetch<categoriesControllerUpdateResponse>(getCategoriesControllerUpdateUrl(id), {
+    ...options,
+    method: "PATCH",
+    headers: { "Content-Type": "application/json", ...options?.headers },
+    body: JSON.stringify(updateCategoryDto)
+  });
+};
+
+export type categoriesControllerDeleteResponse200 = {
+  data: CategoryDeleteResponseDto;
+  status: 200;
+};
+
+export type categoriesControllerDeleteResponseSuccess = categoriesControllerDeleteResponse200 & {
+  headers: Headers;
+};
+export type categoriesControllerDeleteResponse = categoriesControllerDeleteResponseSuccess;
+
+export const getCategoriesControllerDeleteUrl = (id: string) => {
+  return `/api/categories/${id}`;
+};
+
+export const categoriesControllerDelete = async (
+  id: string,
+  options?: RequestInit
+): Promise<categoriesControllerDeleteResponse> => {
+  return bogaapFetch<categoriesControllerDeleteResponse>(getCategoriesControllerDeleteUrl(id), {
+    ...options,
+    method: "DELETE"
+  });
+};
+
+export type documentsControllerListResponse200 = {
+  data: DocumentsListResponseDto;
+  status: 200;
+};
+
+export type documentsControllerListResponseSuccess = documentsControllerListResponse200 & {
+  headers: Headers;
+};
+export type documentsControllerListResponse = documentsControllerListResponseSuccess;
+
+export const getDocumentsControllerListUrl = () => {
+  return `/api/documents`;
+};
+
+export const documentsControllerList = async (
+  options?: RequestInit
+): Promise<documentsControllerListResponse> => {
+  return bogaapFetch<documentsControllerListResponse>(getDocumentsControllerListUrl(), {
+    ...options,
+    method: "GET"
+  });
+};
+
+export type documentsControllerCreateResponse201 = {
+  data: DocumentDto;
+  status: 201;
+};
+
+export type documentsControllerCreateResponseSuccess = documentsControllerCreateResponse201 & {
+  headers: Headers;
+};
+export type documentsControllerCreateResponse = documentsControllerCreateResponseSuccess;
+
+export const getDocumentsControllerCreateUrl = () => {
+  return `/api/documents`;
+};
+
+export const documentsControllerCreate = async (
+  createDocumentBodyDto: CreateDocumentBodyDto,
+  options?: RequestInit
+): Promise<documentsControllerCreateResponse> => {
+  const formData = new FormData();
+  formData.append(`file`, createDocumentBodyDto.file);
+
+  return bogaapFetch<documentsControllerCreateResponse>(getDocumentsControllerCreateUrl(), {
+    ...options,
+    method: "POST",
+    body: formData
+  });
+};
+
+export type documentsControllerListFoldersResponse200 = {
+  data: DocumentFolderDto[];
+  status: 200;
+};
+
+export type documentsControllerListFoldersResponseSuccess =
+  documentsControllerListFoldersResponse200 & {
+    headers: Headers;
+  };
+export type documentsControllerListFoldersResponse = documentsControllerListFoldersResponseSuccess;
+
+export const getDocumentsControllerListFoldersUrl = () => {
+  return `/api/documents/folders`;
+};
+
+export const documentsControllerListFolders = async (
+  options?: RequestInit
+): Promise<documentsControllerListFoldersResponse> => {
+  return bogaapFetch<documentsControllerListFoldersResponse>(
+    getDocumentsControllerListFoldersUrl(),
+    {
+      ...options,
+      method: "GET"
+    }
+  );
+};
+
+export type documentsControllerCreateFolderResponse201 = {
+  data: DocumentFolderDto;
+  status: 201;
+};
+
+export type documentsControllerCreateFolderResponseSuccess =
+  documentsControllerCreateFolderResponse201 & {
+    headers: Headers;
+  };
+export type documentsControllerCreateFolderResponse =
+  documentsControllerCreateFolderResponseSuccess;
+
+export const getDocumentsControllerCreateFolderUrl = () => {
+  return `/api/documents/folders`;
+};
+
+export const documentsControllerCreateFolder = async (
+  createDocumentFolderDto: CreateDocumentFolderDto,
+  options?: RequestInit
+): Promise<documentsControllerCreateFolderResponse> => {
+  return bogaapFetch<documentsControllerCreateFolderResponse>(
+    getDocumentsControllerCreateFolderUrl(),
+    {
+      ...options,
+      method: "POST",
+      headers: { "Content-Type": "application/json", ...options?.headers },
+      body: JSON.stringify(createDocumentFolderDto)
+    }
+  );
+};
+
+export type documentsControllerUpdateFolderResponse200 = {
+  data: DocumentFolderDto;
+  status: 200;
+};
+
+export type documentsControllerUpdateFolderResponseSuccess =
+  documentsControllerUpdateFolderResponse200 & {
+    headers: Headers;
+  };
+export type documentsControllerUpdateFolderResponse =
+  documentsControllerUpdateFolderResponseSuccess;
+
+export const getDocumentsControllerUpdateFolderUrl = (folderId: string) => {
+  return `/api/documents/folders/${folderId}`;
+};
+
+export const documentsControllerUpdateFolder = async (
+  folderId: string,
+  updateDocumentFolderDto: UpdateDocumentFolderDto,
+  options?: RequestInit
+): Promise<documentsControllerUpdateFolderResponse> => {
+  return bogaapFetch<documentsControllerUpdateFolderResponse>(
+    getDocumentsControllerUpdateFolderUrl(folderId),
+    {
+      ...options,
+      method: "PATCH",
+      headers: { "Content-Type": "application/json", ...options?.headers },
+      body: JSON.stringify(updateDocumentFolderDto)
+    }
+  );
+};
+
+export type documentsControllerDeleteFolderResponse200 = {
+  data: DeleteResponseDto;
+  status: 200;
+};
+
+export type documentsControllerDeleteFolderResponseSuccess =
+  documentsControllerDeleteFolderResponse200 & {
+    headers: Headers;
+  };
+export type documentsControllerDeleteFolderResponse =
+  documentsControllerDeleteFolderResponseSuccess;
+
+export const getDocumentsControllerDeleteFolderUrl = (folderId: string) => {
+  return `/api/documents/folders/${folderId}`;
+};
+
+export const documentsControllerDeleteFolder = async (
+  folderId: string,
+  options?: RequestInit
+): Promise<documentsControllerDeleteFolderResponse> => {
+  return bogaapFetch<documentsControllerDeleteFolderResponse>(
+    getDocumentsControllerDeleteFolderUrl(folderId),
+    {
+      ...options,
+      method: "DELETE"
+    }
+  );
+};
+
+export type documentsControllerCreateImportJobResponse201 = {
+  data: DocumentImportJobDto;
+  status: 201;
+};
+
+export type documentsControllerCreateImportJobResponseSuccess =
+  documentsControllerCreateImportJobResponse201 & {
+    headers: Headers;
+  };
+export type documentsControllerCreateImportJobResponse =
+  documentsControllerCreateImportJobResponseSuccess;
+
+export const getDocumentsControllerCreateImportJobUrl = () => {
+  return `/api/documents/imports`;
+};
+
+export const documentsControllerCreateImportJob = async (
+  createDocumentImportJobDto: CreateDocumentImportJobDto,
+  options?: RequestInit
+): Promise<documentsControllerCreateImportJobResponse> => {
+  return bogaapFetch<documentsControllerCreateImportJobResponse>(
+    getDocumentsControllerCreateImportJobUrl(),
+    {
+      ...options,
+      method: "POST",
+      headers: { "Content-Type": "application/json", ...options?.headers },
+      body: JSON.stringify(createDocumentImportJobDto)
+    }
+  );
+};
+
+export type documentsControllerUploadImportItemsResponse200 = {
+  data: DocumentImportJobDto;
+  status: 200;
+};
+
+export type documentsControllerUploadImportItemsResponseSuccess =
+  documentsControllerUploadImportItemsResponse200 & {
+    headers: Headers;
+  };
+export type documentsControllerUploadImportItemsResponse =
+  documentsControllerUploadImportItemsResponseSuccess;
+
+export const getDocumentsControllerUploadImportItemsUrl = (importJobId: string) => {
+  return `/api/documents/imports/${importJobId}/items`;
+};
+
+export const documentsControllerUploadImportItems = async (
+  importJobId: string,
+  uploadDocumentImportItemsDto: UploadDocumentImportItemsDto,
+  options?: RequestInit
+): Promise<documentsControllerUploadImportItemsResponse> => {
+  const formData = new FormData();
+  uploadDocumentImportItemsDto.files.forEach((value) => formData.append(`files`, value));
+
+  return bogaapFetch<documentsControllerUploadImportItemsResponse>(
+    getDocumentsControllerUploadImportItemsUrl(importJobId),
+    {
+      ...options,
+      method: "POST",
+      body: formData
+    }
+  );
+};
+
+export type documentsControllerGetImportJobResponse200 = {
+  data: DocumentImportJobDto;
+  status: 200;
+};
+
+export type documentsControllerGetImportJobResponseSuccess =
+  documentsControllerGetImportJobResponse200 & {
+    headers: Headers;
+  };
+export type documentsControllerGetImportJobResponse =
+  documentsControllerGetImportJobResponseSuccess;
+
+export const getDocumentsControllerGetImportJobUrl = (importJobId: string) => {
+  return `/api/documents/imports/${importJobId}`;
+};
+
+export const documentsControllerGetImportJob = async (
+  importJobId: string,
+  options?: RequestInit
+): Promise<documentsControllerGetImportJobResponse> => {
+  return bogaapFetch<documentsControllerGetImportJobResponse>(
+    getDocumentsControllerGetImportJobUrl(importJobId),
+    {
+      ...options,
+      method: "GET"
+    }
+  );
+};
+
+export type documentsControllerCancelImportJobResponse200 = {
+  data: DocumentImportJobDto;
+  status: 200;
+};
+
+export type documentsControllerCancelImportJobResponseSuccess =
+  documentsControllerCancelImportJobResponse200 & {
+    headers: Headers;
+  };
+export type documentsControllerCancelImportJobResponse =
+  documentsControllerCancelImportJobResponseSuccess;
+
+export const getDocumentsControllerCancelImportJobUrl = (importJobId: string) => {
+  return `/api/documents/imports/${importJobId}/cancel`;
+};
+
+export const documentsControllerCancelImportJob = async (
+  importJobId: string,
+  options?: RequestInit
+): Promise<documentsControllerCancelImportJobResponse> => {
+  return bogaapFetch<documentsControllerCancelImportJobResponse>(
+    getDocumentsControllerCancelImportJobUrl(importJobId),
+    {
+      ...options,
+      method: "POST"
+    }
+  );
+};
+
+export type documentsControllerUpdateResponse200 = {
+  data: DocumentDto;
+  status: 200;
+};
+
+export type documentsControllerUpdateResponseSuccess = documentsControllerUpdateResponse200 & {
+  headers: Headers;
+};
+export type documentsControllerUpdateResponse = documentsControllerUpdateResponseSuccess;
+
+export const getDocumentsControllerUpdateUrl = (documentId: string) => {
+  return `/api/documents/${documentId}`;
+};
+
+export const documentsControllerUpdate = async (
+  documentId: string,
+  updateDocumentDto: UpdateDocumentDto,
+  options?: RequestInit
+): Promise<documentsControllerUpdateResponse> => {
+  return bogaapFetch<documentsControllerUpdateResponse>(
+    getDocumentsControllerUpdateUrl(documentId),
+    {
+      ...options,
+      method: "PATCH",
+      headers: { "Content-Type": "application/json", ...options?.headers },
+      body: JSON.stringify(updateDocumentDto)
+    }
+  );
+};
+
+export type documentsControllerDeleteResponse200 = {
+  data: DeleteResponseDto;
+  status: 200;
+};
+
+export type documentsControllerDeleteResponseSuccess = documentsControllerDeleteResponse200 & {
+  headers: Headers;
+};
+export type documentsControllerDeleteResponse = documentsControllerDeleteResponseSuccess;
+
+export const getDocumentsControllerDeleteUrl = (documentId: string) => {
+  return `/api/documents/${documentId}`;
+};
+
+export const documentsControllerDelete = async (
+  documentId: string,
+  options?: RequestInit
+): Promise<documentsControllerDeleteResponse> => {
+  return bogaapFetch<documentsControllerDeleteResponse>(
+    getDocumentsControllerDeleteUrl(documentId),
+    {
+      ...options,
+      method: "DELETE"
+    }
+  );
+};
+
+export type documentsControllerPreviewResponse200 = {
+  data: void;
+  status: 200;
+};
+
+export type documentsControllerPreviewResponseSuccess = documentsControllerPreviewResponse200 & {
+  headers: Headers;
+};
+export type documentsControllerPreviewResponse = documentsControllerPreviewResponseSuccess;
+
+export const getDocumentsControllerPreviewUrl = (documentId: string) => {
+  return `/api/documents/${documentId}/preview`;
+};
+
+export const documentsControllerPreview = async (
+  documentId: string,
+  options?: RequestInit
+): Promise<documentsControllerPreviewResponse> => {
+  return bogaapFetch<documentsControllerPreviewResponse>(
+    getDocumentsControllerPreviewUrl(documentId),
+    {
+      ...options,
+      method: "GET"
+    }
+  );
+};
+
+export type documentsControllerDownloadResponse200 = {
+  data: void;
+  status: 200;
+};
+
+export type documentsControllerDownloadResponseSuccess = documentsControllerDownloadResponse200 & {
+  headers: Headers;
+};
+export type documentsControllerDownloadResponse = documentsControllerDownloadResponseSuccess;
+
+export const getDocumentsControllerDownloadUrl = (documentId: string) => {
+  return `/api/documents/${documentId}/download`;
+};
+
+export const documentsControllerDownload = async (
+  documentId: string,
+  options?: RequestInit
+): Promise<documentsControllerDownloadResponse> => {
+  return bogaapFetch<documentsControllerDownloadResponse>(
+    getDocumentsControllerDownloadUrl(documentId),
+    {
+      ...options,
+      method: "GET"
+    }
+  );
+};
+
+export type documentsControllerBulkDeleteResponse200 = {
+  data: DeleteResponseDto;
+  status: 200;
+};
+
+export type documentsControllerBulkDeleteResponseSuccess =
+  documentsControllerBulkDeleteResponse200 & {
+    headers: Headers;
+  };
+export type documentsControllerBulkDeleteResponse = documentsControllerBulkDeleteResponseSuccess;
+
+export const getDocumentsControllerBulkDeleteUrl = () => {
+  return `/api/documents/bulk-delete`;
+};
+
+export const documentsControllerBulkDelete = async (
+  bulkDeleteDocumentsDto: BulkDeleteDocumentsDto,
+  options?: RequestInit
+): Promise<documentsControllerBulkDeleteResponse> => {
+  return bogaapFetch<documentsControllerBulkDeleteResponse>(getDocumentsControllerBulkDeleteUrl(), {
+    ...options,
+    method: "POST",
+    headers: { "Content-Type": "application/json", ...options?.headers },
+    body: JSON.stringify(bulkDeleteDocumentsDto)
+  });
+};
+
+export type documentsControllerBulkMoveResponse200 = {
+  data: DeleteResponseDto;
+  status: 200;
+};
+
+export type documentsControllerBulkMoveResponseSuccess = documentsControllerBulkMoveResponse200 & {
+  headers: Headers;
+};
+export type documentsControllerBulkMoveResponse = documentsControllerBulkMoveResponseSuccess;
+
+export const getDocumentsControllerBulkMoveUrl = () => {
+  return `/api/documents/bulk-move`;
+};
+
+export const documentsControllerBulkMove = async (
+  bulkMoveDocumentsDto: BulkMoveDocumentsDto,
+  options?: RequestInit
+): Promise<documentsControllerBulkMoveResponse> => {
+  return bogaapFetch<documentsControllerBulkMoveResponse>(getDocumentsControllerBulkMoveUrl(), {
+    ...options,
+    method: "POST",
+    headers: { "Content-Type": "application/json", ...options?.headers },
+    body: JSON.stringify(bulkMoveDocumentsDto)
+  });
+};
+
+export type notificationsControllerListResponse200 = {
+  data: NotificationsListResponseDto;
+  status: 200;
+};
+
+export type notificationsControllerListResponseSuccess = notificationsControllerListResponse200 & {
+  headers: Headers;
+};
+export type notificationsControllerListResponse = notificationsControllerListResponseSuccess;
+
+export const getNotificationsControllerListUrl = () => {
+  return `/api/notifications`;
+};
+
+export const notificationsControllerList = async (
+  options?: RequestInit
+): Promise<notificationsControllerListResponse> => {
+  return bogaapFetch<notificationsControllerListResponse>(getNotificationsControllerListUrl(), {
+    ...options,
+    method: "GET"
+  });
+};
+
+export type notificationsControllerMarkReadResponse200 = {
+  data: NotificationReadResponseDto;
+  status: 200;
+};
+
+export type notificationsControllerMarkReadResponseSuccess =
+  notificationsControllerMarkReadResponse200 & {
+    headers: Headers;
+  };
+export type notificationsControllerMarkReadResponse =
+  notificationsControllerMarkReadResponseSuccess;
+
+export const getNotificationsControllerMarkReadUrl = (id: string) => {
+  return `/api/notifications/${id}/read`;
+};
+
+export const notificationsControllerMarkRead = async (
+  id: string,
+  options?: RequestInit
+): Promise<notificationsControllerMarkReadResponse> => {
+  return bogaapFetch<notificationsControllerMarkReadResponse>(
+    getNotificationsControllerMarkReadUrl(id),
+    {
+      ...options,
+      method: "PATCH"
+    }
+  );
+};
+
 export type casesControllerListResponse200 = {
   data: CasesListResponseDto;
   status: 200;
@@ -1426,6 +3603,34 @@ export const casesControllerGetTenantCalendar = async (
 ): Promise<casesControllerGetTenantCalendarResponse> => {
   return bogaapFetch<casesControllerGetTenantCalendarResponse>(
     getCasesControllerGetTenantCalendarUrl(),
+    {
+      ...options,
+      method: "GET"
+    }
+  );
+};
+
+export type casesControllerListPickerOptionsResponse200 = {
+  data: CasePickerOptionsResponseDto;
+  status: 200;
+};
+
+export type casesControllerListPickerOptionsResponseSuccess =
+  casesControllerListPickerOptionsResponse200 & {
+    headers: Headers;
+  };
+export type casesControllerListPickerOptionsResponse =
+  casesControllerListPickerOptionsResponseSuccess;
+
+export const getCasesControllerListPickerOptionsUrl = () => {
+  return `/api/cases/picker-options`;
+};
+
+export const casesControllerListPickerOptions = async (
+  options?: RequestInit
+): Promise<casesControllerListPickerOptionsResponse> => {
+  return bogaapFetch<casesControllerListPickerOptionsResponse>(
+    getCasesControllerListPickerOptionsUrl(),
     {
       ...options,
       method: "GET"
@@ -1670,6 +3875,274 @@ export const casesControllerGetCalendar = async (
   });
 };
 
+export type casesControllerListDocumentsResponse200 = {
+  data: CaseDocumentsListResponseDto;
+  status: 200;
+};
+
+export type casesControllerListDocumentsResponseSuccess =
+  casesControllerListDocumentsResponse200 & {
+    headers: Headers;
+  };
+export type casesControllerListDocumentsResponse = casesControllerListDocumentsResponseSuccess;
+
+export const getCasesControllerListDocumentsUrl = (caseId: string) => {
+  return `/api/cases/${caseId}/documents`;
+};
+
+export const casesControllerListDocuments = async (
+  caseId: string,
+  options?: RequestInit
+): Promise<casesControllerListDocumentsResponse> => {
+  return bogaapFetch<casesControllerListDocumentsResponse>(
+    getCasesControllerListDocumentsUrl(caseId),
+    {
+      ...options,
+      method: "GET"
+    }
+  );
+};
+
+export type casesControllerCreateDocumentResponse201 = {
+  data: CaseDocumentDto;
+  status: 201;
+};
+
+export type casesControllerCreateDocumentResponseSuccess =
+  casesControllerCreateDocumentResponse201 & {
+    headers: Headers;
+  };
+export type casesControllerCreateDocumentResponse = casesControllerCreateDocumentResponseSuccess;
+
+export const getCasesControllerCreateDocumentUrl = (caseId: string) => {
+  return `/api/cases/${caseId}/documents`;
+};
+
+export const casesControllerCreateDocument = async (
+  caseId: string,
+  createCaseDocumentBodyDto: CreateCaseDocumentBodyDto,
+  options?: RequestInit
+): Promise<casesControllerCreateDocumentResponse> => {
+  const formData = new FormData();
+  formData.append(`file`, createCaseDocumentBodyDto.file);
+
+  return bogaapFetch<casesControllerCreateDocumentResponse>(
+    getCasesControllerCreateDocumentUrl(caseId),
+    {
+      ...options,
+      method: "POST",
+      body: formData
+    }
+  );
+};
+
+export type casesControllerPreviewDocumentResponse200 = {
+  data: void;
+  status: 200;
+};
+
+export type casesControllerPreviewDocumentResponseSuccess =
+  casesControllerPreviewDocumentResponse200 & {
+    headers: Headers;
+  };
+export type casesControllerPreviewDocumentResponse = casesControllerPreviewDocumentResponseSuccess;
+
+export const getCasesControllerPreviewDocumentUrl = (caseId: string, documentId: string) => {
+  return `/api/cases/${caseId}/documents/${documentId}/preview`;
+};
+
+export const casesControllerPreviewDocument = async (
+  caseId: string,
+  documentId: string,
+  options?: RequestInit
+): Promise<casesControllerPreviewDocumentResponse> => {
+  return bogaapFetch<casesControllerPreviewDocumentResponse>(
+    getCasesControllerPreviewDocumentUrl(caseId, documentId),
+    {
+      ...options,
+      method: "GET"
+    }
+  );
+};
+
+export type casesControllerDownloadDocumentResponse200 = {
+  data: void;
+  status: 200;
+};
+
+export type casesControllerDownloadDocumentResponseSuccess =
+  casesControllerDownloadDocumentResponse200 & {
+    headers: Headers;
+  };
+export type casesControllerDownloadDocumentResponse =
+  casesControllerDownloadDocumentResponseSuccess;
+
+export const getCasesControllerDownloadDocumentUrl = (caseId: string, documentId: string) => {
+  return `/api/cases/${caseId}/documents/${documentId}/download`;
+};
+
+export const casesControllerDownloadDocument = async (
+  caseId: string,
+  documentId: string,
+  options?: RequestInit
+): Promise<casesControllerDownloadDocumentResponse> => {
+  return bogaapFetch<casesControllerDownloadDocumentResponse>(
+    getCasesControllerDownloadDocumentUrl(caseId, documentId),
+    {
+      ...options,
+      method: "GET"
+    }
+  );
+};
+
+export type casesControllerDeleteDocumentResponse200 = {
+  data: CaseDeleteResponseDto;
+  status: 200;
+};
+
+export type casesControllerDeleteDocumentResponseSuccess =
+  casesControllerDeleteDocumentResponse200 & {
+    headers: Headers;
+  };
+export type casesControllerDeleteDocumentResponse = casesControllerDeleteDocumentResponseSuccess;
+
+export const getCasesControllerDeleteDocumentUrl = (caseId: string, documentId: string) => {
+  return `/api/cases/${caseId}/documents/${documentId}`;
+};
+
+export const casesControllerDeleteDocument = async (
+  caseId: string,
+  documentId: string,
+  options?: RequestInit
+): Promise<casesControllerDeleteDocumentResponse> => {
+  return bogaapFetch<casesControllerDeleteDocumentResponse>(
+    getCasesControllerDeleteDocumentUrl(caseId, documentId),
+    {
+      ...options,
+      method: "DELETE"
+    }
+  );
+};
+
+export type casesControllerListHearingsResponse200 = {
+  data: CaseHearingsListResponseDto;
+  status: 200;
+};
+
+export type casesControllerListHearingsResponseSuccess = casesControllerListHearingsResponse200 & {
+  headers: Headers;
+};
+export type casesControllerListHearingsResponse = casesControllerListHearingsResponseSuccess;
+
+export const getCasesControllerListHearingsUrl = (caseId: string) => {
+  return `/api/cases/${caseId}/hearings`;
+};
+
+export const casesControllerListHearings = async (
+  caseId: string,
+  options?: RequestInit
+): Promise<casesControllerListHearingsResponse> => {
+  return bogaapFetch<casesControllerListHearingsResponse>(
+    getCasesControllerListHearingsUrl(caseId),
+    {
+      ...options,
+      method: "GET"
+    }
+  );
+};
+
+export type casesControllerCreateHearingResponse201 = {
+  data: CaseHearingDto;
+  status: 201;
+};
+
+export type casesControllerCreateHearingResponseSuccess =
+  casesControllerCreateHearingResponse201 & {
+    headers: Headers;
+  };
+export type casesControllerCreateHearingResponse = casesControllerCreateHearingResponseSuccess;
+
+export const getCasesControllerCreateHearingUrl = (caseId: string) => {
+  return `/api/cases/${caseId}/hearings`;
+};
+
+export const casesControllerCreateHearing = async (
+  caseId: string,
+  createCaseHearingDto: CreateCaseHearingDto,
+  options?: RequestInit
+): Promise<casesControllerCreateHearingResponse> => {
+  return bogaapFetch<casesControllerCreateHearingResponse>(
+    getCasesControllerCreateHearingUrl(caseId),
+    {
+      ...options,
+      method: "POST",
+      headers: { "Content-Type": "application/json", ...options?.headers },
+      body: JSON.stringify(createCaseHearingDto)
+    }
+  );
+};
+
+export type casesControllerUpdateHearingResponse200 = {
+  data: CaseHearingDto;
+  status: 200;
+};
+
+export type casesControllerUpdateHearingResponseSuccess =
+  casesControllerUpdateHearingResponse200 & {
+    headers: Headers;
+  };
+export type casesControllerUpdateHearingResponse = casesControllerUpdateHearingResponseSuccess;
+
+export const getCasesControllerUpdateHearingUrl = (caseId: string, hearingId: string) => {
+  return `/api/cases/${caseId}/hearings/${hearingId}`;
+};
+
+export const casesControllerUpdateHearing = async (
+  caseId: string,
+  hearingId: string,
+  updateCaseHearingDto: UpdateCaseHearingDto,
+  options?: RequestInit
+): Promise<casesControllerUpdateHearingResponse> => {
+  return bogaapFetch<casesControllerUpdateHearingResponse>(
+    getCasesControllerUpdateHearingUrl(caseId, hearingId),
+    {
+      ...options,
+      method: "PATCH",
+      headers: { "Content-Type": "application/json", ...options?.headers },
+      body: JSON.stringify(updateCaseHearingDto)
+    }
+  );
+};
+
+export type casesControllerDeleteHearingResponse200 = {
+  data: CaseDeleteResponseDto;
+  status: 200;
+};
+
+export type casesControllerDeleteHearingResponseSuccess =
+  casesControllerDeleteHearingResponse200 & {
+    headers: Headers;
+  };
+export type casesControllerDeleteHearingResponse = casesControllerDeleteHearingResponseSuccess;
+
+export const getCasesControllerDeleteHearingUrl = (caseId: string, hearingId: string) => {
+  return `/api/cases/${caseId}/hearings/${hearingId}`;
+};
+
+export const casesControllerDeleteHearing = async (
+  caseId: string,
+  hearingId: string,
+  options?: RequestInit
+): Promise<casesControllerDeleteHearingResponse> => {
+  return bogaapFetch<casesControllerDeleteHearingResponse>(
+    getCasesControllerDeleteHearingUrl(caseId, hearingId),
+    {
+      ...options,
+      method: "DELETE"
+    }
+  );
+};
+
 export type casesControllerGetExpensesSummaryResponse200 = {
   data: CaseExpensesSummaryDto;
   status: 200;
@@ -1695,6 +4168,35 @@ export const casesControllerGetExpensesSummary = async (
     {
       ...options,
       method: "GET"
+    }
+  );
+};
+
+export type casesControllerRecalculateOverdueExpensesResponse200 = {
+  data: CaseExpensesOverdueRecalculationDto;
+  status: 200;
+};
+
+export type casesControllerRecalculateOverdueExpensesResponseSuccess =
+  casesControllerRecalculateOverdueExpensesResponse200 & {
+    headers: Headers;
+  };
+export type casesControllerRecalculateOverdueExpensesResponse =
+  casesControllerRecalculateOverdueExpensesResponseSuccess;
+
+export const getCasesControllerRecalculateOverdueExpensesUrl = (caseId: string) => {
+  return `/api/cases/${caseId}/expenses/recalculate-overdue`;
+};
+
+export const casesControllerRecalculateOverdueExpenses = async (
+  caseId: string,
+  options?: RequestInit
+): Promise<casesControllerRecalculateOverdueExpensesResponse> => {
+  return bogaapFetch<casesControllerRecalculateOverdueExpensesResponse>(
+    getCasesControllerRecalculateOverdueExpensesUrl(caseId),
+    {
+      ...options,
+      method: "POST"
     }
   );
 };
@@ -1753,6 +4255,34 @@ export const casesControllerCreateExpense = async (
       method: "POST",
       headers: { "Content-Type": "application/json", ...options?.headers },
       body: JSON.stringify(createCaseExpenseDto)
+    }
+  );
+};
+
+export type casesControllerGetExpenseResponse200 = {
+  data: CaseExpenseDto;
+  status: 200;
+};
+
+export type casesControllerGetExpenseResponseSuccess = casesControllerGetExpenseResponse200 & {
+  headers: Headers;
+};
+export type casesControllerGetExpenseResponse = casesControllerGetExpenseResponseSuccess;
+
+export const getCasesControllerGetExpenseUrl = (caseId: string, expenseId: string) => {
+  return `/api/cases/${caseId}/expenses/${expenseId}`;
+};
+
+export const casesControllerGetExpense = async (
+  caseId: string,
+  expenseId: string,
+  options?: RequestInit
+): Promise<casesControllerGetExpenseResponse> => {
+  return bogaapFetch<casesControllerGetExpenseResponse>(
+    getCasesControllerGetExpenseUrl(caseId, expenseId),
+    {
+      ...options,
+      method: "GET"
     }
   );
 };
@@ -1951,6 +4481,297 @@ export const casesControllerDeleteExpenseAttachment = async (
       method: "DELETE"
     }
   );
+};
+
+export type documentCategoriesControllerListResponse200 = {
+  data: DocumentCategoriesListResponseDto;
+  status: 200;
+};
+
+export type documentCategoriesControllerListResponseSuccess =
+  documentCategoriesControllerListResponse200 & {
+    headers: Headers;
+  };
+export type documentCategoriesControllerListResponse =
+  documentCategoriesControllerListResponseSuccess;
+
+export const getDocumentCategoriesControllerListUrl = () => {
+  return `/api/document-categories`;
+};
+
+export const documentCategoriesControllerList = async (
+  options?: RequestInit
+): Promise<documentCategoriesControllerListResponse> => {
+  return bogaapFetch<documentCategoriesControllerListResponse>(
+    getDocumentCategoriesControllerListUrl(),
+    {
+      ...options,
+      method: "GET"
+    }
+  );
+};
+
+export type currenciesControllerListResponse200 = {
+  data: CurrencyListResponseDto;
+  status: 200;
+};
+
+export type currenciesControllerListResponseSuccess = currenciesControllerListResponse200 & {
+  headers: Headers;
+};
+export type currenciesControllerListResponse = currenciesControllerListResponseSuccess;
+
+export const getCurrenciesControllerListUrl = () => {
+  return `/api/currencies`;
+};
+
+export const currenciesControllerList = async (
+  options?: RequestInit
+): Promise<currenciesControllerListResponse> => {
+  return bogaapFetch<currenciesControllerListResponse>(getCurrenciesControllerListUrl(), {
+    ...options,
+    method: "GET"
+  });
+};
+
+export type currenciesControllerCreateResponse201 = {
+  data: CurrencyDto;
+  status: 201;
+};
+
+export type currenciesControllerCreateResponseSuccess = currenciesControllerCreateResponse201 & {
+  headers: Headers;
+};
+export type currenciesControllerCreateResponse = currenciesControllerCreateResponseSuccess;
+
+export const getCurrenciesControllerCreateUrl = () => {
+  return `/api/currencies`;
+};
+
+export const currenciesControllerCreate = async (
+  createCurrencyDto: CreateCurrencyDto,
+  options?: RequestInit
+): Promise<currenciesControllerCreateResponse> => {
+  return bogaapFetch<currenciesControllerCreateResponse>(getCurrenciesControllerCreateUrl(), {
+    ...options,
+    method: "POST",
+    headers: { "Content-Type": "application/json", ...options?.headers },
+    body: JSON.stringify(createCurrencyDto)
+  });
+};
+
+export type currenciesControllerListTenantCurrenciesResponse200 = {
+  data: TenantCurrencyListResponseDto;
+  status: 200;
+};
+
+export type currenciesControllerListTenantCurrenciesResponseSuccess =
+  currenciesControllerListTenantCurrenciesResponse200 & {
+    headers: Headers;
+  };
+export type currenciesControllerListTenantCurrenciesResponse =
+  currenciesControllerListTenantCurrenciesResponseSuccess;
+
+export const getCurrenciesControllerListTenantCurrenciesUrl = () => {
+  return `/api/currencies/tenant`;
+};
+
+export const currenciesControllerListTenantCurrencies = async (
+  options?: RequestInit
+): Promise<currenciesControllerListTenantCurrenciesResponse> => {
+  return bogaapFetch<currenciesControllerListTenantCurrenciesResponse>(
+    getCurrenciesControllerListTenantCurrenciesUrl(),
+    {
+      ...options,
+      method: "GET"
+    }
+  );
+};
+
+export type currenciesControllerAddTenantCurrenciesResponse200 = {
+  data: AddTenantCurrenciesResponseDto;
+  status: 200;
+};
+
+export type currenciesControllerAddTenantCurrenciesResponseSuccess =
+  currenciesControllerAddTenantCurrenciesResponse200 & {
+    headers: Headers;
+  };
+export type currenciesControllerAddTenantCurrenciesResponse =
+  currenciesControllerAddTenantCurrenciesResponseSuccess;
+
+export const getCurrenciesControllerAddTenantCurrenciesUrl = () => {
+  return `/api/currencies/tenant`;
+};
+
+export const currenciesControllerAddTenantCurrencies = async (
+  addTenantCurrenciesDto: AddTenantCurrenciesDto,
+  options?: RequestInit
+): Promise<currenciesControllerAddTenantCurrenciesResponse> => {
+  return bogaapFetch<currenciesControllerAddTenantCurrenciesResponse>(
+    getCurrenciesControllerAddTenantCurrenciesUrl(),
+    {
+      ...options,
+      method: "POST",
+      headers: { "Content-Type": "application/json", ...options?.headers },
+      body: JSON.stringify(addTenantCurrenciesDto)
+    }
+  );
+};
+
+export type currenciesControllerListAvailableTenantCurrenciesResponse200 = {
+  data: AvailableTenantCurrenciesResponseDto;
+  status: 200;
+};
+
+export type currenciesControllerListAvailableTenantCurrenciesResponseSuccess =
+  currenciesControllerListAvailableTenantCurrenciesResponse200 & {
+    headers: Headers;
+  };
+export type currenciesControllerListAvailableTenantCurrenciesResponse =
+  currenciesControllerListAvailableTenantCurrenciesResponseSuccess;
+
+export const getCurrenciesControllerListAvailableTenantCurrenciesUrl = () => {
+  return `/api/currencies/tenant/available`;
+};
+
+export const currenciesControllerListAvailableTenantCurrencies = async (
+  options?: RequestInit
+): Promise<currenciesControllerListAvailableTenantCurrenciesResponse> => {
+  return bogaapFetch<currenciesControllerListAvailableTenantCurrenciesResponse>(
+    getCurrenciesControllerListAvailableTenantCurrenciesUrl(),
+    {
+      ...options,
+      method: "GET"
+    }
+  );
+};
+
+export type currenciesControllerDisableTenantCurrencyResponse200 = {
+  data: CurrencyDto;
+  status: 200;
+};
+
+export type currenciesControllerDisableTenantCurrencyResponseSuccess =
+  currenciesControllerDisableTenantCurrencyResponse200 & {
+    headers: Headers;
+  };
+export type currenciesControllerDisableTenantCurrencyResponse =
+  currenciesControllerDisableTenantCurrencyResponseSuccess;
+
+export const getCurrenciesControllerDisableTenantCurrencyUrl = (code: string) => {
+  return `/api/currencies/tenant/${code}`;
+};
+
+export const currenciesControllerDisableTenantCurrency = async (
+  code: string,
+  options?: RequestInit
+): Promise<currenciesControllerDisableTenantCurrencyResponse> => {
+  return bogaapFetch<currenciesControllerDisableTenantCurrencyResponse>(
+    getCurrenciesControllerDisableTenantCurrencyUrl(code),
+    {
+      ...options,
+      method: "DELETE"
+    }
+  );
+};
+
+export type currenciesControllerUpdateResponse200 = {
+  data: CurrencyDto;
+  status: 200;
+};
+
+export type currenciesControllerUpdateResponseSuccess = currenciesControllerUpdateResponse200 & {
+  headers: Headers;
+};
+export type currenciesControllerUpdateResponse = currenciesControllerUpdateResponseSuccess;
+
+export const getCurrenciesControllerUpdateUrl = (id: string) => {
+  return `/api/currencies/${id}`;
+};
+
+export const currenciesControllerUpdate = async (
+  id: string,
+  updateCurrencyDto: UpdateCurrencyDto,
+  options?: RequestInit
+): Promise<currenciesControllerUpdateResponse> => {
+  return bogaapFetch<currenciesControllerUpdateResponse>(getCurrenciesControllerUpdateUrl(id), {
+    ...options,
+    method: "PATCH",
+    headers: { "Content-Type": "application/json", ...options?.headers },
+    body: JSON.stringify(updateCurrencyDto)
+  });
+};
+
+export type currenciesControllerDeleteResponse200 = {
+  data: CurrencyDeleteResponseDto;
+  status: 200;
+};
+
+export type currenciesControllerDeleteResponseSuccess = currenciesControllerDeleteResponse200 & {
+  headers: Headers;
+};
+export type currenciesControllerDeleteResponse = currenciesControllerDeleteResponseSuccess;
+
+export const getCurrenciesControllerDeleteUrl = (id: string) => {
+  return `/api/currencies/${id}`;
+};
+
+export const currenciesControllerDelete = async (
+  id: string,
+  options?: RequestInit
+): Promise<currenciesControllerDeleteResponse> => {
+  return bogaapFetch<currenciesControllerDeleteResponse>(getCurrenciesControllerDeleteUrl(id), {
+    ...options,
+    method: "DELETE"
+  });
+};
+
+export type dashboardControllerGetMetricsResponse200 = {
+  data: DashboardMetricsDto;
+  status: 200;
+};
+
+export type dashboardControllerGetMetricsResponseSuccess =
+  dashboardControllerGetMetricsResponse200 & {
+    headers: Headers;
+  };
+export type dashboardControllerGetMetricsResponse = dashboardControllerGetMetricsResponseSuccess;
+
+export const getDashboardControllerGetMetricsUrl = () => {
+  return `/api/dashboard/metrics`;
+};
+
+export const dashboardControllerGetMetrics = async (
+  options?: RequestInit
+): Promise<dashboardControllerGetMetricsResponse> => {
+  return bogaapFetch<dashboardControllerGetMetricsResponse>(getDashboardControllerGetMetricsUrl(), {
+    ...options,
+    method: "GET"
+  });
+};
+
+export type dashboardControllerSearchResponse200 = {
+  data: DashboardSearchResponseDto;
+  status: 200;
+};
+
+export type dashboardControllerSearchResponseSuccess = dashboardControllerSearchResponse200 & {
+  headers: Headers;
+};
+export type dashboardControllerSearchResponse = dashboardControllerSearchResponseSuccess;
+
+export const getDashboardControllerSearchUrl = () => {
+  return `/api/dashboard/search`;
+};
+
+export const dashboardControllerSearch = async (
+  options?: RequestInit
+): Promise<dashboardControllerSearchResponse> => {
+  return bogaapFetch<dashboardControllerSearchResponse>(getDashboardControllerSearchUrl(), {
+    ...options,
+    method: "GET"
+  });
 };
 
 export type forumsControllerListResponse200 = {

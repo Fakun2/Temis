@@ -1,7 +1,13 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { clearSession, saveSession, type BogaapSession } from "@/lib/auth/session";
+import {
+  clearSession,
+  readSession,
+  saveSession,
+  subscribeSession,
+  type BogaapSession
+} from "@/lib/auth/session";
 
 export function useAdminShellState() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -29,7 +35,7 @@ export function useAdminShellState() {
         const serverSession = (await response.json()) as BogaapSession;
         saveSession(serverSession);
         if (!cancelled) {
-          setSession(serverSession);
+          setSession(readSession());
           setSessionReady(true);
         }
       } catch {
@@ -53,6 +59,8 @@ export function useAdminShellState() {
       tabletQuery.removeEventListener("change", syncCollapsed);
     };
   }, []);
+
+  useEffect(() => subscribeSession(() => setSession(readSession())), []);
 
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {

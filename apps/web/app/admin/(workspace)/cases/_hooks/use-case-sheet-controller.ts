@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useState, type FormEvent } from "react";
+import { useCallback, useEffect, useState, type FormEvent } from "react";
 import type { CaseFormValues } from "@/lib/validation/cases";
 import { caseFormSchema } from "@/lib/validation/cases";
 import { caseCatalogStrategies } from "../_constants/cases.constants";
@@ -40,6 +40,30 @@ export function useCaseSheetController({
   const provincesQuery = useCasesQuery<CatalogResponse<ProvinceDto>>(
     casesQueries.catalogOptions<ProvinceDto>({ key: "provinces", path: "/provinces" })
   );
+  useEffect(() => {
+    const importedProvinceText = caseItem?.provinceText;
+
+    if (caseItem?.province?.id || !importedProvinceText || draft.provinceId) {
+      return;
+    }
+
+    const expectedProvince = normalizeCatalogText(importedProvinceText);
+    const province = (provincesQuery.data?.items ?? []).find((item) =>
+      [item.code, item.name].some((value) => normalizeCatalogText(value) === expectedProvince)
+    );
+
+    if (province) {
+      setDraft((current) =>
+        current.provinceId ? current : { ...current, provinceId: province.id }
+      );
+    }
+  }, [
+    caseItem?.province?.id,
+    caseItem?.provinceText,
+    draft.provinceId,
+    provincesQuery.data?.items
+  ]);
+
   const selectedProvince = (provincesQuery.data?.items ?? []).find(
     (province) => province.id === draft.provinceId
   );
@@ -176,4 +200,13 @@ export function useCaseSheetController({
     updateJudicialCenter,
     updateParticipant
   };
+}
+
+function normalizeCatalogText(value: string) {
+  return value
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, " ")
+    .trim();
 }

@@ -233,6 +233,12 @@ enum NotificationRecipientStatus {
   read
 }
 
+enum TenantOnboardingChecklistStatus {
+  pending
+  completed
+  skipped
+}
+
 enum AsyncOutboxEventStatus {
   pending
   publishing
@@ -241,11 +247,11 @@ enum AsyncOutboxEventStatus {
 }
 
 model Tenant {
-  id                         String                      @id @default(uuid()) @db.Uuid
+  id                         String                          @id @default(uuid()) @db.Uuid
   name                       String
-  legalName                  String?                     @map("legal_name")
-  taxId                      String?                     @map("tax_id")
-  status                     TenantStatus                @default(active)
+  legalName                  String?                         @map("legal_name")
+  taxId                      String?                         @map("tax_id")
+  status                     TenantStatus                    @default(active)
   profile                    TenantProfile?
   settings                   TenantSettings?
   memberships                TenantMembership[]
@@ -256,6 +262,7 @@ model Tenant {
   caseExpenses               CaseExpense[]
   caseExpenseCashboxSyncJobs CaseExpenseCashboxSyncJob[]
   caseHearings               CaseHearing[]
+  caseExternalReferences     CaseExternalReference[]
   expenseAttachments         CaseExpenseAttachment[]
   documentFolders            DocumentFolder[]
   documentCategories         DocumentCategory[]
@@ -274,9 +281,10 @@ model Tenant {
   cashboxMovements           CashboxMovement[]
   notificationReminders      NotificationReminder[]
   notificationRecipients     NotificationReminderRecipient[]
+  onboardingChecklistItems   TenantOnboardingChecklistItem[]
   asyncOutboxEvents          AsyncOutboxEvent[]
-  createdAt                  DateTime                    @default(now()) @map("created_at") @db.Timestamptz(6)
-  updatedAt                  DateTime                    @updatedAt @map("updated_at") @db.Timestamptz(6)
+  createdAt                  DateTime                        @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt                  DateTime                        @updatedAt @map("updated_at") @db.Timestamptz(6)
 
   @@map("tenants")
 }
@@ -285,17 +293,20 @@ model User {
   id                         String                      @id @default(uuid()) @db.Uuid
   email                      String                      @unique
   fullName                   String                      @map("full_name")
-  passwordHash               String                      @map("password_hash")
+  passwordHash               String?                     @map("password_hash")
   dni                        String?
   phone                      String?
+  avatarUrl                  String?                     @map("avatar_url")
   emailVerifiedAt            DateTime?                   @map("email_verified_at") @db.Timestamptz(6)
   lastLoginAt                DateTime?                   @map("last_login_at") @db.Timestamptz(6)
   sessionVersion             Int                         @default(0) @map("session_version")
   status                     UserStatus                  @default(active)
   memberships                TenantMembership[]
+  identities                 UserIdentity[]
   expenseAttachments         CaseExpenseAttachment[]
   documents                  Document[]
   documentImportJobs         DocumentImportJob[]
+  importedCaseReferences     CaseExternalReference[]
   cashboxMovements           CashboxMovement[]
   aiChatRuns                 AiChatRun[]
   createdAt                  DateTime                    @default(now()) @map("created_at") @db.Timestamptz(6)
@@ -304,6 +315,22 @@ model User {
 
   @@index([dni])
   @@map("users")
+}
+
+model UserIdentity {
+  id             String   @id @default(uuid()) @db.Uuid
+  userId         String   @map("user_id") @db.Uuid
+  provider       String
+  providerUserId String   @map("provider_user_id")
+  email          String
+  createdAt      DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt      DateTime @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerUserId])
+  @@index([userId])
+  @@map("user_identities")
 }
 
 model TenantProfile {
@@ -334,6 +361,9 @@ model TenantSettings {
   defaultRoleForInvites String              @default("lawyer") @map("default_role_for_invites")
   caseNumberingMode     CaseNumberingMode   @default(manual) @map("case_numbering_mode")
   documentStorageMode   DocumentStorageMode @default(local) @map("document_storage_mode")
+  accountPlan           String              @default("trial") @map("account_plan")
+  accountPlanStatus     String              @default("active") @map("account_plan_status")
+  monthlyTokenLimit     Int                 @default(100000) @map("monthly_token_limit")
   createdAt             DateTime            @default(now()) @map("created_at") @db.Timestamptz(6)
   updatedAt             DateTime            @updatedAt @map("updated_at") @db.Timestamptz(6)
 
@@ -501,10 +531,13 @@ model Case {
   caption                 String
   subject                 String?
   description             String?
-  provinceId              String       @map("province_id") @db.Uuid
-  forumTemplateId         String       @map("forum_template_id") @db.Uuid
+  provinceId              String?      @map("province_id") @db.Uuid
+  forumTemplateId         String?      @map("forum_template_id") @db.Uuid
   judicialCenterForumId   String?      @map("judicial_center_forum_id") @db.Uuid
   judicialCenterText      String?      @map("judicial_center_text")
+  provinceText            String?      @map("province_text")
+  jurisdictionText        String?      @map("jurisdiction_text")
+  unitText                String?      @map("unit_text")
   court                   String?
   instance                CaseInstance @default(first)
   status                  CaseStatus   @default(open)
@@ -516,8 +549,8 @@ model Case {
   updatedAt               DateTime     @updatedAt @map("updated_at") @db.Timestamptz(6)
 
   tenant                Tenant                  @relation(fields: [tenantId], references: [id], onDelete: Cascade)
-  province              Province                @relation(fields: [provinceId], references: [id], onDelete: Restrict)
-  forumTemplate         ForumTemplate           @relation(fields: [forumTemplateId], references: [id], onDelete: Restrict)
+  province              Province?               @relation(fields: [provinceId], references: [id], onDelete: Restrict)
+  forumTemplate         ForumTemplate?          @relation(fields: [forumTemplateId], references: [id], onDelete: Restrict)
   judicialCenterForum   JudicialCenterForum?    @relation(fields: [judicialCenterForumId], references: [id], onDelete: SetNull)
   primaryClient         Client?                 @relation("CasePrimaryClient", fields: [primaryClientId], references: [id], onDelete: SetNull)
   practiceArea          PracticeArea?           @relation(fields: [practiceAreaId], references: [id], onDelete: SetNull)
@@ -530,6 +563,7 @@ model Case {
   expenseAttachments    CaseExpenseAttachment[]
   documents             Document[]
   aiChatRuns            AiChatRun[]
+  externalReferences    CaseExternalReference[]
 
   @@unique([tenantId, caseNumber])
   @@unique([tenantId, id])
@@ -546,6 +580,28 @@ model Case {
   @@index([practiceAreaId])
   @@index([responsibleMembershipId])
   @@map("cases")
+}
+
+model CaseExternalReference {
+  id               String   @id @default(uuid()) @db.Uuid
+  tenantId         String   @map("tenant_id") @db.Uuid
+  caseId           String   @map("case_id") @db.Uuid
+  source           String
+  externalId       String   @map("external_id")
+  rawPayload       Json     @map("raw_payload")
+  importedByUserId String?  @map("imported_by_user_id") @db.Uuid
+  createdAt        DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt        DateTime @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  tenant         Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  case           Case   @relation(fields: [tenantId, caseId], references: [tenantId, id], onDelete: Cascade)
+  importedByUser User?  @relation(fields: [importedByUserId], references: [id], onDelete: SetNull)
+
+  @@unique([tenantId, source, externalId])
+  @@index([tenantId])
+  @@index([tenantId, caseId])
+  @@index([importedByUserId])
+  @@map("case_external_references")
 }
 
 model DocumentCategory {
@@ -577,11 +633,11 @@ model DocumentFolder {
   createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
   updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz(6)
 
-  tenant    Tenant           @relation(fields: [tenantId], references: [id], onDelete: Cascade)
-  parent    DocumentFolder?  @relation("DocumentFolderHierarchy", fields: [tenantId, parentId], references: [tenantId, id], onDelete: Cascade)
-  children  DocumentFolder[] @relation("DocumentFolderHierarchy")
-  documents Document[]
-  importJobs DocumentImportJob[]
+  tenant      Tenant               @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  parent      DocumentFolder?      @relation("DocumentFolderHierarchy", fields: [tenantId, parentId], references: [tenantId, id], onDelete: Cascade)
+  children    DocumentFolder[]     @relation("DocumentFolderHierarchy")
+  documents   Document[]
+  importJobs  DocumentImportJob[]
   importItems DocumentImportItem[]
 
   @@unique([tenantId, id])
@@ -592,26 +648,26 @@ model DocumentFolder {
 }
 
 model Document {
-  id               String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  tenantId         String    @map("tenant_id") @db.Uuid
-  caseId           String?   @map("case_id") @db.Uuid
-  folderId         String?   @map("folder_id") @db.Uuid
-  categoryId       String?   @map("category_id") @db.Uuid
-  uploadedByUserId String    @map("uploaded_by_user_id") @db.Uuid
-  storageProvider  String    @map("storage_provider")
+  id               String         @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  tenantId         String         @map("tenant_id") @db.Uuid
+  caseId           String?        @map("case_id") @db.Uuid
+  folderId         String?        @map("folder_id") @db.Uuid
+  categoryId       String?        @map("category_id") @db.Uuid
+  uploadedByUserId String         @map("uploaded_by_user_id") @db.Uuid
+  storageProvider  String         @map("storage_provider")
   bucket           String
-  objectKey        String    @map("object_key")
+  objectKey        String         @map("object_key")
   title            String
-  originalName     String    @map("original_name")
+  originalName     String         @map("original_name")
   extension        String?
-  mimeType         String    @map("mime_type")
-  sizeBytes        Int       @map("size_bytes")
+  mimeType         String         @map("mime_type")
+  sizeBytes        Int            @map("size_bytes")
   checksum         String?
   notes            String?
   status           DocumentStatus @default(active)
-  createdAt        DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
-  updatedAt        DateTime  @updatedAt @map("updated_at") @db.Timestamptz(6)
-  deletedAt        DateTime? @map("deleted_at") @db.Timestamptz(6)
+  createdAt        DateTime       @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt        DateTime       @updatedAt @map("updated_at") @db.Timestamptz(6)
+  deletedAt        DateTime?      @map("deleted_at") @db.Timestamptz(6)
 
   tenant         Tenant                      @relation(fields: [tenantId], references: [id], onDelete: Cascade)
   case           Case?                       @relation(fields: [tenantId, caseId], references: [tenantId, id], onDelete: Cascade)
@@ -659,9 +715,9 @@ model DocumentImportJob {
   createdAt       DateTime                @default(now()) @map("created_at") @db.Timestamptz(6)
   updatedAt       DateTime                @updatedAt @map("updated_at") @db.Timestamptz(6)
 
-  tenant        Tenant           @relation(fields: [tenantId], references: [id], onDelete: Cascade)
-  rootFolder    DocumentFolder?  @relation(fields: [tenantId, rootFolderId], references: [tenantId, id], onDelete: SetNull)
-  createdByUser User            @relation(fields: [createdByUserId], references: [id], onDelete: Restrict)
+  tenant        Tenant               @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  rootFolder    DocumentFolder?      @relation(fields: [tenantId, rootFolderId], references: [tenantId, id], onDelete: SetNull)
+  createdByUser User                 @relation(fields: [createdByUserId], references: [id], onDelete: Restrict)
   items         DocumentImportItem[]
 
   @@unique([tenantId, id])
@@ -674,20 +730,20 @@ model DocumentImportJob {
 }
 
 model DocumentImportItem {
-  id          String                   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  tenantId    String                   @map("tenant_id") @db.Uuid
-  importJobId String                   @map("import_job_id") @db.Uuid
-  folderId    String?                  @map("folder_id") @db.Uuid
-  documentId  String?                  @map("document_id") @db.Uuid
-  relativePath String                  @map("relative_path")
-  originalName String                  @map("original_name")
-  mimeType    String                   @map("mime_type")
-  sizeBytes   Int                      @map("size_bytes")
-  checksum    String?
-  status      DocumentImportItemStatus
-  error       String?
-  createdAt   DateTime                 @default(now()) @map("created_at") @db.Timestamptz(6)
-  updatedAt   DateTime                 @updatedAt @map("updated_at") @db.Timestamptz(6)
+  id           String                   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  tenantId     String                   @map("tenant_id") @db.Uuid
+  importJobId  String                   @map("import_job_id") @db.Uuid
+  folderId     String?                  @map("folder_id") @db.Uuid
+  documentId   String?                  @map("document_id") @db.Uuid
+  relativePath String                   @map("relative_path")
+  originalName String                   @map("original_name")
+  mimeType     String                   @map("mime_type")
+  sizeBytes    Int                      @map("size_bytes")
+  checksum     String?
+  status       DocumentImportItemStatus
+  error        String?
+  createdAt    DateTime                 @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt    DateTime                 @updatedAt @map("updated_at") @db.Timestamptz(6)
 
   tenant    Tenant            @relation(fields: [tenantId], references: [id], onDelete: Cascade)
   importJob DocumentImportJob @relation(fields: [tenantId, importJobId], references: [tenantId, id], onDelete: Cascade)
@@ -1180,13 +1236,15 @@ model TenantMembership {
   createdAt DateTime         @default(now()) @map("created_at") @db.Timestamptz(6)
   updatedAt DateTime         @updatedAt @map("updated_at") @db.Timestamptz(6)
 
-  tenant           Tenant                         @relation(fields: [tenantId], references: [id], onDelete: Cascade)
-  user             User                           @relation(fields: [userId], references: [id], onDelete: Cascade)
-  role             Role?                          @relation(fields: [roleId], references: [id], onDelete: SetNull)
-  practiceAreas    TenantMembershipPracticeArea[]
-  responsibleCases Case[]
-  assignedTasks    CaseTask[]                     @relation("CaseTaskAssignee")
-  notificationRecipients NotificationReminderRecipient[]
+  tenant                   Tenant                          @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  user                     User                            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role                     Role?                           @relation(fields: [roleId], references: [id], onDelete: SetNull)
+  practiceAreas            TenantMembershipPracticeArea[]
+  responsibleCases         Case[]
+  assignedTasks            CaseTask[]                      @relation("CaseTaskAssignee")
+  notificationRecipients   NotificationReminderRecipient[]
+  settings                 TenantMembershipSettings?
+  onboardingChecklistItems TenantOnboardingChecklistItem[]
 
   @@unique([tenantId, userId])
   @@unique([tenantId, id])
@@ -1194,6 +1252,42 @@ model TenantMembership {
   @@index([tenantId, roleId])
   @@index([userId])
   @@map("tenant_memberships")
+}
+
+model TenantMembershipSettings {
+  id                   String   @id @default(uuid()) @db.Uuid
+  tenantMembershipId   String   @unique @map("tenant_membership_id") @db.Uuid
+  inAppReminders       Boolean  @default(true) @map("in_app_reminders")
+  browserNotifications Boolean  @default(false) @map("browser_notifications")
+  emailReminders       Boolean  @default(false) @map("email_reminders")
+  dailyDigest          Boolean  @default(false) @map("daily_digest")
+  reminderLeadTime     Int      @default(24) @map("reminder_lead_time")
+  createdAt            DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt            DateTime @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  tenantMembership TenantMembership @relation(fields: [tenantMembershipId], references: [id], onDelete: Cascade)
+
+  @@map("tenant_membership_settings")
+}
+
+model TenantOnboardingChecklistItem {
+  id                 String                          @id @default(uuid()) @db.Uuid
+  tenantId           String                          @map("tenant_id") @db.Uuid
+  tenantMembershipId String                          @map("tenant_membership_id") @db.Uuid
+  step               String
+  status             TenantOnboardingChecklistStatus @default(pending)
+  completedAt        DateTime?                       @map("completed_at") @db.Timestamptz(6)
+  skippedAt          DateTime?                       @map("skipped_at") @db.Timestamptz(6)
+  createdAt          DateTime                        @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt          DateTime                        @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  tenant           Tenant           @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  tenantMembership TenantMembership @relation(fields: [tenantId, tenantMembershipId], references: [tenantId, id], onDelete: Cascade)
+
+  @@unique([tenantId, tenantMembershipId, step])
+  @@index([tenantId, tenantMembershipId])
+  @@index([tenantId, status])
+  @@map("tenant_onboarding_checklist_items")
 }
 
 model NotificationReminder {
@@ -1254,18 +1348,18 @@ model NotificationReminderRecipient {
 }
 
 model AsyncOutboxEvent {
-  id           String                 @id @default(uuid()) @db.Uuid
-  tenantId     String?                @map("tenant_id") @db.Uuid
-  topic        String
-  routingKey   String                 @map("routing_key")
-  payload      Json
-  status       AsyncOutboxEventStatus @default(pending)
-  availableAt  DateTime               @default(now()) @map("available_at") @db.Timestamptz(6)
-  attempts     Int                    @default(0)
-  lastError    String?                @map("last_error")
-  publishedAt  DateTime?              @map("published_at") @db.Timestamptz(6)
-  createdAt    DateTime               @default(now()) @map("created_at") @db.Timestamptz(6)
-  updatedAt    DateTime               @updatedAt @map("updated_at") @db.Timestamptz(6)
+  id          String                 @id @default(uuid()) @db.Uuid
+  tenantId    String?                @map("tenant_id") @db.Uuid
+  topic       String
+  routingKey  String                 @map("routing_key")
+  payload     Json
+  status      AsyncOutboxEventStatus @default(pending)
+  availableAt DateTime               @default(now()) @map("available_at") @db.Timestamptz(6)
+  attempts    Int                    @default(0)
+  lastError   String?                @map("last_error")
+  publishedAt DateTime?              @map("published_at") @db.Timestamptz(6)
+  createdAt   DateTime               @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt   DateTime               @updatedAt @map("updated_at") @db.Timestamptz(6)
 
   tenant Tenant? @relation(fields: [tenantId], references: [id], onDelete: Cascade)
 

@@ -94,7 +94,7 @@ export function CaseTasksTable({
         title="Tareas del expediente"
       />
       <CardContent className="flex min-h-0 flex-1 flex-col px-3 md:px-4">
-        <section className="h-[552px] min-h-[552px] overflow-auto rounded-2xl">
+        <section className="min-h-[240px] max-h-[420px] overflow-auto rounded-2xl xl:max-h-[480px]">
           <Table className="min-w-full text-xs">
             <TasksTableHeader hasActions={hasActions} visibleColumns={visibleColumns} />
             <TasksTableBody

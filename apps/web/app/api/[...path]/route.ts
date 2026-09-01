@@ -123,9 +123,7 @@ async function toProxyResponse(response: Response) {
   const json = parseJson(text);
 
   if (json && hasTokenPair(json)) {
-    const body = Object.fromEntries(
-      Object.entries(json).filter(([key]) => key !== "tokens")
-    );
+    const body = Object.fromEntries(Object.entries(json).filter(([key]) => key !== "tokens"));
     const proxyResponse = NextResponse.json(body, { status: response.status });
     await updateAuthSessionResponse(proxyResponse, json.tokens);
     return proxyResponse;
@@ -154,6 +152,7 @@ function getPassthroughHeaders(response: Response) {
   const contentType = response.headers.get("Content-Type");
   const contentDisposition = response.headers.get("Content-Disposition");
   const contentLength = response.headers.get("Content-Length");
+  const cacheControl = response.headers.get("Cache-Control");
 
   if (contentType) {
     headers["Content-Type"] = contentType;
@@ -163,6 +162,9 @@ function getPassthroughHeaders(response: Response) {
   }
   if (contentLength) {
     headers["Content-Length"] = contentLength;
+  }
+  if (cacheControl) {
+    headers["Cache-Control"] = cacheControl;
   }
 
   return headers;

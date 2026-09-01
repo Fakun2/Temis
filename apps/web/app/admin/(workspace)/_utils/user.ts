@@ -9,6 +9,7 @@ export function getSessionDisplayUser(session: BogaapSession | null) {
   const user = session?.user;
 
   return {
+    avatarUrl: typeof user?.avatarUrl === "string" ? user.avatarUrl : null,
     displayName: user?.fullName || "Usuario BOGAP",
     email: user?.email || "workspace@bogaap"
   };

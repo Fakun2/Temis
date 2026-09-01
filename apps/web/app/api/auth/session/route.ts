@@ -58,6 +58,7 @@ export async function GET() {
   const sessionResponse = NextResponse.json({
     tenantAccess: activePayload.tenantAccess,
     user: {
+      avatarUrl: storedSession?.user.avatarUrl ?? null,
       email: storedSession?.user.email ?? activePayload.email ?? "",
       fullName: storedSession?.user.fullName ?? activePayload.email ?? "Usuario",
       id: activePayload.sub,

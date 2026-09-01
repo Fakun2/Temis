@@ -3,6 +3,7 @@
 import type { AdminNavItem } from "../../_types/admin";
 import { cn } from "@/lib/utils";
 import { SidebarGroup, SidebarMenu } from "@/components/ui/sidebar";
+import { TooltipProvider } from "@/components/ui/tooltip";
 import { SidebarNavItem } from "./sidebar-nav-item";
 
 type SidebarNavSectionProps = {
@@ -21,18 +22,20 @@ export function SidebarNavSection({
 }: SidebarNavSectionProps) {
   return (
     <SidebarGroup className={cn(collapsed ? "mb-1" : "mb-2")}>
-      <SidebarMenu className={cn(collapsed ? "gap-1" : "gap-0.5")}>
-        {items.map((item) => (
-          <SidebarNavItem
-            key={item.href ?? item.label}
-            active={isNavItemActive(item, pathname, isActive)}
-            collapsed={collapsed}
-            item={item}
-            pathname={pathname}
-            isActive={isActive}
-          />
-        ))}
-      </SidebarMenu>
+      <TooltipProvider delayDuration={400}>
+        <SidebarMenu className={cn(collapsed ? "gap-1" : "gap-0.5")}>
+          {items.map((item) => (
+            <SidebarNavItem
+              key={item.href ?? item.label}
+              active={isNavItemActive(item, pathname, isActive)}
+              collapsed={collapsed}
+              item={item}
+              pathname={pathname}
+              isActive={isActive}
+            />
+          ))}
+        </SidebarMenu>
+      </TooltipProvider>
     </SidebarGroup>
   );
 }

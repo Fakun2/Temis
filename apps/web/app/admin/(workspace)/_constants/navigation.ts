@@ -1,66 +1,85 @@
 import {
-  Banknote,
   BarChart3,
-  Bot,
-  BriefcaseBusiness,
-  CalendarDays,
-  CircleHelp,
   CircleDollarSign,
-  FolderOpen,
   Gavel,
   Home,
-  Scale,
-  Settings,
   Tags
 } from "lucide-react";
 import type { AdminNavSection, AdminPageTitle } from "../_types/admin";
+import {
+  AnimatedAiStarsIcon,
+  AnimatedCalendarIcon,
+  AnimatedCashboxIcon,
+  AnimatedCasesIcon,
+  AnimatedLibraryIcon,
+  AnimatedSettingsIcon,
+  AnimatedStaffIcon
+} from "../_components/sidebar/animated-library-icon";
 
 export const adminNavSections: AdminNavSection[] = [
   {
     title: "Navegacion",
     items: [
-      { href: "/admin", label: "Dashboard", icon: Home, requiredPermissions: ["admin:access"] },
+      {
+        href: "/admin",
+        label: "Dashboard",
+        icon: Home,
+        requiredPermissions: ["admin:access"],
+        shortcut: { keys: ["a", "d"], label: "A Luego D" }
+      },
       {
         href: "/admin/cases",
+        iconAnimation: "cases",
         label: "Expedientes",
-        icon: BriefcaseBusiness,
-        requiredPermissions: ["cases:read"]
+        icon: AnimatedCasesIcon,
+        requiredPermissions: ["cases:read"],
+        shortcut: { keys: ["a", "e"], label: "A Luego E" }
       },
       {
         href: "/admin/calendar",
+        iconAnimation: "calendar",
         label: "Calendario",
-        icon: CalendarDays,
-        requiredPermissions: ["cases:read"]
+        icon: AnimatedCalendarIcon,
+        requiredPermissions: ["cases:read"],
+        shortcut: { keys: ["a", "c"], label: "A Luego C" }
       },
       {
         href: "/admin/library",
+        iconAnimation: "library",
         label: "Biblioteca",
-        icon: FolderOpen,
-        requiredPermissions: ["documents:read"]
+        icon: AnimatedLibraryIcon,
+        requiredPermissions: ["documents:read"],
+        shortcut: { keys: ["a", "b"], label: "A Luego B" }
       },
       {
         href: "/admin/staff",
+        iconAnimation: "staff",
         label: "Staff",
-        icon: Scale,
-        requiredPermissions: ["staff:read"]
+        icon: AnimatedStaffIcon,
+        requiredPermissions: ["staff:read"],
+        shortcut: { keys: ["a", "s"], label: "A Luego S" }
       },
       {
         href: "/admin/cashbox",
+        iconAnimation: "cashbox",
         label: "Caja",
-        icon: Banknote,
+        icon: AnimatedCashboxIcon,
         requiredPermissions: ["finance:read"],
+        shortcut: { keys: ["a", "j"], label: "A Luego J" },
         children: [
           {
             href: "/admin/currencies",
             label: "Monedas",
             icon: CircleDollarSign,
-            requiredPermissions: ["currencies:read"]
+            requiredPermissions: ["currencies:read"],
+            shortcut: { keys: ["a", "m"], label: "A Luego M" }
           },
           {
             href: "/admin/categories",
             label: "Categorias",
             icon: Tags,
-            requiredPermissions: ["categories:read"]
+            requiredPermissions: ["categories:read"],
+            shortcut: { keys: ["a", "g"], label: "A Luego G" }
           },
           {
             href: "/admin/reports",
@@ -72,45 +91,35 @@ export const adminNavSections: AdminNavSection[] = [
         ]
       },
       {
+        href: "/admin/legal-catalogs",
+        label: "Catalogos legales",
+        icon: Gavel,
+        requiredPermissions: ["forums:read", "provinces:read"],
+        permissionMode: "any",
+        shortcut: { keys: ["a", "l"], label: "A Luego L" }
+      },
+      {
+        href: "/admin/ai",
+        iconAnimation: "ai-stars",
+        label: "IA",
+        icon: AnimatedAiStarsIcon,
+        requiredPermissions: ["ai:case_chat"],
+        shortcut: { keys: ["a", "i"], label: "A Luego I" }
+      },
+      {
         href: "/admin/roles",
-        icon: Settings,
-        label: "Sistema",
+        icon: AnimatedSettingsIcon,
+        iconAnimation: "settings",
+        label: "Roles",
         requiredPermissions: ["roles:read"],
-        children: [
-          {
-            href: "/admin/legal-catalogs",
-            label: "Catalogos legales",
-            icon: Gavel,
-            requiredPermissions: ["forums:read", "provinces:read"],
-            permissionMode: "any"
-          },
-          {
-            href: "/admin/ai",
-            label: "IA",
-            icon: Bot,
-            requiredPermissions: ["ai:case_chat"]
-          },
-          {
-            href: "/admin/settings",
-            label: "Settings",
-            icon: Settings,
-            requiredPermissions: ["tenants:manage"],
-            status: "soon"
-          },
-          {
-            href: "/admin/help",
-            label: "Help Center",
-            icon: CircleHelp,
-            requiredPermissions: ["admin:access"],
-            status: "soon"
-          }
-        ]
+        shortcut: { keys: ["a", "r"], label: "A Luego R" }
       }
     ]
   }
 ];
 
 export const adminPageTitles: AdminPageTitle[] = [
+  { href: "/admin/account", title: "Cuenta" },
   { href: "/admin/ai", title: "IA" },
   { href: "/admin/roles", title: "Roles" },
   { href: "/admin/legal-catalogs", title: "Catalogos legales" },

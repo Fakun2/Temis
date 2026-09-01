@@ -5,7 +5,6 @@ import { CaseHearingsTable } from "../../_components/detail/case-hearings-table"
 import { CaseExpensesBreakdownCard } from "../../_components/detail/paid-expenses-breakdown";
 import { CaseTasksTable } from "../../_components/detail/tasks-table";
 import type { CaseDetailDto } from "../../_types/cases.types";
-import { CaseAiPanel } from "./ai/case-ai-panel";
 import type {
   CaseDetailCalendarTarget,
   CaseDetailPermissions
@@ -25,10 +24,9 @@ export function CaseDetailView({
   const focusedTaskId = calendarTarget?.focus === "task" ? calendarTarget.eventId : null;
 
   return (
-    <div className="flex min-h-[calc(100svh-104px)] flex-col gap-4 overflow-visible md:min-h-[calc(100svh-112px)] md:gap-5">
+    <div className="flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto scrollbar-none md:gap-5">
       <CaseDetailSummary caseItem={caseItem} />
-      <CaseAiPanel canUseAi={permissions.canUseCaseAi} caseItem={caseItem} />
-      <section className="min-h-0 scroll-mt-24 flex-1 overflow-visible" id="tasks">
+      <section className="scroll-mt-24" id="tasks">
         <CaseTasksTable
           canCreate={permissions.canCreateTask}
           canCreateExpense={permissions.canCreateExpense}
@@ -41,7 +39,7 @@ export function CaseDetailView({
           focusedTaskId={focusedTaskId}
         />
       </section>
-      <section className="min-h-0 scroll-mt-24 flex-1 overflow-visible" id="hearings">
+      <section className="scroll-mt-24" id="hearings">
         <CaseHearingsTable
           canCreate={permissions.canCreateHearing}
           canDelete={permissions.canDeleteHearing}
@@ -50,7 +48,7 @@ export function CaseDetailView({
           focusedHearingId={focusedHearingId}
         />
       </section>
-      <section className="min-h-0 flex-1 overflow-visible">
+      <section>
         <CaseDocumentsPanel
           canRead={permissions.canReadDocument}
           canWrite={permissions.canWriteDocument}
@@ -58,16 +56,9 @@ export function CaseDetailView({
         />
       </section>
       <section
-        className="grid scroll-mt-24 gap-6 overflow-visible lg:grid-cols-[minmax(0,1fr)_340px]"
+        className="grid scroll-mt-24 gap-4 lg:grid-cols-[minmax(0,1fr)_340px] md:gap-5"
         id="expenses"
       >
-        {/* <CalendarCard
-          canCreateExpense={permissions.canCreateExpense}
-          canCreateHearing={permissions.canCreateHearing}
-          canCreateTask={permissions.canCreateTask}
-          canUpdateExpense={permissions.canUpdateExpense}
-          caseId={caseItem.id}
-        /> */}
         <CaseExpensesTable
           canCreate={permissions.canCreateExpense}
           canDelete={permissions.canDeleteExpense}

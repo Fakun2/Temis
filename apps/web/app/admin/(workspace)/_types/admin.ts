@@ -9,9 +9,29 @@ export type AdminNavItem = {
   children?: AdminNavItem[];
   href?: string;
   icon: LucideIcon;
+  iconAnimation?:
+    | "account-ai"
+    | "account-archive"
+    | "account-back"
+    | "account-organization"
+    | "account-plan"
+    | "account-preferences"
+    | "account-profile"
+    | "account-security"
+    | "ai-stars"
+    | "calendar"
+    | "cashbox"
+    | "cases"
+    | "library"
+    | "settings"
+    | "staff";
   label: string;
   permissionMode?: PermissionMode;
   requiredPermissions?: string[];
+  shortcut?: {
+    keys: string[];
+    label: string;
+  };
   status?: "ready" | "soon";
 };
 
