@@ -1,5 +1,5 @@
 import { Injectable, Logger, OnModuleDestroy } from "@nestjs/common";
-import amqp, { type Channel, type ChannelModel, type ConsumeMessage } from "amqplib";
+import amqp, { type Channel, type ChannelModel } from "amqplib";
 import {
   documentCleanupQueueName,
   documentCleanupRoutingKey,
@@ -98,7 +98,7 @@ export class RabbitMqService implements OnModuleDestroy {
   }
 
   private async connect() {
-    const url = process.env.RABBITMQ_URL ?? "amqp://localhost:5672";
+    const url = getRabbitMqUrl();
     const connection = await amqp.connect(url);
     const channel = await connection.createChannel();
 
@@ -149,4 +149,22 @@ export function shouldUseRabbitMq() {
 function getPrefetchCount() {
   const value = Number(process.env.RABBITMQ_PREFETCH);
   return Number.isFinite(value) && value > 0 ? value : 10;
+}
+
+function getRabbitMqUrl() {
+  const explicitUrl = process.env.RABBITMQ_URL?.trim();
+  if (explicitUrl) {
+    return explicitUrl;
+  }
+
+  const user = process.env.RABBITMQ_USER?.trim();
+  const password = process.env.RABBITMQ_PASSWORD?.trim();
+  const host = process.env.RABBITMQ_HOST?.trim() || "localhost";
+  const port = process.env.RABBITMQ_PORT?.trim() || "5672";
+  const vhost = process.env.RABBITMQ_VHOST?.trim();
+  const credentials =
+    user && password ? `${encodeURIComponent(user)}:${encodeURIComponent(password)}@` : "";
+  const encodedVhost = vhost ? `/${encodeURIComponent(vhost)}` : "";
+
+  return `amqp://${credentials}${host}:${port}${encodedVhost}`;
 }

@@ -59,7 +59,7 @@ export function CaseHearingsTable({
         title="Audiencias del expediente"
       />
       <CardContent className="flex min-h-0 flex-1 flex-col px-3 md:px-4">
-        <section className="h-[552px] min-h-[552px] overflow-auto rounded-2xl">
+        <section className="min-h-[220px] max-h-[360px] overflow-auto rounded-2xl xl:max-h-[420px]">
           <Table className="min-w-full text-xs">
             <TableHeader className="bg-[color-mix(in_oklab,var(--muted)_28%,transparent)] [&_tr]:border-0">
               <TableRow className="hover:bg-transparent">
@@ -173,9 +173,7 @@ function HearingsTableBody({
       {hearings.map((hearing) => (
         <TableRow
           className={`h-16 border-border/40 hover:bg-secondary/30 ${
-            focusedHearingId === hearing.id
-              ? "bg-primary/10 ring-1 ring-inset ring-primary/25"
-              : ""
+            focusedHearingId === hearing.id ? "bg-primary/10 ring-1 ring-inset ring-primary/25" : ""
           }`}
           key={hearing.id}
         >
@@ -225,7 +223,7 @@ function MessageBody({
 }) {
   return (
     <TableBody className="[&_tr:last-child]:border-0">
-      <TableRow className="h-[512px] hover:bg-transparent">
+      <TableRow className="h-52 hover:bg-transparent">
         <TableCell className={`px-3 text-center text-sm ${className}`} colSpan={columnCount}>
           {message}
         </TableCell>

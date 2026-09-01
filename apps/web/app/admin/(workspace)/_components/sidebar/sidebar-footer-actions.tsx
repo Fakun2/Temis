@@ -4,6 +4,7 @@ import { Moon } from "lucide-react";
 import { SidebarFooter } from "@/components/ui/sidebar";
 import { useTheme } from "@/lib/theme/theme-provider";
 import { cn } from "@/lib/utils";
+import { sidebarIconStrokeWidth } from "./sidebar-icon-constants";
 
 export function SidebarFooterActions() {
   const theme = useTheme();
@@ -17,7 +18,7 @@ export function SidebarFooterActions() {
         aria-label="Cambiar entre light y dark mode"
       >
         <span className="flex items-center gap-2">
-          <Moon className="h-3.5 w-3.5" strokeWidth={1.75} />
+          <Moon className="h-3.5 w-3.5" strokeWidth={sidebarIconStrokeWidth} />
           {theme.isDark ? "Light Mode" : "Dark Mode"}
         </span>
         <span

@@ -51,6 +51,7 @@ export const RBAC_PERMISSIONS = [
   { code: "finance:create", resource: "finance", action: "create" },
   { code: "finance:update", resource: "finance", action: "update" },
   { code: "finance:delete", resource: "finance", action: "delete" },
+  { code: "integrations:sae_import", resource: "integrations", action: "sae_import" },
   { code: "billing:manage", resource: "billing", action: "manage" }
 ] as const;
 
@@ -86,6 +87,7 @@ export const RBAC_ROLES = [
         permission.resource !== "cases" &&
         permission.resource !== "ai" &&
         permission.resource !== "expenses" &&
+        permission.resource !== "integrations" &&
         isTenantAssignablePermission(permission.code)
     ).map((permission) => permission.code)
   },

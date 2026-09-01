@@ -15,7 +15,7 @@ export function TaskTableMessageRow({
   message: string;
 }) {
   return (
-    <TableRow className="h-[512px] hover:bg-transparent">
+    <TableRow className="h-56 hover:bg-transparent">
       <TableCell className={`px-3 py-10 text-center text-sm ${className}`} colSpan={columnCount}>
         {message}
       </TableCell>

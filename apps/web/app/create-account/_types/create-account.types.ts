@@ -19,10 +19,13 @@ export type UseCreateAccountFormResult = {
   fieldErrors: CreateAccountFieldErrors;
   error: string | null;
   submitting: boolean;
+  googleSubmitting: boolean;
   transitionExiting: boolean;
   transitionSuccess: boolean;
   showPassword: boolean;
+  showGoogleSetupError: () => void;
   submit: (event: FormEvent<HTMLFormElement>) => Promise<void>;
+  submitGoogle: (credential: string) => Promise<void>;
   togglePasswordVisibility: () => void;
   updateField: <K extends CreateAccountFieldName>(
     key: K,

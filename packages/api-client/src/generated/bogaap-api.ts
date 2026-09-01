@@ -6,6 +6,170 @@
  * OpenAPI spec version: 0.1.0
  */
 import { bogaapFetch } from "../fetch-client";
+export interface AccountProfileDto {
+  id: string;
+  firstName: string;
+  lastName: string;
+  fullName: string;
+  email: string;
+  /** @nullable */
+  phone: string | null;
+  /** @nullable */
+  avatarUrl: string | null;
+  hasPassword: boolean;
+}
+
+export interface AccountStudioDto {
+  id: string;
+  name: string;
+  /** @nullable */
+  legalName: string | null;
+  /** @nullable */
+  taxId: string | null;
+  country: string;
+  province: string;
+  city: string;
+  /** @nullable */
+  address: string | null;
+  /** @nullable */
+  website: string | null;
+  /** @nullable */
+  logoUrl: string | null;
+}
+
+export type AccountMembershipDtoStatus =
+  (typeof AccountMembershipDtoStatus)[keyof typeof AccountMembershipDtoStatus];
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const AccountMembershipDtoStatus = {
+  invited: "invited",
+  active: "active",
+  suspended: "suspended"
+} as const;
+
+export interface AccountMembershipDto {
+  id: string;
+  /** @nullable */
+  roleCode: string | null;
+  /** @nullable */
+  roleName: string | null;
+  status: AccountMembershipDtoStatus;
+  accountPlan: string;
+  accountPlanStatus: string;
+  monthlyTokenLimit: number;
+}
+
+export interface AccountNotificationsDto {
+  browserNotifications: boolean;
+  inAppReminders: boolean;
+  emailReminders: boolean;
+  dailyDigest: boolean;
+  reminderLeadTime: number;
+}
+
+export interface AccountTokenUsageDto {
+  periodStart: string;
+  periodEnd: string;
+  usedTokens: number;
+  remainingTokens: number;
+}
+
+export interface AccountPermissionsDto {
+  canManageStudio: boolean;
+  canManageMembership: boolean;
+  canImportSae: boolean;
+}
+
+export interface AccountResponseDto {
+  profile: AccountProfileDto;
+  studio: AccountStudioDto;
+  membership: AccountMembershipDto;
+  notifications: AccountNotificationsDto;
+  tokenUsage: AccountTokenUsageDto;
+  permissions: AccountPermissionsDto;
+}
+
+export interface AccountAiUsageMetricsDto {
+  totalTokens: number;
+  maxDailyTokens: number;
+  currentStreak: number;
+  longestStreak: number;
+}
+
+export interface AccountAiUsageDayDto {
+  date: string;
+  inputTokens: number;
+  outputTokens: number;
+  totalTokens: number;
+}
+
+export interface AccountAiUsageResponseDto {
+  profile: AccountProfileDto;
+  membership: AccountMembershipDto;
+  tokenUsage: AccountTokenUsageDto;
+  historyPeriodStart: string;
+  historyPeriodEnd: string;
+  metrics: AccountAiUsageMetricsDto;
+  dailyUsage: AccountAiUsageDayDto[];
+}
+
+export interface AccountAvatarUploadResponseDto {
+  avatarUrl: string;
+}
+
+export interface UpdateAccountProfileDto {
+  firstName: string;
+  lastName: string;
+  /** @nullable */
+  phone?: string | null;
+  /** @nullable */
+  avatarUrl?: string | null;
+}
+
+export interface UpdateAccountStudioDto {
+  name: string;
+  /** @nullable */
+  legalName?: string | null;
+  taxId: string;
+  country: string;
+  province: string;
+  city: string;
+  /** @nullable */
+  address?: string | null;
+  /** @nullable */
+  website?: string | null;
+  /** @nullable */
+  logoUrl?: string | null;
+}
+
+export interface UpdateAccountNotificationsDto {
+  browserNotifications: boolean;
+  inAppReminders: boolean;
+  emailReminders: boolean;
+  dailyDigest: boolean;
+  reminderLeadTime: number;
+}
+
+export interface UpdateAccountMembershipDto {
+  accountPlan: string;
+  accountPlanStatus: string;
+  monthlyTokenLimit: number;
+}
+
+export interface UpdateAccountPasswordDto {
+  /** @maxLength 72 */
+  currentPassword?: string;
+  /**
+   * @minLength 8
+   * @maxLength 72
+   */
+  newPassword: string;
+}
+
+export interface UpdateAccountPasswordResponseDto {
+  status: string;
+}
+
 export interface CreateAccountDto {
   fullName: string;
   email: string;
@@ -22,12 +186,19 @@ export interface CreateAccountDto {
  */
 export type AuthUserDtoPhone = { [key: string]: unknown } | null;
 
+/**
+ * @nullable
+ */
+export type AuthUserDtoAvatarUrl = { [key: string]: unknown } | null;
+
 export interface AuthUserDto {
   id: string;
   email: string;
   fullName: string;
   /** @nullable */
   phone?: AuthUserDtoPhone;
+  /** @nullable */
+  avatarUrl?: AuthUserDtoAvatarUrl;
   status: string;
 }
 
@@ -51,6 +222,10 @@ export interface TokenPairDto {
 export interface LoginResponseDto {
   user: AuthUserDto;
   tokens: TokenPairDto;
+}
+
+export interface GoogleLoginDto {
+  idToken: string;
 }
 
 export interface RefreshTokenDto {
@@ -277,6 +452,145 @@ export interface OnboardingStatusDto {
   hasFirstCase: boolean;
   hasFirstDocument: boolean;
   missingSteps: string[];
+}
+
+export type OnboardingChecklistStepDtoId =
+  (typeof OnboardingChecklistStepDtoId)[keyof typeof OnboardingChecklistStepDtoId];
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const OnboardingChecklistStepDtoId = {
+  import_cases: "import_cases",
+  configure_finance: "configure_finance",
+  configure_notifications: "configure_notifications",
+  connect_calendar: "connect_calendar"
+} as const;
+
+export type OnboardingChecklistStepDtoStatus =
+  (typeof OnboardingChecklistStepDtoStatus)[keyof typeof OnboardingChecklistStepDtoStatus];
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const OnboardingChecklistStepDtoStatus = {
+  pending: "pending",
+  completed: "completed",
+  skipped: "skipped"
+} as const;
+
+export interface OnboardingChecklistStepDto {
+  id: OnboardingChecklistStepDtoId;
+  title: string;
+  description: string;
+  status: OnboardingChecklistStepDtoStatus;
+  enabled: boolean;
+  /** @nullable */
+  requiredPermission?: string | null;
+  actionLabel: string;
+}
+
+export interface OnboardingChecklistResponseDto {
+  progress: number;
+  completedCount: number;
+  totalCount: number;
+  hidden: boolean;
+  steps: OnboardingChecklistStepDto[];
+}
+
+export type UpdateOnboardingChecklistStepDtoStatus =
+  (typeof UpdateOnboardingChecklistStepDtoStatus)[keyof typeof UpdateOnboardingChecklistStepDtoStatus];
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const UpdateOnboardingChecklistStepDtoStatus = {
+  completed: "completed",
+  skipped: "skipped"
+} as const;
+
+export interface UpdateOnboardingChecklistStepDto {
+  status: UpdateOnboardingChecklistStepDtoStatus;
+}
+
+export interface SaePreviewDto {
+  username: string;
+  password: string;
+}
+
+export type SaePreviewItemDtoSuggestedStatus =
+  (typeof SaePreviewItemDtoSuggestedStatus)[keyof typeof SaePreviewItemDtoSuggestedStatus];
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const SaePreviewItemDtoSuggestedStatus = {
+  open: "open",
+  paused: "paused",
+  closed: "closed"
+} as const;
+
+export type SaePreviewItemDtoAction =
+  (typeof SaePreviewItemDtoAction)[keyof typeof SaePreviewItemDtoAction];
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const SaePreviewItemDtoAction = {
+  create: "create",
+  update: "update"
+} as const;
+
+export interface SaePreviewItemDto {
+  externalId: string;
+  caseNumber: string;
+  caption: string;
+  /** @nullable */
+  jurisdictionText: string | null;
+  /** @nullable */
+  unitText: string | null;
+  /** @nullable */
+  court: string | null;
+  /** @nullable */
+  provinceText: string | null;
+  suggestedStatus: SaePreviewItemDtoSuggestedStatus;
+  action: SaePreviewItemDtoAction;
+  warnings: string[];
+}
+
+export interface SaePreviewSummaryDto {
+  total: number;
+  createCount: number;
+  updateCount: number;
+  warningCount: number;
+}
+
+export interface SaePreviewResponseDto {
+  importSessionId: string;
+  expiresAt: string;
+  items: SaePreviewItemDto[];
+  summary: SaePreviewSummaryDto;
+}
+
+export interface SaeImportDto {
+  [key: string]: unknown;
+}
+
+export type SaeImportItemDtoStatus =
+  (typeof SaeImportItemDtoStatus)[keyof typeof SaeImportItemDtoStatus];
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const SaeImportItemDtoStatus = {
+  imported: "imported",
+  updated: "updated",
+  skipped: "skipped"
+} as const;
+
+export interface SaeImportItemDto {
+  externalId: string;
+  caseNumber: string;
+  /** @nullable */
+  caseId: string | null;
+  status: SaeImportItemDtoStatus;
+  /** @nullable */
+  message: string | null;
+}
+
+export interface SaeImportResponseDto {
+  importedCount: number;
+  updatedCount: number;
+  skippedCount: number;
+  items: SaeImportItemDto[];
 }
 
 export interface CashboxCurrencyDto {
@@ -736,6 +1050,16 @@ export interface CaseParticipantDto {
 /**
  * @nullable
  */
+export type CaseDtoProvince = CaseProvinceDto | null;
+
+/**
+ * @nullable
+ */
+export type CaseDtoForum = CaseForumDto | null;
+
+/**
+ * @nullable
+ */
 export type CaseDtoJudicialCenter = CaseJudicialCenterDto | null;
 
 export type CaseDtoInstance = (typeof CaseDtoInstance)[keyof typeof CaseDtoInstance];
@@ -764,14 +1088,22 @@ export interface CaseDto {
   subject: string | null;
   /** @nullable */
   description: string | null;
-  province: CaseProvinceDto;
-  forum: CaseForumDto;
+  /** @nullable */
+  province: CaseDtoProvince;
+  /** @nullable */
+  forum: CaseDtoForum;
   /** @nullable */
   judicialCenterForumId: string | null;
   /** @nullable */
   judicialCenter: CaseDtoJudicialCenter;
   /** @nullable */
   judicialCenterText: string | null;
+  /** @nullable */
+  provinceText: string | null;
+  /** @nullable */
+  jurisdictionText: string | null;
+  /** @nullable */
+  unitText: string | null;
   /** @nullable */
   court: string | null;
   instance: CaseDtoInstance;
@@ -895,6 +1227,16 @@ export interface CaseMetricsDto {
 /**
  * @nullable
  */
+export type CaseDetailDtoProvince = CaseProvinceDto | null;
+
+/**
+ * @nullable
+ */
+export type CaseDetailDtoForum = CaseForumDto | null;
+
+/**
+ * @nullable
+ */
 export type CaseDetailDtoJudicialCenter = CaseJudicialCenterDto | null;
 
 export type CaseDetailDtoInstance =
@@ -924,14 +1266,22 @@ export interface CaseDetailDto {
   subject: string | null;
   /** @nullable */
   description: string | null;
-  province: CaseProvinceDto;
-  forum: CaseForumDto;
+  /** @nullable */
+  province: CaseDetailDtoProvince;
+  /** @nullable */
+  forum: CaseDetailDtoForum;
   /** @nullable */
   judicialCenterForumId: string | null;
   /** @nullable */
   judicialCenter: CaseDetailDtoJudicialCenter;
   /** @nullable */
   judicialCenterText: string | null;
+  /** @nullable */
+  provinceText: string | null;
+  /** @nullable */
+  jurisdictionText: string | null;
+  /** @nullable */
+  unitText: string | null;
   /** @nullable */
   court: string | null;
   instance: CaseDetailDtoInstance;
@@ -2166,6 +2516,10 @@ export interface StaffDeleteResponseDto {
   status: string;
 }
 
+export type AccountControllerUploadAvatarBody = {
+  file: Blob;
+};
+
 export type CasesControllerCreateExpenseAttachmentBody = {
   file: Blob;
 };
@@ -2200,6 +2554,285 @@ export type ClientsControllerUpdateBody =
   | UpdateCommonClientInputDto
   | UpdateHumanClientInputDto
   | UpdateLegalEntityClientInputDto;
+
+export type accountControllerGetAccountResponse200 = {
+  data: AccountResponseDto;
+  status: 200;
+};
+
+export type accountControllerGetAccountResponseSuccess = accountControllerGetAccountResponse200 & {
+  headers: Headers;
+};
+export type accountControllerGetAccountResponse = accountControllerGetAccountResponseSuccess;
+
+export const getAccountControllerGetAccountUrl = () => {
+  return `/api/account`;
+};
+
+export const accountControllerGetAccount = async (
+  options?: RequestInit
+): Promise<accountControllerGetAccountResponse> => {
+  return bogaapFetch<accountControllerGetAccountResponse>(getAccountControllerGetAccountUrl(), {
+    ...options,
+    method: "GET"
+  });
+};
+
+export type accountControllerGetAiUsageResponse200 = {
+  data: AccountAiUsageResponseDto;
+  status: 200;
+};
+
+export type accountControllerGetAiUsageResponseSuccess = accountControllerGetAiUsageResponse200 & {
+  headers: Headers;
+};
+export type accountControllerGetAiUsageResponse = accountControllerGetAiUsageResponseSuccess;
+
+export const getAccountControllerGetAiUsageUrl = () => {
+  return `/api/account/ai-usage`;
+};
+
+export const accountControllerGetAiUsage = async (
+  options?: RequestInit
+): Promise<accountControllerGetAiUsageResponse> => {
+  return bogaapFetch<accountControllerGetAiUsageResponse>(getAccountControllerGetAiUsageUrl(), {
+    ...options,
+    method: "GET"
+  });
+};
+
+export type accountControllerGetAvatarResponse200 = {
+  data: void;
+  status: 200;
+};
+
+export type accountControllerGetAvatarResponseSuccess = accountControllerGetAvatarResponse200 & {
+  headers: Headers;
+};
+export type accountControllerGetAvatarResponse = accountControllerGetAvatarResponseSuccess;
+
+export const getAccountControllerGetAvatarUrl = () => {
+  return `/api/account/avatar`;
+};
+
+export const accountControllerGetAvatar = async (
+  options?: RequestInit
+): Promise<accountControllerGetAvatarResponse> => {
+  return bogaapFetch<accountControllerGetAvatarResponse>(getAccountControllerGetAvatarUrl(), {
+    ...options,
+    method: "GET"
+  });
+};
+
+export type accountControllerUploadAvatarResponse200 = {
+  data: AccountAvatarUploadResponseDto;
+  status: 200;
+};
+
+export type accountControllerUploadAvatarResponseSuccess =
+  accountControllerUploadAvatarResponse200 & {
+    headers: Headers;
+  };
+export type accountControllerUploadAvatarResponse = accountControllerUploadAvatarResponseSuccess;
+
+export const getAccountControllerUploadAvatarUrl = () => {
+  return `/api/account/avatar`;
+};
+
+export const accountControllerUploadAvatar = async (
+  accountControllerUploadAvatarBody: AccountControllerUploadAvatarBody,
+  options?: RequestInit
+): Promise<accountControllerUploadAvatarResponse> => {
+  const formData = new FormData();
+  formData.append(`file`, accountControllerUploadAvatarBody.file);
+
+  return bogaapFetch<accountControllerUploadAvatarResponse>(getAccountControllerUploadAvatarUrl(), {
+    ...options,
+    method: "POST",
+    body: formData
+  });
+};
+
+export type accountControllerUpdateProfileResponse200 = {
+  data: AccountResponseDto;
+  status: 200;
+};
+
+export type accountControllerUpdateProfileResponseSuccess =
+  accountControllerUpdateProfileResponse200 & {
+    headers: Headers;
+  };
+export type accountControllerUpdateProfileResponse = accountControllerUpdateProfileResponseSuccess;
+
+export const getAccountControllerUpdateProfileUrl = () => {
+  return `/api/account/profile`;
+};
+
+export const accountControllerUpdateProfile = async (
+  updateAccountProfileDto: UpdateAccountProfileDto,
+  options?: RequestInit
+): Promise<accountControllerUpdateProfileResponse> => {
+  return bogaapFetch<accountControllerUpdateProfileResponse>(
+    getAccountControllerUpdateProfileUrl(),
+    {
+      ...options,
+      method: "PATCH",
+      headers: { "Content-Type": "application/json", ...options?.headers },
+      body: JSON.stringify(updateAccountProfileDto)
+    }
+  );
+};
+
+export type accountControllerUpdateStudioResponse200 = {
+  data: AccountResponseDto;
+  status: 200;
+};
+
+export type accountControllerUpdateStudioResponseSuccess =
+  accountControllerUpdateStudioResponse200 & {
+    headers: Headers;
+  };
+export type accountControllerUpdateStudioResponse = accountControllerUpdateStudioResponseSuccess;
+
+export const getAccountControllerUpdateStudioUrl = () => {
+  return `/api/account/studio`;
+};
+
+export const accountControllerUpdateStudio = async (
+  updateAccountStudioDto: UpdateAccountStudioDto,
+  options?: RequestInit
+): Promise<accountControllerUpdateStudioResponse> => {
+  return bogaapFetch<accountControllerUpdateStudioResponse>(getAccountControllerUpdateStudioUrl(), {
+    ...options,
+    method: "PATCH",
+    headers: { "Content-Type": "application/json", ...options?.headers },
+    body: JSON.stringify(updateAccountStudioDto)
+  });
+};
+
+export type accountControllerUpdateNotificationsResponse200 = {
+  data: AccountResponseDto;
+  status: 200;
+};
+
+export type accountControllerUpdateNotificationsResponseSuccess =
+  accountControllerUpdateNotificationsResponse200 & {
+    headers: Headers;
+  };
+export type accountControllerUpdateNotificationsResponse =
+  accountControllerUpdateNotificationsResponseSuccess;
+
+export const getAccountControllerUpdateNotificationsUrl = () => {
+  return `/api/account/notifications`;
+};
+
+export const accountControllerUpdateNotifications = async (
+  updateAccountNotificationsDto: UpdateAccountNotificationsDto,
+  options?: RequestInit
+): Promise<accountControllerUpdateNotificationsResponse> => {
+  return bogaapFetch<accountControllerUpdateNotificationsResponse>(
+    getAccountControllerUpdateNotificationsUrl(),
+    {
+      ...options,
+      method: "PATCH",
+      headers: { "Content-Type": "application/json", ...options?.headers },
+      body: JSON.stringify(updateAccountNotificationsDto)
+    }
+  );
+};
+
+export type accountControllerUpdateMembershipResponse200 = {
+  data: AccountResponseDto;
+  status: 200;
+};
+
+export type accountControllerUpdateMembershipResponseSuccess =
+  accountControllerUpdateMembershipResponse200 & {
+    headers: Headers;
+  };
+export type accountControllerUpdateMembershipResponse =
+  accountControllerUpdateMembershipResponseSuccess;
+
+export const getAccountControllerUpdateMembershipUrl = () => {
+  return `/api/account/membership`;
+};
+
+export const accountControllerUpdateMembership = async (
+  updateAccountMembershipDto: UpdateAccountMembershipDto,
+  options?: RequestInit
+): Promise<accountControllerUpdateMembershipResponse> => {
+  return bogaapFetch<accountControllerUpdateMembershipResponse>(
+    getAccountControllerUpdateMembershipUrl(),
+    {
+      ...options,
+      method: "PATCH",
+      headers: { "Content-Type": "application/json", ...options?.headers },
+      body: JSON.stringify(updateAccountMembershipDto)
+    }
+  );
+};
+
+export type accountControllerValidatePasswordChangeResponse200 = {
+  data: UpdateAccountPasswordResponseDto;
+  status: 200;
+};
+
+export type accountControllerValidatePasswordChangeResponseSuccess =
+  accountControllerValidatePasswordChangeResponse200 & {
+    headers: Headers;
+  };
+export type accountControllerValidatePasswordChangeResponse =
+  accountControllerValidatePasswordChangeResponseSuccess;
+
+export const getAccountControllerValidatePasswordChangeUrl = () => {
+  return `/api/account/password/validate`;
+};
+
+export const accountControllerValidatePasswordChange = async (
+  updateAccountPasswordDto: UpdateAccountPasswordDto,
+  options?: RequestInit
+): Promise<accountControllerValidatePasswordChangeResponse> => {
+  return bogaapFetch<accountControllerValidatePasswordChangeResponse>(
+    getAccountControllerValidatePasswordChangeUrl(),
+    {
+      ...options,
+      method: "PATCH",
+      headers: { "Content-Type": "application/json", ...options?.headers },
+      body: JSON.stringify(updateAccountPasswordDto)
+    }
+  );
+};
+
+export type accountControllerUpdatePasswordResponse200 = {
+  data: UpdateAccountPasswordResponseDto;
+  status: 200;
+};
+
+export type accountControllerUpdatePasswordResponseSuccess =
+  accountControllerUpdatePasswordResponse200 & {
+    headers: Headers;
+  };
+export type accountControllerUpdatePasswordResponse =
+  accountControllerUpdatePasswordResponseSuccess;
+
+export const getAccountControllerUpdatePasswordUrl = () => {
+  return `/api/account/password`;
+};
+
+export const accountControllerUpdatePassword = async (
+  updateAccountPasswordDto: UpdateAccountPasswordDto,
+  options?: RequestInit
+): Promise<accountControllerUpdatePasswordResponse> => {
+  return bogaapFetch<accountControllerUpdatePasswordResponse>(
+    getAccountControllerUpdatePasswordUrl(),
+    {
+      ...options,
+      method: "PATCH",
+      headers: { "Content-Type": "application/json", ...options?.headers },
+      body: JSON.stringify(updateAccountPasswordDto)
+    }
+  );
+};
 
 export type authControllerCreateAccountResponse201 = {
   data: CreateAccountResponseDto;
@@ -2250,6 +2883,32 @@ export const authControllerLogin = async (
     method: "POST",
     headers: { "Content-Type": "application/json", ...options?.headers },
     body: JSON.stringify(loginDto)
+  });
+};
+
+export type authControllerGoogleLoginResponse200 = {
+  data: LoginResponseDto;
+  status: 200;
+};
+
+export type authControllerGoogleLoginResponseSuccess = authControllerGoogleLoginResponse200 & {
+  headers: Headers;
+};
+export type authControllerGoogleLoginResponse = authControllerGoogleLoginResponseSuccess;
+
+export const getAuthControllerGoogleLoginUrl = () => {
+  return `/api/auth/google`;
+};
+
+export const authControllerGoogleLogin = async (
+  googleLoginDto: GoogleLoginDto,
+  options?: RequestInit
+): Promise<authControllerGoogleLoginResponse> => {
+  return bogaapFetch<authControllerGoogleLoginResponse>(getAuthControllerGoogleLoginUrl(), {
+    ...options,
+    method: "POST",
+    headers: { "Content-Type": "application/json", ...options?.headers },
+    body: JSON.stringify(googleLoginDto)
   });
 };
 
@@ -2574,6 +3233,62 @@ export const onboardingControllerStatus = async (
   });
 };
 
+export type onboardingControllerChecklistResponse200 = {
+  data: OnboardingChecklistResponseDto;
+  status: 200;
+};
+
+export type onboardingControllerChecklistResponseSuccess =
+  onboardingControllerChecklistResponse200 & {
+    headers: Headers;
+  };
+export type onboardingControllerChecklistResponse = onboardingControllerChecklistResponseSuccess;
+
+export const getOnboardingControllerChecklistUrl = () => {
+  return `/api/onboarding/checklist`;
+};
+
+export const onboardingControllerChecklist = async (
+  options?: RequestInit
+): Promise<onboardingControllerChecklistResponse> => {
+  return bogaapFetch<onboardingControllerChecklistResponse>(getOnboardingControllerChecklistUrl(), {
+    ...options,
+    method: "GET"
+  });
+};
+
+export type onboardingControllerUpdateChecklistStepResponse200 = {
+  data: OnboardingChecklistResponseDto;
+  status: 200;
+};
+
+export type onboardingControllerUpdateChecklistStepResponseSuccess =
+  onboardingControllerUpdateChecklistStepResponse200 & {
+    headers: Headers;
+  };
+export type onboardingControllerUpdateChecklistStepResponse =
+  onboardingControllerUpdateChecklistStepResponseSuccess;
+
+export const getOnboardingControllerUpdateChecklistStepUrl = (step: string) => {
+  return `/api/onboarding/checklist/${step}`;
+};
+
+export const onboardingControllerUpdateChecklistStep = async (
+  step: string,
+  updateOnboardingChecklistStepDto: UpdateOnboardingChecklistStepDto,
+  options?: RequestInit
+): Promise<onboardingControllerUpdateChecklistStepResponse> => {
+  return bogaapFetch<onboardingControllerUpdateChecklistStepResponse>(
+    getOnboardingControllerUpdateChecklistStepUrl(step),
+    {
+      ...options,
+      method: "PATCH",
+      headers: { "Content-Type": "application/json", ...options?.headers },
+      body: JSON.stringify(updateOnboardingChecklistStepDto)
+    }
+  );
+};
+
 export type identityControllerMeResponse200 = {
   data: void;
   status: 200;
@@ -2618,6 +3333,68 @@ export const identityControllerRoles = async (
     ...options,
     method: "GET"
   });
+};
+
+export type integrationsControllerPreviewSaeImportResponse200 = {
+  data: SaePreviewResponseDto;
+  status: 200;
+};
+
+export type integrationsControllerPreviewSaeImportResponseSuccess =
+  integrationsControllerPreviewSaeImportResponse200 & {
+    headers: Headers;
+  };
+export type integrationsControllerPreviewSaeImportResponse =
+  integrationsControllerPreviewSaeImportResponseSuccess;
+
+export const getIntegrationsControllerPreviewSaeImportUrl = () => {
+  return `/api/integrations/sae/preview`;
+};
+
+export const integrationsControllerPreviewSaeImport = async (
+  saePreviewDto: SaePreviewDto,
+  options?: RequestInit
+): Promise<integrationsControllerPreviewSaeImportResponse> => {
+  return bogaapFetch<integrationsControllerPreviewSaeImportResponse>(
+    getIntegrationsControllerPreviewSaeImportUrl(),
+    {
+      ...options,
+      method: "POST",
+      headers: { "Content-Type": "application/json", ...options?.headers },
+      body: JSON.stringify(saePreviewDto)
+    }
+  );
+};
+
+export type integrationsControllerImportSaeCasesResponse200 = {
+  data: SaeImportResponseDto;
+  status: 200;
+};
+
+export type integrationsControllerImportSaeCasesResponseSuccess =
+  integrationsControllerImportSaeCasesResponse200 & {
+    headers: Headers;
+  };
+export type integrationsControllerImportSaeCasesResponse =
+  integrationsControllerImportSaeCasesResponseSuccess;
+
+export const getIntegrationsControllerImportSaeCasesUrl = () => {
+  return `/api/integrations/sae/import`;
+};
+
+export const integrationsControllerImportSaeCases = async (
+  saeImportDto: SaeImportDto,
+  options?: RequestInit
+): Promise<integrationsControllerImportSaeCasesResponse> => {
+  return bogaapFetch<integrationsControllerImportSaeCasesResponse>(
+    getIntegrationsControllerImportSaeCasesUrl(),
+    {
+      ...options,
+      method: "POST",
+      headers: { "Content-Type": "application/json", ...options?.headers },
+      body: JSON.stringify(saeImportDto)
+    }
+  );
 };
 
 export type cashboxControllerSummaryResponse200 = {
@@ -3368,6 +4145,30 @@ export const notificationsControllerList = async (
   options?: RequestInit
 ): Promise<notificationsControllerListResponse> => {
   return bogaapFetch<notificationsControllerListResponse>(getNotificationsControllerListUrl(), {
+    ...options,
+    method: "GET"
+  });
+};
+
+export type notificationsControllerStreamResponse200 = {
+  data: void;
+  status: 200;
+};
+
+export type notificationsControllerStreamResponseSuccess =
+  notificationsControllerStreamResponse200 & {
+    headers: Headers;
+  };
+export type notificationsControllerStreamResponse = notificationsControllerStreamResponseSuccess;
+
+export const getNotificationsControllerStreamUrl = () => {
+  return `/api/notifications/stream`;
+};
+
+export const notificationsControllerStream = async (
+  options?: RequestInit
+): Promise<notificationsControllerStreamResponse> => {
+  return bogaapFetch<notificationsControllerStreamResponse>(getNotificationsControllerStreamUrl(), {
     ...options,
     method: "GET"
   });

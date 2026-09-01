@@ -88,11 +88,17 @@ export function CaseDetailsDialog({
           <section className="grid gap-4 md:grid-cols-2" aria-label="Informacion principal">
             <CaseDetailItem label="Caratula" value={caseItem.caption} />
             <CaseDetailItem label="Numero de expediente" value={caseItem.caseNumber} />
-            <CaseDetailItem label="Provincia" value={caseItem.province.name} />
-            <CaseDetailItem label="Fuero" value={caseItem.forum.name} />
+            <CaseDetailItem
+              label="Provincia"
+              value={caseItem.province?.name ?? caseItem.provinceText}
+            />
+            <CaseDetailItem
+              label="Fuero"
+              value={caseItem.forum?.name ?? caseItem.jurisdictionText}
+            />
             <CaseDetailItem
               label="Centro judicial"
-              value={caseItem.judicialCenter?.name ?? caseItem.judicialCenterText}
+              value={caseItem.judicialCenter?.name ?? caseItem.judicialCenterText ?? caseItem.unitText}
             />
             <CaseDetailItem label="Juzgado / Tribunal" value={caseItem.court} />
             <CaseDetailItem label="Instancia" value={caseInstanceLabels[caseItem.instance]} />

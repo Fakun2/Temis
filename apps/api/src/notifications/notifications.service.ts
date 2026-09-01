@@ -1,5 +1,12 @@
-import { BadRequestException, Injectable, Logger, NotFoundException } from "@nestjs/common";
+import {
+  BadRequestException,
+  Injectable,
+  Logger,
+  NotFoundException,
+  type MessageEvent
+} from "@nestjs/common";
 import { Prisma } from "@prisma/client";
+import { Observable, Subject } from "rxjs";
 import { PrismaService, type TenantPrismaClient } from "../database/prisma.service";
 import { AsyncOutboxService } from "../queue/async-outbox.service";
 import { notificationReminderRoutingKey } from "../queue/queue.constants";
@@ -19,6 +26,10 @@ type ScheduleReminderInput = {
 };
 
 type NotificationPrismaClient = PrismaService | TenantPrismaClient;
+type NotificationStreamEvent = {
+  notification: ReturnType<typeof toNotificationDto>;
+  unreadCount: number;
+};
 
 type ReminderConfig = {
   notificationDate: string;
@@ -32,6 +43,7 @@ type ReminderConfig = {
 @Injectable()
 export class NotificationsService {
   private readonly logger = new Logger(NotificationsService.name);
+  private readonly streams = new Map<string, Subject<NotificationStreamEvent>>();
 
   constructor(
     private readonly prisma: PrismaService,
@@ -230,6 +242,48 @@ export class NotificationsService {
     };
   }
 
+  streamForUser(tenantId: string, actorUserId: string) {
+    return new Observable<MessageEvent>((subscriber) => {
+      let streamKey: string | null = null;
+      let subject: Subject<NotificationStreamEvent> | null = null;
+      let subscription: ReturnType<Subject<NotificationStreamEvent>["subscribe"]> | null = null;
+      const heartbeatInterval = setInterval(() => {
+        subscriber.next({ data: { status: "ok" }, type: "heartbeat" });
+      }, 25_000);
+
+      void this.findActiveMembershipForUser(this.prisma, tenantId, actorUserId)
+        .then((membership) => {
+          if (subscriber.closed) {
+            return;
+          }
+
+          streamKey = toStreamKey(tenantId, membership.id);
+          subject = this.streams.get(streamKey) ?? null;
+
+          if (!subject) {
+            subject = new Subject<NotificationStreamEvent>();
+            this.streams.set(streamKey, subject);
+          }
+
+          subscriber.next({ data: { status: "connected" }, type: "ready" });
+          subscription = subject.subscribe({
+            next: (event) => subscriber.next({ data: event, type: "notification" })
+          });
+        })
+        .catch((error: unknown) => subscriber.error(error));
+
+      return () => {
+        clearInterval(heartbeatInterval);
+        subscription?.unsubscribe();
+
+        if (streamKey && !subject?.observed) {
+          this.streams.delete(streamKey);
+          subject?.complete();
+        }
+      };
+    });
+  }
+
   async markRead(tenantId: string, actorUserId: string, notificationId: string) {
     const membership = await this.findActiveMembershipForUser(this.prisma, tenantId, actorUserId);
     const notification = await this.prisma.notificationReminderRecipient.findFirst({
@@ -356,7 +410,7 @@ export class NotificationsService {
 
   private async deliverClaimedReminder(reminderId: string, tenantId: string) {
     const deliveredAt = new Date();
-    await this.prisma.$transaction(async (tx) => {
+    const deliveredNotifications = await this.prisma.$transaction(async (tx) => {
       await tx.notificationReminderRecipient.updateMany({
         data: {
           deliveredAt,
@@ -375,7 +429,47 @@ export class NotificationsService {
         },
         where: { id: reminderId }
       });
+
+      return tx.notificationReminderRecipient.findMany({
+        orderBy: [{ deliveredAt: "desc" }, { createdAt: "desc" }],
+        select: notificationRecipientSelect,
+        where: {
+          reminderId,
+          status: "delivered",
+          tenantId
+        }
+      });
     });
+
+    await this.publishDeliveredNotifications(tenantId, deliveredNotifications);
+  }
+
+  private async publishDeliveredNotifications(
+    tenantId: string,
+    notifications: NotificationRecipientRecord[]
+  ) {
+    for (const notification of notifications) {
+      const streamKey = toStreamKey(tenantId, notification.recipientMembershipId);
+      const stream = this.streams.get(streamKey);
+
+      if (!stream) {
+        continue;
+      }
+
+      const unreadCount = await this.prisma.notificationReminderRecipient.count({
+        where: {
+          readAt: null,
+          recipientMembershipId: notification.recipientMembershipId,
+          tenantId,
+          reminder: { status: "delivered" }
+        }
+      });
+
+      stream.next({
+        notification: toNotificationDto(notification),
+        unreadCount
+      });
+    }
   }
 
   private async enqueueReminderOutbox(
@@ -484,6 +578,7 @@ export class NotificationsService {
 const notificationRecipientSelect = {
   deliveredAt: true,
   id: true,
+  recipientMembershipId: true,
   readAt: true,
   reminder: {
     select: {
@@ -558,4 +653,8 @@ function assertRecipients(recipientMembershipIds: string[]) {
   }
 
   return recipientMembershipIds;
+}
+
+function toStreamKey(tenantId: string, membershipId: string) {
+  return `${tenantId}:${membershipId}`;
 }

@@ -2,6 +2,7 @@ import { Module } from "@nestjs/common";
 import { ConfigModule } from "@nestjs/config";
 import { existsSync } from "node:fs";
 import { dirname, join } from "node:path";
+import { AccountModule } from "./account/account.module";
 import { AuthModule } from "./auth/auth.module";
 import { AiModule } from "./ai/ai.module";
 import { CashboxModule } from "./cashbox/cashbox.module";
@@ -14,6 +15,7 @@ import { DatabaseModule } from "./database/database.module";
 import { DocumentsModule } from "./documents/documents.module";
 import { HealthModule } from "./health/health.module";
 import { IdentityModule } from "./identity/identity.module";
+import { IntegrationsModule } from "./integrations/integrations.module";
 import { ForumsModule } from "./forums/forums.module";
 import { JudicialCentersModule } from "./judicial-centers/judicial-centers.module";
 import { OnboardingModule } from "./onboarding/onboarding.module";
@@ -33,6 +35,7 @@ import { TenancyModule } from "./tenancy/tenancy.module";
     }),
     DatabaseModule,
     RedisModule,
+    AccountModule,
     AuthModule,
     AiModule,
     TenancyModule,
@@ -41,6 +44,7 @@ import { TenancyModule } from "./tenancy/tenancy.module";
     ProvincesModule,
     OnboardingModule,
     IdentityModule,
+    IntegrationsModule,
     CashboxModule,
     CategoriesModule,
     DocumentsModule,

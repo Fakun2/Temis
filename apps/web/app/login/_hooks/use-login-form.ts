@@ -1,9 +1,11 @@
 "use client";
 
-import { FormEvent, useEffect, useState } from "react";
+import { FormEvent, useCallback, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { z } from "zod";
-import { hasTenantAccess, saveSession, type BogaapSession } from "@/lib/auth/session";
+import { loginWithGoogleCredential } from "@/lib/auth/google-auth";
+import { getAuthenticatedRedirectPath } from "@/lib/auth/redirect";
+import { saveSession, type BogaapSession } from "@/lib/auth/session";
 import { loginFormSchema, type LoginFormValues } from "@/lib/validation/auth";
 import {
   loginInitialForm,
@@ -28,6 +30,7 @@ export function useLoginForm(initialEmail: string | null) {
   const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
+  const [googleSubmitting, setGoogleSubmitting] = useState(false);
   const transition = useLoginTransition();
 
   useEffect(() => {
@@ -81,7 +84,7 @@ export function useLoginForm(initialEmail: string | null) {
       transition.exit();
       await wait(loginLoadingExitMs);
       shouldHideTransition = false;
-      window.location.assign(getLoginRedirectPath(session, searchParams.get("next")));
+      window.location.assign(getAuthenticatedRedirectPath(session, searchParams.get("next")));
     } catch (caught) {
       setError(caught instanceof Error ? caught.message : "No se pudo iniciar sesion.");
     } finally {
@@ -92,32 +95,56 @@ export function useLoginForm(initialEmail: string | null) {
     }
   }
 
+  function showGoogleSetupError() {
+    setError("Falta configurar NEXT_PUBLIC_GOOGLE_CLIENT_ID para probar Google.");
+  }
+
+  const submitGoogle = useCallback(
+    async (credential: string) => {
+      setGoogleSubmitting(true);
+      setSubmitting(true);
+      setError(null);
+      setFieldErrors({});
+      transition.start();
+      let shouldHideTransition = true;
+      const transitionStartedAt = Date.now();
+
+      try {
+        const session = await loginWithGoogleCredential(credential);
+        const elapsed = Date.now() - transitionStartedAt;
+        await wait(Math.max(loginLoadingTotalMs - elapsed, 0));
+        transition.showSuccess();
+        await wait(loginLoadingSuccessMs);
+        transition.exit();
+        await wait(loginLoadingExitMs);
+        shouldHideTransition = false;
+        window.location.assign(getAuthenticatedRedirectPath(session, searchParams.get("next")));
+      } catch (caught) {
+        setError(caught instanceof Error ? caught.message : "No se pudo iniciar sesion con Google.");
+      } finally {
+        if (shouldHideTransition) {
+          transition.reset();
+          setSubmitting(false);
+          setGoogleSubmitting(false);
+        }
+      }
+    },
+    [searchParams, transition]
+  );
+
   return {
     error,
     fieldErrors,
     form,
+    googleSubmitting,
+    showGoogleSetupError,
     submit,
+    submitGoogle,
     submitting,
     transitionExiting: transition.exiting,
     transitionSuccess: transition.success,
     updateField
   };
-}
-
-function getLoginRedirectPath(session: BogaapSession, nextPath: string | null) {
-  if (!hasTenantAccess(session)) {
-    return "/onboarding";
-  }
-
-  if (!nextPath) {
-    return "/admin";
-  }
-
-  return isSafeAdminPath(nextPath) ? nextPath : "/admin";
-}
-
-function isSafeAdminPath(path: string) {
-  return path.startsWith("/admin") && !path.startsWith("//") && !path.includes("://");
 }
 
 function toFieldErrors(error: z.ZodError) {

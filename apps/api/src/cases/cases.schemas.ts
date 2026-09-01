@@ -91,10 +91,13 @@ const caseInputSchema = z.object({
   caption: z.string().trim().min(3).max(240),
   subject: optionalTrimmedString,
   description: optionalTrimmedString,
-  provinceId: z.string().uuid(),
-  forumTemplateId: z.string().uuid(),
+  provinceId: optionalUuid,
+  forumTemplateId: optionalUuid,
   judicialCenterForumId: optionalUuid,
   judicialCenterText: optionalTrimmedString,
+  provinceText: optionalTrimmedString,
+  jurisdictionText: optionalTrimmedString,
+  unitText: optionalTrimmedString,
   court: optionalTrimmedString,
   instance: caseInstanceSchema.default("first"),
   status: caseStatusSchema.default("open"),
@@ -103,6 +106,27 @@ const caseInputSchema = z.object({
   practiceAreaId: optionalUuid,
   responsibleMembershipId: optionalUuid,
   participants: z.array(caseParticipantInputSchema).max(20).default([])
+}).superRefine((input, ctx) => {
+  const hasCatalog = Boolean(input.provinceId && input.forumTemplateId);
+  const hasLooseJurisdiction = Boolean(
+    input.provinceText || input.jurisdictionText || input.unitText || input.court
+  );
+
+  if (!hasCatalog && !hasLooseJurisdiction) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: "Indica provincia/fuero catalogados o datos judiciales en texto.",
+      path: ["jurisdictionText"]
+    });
+  }
+
+  if ((input.provinceId && !input.forumTemplateId) || (!input.provinceId && input.forumTemplateId)) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: "Provincia y fuero catalogados deben enviarse juntos.",
+      path: ["forumTemplateId"]
+    });
+  }
 });
 
 export const createCaseSchema = caseInputSchema;
@@ -326,11 +350,11 @@ export class CaseDto {
   @ApiProperty({ nullable: true, type: String })
   description!: string | null;
 
-  @ApiProperty({ type: CaseProvinceDto })
-  province!: CaseProvinceDto;
+  @ApiProperty({ nullable: true, type: CaseProvinceDto })
+  province!: CaseProvinceDto | null;
 
-  @ApiProperty({ type: CaseForumDto })
-  forum!: CaseForumDto;
+  @ApiProperty({ nullable: true, type: CaseForumDto })
+  forum!: CaseForumDto | null;
 
   @ApiProperty({ nullable: true, type: String, format: "uuid" })
   judicialCenterForumId!: string | null;
@@ -340,6 +364,15 @@ export class CaseDto {
 
   @ApiProperty({ nullable: true, type: String })
   judicialCenterText!: string | null;
+
+  @ApiProperty({ nullable: true, type: String })
+  provinceText!: string | null;
+
+  @ApiProperty({ nullable: true, type: String })
+  jurisdictionText!: string | null;
+
+  @ApiProperty({ nullable: true, type: String })
+  unitText!: string | null;
 
   @ApiProperty({ nullable: true, type: String })
   court!: string | null;

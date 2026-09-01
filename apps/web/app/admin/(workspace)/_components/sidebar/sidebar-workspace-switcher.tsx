@@ -1,9 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
-import { ChevronDown, PanelLeft } from "lucide-react";
+import { PanelLeft } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { sidebarIconStrokeWidth } from "./sidebar-icon-constants";
 
 type SidebarWorkspaceSwitcherProps = {
   compact: boolean;
@@ -16,8 +16,6 @@ export function SidebarWorkspaceSwitcher({
   onClose,
   showCloseButton = false
 }: SidebarWorkspaceSwitcherProps) {
-  const [workspaceOpen, setWorkspaceOpen] = useState(false);
-
   return (
     <>
       <div className={cn("flex items-center", compact ? "justify-center" : "justify-between")}>
@@ -45,7 +43,11 @@ export function SidebarWorkspaceSwitcher({
             onClick={onClose}
             aria-label="Cerrar navegacion"
           >
-            <PanelLeft className="h-3.5 w-3.5" strokeWidth={1.75} aria-hidden="true" />
+            <PanelLeft
+              className="h-3.5 w-3.5"
+              strokeWidth={sidebarIconStrokeWidth}
+              aria-hidden="true"
+            />
           </button>
         ) : null}
       </div>
