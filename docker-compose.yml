@@ -38,7 +38,7 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres} -d ${POSTGRES_DB:-bogaap}"]
+      test: [ "CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres} -d ${POSTGRES_DB:-bogaap}" ]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -52,7 +52,7 @@ services:
     volumes:
       - redis_data:/data
     healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
+      test: [ "CMD", "redis-cli", "ping" ]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -70,7 +70,7 @@ services:
     volumes:
       - rabbitmq_data:/var/lib/rabbitmq
     healthcheck:
-      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
+      test: [ "CMD", "rabbitmq-diagnostics", "-q", "ping" ]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -95,13 +95,10 @@ services:
     depends_on:
       - minio
     entrypoint: >
-      /bin/sh -c "
-      until mc alias set local http://minio:9000 ${STORAGE_ACCESS_KEY_ID:-bogaap_minio} ${STORAGE_SECRET_ACCESS_KEY:-bogaap_minio_dev_12345}; do
+      /bin/sh -c " until mc alias set local http://minio:9000 ${STORAGE_ACCESS_KEY_ID:-bogaap_minio} ${STORAGE_SECRET_ACCESS_KEY:-bogaap_minio_dev_12345}; do
         echo 'Waiting for MinIO...';
         sleep 2;
-      done;
-      mc mb --ignore-existing local/${STORAGE_BUCKET:-bogaap-dev};
-      "
+      done; mc mb --ignore-existing local/${STORAGE_BUCKET:-bogaap-dev}; "
 
   api:
     <<: *api-resource-limits
@@ -149,6 +146,13 @@ services:
       AI_MODEL_FAST: ${AI_MODEL_FAST:-}
       AI_MAX_OUTPUT_TOKENS: ${AI_MAX_OUTPUT_TOKENS:-}
       AI_TEMPERATURE: ${AI_TEMPERATURE:-}
+      SAE_TUCUMAN_LOGIN_URL: ${SAE_TUCUMAN_LOGIN_URL:-}
+      SAE_TUCUMAN_PROCEEDINGS_URL: ${SAE_TUCUMAN_LOGIN_URL:-}
+      SAE_TUCUMAN_ORIGIN: ${SAE_TUCUMAN_LOGIN_URL:-}
+      SAE_TUCUMAN_USER_AGENT: ${SAE_TUCUMAN_LOGIN_URL:-}
+      GOOGLE_AUTH_ENABLED: ${GOOGLE_AUTH_ENABLED:-false}
+      GOOGLE_AUTH_CLIENT_ID: ${GOOGLE_AUTH_CLIENT_ID:-}
+      NEXT_PUBLIC_GOOGLE_CLIENT_ID: ${NEXT_PUBLIC_GOOGLE_CLIENT_ID:-}
     depends_on:
       postgres:
         condition: service_healthy
@@ -214,6 +218,7 @@ services:
       NEXT_PUBLIC_API_BASE_URL: /api
       NEXT_PUBLIC_API_PROXY_ORIGIN: http://api:3001
       JWT_ACCESS_SECRET: ${JWT_ACCESS_SECRET:-dev-access-secret-change-me}
+      NEXT_PUBLIC_GOOGLE_CLIENT_ID: ${NEXT_PUBLIC_GOOGLE_CLIENT_ID:-}
       REDIS_URL: redis://redis:6379
     depends_on:
       - api

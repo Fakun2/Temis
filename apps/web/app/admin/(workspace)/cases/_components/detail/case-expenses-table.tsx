@@ -138,7 +138,7 @@ export function CaseExpensesTable({
         title="Gastos del expediente"
       />
       <CardContent className="flex min-h-0 flex-1 flex-col px-3 md:px-4">
-        <div className="h-[552px] min-h-[552px] overflow-auto rounded-2xl">
+        <div className="min-h-[240px] max-h-[420px] overflow-auto rounded-2xl xl:max-h-[480px]">
           <Table className="min-w-full text-xs">
             <TableHeader className="bg-[color-mix(in_oklab,var(--muted)_28%,transparent)] [&_tr]:border-0">
               <TableRow className="hover:bg-transparent">
@@ -365,7 +365,7 @@ function CaseExpensesMessageBody({
 }) {
   return (
     <TableBody className="[&_tr:last-child]:border-0">
-      <TableRow className="h-[512px] hover:bg-transparent">
+      <TableRow className="h-56 hover:bg-transparent">
         <TableCell className={`px-3 py-10 text-center text-sm ${className}`} colSpan={columnCount}>
           {message}
         </TableCell>

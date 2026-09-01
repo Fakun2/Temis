@@ -4,6 +4,7 @@ import { AuthService } from "./auth.service";
 import {
   CreateAccountDto,
   CreateAccountResponseDto,
+  GoogleLoginDto,
   LoginDto,
   LoginResponseDto,
   LogoutDto,
@@ -27,6 +28,13 @@ export class AuthController {
   @ApiOkResponse({ type: LoginResponseDto })
   login(@Body() input: LoginDto) {
     return this.authService.login(input);
+  }
+
+  @Post("google")
+  @HttpCode(200)
+  @ApiOkResponse({ type: LoginResponseDto })
+  googleLogin(@Body() input: GoogleLoginDto) {
+    return this.authService.googleLogin(input);
   }
 
   @Post("refresh")

@@ -2,6 +2,11 @@ import { Injectable, OnModuleDestroy, OnModuleInit } from "@nestjs/common";
 import { Prisma, PrismaClient } from "@prisma/client";
 
 export type TenantPrismaClient = Prisma.TransactionClient;
+type TenantTransactionOptions = {
+  isolationLevel?: Prisma.TransactionIsolationLevel;
+  maxWait?: number;
+  timeout?: number;
+};
 
 @Injectable()
 export class PrismaService extends PrismaClient implements OnModuleInit, OnModuleDestroy {
@@ -15,7 +20,8 @@ export class PrismaService extends PrismaClient implements OnModuleInit, OnModul
 
   async runWithTenant<T>(
     tenantId: string,
-    callback: (prisma: TenantPrismaClient) => Promise<T>
+    callback: (prisma: TenantPrismaClient) => Promise<T>,
+    options?: TenantTransactionOptions
   ): Promise<T> {
     return this.$transaction(async (tx) => {
       await tx.$executeRaw`
@@ -23,6 +29,6 @@ export class PrismaService extends PrismaClient implements OnModuleInit, OnModul
       `;
 
       return callback(tx);
-    });
+    }, options);
   }
 }

@@ -9,9 +9,19 @@ import { JwtService, JwtSignOptions } from "@nestjs/jwt";
 import { compare, hash } from "bcryptjs";
 import { PrismaService } from "../database/prisma.service";
 import { RbacService } from "../rbac/rbac.service";
-import { CreateAccountDto, LoginDto } from "./auth.schemas";
+import { CreateAccountDto, GoogleLoginDto, LoginDto } from "./auth.schemas";
 import { JwtPayload } from "./auth.types";
+import { GoogleAuthService, type GoogleAuthProfile } from "./google-auth.service";
 import { getRequiredJwtConfig } from "./jwt-config";
+
+type LoginUser = {
+  avatarUrl: string | null;
+  email: string;
+  fullName: string;
+  id: string;
+  phone: string | null;
+  status: string;
+};
 
 @Injectable()
 export class AuthService {
@@ -19,7 +29,8 @@ export class AuthService {
     private readonly jwtService: JwtService,
     private readonly config: ConfigService,
     private readonly prisma: PrismaService,
-    private readonly rbacService: RbacService
+    private readonly rbacService: RbacService,
+    private readonly googleAuthService: GoogleAuthService
   ) {}
 
   async createAccount(input: CreateAccountDto) {
@@ -61,46 +72,48 @@ export class AuthService {
       throw new ForbiddenException("Esta cuenta se encuentra suspendida.");
     }
 
+    if (!user.passwordHash) {
+      throw new UnauthorizedException("Esta cuenta usa acceso con Google.");
+    }
+
     const passwordMatches = await compare(input.password, user.passwordHash);
     if (!passwordMatches) {
       throw new UnauthorizedException("Email o contrasena invalidos.");
     }
 
-    const memberships = await this.prisma.tenantMembership.findMany({
+    return this.issueLoginSession(user, input.tenantId);
+  }
+
+  async googleLogin(input: GoogleLoginDto) {
+    const profile = await this.googleAuthService.verifyIdToken(input.idToken);
+    const now = new Date();
+    const identity = await this.prisma.userIdentity.findUnique({
       where: {
-        userId: user.id,
-        ...(input.tenantId ? { tenantId: input.tenantId } : {})
+        provider_providerUserId: {
+          provider: "google",
+          providerUserId: profile.providerUserId
+        }
       },
       include: {
-        role: true,
-        tenant: true
+        user: true
       }
     });
 
-    if (input.tenantId && memberships.length === 0) {
-      throw new ForbiddenException("No tenes acceso activo a ese estudio.");
+    const user = identity?.user
+      ? await this.prisma.user.update({
+          where: { id: identity.user.id },
+          data: {
+            avatarUrl: identity.user.avatarUrl ?? profile.avatarUrl,
+            emailVerifiedAt: identity.user.emailVerifiedAt ?? now
+          }
+        })
+      : await this.findOrCreateGoogleUser(profile, now);
+
+    if (user.status !== "active") {
+      throw new ForbiddenException("Esta cuenta se encuentra suspendida.");
     }
 
-    const activeTenantMemberships = memberships.filter(
-      (membership) => membership.tenant.status === "active" && membership.status === "active"
-    );
-    const hasSuspendedMembership = memberships.some(
-      (membership) => membership.tenant.status === "active" && membership.status === "suspended"
-    );
-
-    if (activeTenantMemberships.length === 0 && hasSuspendedMembership) {
-      throw new ForbiddenException("Esta cuenta se encuentra suspendida para este estudio.");
-    }
-
-    await this.prisma.user.update({
-      where: { id: user.id },
-      data: { lastLoginAt: new Date() }
-    });
-
-    return {
-      user: this.toAuthUser(user),
-      tokens: await this.issueTokens(await this.buildJwtPayload(user.id))
-    };
+    return this.issueLoginSession(user);
   }
 
   async refresh(refreshToken: string) {
@@ -128,6 +141,90 @@ export class AuthService {
     };
   }
 
+  private async issueLoginSession(user: LoginUser, tenantId?: string) {
+    const memberships = await this.prisma.tenantMembership.findMany({
+      where: {
+        userId: user.id,
+        ...(tenantId ? { tenantId } : {})
+      },
+      include: {
+        role: true,
+        tenant: true
+      }
+    });
+
+    if (tenantId && memberships.length === 0) {
+      throw new ForbiddenException("No tenes acceso activo a ese estudio.");
+    }
+
+    const activeTenantMemberships = memberships.filter(
+      (membership) => membership.tenant.status === "active" && membership.status === "active"
+    );
+    const hasSuspendedMembership = memberships.some(
+      (membership) => membership.tenant.status === "active" && membership.status === "suspended"
+    );
+
+    if (activeTenantMemberships.length === 0 && hasSuspendedMembership) {
+      throw new ForbiddenException("Esta cuenta se encuentra suspendida para este estudio.");
+    }
+
+    await this.prisma.user.update({
+      where: { id: user.id },
+      data: { lastLoginAt: new Date() }
+    });
+
+    return {
+      user: this.toAuthUser(user),
+      tokens: await this.issueTokens(await this.buildJwtPayload(user.id))
+    };
+  }
+
+  private async findOrCreateGoogleUser(profile: GoogleAuthProfile, now: Date) {
+    return this.prisma.$transaction(async (tx) => {
+      const existingUser = await tx.user.findUnique({
+        where: { email: profile.email }
+      });
+      const user = existingUser
+        ? await tx.user.update({
+            where: { id: existingUser.id },
+            data: {
+              avatarUrl: existingUser.avatarUrl ?? profile.avatarUrl,
+              emailVerifiedAt: existingUser.emailVerifiedAt ?? now
+            }
+          })
+        : await tx.user.create({
+            data: {
+              avatarUrl: profile.avatarUrl,
+              email: profile.email,
+              emailVerifiedAt: now,
+              fullName: profile.fullName,
+              passwordHash: null,
+              status: "active"
+            }
+          });
+
+      await tx.userIdentity.upsert({
+        where: {
+          provider_providerUserId: {
+            provider: "google",
+            providerUserId: profile.providerUserId
+          }
+        },
+        update: {
+          email: profile.email
+        },
+        create: {
+          email: profile.email,
+          provider: "google",
+          providerUserId: profile.providerUserId,
+          userId: user.id
+        }
+      });
+
+      return user;
+    });
+  }
+
   private toTokenPayload(payload: JwtPayload): JwtPayload {
     return {
       sub: payload.sub,
@@ -137,18 +234,13 @@ export class AuthService {
     };
   }
 
-  private toAuthUser(user: {
-    id: string;
-    email: string;
-    fullName: string;
-    phone: string | null;
-    status: string;
-  }) {
+  private toAuthUser(user: LoginUser) {
     return {
       id: user.id,
       email: user.email,
       fullName: user.fullName,
       phone: user.phone,
+      avatarUrl: user.avatarUrl,
       status: user.status
     };
   }
@@ -204,17 +296,6 @@ export class AuthService {
     ) {
       throw new UnauthorizedException("Sesion invalida.");
     }
-  }
-
-  private async getUserSessionVersion(userId: string) {
-    const [user] = await this.prisma.$queryRaw<Array<{ sessionVersion: number }>>`
-      SELECT "session_version" AS "sessionVersion"
-      FROM "users"
-      WHERE "id" = ${userId}::uuid
-      LIMIT 1
-    `;
-
-    return user?.sessionVersion ?? 0;
   }
 
   private async getUserSessionState(userId: string) {

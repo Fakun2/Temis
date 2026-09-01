@@ -1,15 +1,17 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import { useDashboardMutation } from "@/lib/query/use-dashboard-mutation";
 import { useDashboardQuery } from "@/lib/query/use-dashboard-query";
 import {
   listNotifications,
   markNotificationRead as markNotificationReadRequest,
-  notificationKeys
+  notificationKeys,
+  type NotificationDto,
+  type NotificationsListResponse
 } from "../../../_api/notifications.api";
 import {
-  NOTIFICATION_REFETCH_INTERVAL_MS,
   NOTIFICATION_TOAST_EXIT_MS,
   NOTIFICATION_TOAST_MAX_VISIBLE,
   NOTIFICATION_TOAST_VISIBLE_MS
@@ -17,6 +19,7 @@ import {
 import type { VisibleNotificationToast } from "./notifications.types";
 
 export function useNotificationsBell() {
+  const queryClient = useQueryClient();
   const [toastNotifications, setToastNotifications] = useState<VisibleNotificationToast[]>([]);
   const seenIdsRef = useRef(new Set<string>());
   const toastTimeoutsRef = useRef(new Map<string, number>());
@@ -24,8 +27,7 @@ export function useNotificationsBell() {
 
   const query = useDashboardQuery({
     queryKey: notificationKeys.list(),
-    queryFn: listNotifications,
-    refetchInterval: NOTIFICATION_REFETCH_INTERVAL_MS
+    queryFn: listNotifications
   });
 
   const mutation = useDashboardMutation({
@@ -116,6 +118,42 @@ export function useNotificationsBell() {
   }, [dismissToast, query.data?.items]);
 
   useEffect(() => {
+    if (!query.hasSession || !query.tenantId) {
+      return;
+    }
+
+    const eventSource = new EventSource("/api/notifications/stream");
+    const queryKey = [query.tenantId, ...notificationKeys.list()];
+
+    function handleNotification(event: Event) {
+      const data = parseNotificationStreamEvent((event as MessageEvent<string>).data);
+      if (!data) {
+        return;
+      }
+
+      queryClient.setQueryData<NotificationsListResponse>(queryKey, (current) => {
+        const currentItems = current?.items ?? [];
+        const nextItems = [
+          data.notification,
+          ...currentItems.filter((item) => item.id !== data.notification.id)
+        ].slice(0, NOTIFICATION_TOAST_MAX_VISIBLE * 5);
+
+        return {
+          items: nextItems,
+          unreadCount: data.unreadCount
+        };
+      });
+    }
+
+    eventSource.addEventListener("notification", handleNotification);
+
+    return () => {
+      eventSource.removeEventListener("notification", handleNotification);
+      eventSource.close();
+    };
+  }, [query.hasSession, query.tenantId, queryClient]);
+
+  useEffect(() => {
     return () => {
       for (const timeout of toastTimeoutsRef.current.values()) {
         window.clearTimeout(timeout);
@@ -138,4 +176,26 @@ export function useNotificationsBell() {
     toastNotifications,
     unreadCount: query.data?.unreadCount ?? 0
   };
+}
+
+type NotificationStreamEvent = {
+  notification: NotificationDto;
+  unreadCount: number;
+};
+
+function parseNotificationStreamEvent(data: string): NotificationStreamEvent | null {
+  try {
+    const value = JSON.parse(data) as Partial<NotificationStreamEvent>;
+
+    if (!value.notification?.id || typeof value.unreadCount !== "number") {
+      return null;
+    }
+
+    return {
+      notification: value.notification,
+      unreadCount: value.unreadCount
+    };
+  } catch {
+    return null;
+  }
 }

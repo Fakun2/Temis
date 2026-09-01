@@ -28,6 +28,10 @@ export const loginSchema = z.object({
   tenantId: z.string().uuid().optional()
 });
 
+export const googleLoginSchema = z.object({
+  idToken: z.string().min(1, "No se recibio el token de Google.")
+});
+
 export const refreshTokenSchema = z.object({
   refreshToken: z.string().min(1)
 });
@@ -61,6 +65,11 @@ export class LoginDto extends createZodDto(loginSchema) {
   tenantId?: string;
 }
 
+export class GoogleLoginDto extends createZodDto(googleLoginSchema) {
+  @ApiProperty()
+  idToken!: string;
+}
+
 export class AuthUserDto {
   @ApiProperty({ format: "uuid" })
   id!: string;
@@ -73,6 +82,9 @@ export class AuthUserDto {
 
   @ApiProperty({ required: false, nullable: true, example: "+54 9 11 5555-5555" })
   phone!: string | null;
+
+  @ApiProperty({ required: false, nullable: true, example: "https://lh3.googleusercontent.com/a/..." })
+  avatarUrl!: string | null;
 
   @ApiProperty({ example: "active" })
   status!: string;

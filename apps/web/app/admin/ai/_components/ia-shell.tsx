@@ -21,11 +21,11 @@ export function IaShell({ children }: { children: ReactNode }) {
   }, [router, session, sessionReady]);
 
   if (!sessionReady || !session) {
-    return <main className="min-h-[100svh] bg-[var(--admin-page-bg)]" />;
+    return <main className="min-h-[100svh] bg-[var(--admin-sidebar-bg)]" />;
   }
 
   return (
-    <main className="flex h-[100svh] flex-col overflow-hidden bg-[var(--admin-page-bg)] text-foreground">
+    <main className="flex h-[100svh] flex-col overflow-hidden bg-[var(--admin-sidebar-bg)] text-foreground">
       <header className="flex h-16 shrink-0 items-center justify-between backdrop-blur px-4 sm:px-12">
         <Link
           href="/admin"

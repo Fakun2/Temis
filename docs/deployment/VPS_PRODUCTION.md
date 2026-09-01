@@ -28,6 +28,23 @@ app.bogaap.example
 
 Use the real subdomain in every `server_name` and certificate path.
 
+Production values that must be reviewed before the first real login:
+
+- `FRONTEND_PUBLIC_URL`, `API_PUBLIC_URL` and `API_CORS_ALLOWED_ORIGINS` must use
+  the final HTTPS domain.
+- `JWT_ACCESS_SECRET`, `JWT_REFRESH_SECRET`, `POSTGRES_PASSWORD`,
+  `RABBITMQ_PASSWORD`, `STORAGE_ACCESS_KEY_ID` and `STORAGE_SECRET_ACCESS_KEY`
+  must be strong private values.
+- For Google login, set `GOOGLE_AUTH_ENABLED=true` and use the same OAuth client
+  id in `GOOGLE_AUTH_CLIENT_ID` and `NEXT_PUBLIC_GOOGLE_CLIENT_ID`. The Google
+  OAuth client must allow the final frontend origin, for example
+  `https://app.bogaap.example`.
+- For real AI responses, set `AI_PROVIDER=openai-compatible`,
+  `AI_OPENAI_API_KEY` or `OPENAI_API_KEY`, and the selected model variables.
+- For SAE Tucuman imports, set `SAE_TUCUMAN_LOGIN_URL`,
+  `SAE_TUCUMAN_PROCEEDINGS_URL`, `SAE_TUCUMAN_ORIGIN` and optionally
+  `SAE_TUCUMAN_USER_AGENT`.
+
 ## 3. Issue TLS Certificates
 
 Before starting Nginx, generate the first Let's Encrypt certificate with Certbot:

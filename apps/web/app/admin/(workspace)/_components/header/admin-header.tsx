@@ -22,8 +22,8 @@ export function AdminHeader({
   return (
     <header
       className={cn(
-        "flex h-[48px] items-center justify-between px-6 transition-shadow md:px-10",
-        scrolled && "shadow-sm"
+        "flex h-[54px] shrink-0 items-center justify-between border-b border-transparent px-4 transition-colors md:px-7",
+        scrolled && "border-border/45"
       )}
     >
       <div className="flex min-w-0 items-center gap-2">

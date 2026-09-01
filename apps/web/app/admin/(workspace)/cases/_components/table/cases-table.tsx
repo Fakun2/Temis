@@ -265,9 +265,11 @@ function renderCaseTableCell(column: CasesTableColumn, item: CaseDto) {
       </span>
     ),
     court: <NullableText value={item.court} />,
-    forum: <NullableText value={item.forum.name} />,
-    judicialCenter: <NullableText value={item.judicialCenter?.name ?? item.judicialCenterText} />,
-    province: <NullableText value={item.province.name} />,
+    forum: <NullableText value={item.forum?.name ?? item.jurisdictionText} />,
+    judicialCenter: (
+      <NullableText value={item.judicialCenter?.name ?? item.judicialCenterText ?? item.unitText} />
+    ),
+    province: <NullableText value={item.province?.name ?? item.provinceText} />,
     status: <span className="text-sm text-foreground">{caseStatusLabels[item.status]}</span>
   };
 

@@ -53,11 +53,14 @@ export type CaseDto = {
   caption: string;
   subject: string | null;
   description: string | null;
-  province: ProvinceDto;
-  forum: ForumDto;
+  province: ProvinceDto | null;
+  forum: ForumDto | null;
   judicialCenter: JudicialCenterDto | null;
   judicialCenterForumId: string | null;
   judicialCenterText: string | null;
+  provinceText: string | null;
+  jurisdictionText: string | null;
+  unitText: string | null;
   court: string | null;
   instance: CaseInstance;
   status: CaseStatus;

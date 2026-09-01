@@ -1,6 +1,7 @@
 import {
   BadRequestException,
   ConflictException,
+  ForbiddenException,
   Injectable,
   NotFoundException
 } from "@nestjs/common";
@@ -9,7 +10,52 @@ import { AuthService } from "../auth/auth.service";
 import { JwtPayload } from "../auth/auth.types";
 import { RBAC_PERMISSIONS, RBAC_ROLES } from "../rbac/rbac.constants";
 import { RbacService } from "../rbac/rbac.service";
-import { StartOnboardingDto } from "./onboarding.schemas";
+import {
+  OnboardingChecklistStepId,
+  StartOnboardingDto,
+  UpdateOnboardingChecklistStepDto
+} from "./onboarding.schemas";
+
+type OnboardingChecklistDefinition = {
+  actionLabel: string;
+  description: string;
+  id: OnboardingChecklistStepId;
+  permissionMode?: "all" | "any";
+  permissions: string[];
+  title: string;
+};
+
+const onboardingChecklistSteps: OnboardingChecklistDefinition[] = [
+  {
+    actionLabel: "Importar expedientes",
+    description: "Trae tus expedientes desde SAE Tucuman u otro sistema judicial disponible.",
+    id: "import_cases",
+    permissionMode: "any",
+    permissions: ["integrations:sae_import"],
+    title: "Importar expedientes"
+  },
+  {
+    actionLabel: "Configurar caja",
+    description: "Activa monedas, categorias financieras y un saldo inicial opcional.",
+    id: "configure_finance",
+    permissions: ["finance:update", "categories:create", "finance:create"],
+    title: "Configurar caja"
+  },
+  {
+    actionLabel: "Configurar notificaciones",
+    description: "Define recordatorios in-app, browser local, email y anticipacion.",
+    id: "configure_notifications",
+    permissions: [],
+    title: "Configurar notificaciones"
+  },
+  {
+    actionLabel: "Ver calendario",
+    description: "Prepara la futura conexion con Google Calendar o salta este paso.",
+    id: "connect_calendar",
+    permissions: [],
+    title: "Conectar calendario"
+  }
+];
 
 @Injectable()
 export class OnboardingService {
@@ -43,6 +89,8 @@ export class OnboardingService {
       }
     }
 
+    await this.ensureRbacCatalog();
+
     const result = await this.prisma.$transaction(async (tx) => {
       await tx.currency.upsert({
         where: { code: input.tenant.defaultCurrency },
@@ -58,60 +106,6 @@ export class OnboardingService {
           active: true
         }
       });
-
-      for (const permission of RBAC_PERMISSIONS) {
-        await tx.permission.upsert({
-          where: { code: permission.code },
-          update: {
-            resource: permission.resource,
-            action: permission.action
-          },
-          create: {
-            code: permission.code,
-            resource: permission.resource,
-            action: permission.action
-          }
-        });
-      }
-
-      for (const role of RBAC_ROLES) {
-        const savedRole = await tx.role.upsert({
-          where: { code: role.code },
-          update: {
-            description: role.description,
-            hierarchyLevel: role.hierarchyLevel,
-            name: role.name,
-            isSystem: true
-          },
-          create: {
-            code: role.code,
-            description: role.description,
-            hierarchyLevel: role.hierarchyLevel,
-            name: role.name,
-            isSystem: true
-          }
-        });
-
-        for (const permissionCode of role.permissions) {
-          const savedPermission = await tx.permission.findUniqueOrThrow({
-            where: { code: permissionCode }
-          });
-
-          await tx.rolePermission.upsert({
-            where: {
-              roleId_permissionId: {
-                roleId: savedRole.id,
-                permissionId: savedPermission.id
-              }
-            },
-            update: {},
-            create: {
-              roleId: savedRole.id,
-              permissionId: savedPermission.id
-            }
-          });
-        }
-      }
 
       const ownerRole = await tx.role.findUniqueOrThrow({
         where: { code: "owner" }
@@ -280,6 +274,171 @@ export class OnboardingService {
     };
   }
 
+  async checklist(tenantId: string, user: JwtPayload) {
+    const membership = await this.findActiveMembershipOrThrow(tenantId, user.sub);
+    const visibleSteps = onboardingChecklistSteps.filter((step) =>
+      hasPermissions(user, tenantId, step.permissions, step.permissionMode ?? "all")
+    );
+
+    if (visibleSteps.length === 0) {
+      return {
+        completedCount: 0,
+        hidden: true,
+        progress: 100,
+        steps: [],
+        totalCount: 0
+      };
+    }
+
+    const savedSteps = await this.prisma.tenantOnboardingChecklistItem.findMany({
+      where: {
+        step: { in: visibleSteps.map((step) => step.id) },
+        tenantId,
+        tenantMembershipId: membership.id
+      }
+    });
+    const statusByStep = new Map(savedSteps.map((step) => [step.step, step.status]));
+    const steps = visibleSteps.map((step) => ({
+      actionLabel: step.actionLabel,
+      description: step.description,
+      enabled: true,
+      id: step.id,
+      requiredPermission: step.permissions[0] ?? null,
+      status: statusByStep.get(step.id) ?? "pending",
+      title: step.title
+    }));
+    const completedCount = steps.filter((step) => step.status !== "pending").length;
+
+    return {
+      completedCount,
+      hidden: completedCount === steps.length,
+      progress: Math.round((completedCount / steps.length) * 100),
+      steps,
+      totalCount: steps.length
+    };
+  }
+
+  async updateChecklistStep(
+    tenantId: string,
+    user: JwtPayload,
+    stepId: OnboardingChecklistStepId,
+    input: UpdateOnboardingChecklistStepDto
+  ) {
+    const definition = onboardingChecklistSteps.find((step) => step.id === stepId);
+
+    if (
+      !definition ||
+      !hasPermissions(user, tenantId, definition.permissions, definition.permissionMode ?? "all")
+    ) {
+      throw new ForbiddenException("No tenes permisos para actualizar este paso.");
+    }
+
+    const membership = await this.findActiveMembershipOrThrow(tenantId, user.sub);
+    const now = new Date();
+
+    await this.prisma.tenantOnboardingChecklistItem.upsert({
+      where: {
+        tenantId_tenantMembershipId_step: {
+          step: stepId,
+          tenantId,
+          tenantMembershipId: membership.id
+        }
+      },
+      create: {
+        completedAt: input.status === "completed" ? now : null,
+        skippedAt: input.status === "skipped" ? now : null,
+        status: input.status,
+        step: stepId,
+        tenantId,
+        tenantMembershipId: membership.id
+      },
+      update: {
+        completedAt: input.status === "completed" ? now : null,
+        skippedAt: input.status === "skipped" ? now : null,
+        status: input.status
+      }
+    });
+
+    return this.checklist(tenantId, user);
+  }
+
+  private async ensureRbacCatalog() {
+    await Promise.all(
+      RBAC_PERMISSIONS.map((permission) =>
+        this.prisma.permission.upsert({
+          where: { code: permission.code },
+          update: {
+            resource: permission.resource,
+            action: permission.action
+          },
+          create: {
+            code: permission.code,
+            resource: permission.resource,
+            action: permission.action
+          }
+        })
+      )
+    );
+
+    const permissions = await this.prisma.permission.findMany({
+      where: {
+        code: { in: RBAC_PERMISSIONS.map((permission) => permission.code) }
+      },
+      select: {
+        code: true,
+        id: true
+      }
+    });
+    const permissionIdsByCode = new Map(
+      permissions.map((permission) => [permission.code, permission.id])
+    );
+
+    await Promise.all(
+      RBAC_ROLES.map(async (role) => {
+        const savedRole = await this.prisma.role.upsert({
+          where: { code: role.code },
+          update: {
+            description: role.description,
+            hierarchyLevel: role.hierarchyLevel,
+            name: role.name,
+            isSystem: true
+          },
+          create: {
+            code: role.code,
+            description: role.description,
+            hierarchyLevel: role.hierarchyLevel,
+            name: role.name,
+            isSystem: true
+          }
+        });
+
+        await Promise.all(
+          role.permissions.map((permissionCode) => {
+            const permissionId = permissionIdsByCode.get(permissionCode);
+
+            if (!permissionId) {
+              throw new BadRequestException(`Permiso RBAC inexistente: ${permissionCode}.`);
+            }
+
+            return this.prisma.rolePermission.upsert({
+              where: {
+                roleId_permissionId: {
+                  roleId: savedRole.id,
+                  permissionId
+                }
+              },
+              update: {},
+              create: {
+                roleId: savedRole.id,
+                permissionId
+              }
+            });
+          })
+        );
+      })
+    );
+  }
+
   private async getUserSessionVersion(userId: string) {
     const [user] = await this.prisma.$queryRaw<Array<{ sessionVersion: number }>>`
       SELECT "session_version" AS "sessionVersion"
@@ -289,6 +448,23 @@ export class OnboardingService {
     `;
 
     return user?.sessionVersion ?? 0;
+  }
+
+  private async findActiveMembershipOrThrow(tenantId: string, userId: string) {
+    const membership = await this.prisma.tenantMembership.findFirst({
+      where: {
+        status: "active",
+        tenantId,
+        userId
+      },
+      select: { id: true }
+    });
+
+    if (!membership) {
+      throw new NotFoundException("No se encontro una membresia activa para este estudio.");
+    }
+
+    return membership;
   }
 }
 
@@ -310,4 +486,24 @@ function getCurrencySymbol(code: string) {
   };
 
   return symbols[code] ?? code;
+}
+
+function hasPermissions(
+  user: JwtPayload,
+  tenantId: string,
+  permissions: string[],
+  mode: "all" | "any"
+) {
+  if (permissions.length === 0) {
+    return true;
+  }
+
+  const access = user.tenantAccess.find((tenantAccess) => tenantAccess.tenantId === tenantId);
+  if (!access) {
+    return false;
+  }
+
+  return mode === "any"
+    ? permissions.some((permission) => access.permissions.includes(permission))
+    : permissions.every((permission) => access.permissions.includes(permission));
 }

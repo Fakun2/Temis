@@ -1,4 +1,5 @@
 import { ArrowRight, Eye, EyeOff, Loader2 } from "lucide-react";
+import { GoogleSignInButton } from "@/components/auth/google-sign-in-button";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { createAccountCopy, createAccountFieldMap } from "../../_constants/create-account.constants";
@@ -70,6 +71,13 @@ export function CreateAccountForm({ state }: CreateAccountFormProps) {
           {!state.submitting ? <ArrowRight className="h-4 w-4" /> : null}
         </Button>
       </div>
+
+      <GoogleSignInButton
+        disabled={state.submitting}
+        mode="signup"
+        onCredential={state.submitGoogle}
+        onMissingClientId={state.showGoogleSetupError}
+      />
     </form>
   );
 }

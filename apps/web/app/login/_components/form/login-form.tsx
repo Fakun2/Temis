@@ -5,6 +5,7 @@ import { ArrowRight, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
+import { GoogleSignInButton } from "@/components/auth/google-sign-in-button";
 import { loginCopy } from "../../_constants/login.constants";
 import { useLoginForm } from "../../_hooks/use-login-form";
 import { LoginField } from "./login-field";
@@ -58,6 +59,13 @@ export function LoginForm({ firstLogin, initialEmail }: LoginFormProps) {
               {loginCopy.forgot}
             </Link>
           </div>
+
+          <GoogleSignInButton
+            disabled={state.submitting}
+            mode="login"
+            onCredential={state.submitGoogle}
+            onMissingClientId={state.showGoogleSetupError}
+          />
 
           {state.error ? (
             <div className="rounded-2xl border border-border bg-secondary px-4 py-3 text-sm text-foreground">

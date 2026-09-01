@@ -1,8 +1,10 @@
 "use client";
 
-import { FormEvent, useState } from "react";
+import { FormEvent, useCallback, useState } from "react";
 import { useRouter } from "next/navigation";
 import { authControllerCreateAccount } from "@bogaap/api-client";
+import { loginWithGoogleCredential } from "@/lib/auth/google-auth";
+import { getAuthenticatedRedirectPath } from "@/lib/auth/redirect";
 import { createAccountFormSchema, type CreateAccountFormValues } from "@/lib/validation/auth";
 import {
   createAccountInitialForm,
@@ -31,6 +33,7 @@ export function useCreateAccountForm(): UseCreateAccountFormResult {
   const [fieldErrors, setFieldErrors] = useState<CreateAccountFieldErrors>({});
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
+  const [googleSubmitting, setGoogleSubmitting] = useState(false);
   const transition = useCreateAccountTransition();
   const [showPassword, setShowPassword] = useState(false);
 
@@ -90,15 +93,55 @@ export function useCreateAccountForm(): UseCreateAccountFormResult {
     }
   }
 
+  function showGoogleSetupError() {
+    setError("Falta configurar NEXT_PUBLIC_GOOGLE_CLIENT_ID para probar Google.");
+  }
+
+  const submitGoogle = useCallback(
+    async (credential: string) => {
+      setGoogleSubmitting(true);
+      setSubmitting(true);
+      setError(null);
+      setFieldErrors({});
+      transition.start();
+      let shouldHideTransition = true;
+      const transitionStartedAt = Date.now();
+
+      try {
+        const session = await loginWithGoogleCredential(credential);
+        const elapsed = Date.now() - transitionStartedAt;
+        await wait(Math.max(createAccountLoadingTotalMs - elapsed, 0));
+        transition.showSuccess();
+        await wait(createAccountLoadingSuccessMs);
+        transition.exit();
+        await wait(createAccountLoadingExitMs);
+        shouldHideTransition = false;
+        router.push(getAuthenticatedRedirectPath(session, null));
+      } catch (caught) {
+        setError(caught instanceof Error ? caught.message : "No se pudo crear la cuenta con Google.");
+      } finally {
+        if (shouldHideTransition) {
+          transition.reset();
+          setSubmitting(false);
+          setGoogleSubmitting(false);
+        }
+      }
+    },
+    [router, transition]
+  );
+
   return {
     form,
     fieldErrors,
     error,
     submitting,
+    googleSubmitting,
     transitionExiting: transition.exiting,
     transitionSuccess: transition.success,
     showPassword,
+    showGoogleSetupError,
     submit,
+    submitGoogle,
     togglePasswordVisibility,
     updateField
   };

@@ -84,7 +84,7 @@ export class UpdateCurrencyDto extends createZodDto(updateCurrencySchema) {
 }
 
 export class AddTenantCurrenciesDto extends createZodDto(addTenantCurrenciesSchema) {
-  @ApiProperty({ example: ["USD", "BRL"], isArray: true, minItems: 1, maxItems: 25 })
+  @ApiProperty({ example: ["USD", "BRL"], isArray: true, minItems: 1, maxItems: 25, type: String })
   currencyCodes!: string[];
 }
 

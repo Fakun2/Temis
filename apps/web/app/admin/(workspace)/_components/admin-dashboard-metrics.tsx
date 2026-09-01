@@ -26,8 +26,7 @@ export function AdminDashboardMetrics({
             value: "--"
           },
           {
-            badge: "Soon",
-            detail: "Modulo de clientes pendiente",
+            detail: "Listado disponible en Clientes",
             icon: Users,
             label: "Clientes",
             value: "--"
@@ -67,8 +66,7 @@ export function AdminDashboardMetrics({
           value: metrics.activeCasesCount
         },
         {
-          badge: "Soon",
-          detail: "Modulo de clientes pendiente",
+          detail: "Listado disponible en Clientes",
           icon: Users,
           label: "Clientes",
           value: "--"

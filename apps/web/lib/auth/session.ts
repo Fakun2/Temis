@@ -24,6 +24,14 @@ export type SessionJwtPayload = {
   tenantAccess: SessionTenantAccess[];
 };
 
+export type SessionUserPatch = {
+  avatarUrl?: string | null;
+  email?: string;
+  fullName?: string;
+  phone?: string | null;
+  status?: string;
+};
+
 export function saveSession(session: BogaapSession) {
   const tenantAccess =
     session.tenantAccess ??
@@ -34,6 +42,21 @@ export function saveSession(session: BogaapSession) {
     user: session.user
   };
   removeStoredSession();
+  notifySessionListeners();
+}
+
+export function updateSessionUser(user: SessionUserPatch) {
+  if (!currentSession) {
+    return;
+  }
+
+  currentSession = {
+    ...currentSession,
+    user: {
+      ...currentSession.user,
+      ...user
+    } as BogaapSession["user"]
+  };
   notifySessionListeners();
 }
 
@@ -84,7 +107,9 @@ export function getSessionTenantAccess(session: BogaapSession | null) {
     return session.tenantAccess;
   }
 
-  return session.tokens?.accessToken ? readAccessTokenPayload(session.tokens.accessToken).tenantAccess : [];
+  return session.tokens?.accessToken
+    ? readAccessTokenPayload(session.tokens.accessToken).tenantAccess
+    : [];
 }
 
 export function sessionHasPermission(session: BogaapSession | null, permission: string) {

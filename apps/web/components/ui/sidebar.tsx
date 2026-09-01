@@ -164,7 +164,7 @@ function SidebarMenuButton({
       className={cn(
         "group/sidebar-menu-button relative flex w-full min-h-11 items-center rounded-md text-sm transition-colors duration-150 ease-in-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
         "data-[active=true]:bg-[var(--admin-sidebar-active)] data-[active=true]:font-medium data-[active=true]:text-[var(--admin-sidebar-active-foreground)] data-[active=true]:shadow-sm",
-        "data-[active=false]:font-normal data-[active=false]:text-muted-foreground data-[active=false]:hover:bg-[var(--admin-sidebar-hover)] data-[active=false]:hover:text-foreground",
+        "data-[active=false]:font-normal data-[active=false]:text-[var(--admin-sidebar-item-foreground)] data-[active=false]:hover:bg-[var(--admin-sidebar-hover)] data-[active=false]:hover:text-foreground",
         className
       )}
       {...props}

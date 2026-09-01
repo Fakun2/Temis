@@ -46,9 +46,11 @@ export function CaseDetailSummary({ caseItem }: { caseItem: CaseDetailDto }) {
                 {currentCase.caseNumber}
               </p>
               <p className="truncate text-sm font-medium text-muted-foreground sm:text-base">
-                {currentCase.province.name}
+                {currentCase.province?.name ?? currentCase.provinceText ?? "Sin provincia"}
               </p>
-              <p className="truncate text-sm text-muted-foreground">{currentCase.forum.name}</p>
+              <p className="truncate text-sm text-muted-foreground">
+                {currentCase.forum?.name ?? currentCase.jurisdictionText ?? "Sin fuero"}
+              </p>
             </div>
           </div>
         </div>
