@@ -1,7 +1,7 @@
 export const createAccountLoadingCopy = {
   animatedWord: "espere",
   footerItems: ["Validando datos...", "Creando acceso seguro...", "Preparando inicio de sesiÃ³n..."],
-  subtitle: "Estamos preparando tu acceso seguro a BOGAP.",
+  subtitle: "Estamos preparando tu acceso seguro a TEMIS.",
   successTitle: "Cuenta creada con exito!",
   titlePrefix: "Creando cuenta, "
 } as const;

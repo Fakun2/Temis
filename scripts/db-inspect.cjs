@@ -342,7 +342,7 @@ async function explain(name, sql, params) {
 }
 
 function printHumanReport(report) {
-  console.log("BogApp DB Inspect");
+  console.log("Temis DB Inspect");
   console.log(`Generated at: ${report.generatedAt}`);
   console.log(`ANALYZE executed first: ${report.analyzeExecuted ? "yes" : "no"}`);
   console.log("DATABASE_URL printed: no");

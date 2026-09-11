@@ -1,4 +1,4 @@
-import type { AiAuthorizedContext, AiModel, AiToolDefinition } from "@bogaap/ai-contracts";
+import type { AiAuthorizedContext, AiModel, AiToolDefinition } from "@temis/ai-contracts";
 
 export type BuildSystemPromptInput = {
   context: AiAuthorizedContext;
@@ -6,7 +6,7 @@ export type BuildSystemPromptInput = {
   tool: AiToolDefinition;
 };
 
-export function buildBogappSystemPrompt(input: BuildSystemPromptInput) {
+export function buildTemisSystemPrompt(input: BuildSystemPromptInput) {
   const contextSummary = [
     input.context.case
       ? `Expediente: ${input.context.case.caseNumber} - ${input.context.case.caption}`
@@ -21,7 +21,7 @@ export function buildBogappSystemPrompt(input: BuildSystemPromptInput) {
   ].filter(Boolean);
 
   return [
-    "Sos el asistente IA de BogApp para estudios juridicos.",
+    "Sos el asistente IA de Temis para estudios juridicos.",
     "Trabajas en modo solo lectura: no podes crear, actualizar ni borrar datos.",
     "Responde solo con informacion autorizada por el backend para el tenant activo.",
     "Si falta contexto, deci que no tenes informacion suficiente.",

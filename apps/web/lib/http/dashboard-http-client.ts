@@ -82,10 +82,10 @@ function toApiError(data: unknown, status: number) {
       ? data.message[0]
       : data.message;
 
-    return new ApiError(message || `BOGAP API request failed: ${status}`, status, data);
+    return new ApiError(message || `TEMIS API request failed: ${status}`, status, data);
   }
 
-  return new ApiError(`BOGAP API request failed: ${status}`, status, data);
+  return new ApiError(`TEMIS API request failed: ${status}`, status, data);
 }
 
 function isErrorBody(value: unknown): value is { message?: string | string[] } {

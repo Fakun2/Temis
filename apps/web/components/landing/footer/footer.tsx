@@ -17,7 +17,7 @@ export function Footer() {
             <span className="flex h-8 w-8 items-center justify-center rounded-full bg-primary text-primary-foreground">
               <Scale className="h-4 w-4" />
             </span>
-            Justinia
+            Temis
           </Link>
           <p className="mt-4 max-w-sm text-sm font-light leading-6 text-muted-foreground">
             Plataforma juridica para estudios que necesitan expedientes, equipo y vencimientos bajo
@@ -42,7 +42,7 @@ export function Footer() {
       </LandingContainer>
 
       <LandingContainer className="mt-12 pb-2 flex flex-col gap-3 pt-6 text-sm text-muted-foreground md:flex-row md:items-center md:justify-between">
-        <p className="font-thin">(c) {new Date().getFullYear()} Justinia. Todos los derechos reservados.</p>
+        <p className="font-thin">(c) {new Date().getFullYear()} Temis. Todos los derechos reservados.</p>
         <p className="font-thin">Construido en Argentina - Tucuman</p>
       </LandingContainer>
     </footer>

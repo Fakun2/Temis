@@ -71,7 +71,7 @@ export function SecuritySection({ hasPassword }: SecuritySectionProps) {
           <DialogHeader>
             <DialogTitle>{title}</DialogTitle>
             <DialogDescription>
-              Al {hasPassword ? "cambiar" : "crear"} la contraseña se cerrara tu sesion de Justinia
+              Al {hasPassword ? "cambiar" : "crear"} la contraseña se cerrara tu sesion de Temis
               y tendras que volver a ingresar.
             </DialogDescription>
           </DialogHeader>

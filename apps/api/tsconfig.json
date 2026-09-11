@@ -11,8 +11,8 @@
     "outDir": "dist",
     "rootDir": "src",
     "paths": {
-      "@bogaap/ai-contracts": ["packages/ai-contracts/dist/index"],
-      "@bogaap/ai-core": ["packages/ai-core/dist/index"]
+      "@temis/ai-contracts": ["packages/ai-contracts/dist/index"],
+      "@temis/ai-core": ["packages/ai-core/dist/index"]
     }
   },
   "include": ["src/**/*.ts"]

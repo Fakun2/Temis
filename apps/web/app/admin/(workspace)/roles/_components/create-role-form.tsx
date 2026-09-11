@@ -2,7 +2,7 @@
 
 import { useEffect, useState, type FormEvent, type ReactNode } from "react";
 import { Loader2, Plus, Save } from "lucide-react";
-import type { PermissionDto, RoleDto } from "@bogaap/api-client";
+import type { PermissionDto, RoleDto } from "@temis/api-client";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";

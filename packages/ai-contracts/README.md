@@ -1,4 +1,4 @@
-# BogApp AI Contracts
+# Temis AI Contracts
 
 Contratos compartidos entre `apps/api`, `apps/ai-service` y, si hiciera falta, `apps/web`.
 

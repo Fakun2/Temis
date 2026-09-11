@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { Archive, Eye, MoreHorizontal, PencilLine } from "lucide-react";
-import type { ClientSummaryDto } from "@bogaap/api-client";
+import type { ClientSummaryDto } from "@temis/api-client";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,

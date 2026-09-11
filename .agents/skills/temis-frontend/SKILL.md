@@ -1,16 +1,16 @@
 ---
-name: bogapp-frontend
+name: temis-frontend
 description: >-
-  Implement and review BogApp frontend web work for a professional legaltech
+  Implement and review Temis frontend web work for a professional legaltech
   SaaS using Next.js App Router, Tailwind CSS, shadcn/ui, Zod validation,
   legal-domain UX, API contracts, onboarding, clients, cases, documents, tasks,
   finance views, and tenant-aware workflows. Use when building or reviewing UI,
   forms, screens, state, API integration, responsive behavior, and frontend QA.
 ---
 
-# BogApp Frontend
+# Temis Frontend
 
-Use this skill for BogApp web UI implementation and review.
+Use this skill for Temis web UI implementation and review.
 
 ## Sources of truth
 
@@ -21,7 +21,7 @@ Use this skill for BogApp web UI implementation and review.
 
 ## UX principles
 
-- Present BogApp as a professional legaltech tool for small law firms scaling into SaaS.
+- Present Temis as a professional legaltech tool for small law firms scaling into SaaS.
 - Use legal-domain language: estudio, cliente, expediente, parte contraria, tarea, vencimiento, caja.
 - Favor dense, clear operational screens over marketing-style layouts.
 - Every data screen needs loading, error, empty, and success states where relevant.

@@ -1,10 +1,10 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { clearSession, saveSession, type BogaapSession } from "@/lib/auth/session";
+import { clearSession, saveSession, type TemisSession } from "@/lib/auth/session";
 
 export function useIaSession() {
-  const [session, setSession] = useState<BogaapSession | null>(null);
+  const [session, setSession] = useState<TemisSession | null>(null);
   const [sessionReady, setSessionReady] = useState(false);
 
   useEffect(() => {
@@ -22,7 +22,7 @@ export function useIaSession() {
           return;
         }
 
-        const serverSession = (await response.json()) as BogaapSession;
+        const serverSession = (await response.json()) as TemisSession;
         saveSession(serverSession);
         if (!cancelled) {
           setSession(serverSession);

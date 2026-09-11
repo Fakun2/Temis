@@ -6,10 +6,10 @@ import { WorkerModule } from "./worker.module";
 async function bootstrap() {
   const app = await NestFactory.createApplicationContext(WorkerModule);
   const logger = new Logger("Worker");
-  logger.log("BogApp async worker started.");
+  logger.log("Temis async worker started.");
 
   const shutdown = async () => {
-    logger.log("Stopping BogApp async worker.");
+    logger.log("Stopping Temis async worker.");
     await app.close();
     process.exit(0);
   };

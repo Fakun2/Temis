@@ -51,12 +51,12 @@ import {
   type AiToolOption
 } from "../_api/ai.api";
 
-const defaultModel: AiModel = "justinia-legal";
+const defaultModel: AiModel = "temis-legal";
 const defaultTool: AiTool = "general";
 
 const fallbackModel: AiModelOption = {
   id: defaultModel,
-  name: "Justinia Legal",
+  name: "Temis Legal",
   provider: "openai"
 };
 const fallbackTool: AiToolOption = {
@@ -71,7 +71,7 @@ const initialMessages: CaseAiMessage[] = [
   {
     id: "assistant-global-welcome",
     content:
-      "Soy el asistente IA de Justinia. Puedo ayudarte a orientar consultas generales.\n\nPara preguntas con datos de un expediente, abri el expediente correspondiente y usa el panel contextual.",
+      "Soy el asistente IA de Temis. Puedo ayudarte a orientar consultas generales.\n\nPara preguntas con datos de un expediente, abri el expediente correspondiente y usa el panel contextual.",
     createdAtLabel: "Preview",
     role: "assistant"
   }

@@ -1,6 +1,6 @@
-# BogApp - Setup de GitHub Project
+# Temis - Setup de GitHub Project
 
-Guia para crear el Project real de BogApp en GitHub y usarlo como tablero central de ejecucion. La documentacion vive en este repo y el Project debe consumir las issues reales.
+Guia para crear el Project real de Temis en GitHub y usarlo como tablero central de ejecucion. La documentacion vive en este repo y el Project debe consumir las issues reales.
 
 ## Objetivo del Project
 
@@ -14,7 +14,7 @@ Tener una vista unica para:
 
 ## Nombre sugerido
 
-`BogApp - Product Delivery`
+`Temis - Product Delivery`
 
 ## Tipo de Project
 
@@ -27,8 +27,8 @@ Ruta sugerida:
 3. Abrir **Projects**.
 4. Crear **New project**.
 5. Elegir **Table**.
-6. Nombre: `BogApp - Product Delivery`.
-7. Agregar el repositorio `Fakun2/BogApp` como fuente.
+6. Nombre: `Temis - Product Delivery`.
+7. Agregar el repositorio `Fakun2/Temis` como fuente.
 
 ## Campos obligatorios
 

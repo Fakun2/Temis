@@ -1,6 +1,6 @@
-# BOGAP TODO
+# TEMIS TODO
 
-Inventario historico basado en `docs/diagrams/bogaap-er.puml`.
+Inventario historico basado en `docs/diagrams/temis-er.puml`.
 
 La fuente de verdad actual para planificacion esta en:
 

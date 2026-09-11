@@ -1,20 +1,20 @@
 import {
   getSessionTenantAccess,
-  type BogaapSession,
+  type TemisSession,
   type SessionTenantAccess
 } from "./session";
 
 export type PermissionMode = "all" | "any";
 
-export function getActiveTenantAccess(session: BogaapSession | null): SessionTenantAccess | null {
+export function getActiveTenantAccess(session: TemisSession | null): SessionTenantAccess | null {
   return getSessionTenantAccess(session)[0] ?? null;
 }
 
-export function hasPermission(session: BogaapSession | null, permission: string) {
+export function hasPermission(session: TemisSession | null, permission: string) {
   return hasAllPermissions(session, [permission]);
 }
 
-export function hasAnyPermission(session: BogaapSession | null, permissions: string[]) {
+export function hasAnyPermission(session: TemisSession | null, permissions: string[]) {
   if (permissions.length === 0) {
     return true;
   }
@@ -23,7 +23,7 @@ export function hasAnyPermission(session: BogaapSession | null, permissions: str
   return Boolean(access && permissions.some((permission) => access.permissions.includes(permission)));
 }
 
-export function hasAllPermissions(session: BogaapSession | null, permissions: string[]) {
+export function hasAllPermissions(session: TemisSession | null, permissions: string[]) {
   if (permissions.length === 0) {
     return true;
   }
@@ -33,7 +33,7 @@ export function hasAllPermissions(session: BogaapSession | null, permissions: st
 }
 
 export function hasPermissions(
-  session: BogaapSession | null,
+  session: TemisSession | null,
   permissions: string[] | undefined,
   mode: PermissionMode = "all"
 ) {

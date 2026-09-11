@@ -92,7 +92,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.api
-    image: ${API_IMAGE:-bogaap-api:prod}
+    image: ${API_IMAGE:-temis-api:prod}
     container_name: ${CONTAINER_PREFIX:-bogaap-prod}-api
     restart: unless-stopped
     mem_limit: ${API_MEMORY_LIMIT:-768m}
@@ -136,6 +136,7 @@ services:
       AI_OPENAI_PROVIDER_NAME: ${AI_OPENAI_PROVIDER_NAME:-openai}
       AI_OPENAI_MODEL: ${AI_OPENAI_MODEL:-}
       AI_DEFAULT_MODEL: ${AI_DEFAULT_MODEL:-}
+      AI_MODEL_TEMIS_LEGAL: ${AI_MODEL_TEMIS_LEGAL:-}
       AI_MODEL_JUSTINIA_LEGAL: ${AI_MODEL_JUSTINIA_LEGAL:-}
       AI_MODEL_BOGAPP_LEGAL: ${AI_MODEL_BOGAPP_LEGAL:-}
       AI_MODEL_REASONING: ${AI_MODEL_REASONING:-}
@@ -171,7 +172,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.worker
-    image: ${WORKER_IMAGE:-bogaap-worker:prod}
+    image: ${WORKER_IMAGE:-temis-worker:prod}
     container_name: ${CONTAINER_PREFIX:-bogaap-prod}-worker
     restart: unless-stopped
     mem_limit: ${WORKER_MEMORY_LIMIT:-384m}
@@ -223,7 +224,7 @@ services:
         NEXT_PUBLIC_API_PROXY_ORIGIN: ${NEXT_PUBLIC_API_PROXY_ORIGIN:-http://api:3001}
         NEXT_PUBLIC_APP_URL: ${FRONTEND_PUBLIC_URL:?FRONTEND_PUBLIC_URL is required}
         NEXT_PUBLIC_GOOGLE_CLIENT_ID: ${NEXT_PUBLIC_GOOGLE_CLIENT_ID:-}
-    image: ${WEB_IMAGE:-bogaap-web:prod}
+    image: ${WEB_IMAGE:-temis-web:prod}
     container_name: ${CONTAINER_PREFIX:-bogaap-prod}-web
     restart: unless-stopped
     mem_limit: ${WEB_MEMORY_LIMIT:-512m}

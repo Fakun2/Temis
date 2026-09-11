@@ -1,2 +1,2 @@
-export { aiModels, aiTools, aiToolsById } from "@bogaap/ai-contracts";
-export type { AiToolDefinition } from "@bogaap/ai-contracts";
+export { aiModels, aiTools, aiToolsById } from "@temis/ai-contracts";
+export type { AiToolDefinition } from "@temis/ai-contracts";

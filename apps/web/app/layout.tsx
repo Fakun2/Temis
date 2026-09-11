@@ -5,7 +5,9 @@ import { ThemeProvider, type ThemeVariant } from "@/lib/theme/theme-provider";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Justinia",
+  title: "Temis",
+  applicationName: "Temis",
+  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || "https://temis.ar"),
   description: "Sistema de gestión integral para estudios jurídicos motorizado por IA"
 };
 

@@ -1,4 +1,4 @@
-# BogApp - Catalogo de issues S1 a S10
+# Temis - Catalogo de issues S1 a S10
 
 Backlog operativo para crear issues reales y cargarlas al Project. El campo `Depends on` define la correlatividad minima.
 

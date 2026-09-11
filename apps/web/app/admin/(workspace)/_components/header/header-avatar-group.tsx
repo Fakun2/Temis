@@ -1,18 +1,18 @@
 "use client";
 
 import { Plus } from "lucide-react";
-import type { BogaapSession } from "@/lib/auth/session";
+import type { TemisSession } from "@/lib/auth/session";
 import { Avatar, AvatarFallback, AvatarGroup, AvatarGroupCount } from "@/components/ui/avatar";
 import { getInitials, getSessionDisplayUser } from "../../_utils/user";
 import { HeaderActionButton } from "./header-action-button";
 
 type HeaderAvatarGroupProps = {
-  session: BogaapSession | null;
+  session: TemisSession | null;
 };
 
 export function HeaderAvatarGroup({ session }: HeaderAvatarGroupProps) {
   const { displayName } = getSessionDisplayUser(session);
-  const collaborators = [{ name: displayName }, { name: "Staff BOGAP" }];
+  const collaborators = [{ name: displayName }, { name: "Staff TEMIS" }];
 
   return (
     <div className="hidden items-center gap-2 md:flex">

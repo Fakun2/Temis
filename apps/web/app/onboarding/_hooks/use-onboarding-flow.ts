@@ -6,7 +6,7 @@ import {
   clearSession,
   hasTenantAccess,
   saveSession,
-  type BogaapSession
+  type TemisSession
 } from "@/lib/auth/session";
 import {
   initialOnboardingState,
@@ -42,7 +42,7 @@ export function useOnboardingFlow() {
   const router = useRouter();
   const [step, setStep] = useState<StepIndex>(0);
   const [form, setForm] = useState<OnboardingFormState>(initialOnboardingState);
-  const [session, setSession] = useState<BogaapSession | null>(null);
+  const [session, setSession] = useState<TemisSession | null>(null);
   const [sessionReady, setSessionReady] = useState(false);
   const [practiceAreasEnabled, setPracticeAreasEnabled] = useState(false);
   const [practiceAreaTemplates, setPracticeAreaTemplates] = useState<PracticeAreaTemplate[]>([]);
@@ -377,6 +377,6 @@ export function useOnboardingFlow() {
       return null;
     }
 
-    return (await response.json()) as BogaapSession;
+    return (await response.json()) as TemisSession;
   }
 }

@@ -1,7 +1,7 @@
 ---
-name: bogapp-testing-qa
+name: temis-testing-qa
 description: >-
-  Plan, implement, and review BogApp testing and QA for a legaltech SaaS,
+  Plan, implement, and review Temis testing and QA for a legaltech SaaS,
   covering acceptance criteria, tenant isolation, RBAC, backend DTO/service
   tests, frontend validation, onboarding flows, API integration, e2e checks,
   regression risk, and PR evidence. Use when designing test strategy, adding
@@ -9,7 +9,7 @@ description: >-
   close a BOG-### issue.
 ---
 
-# BogApp Testing QA
+# Temis Testing QA
 
 Use this skill to convert acceptance criteria into validation evidence.
 

@@ -1,14 +1,14 @@
 ---
-name: bogapp-backend-nestjs
+name: temis-backend-nestjs
 description: >-
-  Implement and review BogApp backend work in NestJS with Prisma/PostgreSQL,
+  Implement and review Temis backend work in NestJS with Prisma/PostgreSQL,
   tenant context, RBAC guards, DTO validation, transactions, migrations,
   OpenAPI-compatible contracts, and legaltech domain modules. Use when changing
   API modules, services, controllers, Prisma models, migrations, auth, tenant
   bootstrap, clients, cases, documents, tasks, finance, or backend tests.
 ---
 
-# BogApp Backend NestJS
+# Temis Backend NestJS
 
 Use this skill for backend implementation and backend code review.
 

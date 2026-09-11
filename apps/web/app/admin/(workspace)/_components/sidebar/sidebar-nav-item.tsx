@@ -52,7 +52,7 @@ export function SidebarNavItem({
   const buttonClassName = cn(
     collapsed ? "min-h-11 justify-center px-2" : "min-h-9 px-3 text-sm",
     "data-[active=false]:text-[var(--admin-sidebar-item-foreground)] data-[active=false]:hover:text-foreground",
-    item.iconAnimation && `justinia-${item.iconAnimation}-trigger`,
+    item.iconAnimation && `temis-${item.iconAnimation}-trigger`,
     isSoon &&
       "cursor-not-allowed text-muted-foreground/55 hover:bg-transparent hover:text-muted-foreground/55"
   );

@@ -25,7 +25,7 @@ import { CaseAiMessageList } from "./case-ai-message-list";
 import { CaseAiState } from "./case-ai-state";
 import type { CaseAiMessage, CaseAiSource, CaseAiStatus } from "./case-ai-types";
 
-const defaultModel: AiModel = "justinia-legal";
+const defaultModel: AiModel = "temis-legal";
 const defaultTool: AiTool = "case_summary";
 const fallbackTool: AiToolOption = {
   description: "Prepara respuestas usando solo datos de lectura del expediente indicado.",

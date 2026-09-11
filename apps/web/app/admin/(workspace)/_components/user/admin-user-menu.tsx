@@ -24,7 +24,7 @@ import {
   DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu";
 import { redirectToLoginForLogout } from "@/lib/auth/logout";
-import type { BogaapSession } from "@/lib/auth/session";
+import type { TemisSession } from "@/lib/auth/session";
 import { useTheme, type ColorMode, type ThemeVariant } from "@/lib/theme/theme-provider";
 import { cn } from "@/lib/utils";
 import { getInitials, getSessionDisplayUser } from "../../_utils/user";
@@ -57,7 +57,7 @@ const appearanceVariants: Array<{
 
 type AdminUserMenuProps = {
   collapsed?: boolean;
-  session: BogaapSession | null;
+  session: TemisSession | null;
   triggerVariant?: "avatar" | "pill";
 };
 

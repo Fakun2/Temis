@@ -9,7 +9,7 @@ export function Navbar() {
         <span className="flex h-8 w-8 items-center justify-center rounded-full bg-primary text-primary-foreground">
           <Scale className="h-4 w-4" />
         </span>
-        Justinia
+        Temis
       </Link>
 
       <div className="hidden items-center gap-8 text-sm text-muted-foreground md:flex">

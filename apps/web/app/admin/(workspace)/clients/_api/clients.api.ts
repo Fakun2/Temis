@@ -10,7 +10,7 @@ import {
   type ClientsControllerListParams,
   type ClientsControllerUpdateBody,
   type ClientsListResponseDto
-} from "@bogaap/api-client";
+} from "@temis/api-client";
 import { dashboardHttpClient } from "@/lib/http";
 
 export const clientKeys = {

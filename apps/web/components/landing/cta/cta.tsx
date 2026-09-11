@@ -14,7 +14,7 @@ export function FinalCTA() {
         </div>
         <h2 className="mt-6 text-4xl font-semibold leading-tight tracking-normal sm:text-6xl">
           Sumate a los primeros estudios que van a probar{" "}
-          <span className="font-serif font-normal italic text-primary">Justinia</span>.
+          <span className="font-serif font-normal italic text-primary">Temis</span>.
         </h2>
         <p className="mx-auto mt-5 max-w-2xl text-base leading-7 text-muted-foreground">
           Estamos abriendo cupos limitados para estudios juridicos que quieran validar expedientes,

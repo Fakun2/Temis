@@ -134,7 +134,7 @@ const TokenHeatmapCell = memo(function TokenHeatmapCell({
       <TooltipTrigger asChild>
         <span
           className={cn(
-            "block size-[13px] rounded-[4px] transition-transform hover:scale-110 motion-safe:animate-[justinia-token-cell-reveal_520ms_cubic-bezier(0.45,0,0.18,1)_both] motion-safe:[animation-delay:var(--token-cell-delay)]",
+            "block size-[13px] rounded-[4px] transition-transform hover:scale-110 motion-safe:animate-[temis-token-cell-reveal_520ms_cubic-bezier(0.45,0,0.18,1)_both] motion-safe:[animation-delay:var(--token-cell-delay)]",
             item.isPainted ? "bg-[#5f8fdc]" : getTokenCellClassName(intensity),
             highlighted &&
               (item.isPainted

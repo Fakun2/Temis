@@ -1,4 +1,4 @@
-import type { StaffListResponseDto, StaffWorkerDto } from "@bogaap/api-client";
+import type { StaffListResponseDto, StaffWorkerDto } from "@temis/api-client";
 
 export type StaffListResponse = StaffListResponseDto;
 

@@ -1,7 +1,7 @@
 ---
-name: bogapp-architecture-guardian
+name: temis-architecture-guardian
 description: >-
-  Guard BogApp architecture decisions for a multi-tenant legaltech SaaS using
+  Guard Temis architecture decisions for a multi-tenant legaltech SaaS using
   NestJS, Prisma, PostgreSQL, Next.js frontend contracts, RBAC, tenant context,
   auditability, and roadmap constraints. Use when reviewing or designing
   architecture, data boundaries, module boundaries, integration strategy,
@@ -9,7 +9,7 @@ description: >-
   long-term SaaS maintainability.
 ---
 
-# BogApp Architecture Guardian
+# Temis Architecture Guardian
 
 Use this skill to evaluate architecture before implementation or during review.
 
@@ -24,7 +24,7 @@ Use this skill to evaluate architecture before implementation or during review.
 
 ## Non-negotiables
 
-- BogApp is multi-tenant from day zero.
+- Temis is multi-tenant from day zero.
 - Operational entities must be tenant-scoped directly or through mandatory tenant-scoped relationships.
 - Backend must derive tenant context from authenticated request context, not from arbitrary client body input.
 - Cross-tenant reads and writes must be impossible by default.

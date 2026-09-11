@@ -1,6 +1,6 @@
 import { HttpException, HttpStatus, Injectable } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
-import { createBogappAiProvider, type BogappAiProvider } from "@bogaap/ai-core";
+import { createTemisAiProvider, type TemisAiProvider } from "@temis/ai-core";
 import type { AiModel } from "../ai.schemas";
 import type { AiProviderRequest, AiProviderResponse } from "../types/ai-provider.types";
 
@@ -9,10 +9,10 @@ const providerCreditMessage =
 
 @Injectable()
 export class AiProviderService {
-  private readonly provider: BogappAiProvider;
+  private readonly provider: TemisAiProvider;
 
   constructor(config: ConfigService) {
-    this.provider = createBogappAiProvider(toProviderConfig(config));
+    this.provider = createTemisAiProvider(toProviderConfig(config));
   }
 
   async generate(request: AiProviderRequest): Promise<AiProviderResponse> {
@@ -24,7 +24,7 @@ export class AiProviderService {
   }
 }
 
-function toProviderConfig(config: ConfigService): Parameters<typeof createBogappAiProvider>[0] {
+function toProviderConfig(config: ConfigService): Parameters<typeof createTemisAiProvider>[0] {
   const strategy = config.get<string>("AI_PROVIDER") ?? "preview";
 
   if (strategy !== "openai-compatible") {
@@ -51,14 +51,15 @@ function toProviderConfig(config: ConfigService): Parameters<typeof createBogapp
 
 function createModelResolver(config: ConfigService) {
   const fallbackModel =
-    config.get<string>("AI_OPENAI_MODEL") ?? config.get<string>("AI_DEFAULT_MODEL");
+    config.get<string>("AI_OPENAI_MODEL") || config.get<string>("AI_DEFAULT_MODEL");
   const modelMap: Record<AiModel, string | undefined> = {
-    "justinia-legal":
-      config.get<string>("AI_MODEL_JUSTINIA_LEGAL") ??
-      config.get<string>("AI_MODEL_BOGAPP_LEGAL") ??
+    "temis-legal":
+      config.get<string>("AI_MODEL_TEMIS_LEGAL") ||
+      config.get<string>("AI_MODEL_JUSTINIA_LEGAL") ||
+      config.get<string>("AI_MODEL_BOGAPP_LEGAL") ||
       fallbackModel,
-    fast: config.get<string>("AI_MODEL_FAST") ?? fallbackModel,
-    reasoning: config.get<string>("AI_MODEL_REASONING") ?? fallbackModel
+    fast: config.get<string>("AI_MODEL_FAST") || fallbackModel,
+    reasoning: config.get<string>("AI_MODEL_REASONING") || fallbackModel
   };
 
   return (model: AiModel) => {

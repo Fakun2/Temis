@@ -1,7 +1,7 @@
 import "server-only";
 
 import { randomUUID } from "node:crypto";
-import type { AuthUserDto } from "@bogaap/api-client";
+import type { AuthUserDto } from "@temis/api-client";
 import { decodeJwtPayload } from "./jwt";
 import type { SessionTenantAccess } from "./session";
 import { decodeSessionCookie, encodeSessionCookie } from "./session-cookie";
@@ -16,8 +16,8 @@ type StoredAuthSession = {
 };
 
 declare global {
-  var bogaapAuthSessions: Map<string, StoredAuthSession> | undefined;
-  var bogaapAuthRedis:
+  var temisAuthSessions: Map<string, StoredAuthSession> | undefined;
+  var temisAuthRedis:
     | {
         del(key: string): Promise<unknown>;
         get(key: string): Promise<string | null>;
@@ -126,8 +126,8 @@ async function deleteStoredSession(sessionId: string) {
 }
 
 function getMemoryStore() {
-  globalThis.bogaapAuthSessions ??= new Map<string, StoredAuthSession>();
-  return globalThis.bogaapAuthSessions;
+  globalThis.temisAuthSessions ??= new Map<string, StoredAuthSession>();
+  return globalThis.temisAuthSessions;
 }
 
 async function getRedisClient() {
@@ -136,17 +136,17 @@ async function getRedisClient() {
     return null;
   }
 
-  if (globalThis.bogaapAuthRedis) {
-    return globalThis.bogaapAuthRedis;
+  if (globalThis.temisAuthRedis) {
+    return globalThis.temisAuthRedis;
   }
 
   const { default: Redis } = await import("ioredis");
-  globalThis.bogaapAuthRedis = new Redis(redisUrl, {
+  globalThis.temisAuthRedis = new Redis(redisUrl, {
     enableOfflineQueue: false,
     maxRetriesPerRequest: 1
   });
 
-  return globalThis.bogaapAuthRedis;
+  return globalThis.temisAuthRedis;
 }
 
 function toRedisKey(sessionId: string) {

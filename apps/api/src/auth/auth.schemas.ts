@@ -51,7 +51,7 @@ export class CreateAccountDto extends createZodDto(createAccountSchema) {
 }
 
 export class LoginDto extends createZodDto(loginSchema) {
-  @ApiProperty({ example: "admin@bogaap.local" })
+  @ApiProperty({ example: "admin@temis.local" })
   email!: string;
 
   @ApiProperty({ minLength: 8, example: "password123" })

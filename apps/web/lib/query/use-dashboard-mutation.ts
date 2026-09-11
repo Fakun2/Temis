@@ -3,11 +3,11 @@
 import { useMemo } from "react";
 import { useMutation, type UseMutationOptions } from "@tanstack/react-query";
 import { getActiveTenantAccess, hasPermission } from "@/lib/auth/permissions";
-import type { BogaapSession } from "@/lib/auth/session";
+import type { TemisSession } from "@/lib/auth/session";
 import { useSession } from "@/lib/auth/use-session";
 
 type DashboardMutationContext = {
-  session: BogaapSession;
+  session: TemisSession;
   tenantId: string;
 };
 

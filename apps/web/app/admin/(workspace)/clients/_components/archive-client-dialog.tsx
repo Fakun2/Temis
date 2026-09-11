@@ -1,7 +1,7 @@
 "use client";
 
 import { Archive, Loader2, TriangleAlert, X } from "lucide-react";
-import type { ClientSummaryDto } from "@bogaap/api-client";
+import type { ClientSummaryDto } from "@temis/api-client";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,

@@ -19,7 +19,7 @@ Implementar pantalla `Estudio juridico` respetando el diseno actual.
 - Domicilio.
 - Sitio web.
 - Areas principales.
-- Como conocio BogApp.
+- Como conocio Temis.
 
 ## Criterios de aceptacion
 

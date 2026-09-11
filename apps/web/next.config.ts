@@ -19,7 +19,7 @@ const nextConfig: NextConfig = {
   turbopack: {
     root: workspaceRoot
   },
-  transpilePackages: ["@bogaap/api-client"],
+  transpilePackages: ["@temis/api-client"],
   allowedDevOrigins: lanAllowedDevOrigins
 };
 

@@ -1,10 +1,11 @@
-# BogApp
+# Temis
 
 SaaS B2B para estudios juridicos.
 
-Nombre publico del producto: **BogApp**. Los identificadores internos heredados
-pueden seguir apareciendo como `bogaap`, `BOGAP` o `@bogaap/*` hasta que una
-tarea especifica de marca los alinee sin mezclarlo con cambios funcionales.
+Nombre definitivo del producto: **Temis**. Dominio oficial: **https://temis.ar**.
+Los paquetes internos usan `@temis/*`. Ver
+[`docs/deployment/TEMIS_REBRAND.md`](docs/deployment/TEMIS_REBRAND.md) para la
+compatibilidad con instalaciones existentes y la configuracion del dominio.
 
 ## Stack
 

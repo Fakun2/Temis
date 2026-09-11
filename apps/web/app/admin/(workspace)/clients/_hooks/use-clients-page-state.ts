@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import type { ClientStatus, ClientType, ClientsControllerListParams } from "@bogaap/api-client";
+import type { ClientStatus, ClientType, ClientsControllerListParams } from "@temis/api-client";
 import { clientsPageSize } from "../_constants/clients.constants";
 
 export type ClientTypeFilter = ClientType | "all";

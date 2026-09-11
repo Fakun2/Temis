@@ -36,7 +36,7 @@ async function bootstrap() {
   }
 
   documentCleanup.startRecoveryLoop();
-  logger.info("BogApp lightweight worker started.");
+  logger.info("Temis lightweight worker started.");
 }
 
 function startConsumersSupervisor() {
@@ -91,7 +91,7 @@ async function registerConsumers() {
 
 async function shutdown() {
   isShuttingDown = true;
-  logger.info("Stopping BogApp lightweight worker.");
+  logger.info("Stopping Temis lightweight worker.");
   publisher.stop();
   await rabbitMq.close();
   await prisma.$disconnect();

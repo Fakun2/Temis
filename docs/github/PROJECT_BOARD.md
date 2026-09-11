@@ -1,6 +1,6 @@
 # GitHub project board
 
-Tablero sugerido para organizar BogApp por milestones y PRs chicos.
+Tablero sugerido para organizar Temis por milestones y PRs chicos.
 
 ## Vistas
 

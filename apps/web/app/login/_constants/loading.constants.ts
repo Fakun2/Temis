@@ -1,7 +1,7 @@
 export const loginLoadingCopy = {
   animatedWord: "espere",
   footerItems: ["Validando credenciales...", "Cargando permisos...", "Preparando workspace..."],
-  subtitle: "Estamos verificando tu acceso seguro a Justinia.",
+  subtitle: "Estamos verificando tu acceso seguro a Temis.",
   successTitle: "Acceso concedido!",
   titlePrefix: "Iniciando sesion, "
 } as const;

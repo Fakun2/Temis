@@ -1,4 +1,4 @@
-# BogApp DB Optimization Baseline
+# Temis DB Optimization Baseline
 
 Fecha: 2026-08-03.
 
