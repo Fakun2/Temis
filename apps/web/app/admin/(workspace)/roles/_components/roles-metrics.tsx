@@ -1,5 +1,5 @@
 import { CircleCheck, CircleSlash, ShieldCheck } from "lucide-react";
-import type { RoleDto } from "@bogaap/api-client";
+import type { RoleDto } from "@temis/api-client";
 import { AdminMetricsGrid } from "../../_components/admin-metrics-grid";
 
 export function RolesMetrics({ roles }: { roles: RoleDto[] }) {

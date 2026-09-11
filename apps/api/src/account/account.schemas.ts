@@ -81,7 +81,7 @@ export class UpdateAccountProfileDto extends createZodDto(updateAccountProfileSc
   @ApiProperty({ required: false, nullable: true, example: "+54 11 5555-5555" })
   phone?: string;
 
-  @ApiProperty({ required: false, nullable: true, example: "https://cdn.bogaap.local/avatar.png" })
+  @ApiProperty({ required: false, nullable: true, example: "https://cdn.temis.local/avatar.png" })
   avatarUrl?: string;
 }
 
@@ -110,7 +110,7 @@ export class UpdateAccountStudioDto extends createZodDto(updateAccountStudioSche
   @ApiProperty({ required: false, nullable: true, example: "https://estudio.com" })
   website?: string;
 
-  @ApiProperty({ required: false, nullable: true, example: "https://cdn.bogaap.local/logo.png" })
+  @ApiProperty({ required: false, nullable: true, example: "https://cdn.temis.local/logo.png" })
   logoUrl?: string;
 }
 

@@ -3,8 +3,8 @@ import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger";
 
 export function createOpenApiDocument(app: INestApplication) {
   const config = new DocumentBuilder()
-    .setTitle("BOGAP API")
-    .setDescription("API del monolito modular BOGAP.")
+    .setTitle("TEMIS API")
+    .setDescription("API del monolito modular TEMIS.")
     .setVersion("0.1.0")
     .addBearerAuth()
     .addApiKey(

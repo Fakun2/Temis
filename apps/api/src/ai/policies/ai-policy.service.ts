@@ -1,5 +1,5 @@
 import { ForbiddenException, Injectable, UnauthorizedException } from "@nestjs/common";
-import { canUseAiTool, isReadOnlyTool } from "@bogaap/ai-core";
+import { canUseAiTool, isReadOnlyTool } from "@temis/ai-core";
 import type { PermissionCode } from "../../rbac/rbac.constants";
 import { PrismaService } from "../../database/prisma.service";
 import { aiTools, type AiToolDefinition } from "../ai.catalog";

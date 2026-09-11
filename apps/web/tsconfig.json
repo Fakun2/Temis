@@ -16,8 +16,8 @@
     ],
     "paths": {
       "@/*": ["./*"],
-      "@bogaap/api-client": ["../../packages/api-client/src"],
-      "@bogaap/database": ["../../packages/database/src"]
+      "@temis/api-client": ["../../packages/api-client/src"],
+      "@temis/database": ["../../packages/database/src"]
     }
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],

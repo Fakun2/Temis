@@ -46,17 +46,17 @@ export function NotificationsPopover({
           <HeaderActionButton
             label="Notificaciones"
             className={cn(
-              "justinia-notification-trigger relative grid size-8 place-items-center rounded-full border border-[var(--dropdown-border)] bg-[var(--dropdown-bg)] text-foreground backdrop-blur-xl hover:bg-[var(--dropdown-item-hover)]",
-              hasIncomingNotification && "justinia-notification-trigger-incoming"
+              "temis-notification-trigger relative grid size-8 place-items-center rounded-full border border-[var(--dropdown-border)] bg-[var(--dropdown-bg)] text-foreground backdrop-blur-xl hover:bg-[var(--dropdown-item-hover)]",
+              hasIncomingNotification && "temis-notification-trigger-incoming"
             )}
           >
             <Bell
-              className="justinia-notification-bell h-4 w-4"
+              className="temis-notification-bell h-4 w-4"
               strokeWidth={1.9}
               aria-hidden="true"
             />
             {unreadCount > 0 ? (
-              <span className="justinia-notification-badge absolute -right-0.5 -top-0.5 flex size-4 items-center justify-center rounded-full bg-destructive font-mono text-[9px] font-semibold leading-none text-white ring-2 ring-[var(--admin-page-bg)]">
+              <span className="temis-notification-badge absolute -right-0.5 -top-0.5 flex size-4 items-center justify-center rounded-full bg-destructive font-mono text-[9px] font-semibold leading-none text-white ring-2 ring-[var(--admin-page-bg)]">
                 {Math.min(unreadCount, 9)}
               </span>
             ) : null}

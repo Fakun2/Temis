@@ -22,7 +22,7 @@ export const adminWorkspaceStatus = [
   "Tenant activo",
   "Onboarding completo",
   "Sesion local disponible",
-  "Theme BOGAP aplicado"
+  "Theme TEMIS aplicado"
 ];
 
 export const adminSurfaceClassName = "bg-card text-card-foreground";

@@ -1,7 +1,7 @@
 ---
-name: bogapp-issue-factory
+name: temis-issue-factory
 description: >-
-  Create, refine, split, and validate BogApp GitHub issues using BOG-###
+  Create, refine, split, and validate Temis GitHub issues using BOG-###
   correlation, GitHub Project fields, dependencies, roadmap phases, labels,
   acceptance criteria, branch names, evidence requirements, and PR closure
   wording. Use when drafting new issues, converting backlog docs into GitHub
@@ -9,9 +9,9 @@ description: >-
   issue is ready for two-developer execution.
 ---
 
-# BogApp Issue Factory
+# Temis Issue Factory
 
-Use this skill to produce implementation-ready BogApp issues.
+Use this skill to produce implementation-ready Temis issues.
 
 ## Sources of truth
 

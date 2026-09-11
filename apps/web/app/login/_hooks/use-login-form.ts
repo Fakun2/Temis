@@ -5,7 +5,7 @@ import { useSearchParams } from "next/navigation";
 import { z } from "zod";
 import { loginWithGoogleCredential } from "@/lib/auth/google-auth";
 import { getAuthenticatedRedirectPath } from "@/lib/auth/redirect";
-import { saveSession, type BogaapSession } from "@/lib/auth/session";
+import { saveSession, type TemisSession } from "@/lib/auth/session";
 import { loginFormSchema, type LoginFormValues } from "@/lib/validation/auth";
 import {
   loginInitialForm,
@@ -69,13 +69,13 @@ export function useLoginForm(initialEmail: string | null) {
         headers: { "Content-Type": "application/json" },
         method: "POST"
       });
-      const data = (await response.json().catch(() => null)) as BogaapSession | unknown;
+      const data = (await response.json().catch(() => null)) as TemisSession | unknown;
 
       if (!response.ok) {
         throw new Error(getApiErrorMessage(data));
       }
 
-      const session = data as BogaapSession;
+      const session = data as TemisSession;
       saveSession(session);
       const elapsed = Date.now() - transitionStartedAt;
       await wait(Math.max(loginLoadingTotalMs - elapsed, 0));

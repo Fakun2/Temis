@@ -1,8 +1,8 @@
-# CodeRabbit Guidelines - BogApp
+# CodeRabbit Guidelines - Temis
 
 ## Contexto del producto
 
-BogApp es un SaaS B2B para estudios jurídicos. El sistema debe permitir gestionar estudios, usuarios, roles, clientes, expedientes, documentos, tareas, calendario, caja y reportes.
+Temis es un SaaS B2B para estudios jurídicos. El sistema debe permitir gestionar estudios, usuarios, roles, clientes, expedientes, documentos, tareas, calendario, caja y reportes.
 
 ## Prioridades de revisión
 

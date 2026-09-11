@@ -1,6 +1,6 @@
 # MVP scope
 
-Este documento define el alcance minimo profesional de BogApp. Todo lo que no
+Este documento define el alcance minimo profesional de Temis. Todo lo que no
 este aca debe tratarse como post-MVP salvo decision explicita.
 
 ## Incluido en MVP

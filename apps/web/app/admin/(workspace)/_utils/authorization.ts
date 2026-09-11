@@ -1,9 +1,9 @@
 import { hasPermissions } from "@/lib/auth/permissions";
-import type { BogaapSession } from "@/lib/auth/session";
+import type { TemisSession } from "@/lib/auth/session";
 import type { AdminCommandSection, AdminNavItem, AdminNavSection } from "../_types/admin";
 
 export function getAuthorizedNavSections(
-  session: BogaapSession | null,
+  session: TemisSession | null,
   sections: AdminNavSection[]
 ): AdminNavSection[] {
   return sections
@@ -17,7 +17,7 @@ export function getAuthorizedNavSections(
 }
 
 export function getAuthorizedCommandSections(
-  session: BogaapSession | null,
+  session: TemisSession | null,
   sections: AdminCommandSection[]
 ): AdminCommandSection[] {
   return sections
@@ -29,7 +29,7 @@ export function getAuthorizedCommandSections(
 }
 
 function isAuthorizedItem(
-  session: BogaapSession | null,
+  session: TemisSession | null,
   item: {
     permissionMode?: "all" | "any";
     requiredPermissions?: string[];
@@ -43,7 +43,7 @@ function isAuthorizedItem(
   return hasPermissions(session, item.requiredPermissions, item.permissionMode);
 }
 
-function getAuthorizedNavItem(session: BogaapSession | null, item: AdminNavItem): AdminNavItem | null {
+function getAuthorizedNavItem(session: TemisSession | null, item: AdminNavItem): AdminNavItem | null {
   if (item.status === "soon") {
     return null;
   }

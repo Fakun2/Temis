@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import type { TokenPairDto } from "@bogaap/api-client";
+import type { TokenPairDto } from "@temis/api-client";
 import {
   clearAuthCookies,
   getAccessTokenCookie,
@@ -191,7 +191,7 @@ function normalizeErrorBody(body: Record<string, unknown> | null, status: number
     message:
       typeof message === "string" || Array.isArray(message)
         ? message
-        : `BOGAP API request failed: ${status}`,
+        : `TEMIS API request failed: ${status}`,
     statusCode: status
   };
 }

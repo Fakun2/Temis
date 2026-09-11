@@ -28,7 +28,7 @@ export function OnboardingVisual({
             className="mb-8 rounded-full border-[var(--onboarding-panel-border)] bg-[var(--onboarding-panel-surface)] px-3 py-1 text-[var(--onboarding-panel-surface-foreground)]"
           >
             <Scale className="h-4 w-4" />
-            BOGAP
+            TEMIS
           </Badge>
           <h2 className="max-w-md text-balance text-4xl font-semibold leading-tight">
             Configuremos tu estudio juridico.

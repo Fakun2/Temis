@@ -1,8 +1,8 @@
-@startuml bogaap-er
-title BOGAP - ERD Multitenant + RBAC
+@startuml temis-er
+title TEMIS - ERD Multitenant + RBAC
 
 ' ============================================================
-' BOGAP - Diagrama ER para una SaaS B2B de abogacia
+' TEMIS - Diagrama ER para una SaaS B2B de abogacia
 ' ------------------------------------------------------------
 ' Criterio principal:
 ' - tenants = estudios juridicos que contratan la plataforma.

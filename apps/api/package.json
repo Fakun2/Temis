@@ -1,11 +1,11 @@
 {
-  "name": "@bogaap/api",
+  "name": "@temis/api",
   "version": "0.1.0",
   "private": true,
   "type": "commonjs",
   "main": "dist/main.js",
   "scripts": {
-    "build:ai-packages": "npm --prefix ../.. run build --workspace @bogaap/ai-contracts && npm --prefix ../.. run build --workspace @bogaap/ai-core",
+    "build:ai-packages": "npm --prefix ../.. run build --workspace @temis/ai-contracts && npm --prefix ../.. run build --workspace @temis/ai-core",
     "dev": "npm run build:ai-packages && nest start --watch",
     "dev:lan": "npm run build:ai-packages && nest start --watch",
     "build": "npm run build:ai-packages && nest build",
@@ -20,9 +20,9 @@
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.1096.0",
-    "@bogaap/ai-contracts": "0.1.0",
-    "@bogaap/ai-core": "0.1.0",
-    "@bogaap/database": "0.1.0",
+    "@temis/ai-contracts": "0.1.0",
+    "@temis/ai-core": "0.1.0",
+    "@temis/database": "0.1.0",
     "@nestjs/common": "^11.1.19",
     "@nestjs/config": "^4.0.0",
     "@nestjs/core": "^11.1.19",

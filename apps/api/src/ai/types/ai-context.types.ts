@@ -1,1 +1,1 @@
-export type { AiAuthorizedContext as AiContext, AiCaseContext } from "@bogaap/ai-contracts";
+export type { AiAuthorizedContext as AiContext, AiCaseContext } from "@temis/ai-contracts";

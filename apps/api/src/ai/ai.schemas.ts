@@ -1,14 +1,16 @@
-import type { AiModel, AiTool } from "@bogaap/ai-contracts";
-import { aiModelIds, aiToolIds } from "@bogaap/ai-contracts";
+import type { AiModel, AiTool } from "@temis/ai-contracts";
+import { aiModelIds, aiToolIds } from "@temis/ai-contracts";
 import { createZodDto } from "nestjs-zod";
 import { z } from "zod";
 
-export const aiModelSchema = z.enum(aiModelIds);
+// Accept the previous logical ID from clients open during a rolling deployment.
+export const aiModelSchema = z.union([z.enum(aiModelIds), z.literal("justinia-legal")])
+  .transform((model) => model === "justinia-legal" ? "temis-legal" as const : model);
 export const aiToolSchema = z.enum(aiToolIds);
 
 export const aiChatSchema = z.object({
   caseId: z.string().uuid().optional(),
-  model: aiModelSchema.default("justinia-legal"),
+  model: aiModelSchema.default("temis-legal"),
   prompt: z.string().trim().min(1).max(4000),
   tool: aiToolSchema.default("general")
 });

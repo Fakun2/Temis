@@ -108,7 +108,7 @@ export function TenantStep({ darkMode, form, updateTenant }: TenantStepProps) {
           placeholder="https://estudio.com"
         />
       </OnboardingField>
-      <OnboardingField label="Como conocio BOGAP">
+      <OnboardingField label="Como conocio TEMIS">
         <Select
           value={form.tenant.referralSource}
           onValueChange={(value) => updateTenant("referralSource", value)}

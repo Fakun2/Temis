@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import type { TokenPairDto } from "@bogaap/api-client";
+import type { TokenPairDto } from "@temis/api-client";
 import {
   clearAuthCookies,
   getRefreshTokenCookie,

@@ -1,4 +1,4 @@
-import type { ClientStatus } from "@bogaap/api-client";
+import type { ClientStatus } from "@temis/api-client";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { clientStatusLabels } from "../_constants/clients.constants";

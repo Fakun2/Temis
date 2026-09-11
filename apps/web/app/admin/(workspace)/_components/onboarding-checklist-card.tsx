@@ -255,7 +255,7 @@ function ImportCasesSetup({
   return (
     <div className="grid gap-4">
       <p className="rounded-xl border border-border/60 bg-secondary/20 px-3 py-2 text-sm text-muted-foreground">
-        Las credenciales se piden en cada busqueda y no se guardan en BogApp.
+        Las credenciales se piden en cada busqueda y no se guardan en Temis.
       </p>
       <div className="flex flex-wrap gap-2">
         {courtImportSystems.map((system) => (

@@ -14,7 +14,7 @@ async function clearDemoData() {
     const demoTenant = await tx.tenant.findFirst({
       where: {
         taxId: demoTenantTaxId,
-        name: { startsWith: "Demo BogApp" }
+        OR: [{ name: { startsWith: "Demo Temis" } }, { name: { startsWith: "Demo BogApp" } }]
       },
       select: { id: true }
     });

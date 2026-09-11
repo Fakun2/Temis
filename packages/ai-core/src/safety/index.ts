@@ -1,4 +1,4 @@
-import type { AiToolDefinition } from "@bogaap/ai-contracts";
+import type { AiToolDefinition } from "@temis/ai-contracts";
 
 export type AiSafetyPolicy = {
   allowSensitiveCaseData: boolean;

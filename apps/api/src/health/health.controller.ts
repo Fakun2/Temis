@@ -8,7 +8,7 @@ export class HealthController {
   check() {
     return {
       status: "ok",
-      service: "bogaap-api"
+      service: "temis-api"
     };
   }
 }

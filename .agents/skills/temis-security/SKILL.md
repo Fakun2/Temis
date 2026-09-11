@@ -1,7 +1,7 @@
 ---
-name: bogapp-security
+name: temis-security
 description: >-
-  Review and guide BogApp security for a legaltech SaaS handling sensitive law
+  Review and guide Temis security for a legaltech SaaS handling sensitive law
   firm data, including multi-tenant isolation, auth, RBAC, permission checks,
   data privacy, audit logs, secure DTO validation, secrets, file/document
   access, dependency risk, and secure PR acceptance. Use when implementing or
@@ -9,7 +9,7 @@ description: >-
   auth, or integration changes.
 ---
 
-# BogApp Security
+# Temis Security
 
 Use this skill when security, privacy, authorization, or sensitive legal data is involved.
 

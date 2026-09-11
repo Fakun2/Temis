@@ -7,12 +7,12 @@ import {
   type StaffDeleteResponseDto,
   type StaffListResponseDto,
   type StaffUpdateResponseDto
-} from "@bogaap/api-client";
+} from "@temis/api-client";
 import { dashboardHttpClient } from "@/lib/http";
 import { allStaffFilterValue } from "../_constants/staff.constants";
 import type { StaffQueryParams } from "../_types/staff.types";
 import type { CreateStaffFormValues, UpdateStaffFormValues } from "@/lib/validation/staff";
-import type { BogaapSession } from "@/lib/auth/session";
+import type { TemisSession } from "@/lib/auth/session";
 
 export const staffKeys = {
   all: ["staff"] as const,
@@ -25,7 +25,7 @@ export async function listStaff({
   limit,
   sortDirection,
   sortKey
-}: StaffQueryParams & { session: BogaapSession; tenantId: string }): Promise<StaffListResponseDto> {
+}: StaffQueryParams & { session: TemisSession; tenantId: string }): Promise<StaffListResponseDto> {
   const params = new URLSearchParams();
   appendFilter(params, "cursor", cursor ?? "");
   appendFilter(params, "firstName", filters.firstName);
@@ -47,7 +47,7 @@ export async function createStaff({
   input
 }: {
   input: CreateStaffFormValues;
-  session: BogaapSession;
+  session: TemisSession;
   tenantId: string;
 }): Promise<StaffCreateResponseDto> {
   return dashboardHttpClient.request<StaffCreateResponseDto>({
@@ -67,7 +67,7 @@ export async function updateStaff({
   staffId
 }: {
   input: UpdateStaffFormValues;
-  session: BogaapSession;
+  session: TemisSession;
   staffId: string;
   tenantId: string;
 }): Promise<StaffUpdateResponseDto> {
@@ -87,7 +87,7 @@ export async function updateStaff({
 export async function deleteStaff({
   staffId
 }: {
-  session: BogaapSession;
+  session: TemisSession;
   staffId: string;
   tenantId: string;
 }): Promise<StaffDeleteResponseDto> {

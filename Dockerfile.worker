@@ -18,7 +18,7 @@ RUN npm ci
 FROM deps AS builder
 COPY . .
 RUN npm run db:generate
-RUN npm run build --workspace @bogaap/worker
+RUN npm run build --workspace @temis/worker
 
 FROM base AS runtime-deps
 COPY apps/worker/package.json ./package.json
@@ -28,13 +28,13 @@ FROM base AS runner
 ENV NODE_ENV=production
 ENV NODE_OPTIONS=--max-old-space-size=256
 
-RUN addgroup -S nodejs && adduser -S bogaap -G nodejs
+RUN addgroup -S nodejs && adduser -S temis -G nodejs
 
-COPY --from=runtime-deps --chown=bogaap:nodejs /app/node_modules ./node_modules
-COPY --from=builder --chown=bogaap:nodejs /app/node_modules/.prisma ./node_modules/.prisma
-COPY --from=builder --chown=bogaap:nodejs /app/node_modules/@prisma/client ./node_modules/@prisma/client
-COPY --from=builder --chown=bogaap:nodejs /app/apps/worker/package.json ./apps/worker/package.json
-COPY --from=builder --chown=bogaap:nodejs /app/apps/worker/dist ./apps/worker/dist
+COPY --from=runtime-deps --chown=temis:nodejs /app/node_modules ./node_modules
+COPY --from=builder --chown=temis:nodejs /app/node_modules/.prisma ./node_modules/.prisma
+COPY --from=builder --chown=temis:nodejs /app/node_modules/@prisma/client ./node_modules/@prisma/client
+COPY --from=builder --chown=temis:nodejs /app/apps/worker/package.json ./apps/worker/package.json
+COPY --from=builder --chown=temis:nodejs /app/apps/worker/dist ./apps/worker/dist
 
-USER bogaap
+USER temis
 CMD ["node", "apps/worker/dist/index.js"]

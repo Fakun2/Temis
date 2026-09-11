@@ -25,14 +25,14 @@ export function SidebarWorkspaceSwitcher({
             "flex min-w-0 items-center gap-2 rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
             compact && "justify-center"
           )}
-          aria-label="BOGAP admin"
+          aria-label="TEMIS admin"
         >
           <span className="flex size-5 shrink-0 items-center justify-center rounded-md bg-btn-primary text-[11px] font-medium text-btn-primary-foreground">
             J
           </span>
           {!compact ? (
             <span className="truncate text-sm font-medium tracking-[-0.01em] text-foreground">
-              Justinia
+              Temis
             </span>
           ) : null}
         </Link>

@@ -3,7 +3,7 @@ import type {
   AiProviderRequest,
   AiProviderResponse,
   AiTool
-} from "@bogaap/ai-contracts";
+} from "@temis/ai-contracts";
 import { createOpenAICompatible } from "@ai-sdk/openai-compatible";
 import { generateText } from "ai";
 import { estimateTokens } from "../tokens";
@@ -23,7 +23,7 @@ export interface AiProvider {
   generateText(input: GenerateTextInput): Promise<GenerateTextResult>;
 }
 
-export interface BogappAiProvider {
+export interface TemisAiProvider {
   generate(request: AiProviderRequest): Promise<AiProviderResponse>;
 }
 
@@ -43,15 +43,15 @@ export type AiProviderStrategyConfig =
 
 export type AiProviderModelResolver = (model: AiModel) => string;
 
-export function createBogappAiProvider(config: AiProviderStrategyConfig): BogappAiProvider {
+export function createTemisAiProvider(config: AiProviderStrategyConfig): TemisAiProvider {
   if (config.strategy === "openai-compatible") {
-    return new OpenAICompatibleBogappAiProvider(config);
+    return new OpenAICompatibleTemisAiProvider(config);
   }
 
-  return new PreviewBogappAiProvider();
+  return new PreviewTemisAiProvider();
 }
 
-export class PreviewBogappAiProvider implements BogappAiProvider {
+export class PreviewTemisAiProvider implements TemisAiProvider {
   async generate(request: AiProviderRequest): Promise<AiProviderResponse> {
     return {
       content: buildPreviewResponse(request.tool, request.context.case?.caseNumber),
@@ -64,7 +64,7 @@ export class PreviewBogappAiProvider implements BogappAiProvider {
   }
 }
 
-export class OpenAICompatibleBogappAiProvider implements BogappAiProvider {
+export class OpenAICompatibleTemisAiProvider implements TemisAiProvider {
   private readonly provider;
 
   constructor(private readonly config: Extract<AiProviderStrategyConfig, { strategy: "openai-compatible" }>) {
@@ -87,7 +87,7 @@ export class OpenAICompatibleBogappAiProvider implements BogappAiProvider {
 
     return {
       content: response.text,
-      finishReason: toBogappFinishReason(response.finishReason),
+      finishReason: toTemisFinishReason(response.finishReason),
       usage: {
         inputTokens:
           response.usage.inputTokens ?? estimateTokens(`${request.systemPrompt}\n${request.prompt}`),
@@ -107,7 +107,7 @@ function buildPreviewResponse(tool: AiTool, caseNumber?: string) {
   return `Validacion completada. Puedo responder${caseLabel} usando solo datos de lectura autorizados del tenant activo.`;
 }
 
-function toBogappFinishReason(finishReason: string): AiProviderResponse["finishReason"] {
+function toTemisFinishReason(finishReason: string): AiProviderResponse["finishReason"] {
   if (finishReason === "stop" || finishReason === "length") {
     return finishReason;
   }

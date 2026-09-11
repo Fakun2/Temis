@@ -40,7 +40,7 @@ if (useDockerPgTools) {
 }
 
 const targetEnv = { ...process.env, DATABASE_URL: targetUrl };
-const tempDir = mkdtempSync(join(tmpdir(), "bogaap-db-copy-"));
+const tempDir = mkdtempSync(join(tmpdir(), "temis-db-copy-"));
 const dumpPath = join(tempDir, "data.sql");
 
 try {

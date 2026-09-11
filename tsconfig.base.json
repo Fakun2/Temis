@@ -11,10 +11,10 @@
     "noUncheckedIndexedAccess": true,
     "baseUrl": ".",
     "paths": {
-      "@bogaap/database": ["packages/database/src"],
-      "@bogaap/api-client": ["packages/api-client/src"],
-      "@bogaap/ai-contracts": ["packages/ai-contracts/src"],
-      "@bogaap/ai-core": ["packages/ai-core/src"]
+      "@temis/database": ["packages/database/src"],
+      "@temis/api-client": ["packages/api-client/src"],
+      "@temis/ai-contracts": ["packages/ai-contracts/src"],
+      "@temis/ai-core": ["packages/ai-core/src"]
     }
   }
 }

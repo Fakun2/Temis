@@ -1,6 +1,6 @@
 # Multitenancy
 
-BogApp debe ser multi-tenant desde el dia cero aunque el primer uso sea un solo
+Temis debe ser multi-tenant desde el dia cero aunque el primer uso sea un solo
 estudio piloto.
 
 ## Modelo

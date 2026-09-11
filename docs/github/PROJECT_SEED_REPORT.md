@@ -1,4 +1,4 @@
-# BogApp Project Seed Report
+# Temis Project Seed Report
 
 ## Project
 

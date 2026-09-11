@@ -104,6 +104,6 @@ Modelos:
 ## Fuente de verdad tecnica
 
 - Implementado hoy: `packages/database/prisma/schema.prisma`.
-- Dominio objetivo: `docs/diagrams/bogaap-er.puml`.
+- Dominio objetivo: `docs/diagrams/temis-er.puml`.
 - Plan y alcance: `docs/product/ROADMAP.md` y `docs/product/MVP_SCOPE.md`.
 - Gaps: `docs/database/gaps.md`.

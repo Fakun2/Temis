@@ -1,4 +1,4 @@
-import type { PermissionDto, RoleDto } from "@bogaap/api-client";
+import type { PermissionDto, RoleDto } from "@temis/api-client";
 import { RoleCard } from "./role-card";
 
 export function RolesList({ permissions, roles }: { permissions: PermissionDto[]; roles: RoleDto[] }) {
