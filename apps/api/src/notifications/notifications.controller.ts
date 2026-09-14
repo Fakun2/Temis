@@ -13,6 +13,7 @@ import { ApiBearerAuth, ApiOkResponse, ApiSecurity, ApiTags } from "@nestjs/swag
 import type { Observable } from "rxjs";
 import type { AuthenticatedRequest } from "../auth/auth.types";
 import { JwtAuthGuard } from "../auth/jwt-auth.guard";
+import { Permissions } from "../auth/permissions.decorator";
 import { PermissionsGuard } from "../auth/permissions.guard";
 import { ActiveTenant } from "../tenancy/active-tenant.decorator";
 import { TenantGuard } from "../tenancy/tenant.guard";
@@ -32,6 +33,7 @@ export class NotificationsController {
   constructor(private readonly notificationsService: NotificationsService) {}
 
   @Get()
+  @Permissions("notifications:read")
   @ApiOkResponse({ type: NotificationsListResponseDto })
   list(
     @ActiveTenant() tenantId: string,
@@ -42,6 +44,7 @@ export class NotificationsController {
   }
 
   @Sse("stream")
+  @Permissions("notifications:read")
   stream(
     @ActiveTenant() tenantId: string,
     @Req() request: AuthenticatedRequest
@@ -50,6 +53,7 @@ export class NotificationsController {
   }
 
   @Patch(":id/read")
+  @Permissions("notifications:update")
   @ApiOkResponse({ type: NotificationReadResponseDto })
   markRead(
     @ActiveTenant() tenantId: string,

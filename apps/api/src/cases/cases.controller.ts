@@ -55,11 +55,13 @@ import {
   CaseTaskDto,
   CaseTasksListResponseDto,
   CasesListResponseDto,
+  GlobalCaseTaskDto,
   CreateCaseDto,
   CreateCaseDocumentBodyDto,
   CreateCaseExpenseDto,
   CreateCaseHearingDto,
   CreateCaseTaskDto,
+  CreateTaskBoardViewDto,
   ListCaseExpenseAttachmentsQueryDto,
   ListCaseDocumentsQueryDto,
   ListCaseExpensesQueryDto,
@@ -67,10 +69,17 @@ import {
   ListCasePickerOptionsQueryDto,
   ListCaseTasksQueryDto,
   ListCasesQueryDto,
+  ListTenantCaseTasksQueryDto,
+  TaskBoardViewDto,
+  TaskBoardViewsListResponseDto,
   UpdateCaseDto,
   UpdateCaseExpenseDto,
   UpdateCaseHearingDto,
-  UpdateCaseTaskDto
+  UpdateCaseTaskLocalContextDto,
+  UpdateCaseTaskDto,
+  UpdateTaskBoardViewDto,
+  TenantCaseTasksListResponseDto,
+  TenantCaseTasksMetricsDto
 } from "./cases.schemas";
 import { CasesService } from "./cases.service";
 import {
@@ -126,6 +135,85 @@ export class CasesController {
     @Query() query: ListCasePickerOptionsQueryDto
   ) {
     return this.casesService.listPickerOptions(tenantId, query);
+  }
+
+  @Get("tasks/metrics")
+  @Permissions("tasks:read")
+  @ApiOkResponse({ type: TenantCaseTasksMetricsDto })
+  getTenantTasksMetrics(@ActiveTenant() tenantId: string) {
+    return this.casesService.getTenantTasksMetrics(tenantId);
+  }
+
+  @Get("tasks/boards")
+  @Permissions("tasks:read")
+  @ApiOkResponse({ type: TaskBoardViewsListResponseDto })
+  listTaskBoards(@ActiveTenant() tenantId: string) {
+    return this.casesService.listTaskBoards(tenantId);
+  }
+
+  @Post("tasks/boards")
+  @Permissions("tasks:update")
+  @ApiCreatedResponse({ type: TaskBoardViewDto })
+  createTaskBoard(
+    @ActiveTenant() tenantId: string,
+    @Body() input: CreateTaskBoardViewDto,
+    @Req() request: AuthenticatedRequest
+  ) {
+    return this.casesService.createTaskBoard(
+      tenantId,
+      request.user?.sub ?? missingAuthenticatedUser(),
+      input
+    );
+  }
+
+  @Patch("tasks/boards/:boardId")
+  @Permissions("tasks:update")
+  @ApiOkResponse({ type: TaskBoardViewDto })
+  updateTaskBoard(
+    @ActiveTenant() tenantId: string,
+    @Param("boardId") boardId: string,
+    @Body() input: UpdateTaskBoardViewDto
+  ) {
+    return this.casesService.updateTaskBoard(tenantId, boardId, input);
+  }
+
+  @Delete("tasks/boards/:boardId")
+  @Permissions("tasks:update")
+  @ApiOkResponse({ type: CaseDeleteResponseDto })
+  deleteTaskBoard(@ActiveTenant() tenantId: string, @Param("boardId") boardId: string) {
+    return this.casesService.deleteTaskBoard(tenantId, boardId);
+  }
+
+  @Get("tasks")
+  @Permissions("tasks:read")
+  @ApiOkResponse({ type: TenantCaseTasksListResponseDto })
+  listTenantTasks(
+    @ActiveTenant() tenantId: string,
+    @Query() query: ListTenantCaseTasksQueryDto
+  ) {
+    return this.casesService.listTenantTasks(tenantId, query);
+  }
+
+  @Patch("tasks/:taskId")
+  @Permissions("tasks:update")
+  @ApiOkResponse({ type: GlobalCaseTaskDto })
+  updateTenantTask(
+    @ActiveTenant() tenantId: string,
+    @Param("taskId") taskId: string,
+    @Body() input: UpdateCaseTaskDto
+  ) {
+    return this.casesService.updateTenantTask(tenantId, taskId, input);
+  }
+
+  @Patch("tasks/:taskId/local-context")
+  @Permissions("tasks:update")
+  @ApiOkResponse({ type: GlobalCaseTaskDto })
+  updateTenantTaskLocalContext(
+    @ActiveTenant() tenantId: string,
+    @Param("taskId") taskId: string,
+    @Body() input: UpdateCaseTaskLocalContextDto
+  ) {
+    return this.casesService.updateTenantTaskLocalContext(tenantId, taskId, input);
   }
 
   @Post()

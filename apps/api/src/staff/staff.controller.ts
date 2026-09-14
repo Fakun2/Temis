@@ -14,7 +14,9 @@ import { ActiveTenant } from "../tenancy/active-tenant.decorator";
 import { TenantGuard } from "../tenancy/tenant.guard";
 import {
   CreateStaffDto,
+  ListParticipantOptionsQueryDto,
   ListStaffQueryDto,
+  ParticipantOptionsResponseDto,
   StaffCreateResponseDto,
   StaffDeleteResponseDto,
   StaffListResponseDto,
@@ -40,6 +42,16 @@ export class StaffController {
     @Query() query: ListStaffQueryDto
   ) {
     return this.staffService.list(tenantId, request.user?.sub ?? "", query);
+  }
+
+  @Get("participant-options")
+  @Permissions("staff:read")
+  @ApiOkResponse({ type: ParticipantOptionsResponseDto })
+  participantOptions(
+    @ActiveTenant() tenantId: string,
+    @Query() query: ListParticipantOptionsQueryDto
+  ) {
+    return this.staffService.listParticipantOptions(tenantId, query);
   }
 
   @Post()

@@ -39,6 +39,14 @@ const optionalNullableUuid = z.preprocess(
   z.string().uuid().nullable().optional()
 );
 const requiredDateString = z.string().trim().min(1);
+const optionalDateString = z.preprocess(
+  (value) => (typeof value === "string" && value.trim() === "" ? undefined : value),
+  z
+    .string()
+    .trim()
+    .regex(/^\d{4}-(0[1-9]|1[0-2])-([0-2]\d|3[01])$/)
+    .optional()
+);
 const monthStringSchema = z
   .string()
   .trim()
@@ -48,6 +56,7 @@ const monthStringSchema = z
 const caseInstanceSchema = z.enum(["first", "second", "third"]);
 const caseStatusSchema = z.enum(["open", "paused", "closed"]);
 const caseTaskStatusSchema = z.enum(["pending", "in_progress", "completed", "cancelled"]);
+const caseTaskDueStatusSchema = z.enum(["due_soon", "overdue"]);
 const caseExpenseEditableStatusSchema = z.enum(["pending", "paid", "cancelled"]);
 const caseExpenseStatusSchema = z.enum(["pending", "paid", "cancelled", "overdue"]);
 const caseHearingTypeSchema = z.enum([
@@ -86,48 +95,53 @@ const caseParticipantInputSchema = z.object({
   clientId: optionalUuid
 });
 
-const caseInputSchema = z.object({
-  caseNumber: z.string().trim().min(1).max(80),
-  caption: z.string().trim().min(3).max(240),
-  subject: optionalTrimmedString,
-  description: optionalTrimmedString,
-  provinceId: optionalUuid,
-  forumTemplateId: optionalUuid,
-  judicialCenterForumId: optionalUuid,
-  judicialCenterText: optionalTrimmedString,
-  provinceText: optionalTrimmedString,
-  jurisdictionText: optionalTrimmedString,
-  unitText: optionalTrimmedString,
-  court: optionalTrimmedString,
-  instance: caseInstanceSchema.default("first"),
-  status: caseStatusSchema.default("open"),
-  filingDate: optionalTrimmedString,
-  primaryClientId: optionalUuid,
-  practiceAreaId: optionalUuid,
-  responsibleMembershipId: optionalUuid,
-  participants: z.array(caseParticipantInputSchema).max(20).default([])
-}).superRefine((input, ctx) => {
-  const hasCatalog = Boolean(input.provinceId && input.forumTemplateId);
-  const hasLooseJurisdiction = Boolean(
-    input.provinceText || input.jurisdictionText || input.unitText || input.court
-  );
+const caseInputSchema = z
+  .object({
+    caseNumber: z.string().trim().min(1).max(80),
+    caption: z.string().trim().min(3).max(240),
+    subject: optionalTrimmedString,
+    description: optionalTrimmedString,
+    provinceId: optionalUuid,
+    forumTemplateId: optionalUuid,
+    judicialCenterForumId: optionalUuid,
+    judicialCenterText: optionalTrimmedString,
+    provinceText: optionalTrimmedString,
+    jurisdictionText: optionalTrimmedString,
+    unitText: optionalTrimmedString,
+    court: optionalTrimmedString,
+    instance: caseInstanceSchema.default("first"),
+    status: caseStatusSchema.default("open"),
+    filingDate: optionalTrimmedString,
+    primaryClientId: optionalUuid,
+    practiceAreaId: optionalUuid,
+    responsibleMembershipId: optionalUuid,
+    participants: z.array(caseParticipantInputSchema).max(20).default([])
+  })
+  .superRefine((input, ctx) => {
+    const hasCatalog = Boolean(input.provinceId && input.forumTemplateId);
+    const hasLooseJurisdiction = Boolean(
+      input.provinceText || input.jurisdictionText || input.unitText || input.court
+    );
 
-  if (!hasCatalog && !hasLooseJurisdiction) {
-    ctx.addIssue({
-      code: z.ZodIssueCode.custom,
-      message: "Indica provincia/fuero catalogados o datos judiciales en texto.",
-      path: ["jurisdictionText"]
-    });
-  }
+    if (!hasCatalog && !hasLooseJurisdiction) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Indica provincia/fuero catalogados o datos judiciales en texto.",
+        path: ["jurisdictionText"]
+      });
+    }
 
-  if ((input.provinceId && !input.forumTemplateId) || (!input.provinceId && input.forumTemplateId)) {
-    ctx.addIssue({
-      code: z.ZodIssueCode.custom,
-      message: "Provincia y fuero catalogados deben enviarse juntos.",
-      path: ["forumTemplateId"]
-    });
-  }
-});
+    if (
+      (input.provinceId && !input.forumTemplateId) ||
+      (!input.provinceId && input.forumTemplateId)
+    ) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Provincia y fuero catalogados deben enviarse juntos.",
+        path: ["forumTemplateId"]
+      });
+    }
+  });
 
 export const createCaseSchema = caseInputSchema;
 export const updateCaseSchema = caseInputSchema;
@@ -165,7 +179,8 @@ const caseHearingInputSchema = z
       .trim()
       .regex(/^([01]\d|2[0-3]):[0-5]\d$/),
     description: z.string().trim().min(3).max(500),
-    notificationsEnabled: optionalBooleanInputSchema
+    notificationsEnabled: optionalBooleanInputSchema,
+    participantMembershipIds: z.array(z.string().uuid()).max(50).default([])
   })
   .and(notificationSettingsSchema);
 
@@ -212,6 +227,83 @@ export const listCaseTasksQuerySchema = z.object({
   cursor: optionalTrimmedString
 });
 
+export const listTenantCaseTasksQuerySchema = z.object({
+  limit: z.coerce.number().int().min(1).max(50).default(8),
+  cursor: optionalTrimmedString,
+  offset: z.coerce.number().int().min(0).default(0),
+  search: optionalTrimmedString,
+  status: caseTaskStatusSchema.optional(),
+  assignedMembershipId: optionalUuid,
+  practiceAreaId: optionalUuid,
+  clientId: optionalUuid,
+  caseId: optionalUuid,
+  dueStatus: caseTaskDueStatusSchema.optional(),
+  endDateFrom: optionalDateString,
+  endDateTo: optionalDateString,
+  sortBy: z
+    .enum(["name", "status", "endDate", "client", "case", "assignedTo", "createdAt"])
+    .default("createdAt"),
+  sortDirection: z.enum(["asc", "desc"]).default("desc")
+});
+
+export const taskBoardFiltersSchema = listTenantCaseTasksQuerySchema
+  .omit({ cursor: true, limit: true, offset: true, sortBy: true, sortDirection: true })
+  .default({});
+
+export const taskBoardSettingsSchema = z
+  .object({
+    chartGroupBy: z.enum(["status", "client", "case", "assignedTo"]).default("status"),
+    chartShowHorizontalLines: z.boolean().default(true),
+    chartSortBy: z.enum(["count", "label"]).default("count"),
+    chartSortDirection: z.enum(["asc", "desc"]).default("desc"),
+    chartType: z.enum(["vertical_bar", "horizontal_bar", "line", "pie"]).default("vertical_bar"),
+    hideZeroValues: z.boolean().default(false),
+    kanbanCardLayout: z.enum(["compact", "list"]).default("compact"),
+    kanbanCardSize: z.enum(["small", "medium", "large"]).default("medium"),
+    kanbanColorColumns: z.boolean().default(true),
+    openTaskIn: z.enum(["side_sheet", "center_modal"]).default("side_sheet"),
+    sortBy: z
+      .enum(["name", "status", "endDate", "client", "case", "assignedTo", "createdAt"])
+      .default("createdAt"),
+    sortDirection: z.enum(["asc", "desc"]).default("desc"),
+    viewMode: z.enum(["table", "kanban", "calendar", "bar_chart"]).default("kanban"),
+    visibleProperties: z
+      .array(z.enum(["case", "client", "assignedTo", "endDate", "status", "notes"]))
+      .default(["case", "client", "assignedTo", "endDate", "status"])
+  })
+  .default({
+    chartGroupBy: "status",
+    chartShowHorizontalLines: true,
+    chartSortBy: "count",
+    chartSortDirection: "desc",
+    chartType: "vertical_bar",
+    hideZeroValues: false,
+    kanbanCardLayout: "compact",
+    kanbanCardSize: "medium",
+    kanbanColorColumns: true,
+    openTaskIn: "side_sheet",
+    sortBy: "createdAt",
+    sortDirection: "desc",
+    viewMode: "kanban",
+    visibleProperties: ["case", "client", "assignedTo", "endDate", "status"]
+  });
+
+export const createTaskBoardViewSchema = z.object({
+  name: z.string().trim().min(2).max(120),
+  filters: taskBoardFiltersSchema,
+  settings: taskBoardSettingsSchema.optional()
+});
+
+export const updateTaskBoardViewSchema = z.object({
+  name: z.string().trim().min(2).max(120).optional(),
+  filters: taskBoardFiltersSchema.optional(),
+  settings: taskBoardSettingsSchema.optional()
+});
+
+export const updateCaseTaskLocalContextSchema = z.object({
+  caseId: optionalNullableUuid
+});
+
 export const listCaseExpenseAttachmentsQuerySchema = z.object({
   limit: z.coerce.number().int().min(1).max(8).default(8),
   cursor: optionalTrimmedString
@@ -248,6 +340,10 @@ export class ListCasePickerOptionsQueryDto extends createZodDto(listCasePickerOp
 export class ListCaseExpensesQueryDto extends createZodDto(listCaseExpensesQuerySchema) {}
 export class ListCaseHearingsQueryDto extends createZodDto(listCaseHearingsQuerySchema) {}
 export class ListCaseTasksQueryDto extends createZodDto(listCaseTasksQuerySchema) {}
+export class ListTenantCaseTasksQueryDto extends createZodDto(listTenantCaseTasksQuerySchema) {}
+export class CreateTaskBoardViewDto extends createZodDto(createTaskBoardViewSchema) {}
+export class UpdateTaskBoardViewDto extends createZodDto(updateTaskBoardViewSchema) {}
+export class UpdateCaseTaskLocalContextDto extends createZodDto(updateCaseTaskLocalContextSchema) {}
 export class ListCaseExpenseAttachmentsQueryDto extends createZodDto(
   listCaseExpenseAttachmentsQuerySchema
 ) {}
@@ -440,8 +536,8 @@ export class CaseTaskDto {
   @ApiProperty({ format: "uuid" })
   id!: string;
 
-  @ApiProperty({ format: "uuid" })
-  caseId!: string;
+  @ApiProperty({ nullable: true, type: String, format: "uuid" })
+  caseId!: string | null;
 
   @ApiProperty({ nullable: true, type: String, format: "uuid" })
   assignedMembershipId!: string | null;
@@ -490,6 +586,144 @@ export class CaseTaskDto {
 
   @ApiProperty({ format: "date-time" })
   updatedAt!: string;
+}
+
+export class GlobalCaseTaskCaseDto {
+  @ApiProperty({ format: "uuid" })
+  id!: string;
+
+  @ApiProperty({ example: "EXP-1234/2026" })
+  caseNumber!: string;
+
+  @ApiProperty({ example: "Perez c/ Gomez s/ Danos y perjuicios" })
+  caption!: string;
+}
+
+export class GlobalCaseTaskClientDto {
+  @ApiProperty({ format: "uuid" })
+  id!: string;
+
+  @ApiProperty({ example: "Ana Perez" })
+  displayName!: string;
+}
+
+export class GlobalCaseTaskDto extends CaseTaskDto {
+  @ApiProperty({ nullable: true, type: GlobalCaseTaskCaseDto })
+  case!: GlobalCaseTaskCaseDto | null;
+
+  @ApiProperty({ nullable: true, type: GlobalCaseTaskClientDto })
+  client!: GlobalCaseTaskClientDto | null;
+}
+
+export class TaskBoardFiltersDto {
+  @ApiPropertyOptional({ format: "uuid" })
+  assignedMembershipId?: string;
+
+  @ApiPropertyOptional({ format: "uuid" })
+  practiceAreaId?: string;
+
+  @ApiPropertyOptional({ format: "uuid" })
+  caseId?: string;
+
+  @ApiPropertyOptional({ format: "uuid" })
+  clientId?: string;
+
+  @ApiPropertyOptional({ enum: caseTaskDueStatusSchema.options })
+  dueStatus?: z.infer<typeof caseTaskDueStatusSchema>;
+
+  @ApiPropertyOptional({ format: "date" })
+  endDateFrom?: string;
+
+  @ApiPropertyOptional({ format: "date" })
+  endDateTo?: string;
+
+  @ApiPropertyOptional()
+  search?: string;
+
+  @ApiPropertyOptional({ enum: caseTaskStatusSchema.options })
+  status?: z.infer<typeof caseTaskStatusSchema>;
+}
+
+export class TaskBoardSettingsDto {
+  @ApiProperty({ enum: ["status", "client", "case", "assignedTo"], example: "status" })
+  chartGroupBy!: z.infer<typeof taskBoardSettingsSchema>["chartGroupBy"];
+
+  @ApiProperty({ example: true })
+  chartShowHorizontalLines!: z.infer<typeof taskBoardSettingsSchema>["chartShowHorizontalLines"];
+
+  @ApiProperty({ enum: ["count", "label"], example: "count" })
+  chartSortBy!: z.infer<typeof taskBoardSettingsSchema>["chartSortBy"];
+
+  @ApiProperty({ enum: ["asc", "desc"], example: "desc" })
+  chartSortDirection!: z.infer<typeof taskBoardSettingsSchema>["chartSortDirection"];
+
+  @ApiProperty({
+    enum: ["vertical_bar", "horizontal_bar", "line", "pie"],
+    example: "vertical_bar"
+  })
+  chartType!: z.infer<typeof taskBoardSettingsSchema>["chartType"];
+
+  @ApiProperty({ example: false })
+  hideZeroValues!: z.infer<typeof taskBoardSettingsSchema>["hideZeroValues"];
+
+  @ApiProperty({ enum: ["compact", "list"], example: "compact" })
+  kanbanCardLayout!: z.infer<typeof taskBoardSettingsSchema>["kanbanCardLayout"];
+
+  @ApiProperty({ enum: ["small", "medium", "large"], example: "medium" })
+  kanbanCardSize!: z.infer<typeof taskBoardSettingsSchema>["kanbanCardSize"];
+
+  @ApiProperty({ example: true })
+  kanbanColorColumns!: z.infer<typeof taskBoardSettingsSchema>["kanbanColorColumns"];
+
+  @ApiProperty({ enum: ["side_sheet", "center_modal"], example: "side_sheet" })
+  openTaskIn!: z.infer<typeof taskBoardSettingsSchema>["openTaskIn"];
+
+  @ApiProperty({ enum: ["table", "kanban", "calendar", "bar_chart"], example: "kanban" })
+  viewMode!: z.infer<typeof taskBoardSettingsSchema>["viewMode"];
+
+  @ApiProperty({
+    enum: ["case", "client", "assignedTo", "endDate", "status", "notes"],
+    example: ["case", "client", "assignedTo", "endDate", "status"],
+    isArray: true
+  })
+  visibleProperties!: z.infer<typeof taskBoardSettingsSchema>["visibleProperties"];
+
+  @ApiProperty({
+    enum: ["name", "status", "endDate", "client", "case", "assignedTo", "createdAt"],
+    example: "createdAt"
+  })
+  sortBy!: z.infer<typeof taskBoardSettingsSchema>["sortBy"];
+
+  @ApiProperty({ enum: ["asc", "desc"], example: "desc" })
+  sortDirection!: z.infer<typeof taskBoardSettingsSchema>["sortDirection"];
+}
+
+export class TaskBoardViewDto {
+  @ApiProperty({ format: "uuid" })
+  id!: string;
+
+  @ApiProperty({ example: "Tablero de tareas" })
+  name!: string;
+
+  @ApiProperty({ type: TaskBoardFiltersDto })
+  filters!: TaskBoardFiltersDto;
+
+  @ApiProperty({ type: TaskBoardSettingsDto })
+  settings!: TaskBoardSettingsDto;
+
+  @ApiProperty({ format: "uuid" })
+  createdByMembershipId!: string;
+
+  @ApiProperty({ format: "date-time" })
+  createdAt!: string;
+
+  @ApiProperty({ format: "date-time" })
+  updatedAt!: string;
+}
+
+export class TaskBoardViewsListResponseDto {
+  @ApiProperty({ type: [TaskBoardViewDto] })
+  items!: TaskBoardViewDto[];
 }
 
 export class CaseExpenseTaskDto {
@@ -644,6 +878,9 @@ export class CaseHearingDto {
   @ApiProperty({ example: true })
   notificationsEnabled!: boolean;
 
+  @ApiProperty({ type: [String], format: "uuid" })
+  participantMembershipIds!: string[];
+
   @ApiProperty({ example: false })
   notificationEnabled!: boolean;
 
@@ -739,6 +976,28 @@ export class CasesPageInfoDto {
 export class CaseTasksListResponseDto {
   @ApiProperty({ type: [CaseTaskDto] })
   items!: CaseTaskDto[];
+
+  @ApiProperty({ type: CasesPageInfoDto })
+  pageInfo!: CasesPageInfoDto;
+}
+
+export class TenantCaseTasksMetricsDto {
+  @ApiProperty({ example: 5 })
+  todo!: number;
+
+  @ApiProperty({ example: 12 })
+  done!: number;
+
+  @ApiProperty({ example: 3 })
+  dueSoon!: number;
+
+  @ApiProperty({ example: 2 })
+  overdue!: number;
+}
+
+export class TenantCaseTasksListResponseDto {
+  @ApiProperty({ type: [GlobalCaseTaskDto] })
+  items!: GlobalCaseTaskDto[];
 
   @ApiProperty({ type: CasesPageInfoDto })
   pageInfo!: CasesPageInfoDto;
@@ -895,6 +1154,11 @@ export type ListCasePickerOptionsQuery = z.infer<typeof listCasePickerOptionsQue
 export type ListCaseExpensesQuery = z.infer<typeof listCaseExpensesQuerySchema>;
 export type ListCaseHearingsQuery = z.infer<typeof listCaseHearingsQuerySchema>;
 export type ListCaseTasksQuery = z.infer<typeof listCaseTasksQuerySchema>;
+export type ListTenantCaseTasksQuery = z.infer<typeof listTenantCaseTasksQuerySchema>;
+export type TaskBoardFiltersInput = z.infer<typeof taskBoardFiltersSchema>;
+export type TaskBoardSettingsInput = z.infer<typeof taskBoardSettingsSchema>;
+export type CreateTaskBoardViewInput = z.infer<typeof createTaskBoardViewSchema>;
+export type UpdateTaskBoardViewInput = z.infer<typeof updateTaskBoardViewSchema>;
 export type ListCaseExpenseAttachmentsQuery = z.infer<typeof listCaseExpenseAttachmentsQuerySchema>;
 export type ListCaseDocumentsQuery = z.infer<typeof listCaseDocumentsQuerySchema>;
 export type ListDocumentCategoriesQuery = z.infer<typeof listDocumentCategoriesQuerySchema>;
@@ -904,6 +1168,7 @@ export type CreateCaseInput = z.infer<typeof createCaseSchema>;
 export type UpdateCaseInput = z.infer<typeof updateCaseSchema>;
 export type CreateCaseTaskInput = z.infer<typeof caseTaskInputSchema>;
 export type UpdateCaseTaskInput = z.infer<typeof caseTaskInputSchema>;
+export type UpdateCaseTaskLocalContextInput = z.infer<typeof updateCaseTaskLocalContextSchema>;
 export type CreateCaseExpenseInput = z.infer<typeof caseExpenseInputSchema>;
 export type UpdateCaseExpenseInput = z.infer<typeof caseExpenseInputSchema>;
 export type CreateCaseHearingInput = z.infer<typeof caseHearingInputSchema>;

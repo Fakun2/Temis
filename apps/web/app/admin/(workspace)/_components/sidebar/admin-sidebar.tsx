@@ -22,6 +22,7 @@ import {
 } from "@/components/ui/sidebar";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { libraryKeys, listLibraryFolders } from "../../library/_api/library.api";
+import { connectorViews } from "../../account/_constants/connectors";
 import { useDashboardQuery } from "@/lib/query/use-dashboard-query";
 import { SidebarFooterActions } from "./sidebar-footer-actions";
 import { SidebarNavSection } from "./sidebar-nav-section";
@@ -105,6 +106,9 @@ function AccountSidebarNav({ collapsed, onClose }: { collapsed: boolean; onClose
   const searchParams = useSearchParams();
   const [activeHash, setActiveHash] = useState("#profile");
   const accountView = searchParams.get("view");
+  const hasNotionOAuthCallback =
+    Boolean(searchParams.get("code") && searchParams.get("state")) ||
+    Boolean(searchParams.get("error"));
   const backIconClassName = cn(
     "admin-sidebar-nav-icon shrink-0 text-[var(--admin-sidebar-icon-foreground)]",
     collapsed ? "size-4" : "size-[18px]"
@@ -129,8 +133,7 @@ function AccountSidebarNav({ collapsed, onClose }: { collapsed: boolean; onClose
               asChild
               isActive={false}
               className={cn(
-                collapsed ? "min-h-11 justify-center px-2" : "mb-2 min-h-10 px-3 text-sm",
-                "temis-account-back-trigger"
+                collapsed ? "min-h-11 justify-center px-2" : "mb-2 min-h-10 px-3 text-sm"
               )}
             >
               <Link href="/admin" onClick={onClose}>
@@ -145,9 +148,9 @@ function AccountSidebarNav({ collapsed, onClose }: { collapsed: boolean; onClose
           </AccountSidebarTooltip>
         </SidebarMenuItem>
         {accountSidebarItems.map((item) => {
-          const itemView = item.href.includes("?view=ia") ? "ia" : null;
+          const itemView = getAccountSidebarItemView(item.href);
           const active = itemView
-            ? accountView === itemView || accountView === "ai"
+            ? isAccountSidebarViewActive(itemView, accountView, hasNotionOAuthCallback)
             : !accountView && item.href.endsWith(activeHash);
 
           return (
@@ -174,7 +177,13 @@ function AccountSidebarNav({ collapsed, onClose }: { collapsed: boolean; onClose
                       className={cn(
                         "shrink-0",
                         "admin-sidebar-nav-icon",
-                        collapsed ? "size-4" : "size-[18px]",
+                        item.iconAnimation === "account-connectors"
+                          ? collapsed
+                            ? "size-[18px]"
+                            : "size-5"
+                          : collapsed
+                            ? "size-4"
+                            : "size-[18px]",
                         active
                           ? "text-[var(--admin-sidebar-active-foreground)]"
                           : "text-[var(--admin-sidebar-icon-foreground)]"
@@ -192,6 +201,34 @@ function AccountSidebarNav({ collapsed, onClose }: { collapsed: boolean; onClose
       </SidebarMenu>
     </TooltipProvider>
   );
+}
+
+function getAccountSidebarItemView(href?: string) {
+  if (!href?.includes("?")) {
+    return null;
+  }
+
+  return new URLSearchParams(href.slice(href.indexOf("?") + 1)).get("view");
+}
+
+function isAccountSidebarViewActive(
+  itemView: string,
+  accountView: string | null,
+  hasNotionOAuthCallback: boolean
+) {
+  if (itemView === "ia") {
+    return accountView === "ia" || accountView === "ai";
+  }
+
+  if (itemView === "connectors") {
+    return (
+      hasNotionOAuthCallback ||
+      accountView === "connectors" ||
+      Boolean(accountView && connectorViews.has(accountView))
+    );
+  }
+
+  return accountView === itemView;
 }
 
 function AccountSidebarTooltip({ children, label }: { children: ReactNode; label: string }) {

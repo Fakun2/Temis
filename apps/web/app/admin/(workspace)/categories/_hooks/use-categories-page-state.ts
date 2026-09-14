@@ -65,6 +65,7 @@ export function useCategoriesPageState() {
 
   return {
     cursor,
+    cursorStack,
     filters,
     pageIndex,
     sortDirection,

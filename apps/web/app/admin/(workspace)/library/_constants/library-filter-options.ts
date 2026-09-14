@@ -1,5 +1,4 @@
 import {
-  BriefcaseBusiness,
   FileImage,
   FileSpreadsheet,
   FileText,
@@ -11,7 +10,6 @@ import type { DocumentMimeGroup } from "../_types/library.types";
 
 export const libraryFilterSectionIcons = {
   category: Tags,
-  case: BriefcaseBusiness,
   type: FileType
 };
 
@@ -26,4 +24,3 @@ export const documentTypeFilterOptions: Array<{
   { icon: FileSpreadsheet, label: "Excel", value: "excel" },
   { icon: Presentation, label: "PowerPoint", value: "powerpoint" }
 ];
-

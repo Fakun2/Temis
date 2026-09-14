@@ -4,7 +4,6 @@ import {
   Gavel,
   Home,
   Tags,
-  UsersRound
 } from "lucide-react";
 import type { AdminNavSection, AdminPageTitle } from "../_types/admin";
 import {
@@ -12,9 +11,11 @@ import {
   AnimatedCalendarIcon,
   AnimatedCashboxIcon,
   AnimatedCasesIcon,
+  AnimatedClientsIcon,
   AnimatedLibraryIcon,
   AnimatedSettingsIcon,
-  AnimatedStaffIcon
+  AnimatedStaffIcon,
+  AnimatedTasksIcon,
 } from "../_components/sidebar/animated-library-icon";
 
 export const adminNavSections: AdminNavSection[] = [
@@ -31,7 +32,8 @@ export const adminNavSections: AdminNavSection[] = [
       {
         href: "/admin/clients",
         label: "Clientes",
-        icon: UsersRound,
+        icon: AnimatedClientsIcon,
+        iconAnimation: "clients",
         requiredPermissions: ["clients:read"]
       },
       {
@@ -49,6 +51,14 @@ export const adminNavSections: AdminNavSection[] = [
         icon: AnimatedCalendarIcon,
         requiredPermissions: ["cases:read"],
         shortcut: { keys: ["a", "c"], label: "A Luego C" }
+      },
+      {
+        href: "/admin/tasks",
+        iconAnimation: "tasks",
+        label: "Tareas",
+        icon: AnimatedTasksIcon,
+        requiredPermissions: ["tasks:read"],
+        shortcut: { keys: ["a", "t"], label: "A Luego T" }
       },
       {
         href: "/admin/library",
@@ -134,6 +144,7 @@ export const adminPageTitles: AdminPageTitle[] = [
   { href: "/admin/categories", title: "Categorias" },
   { href: "/admin/staff", title: "Staff" },
   { href: "/admin/cases", title: "Expedientes" },
+  { href: "/admin/tasks", title: "Tareas" },
   { href: "/admin/calendar", title: "Calendario" },
   { href: "/admin/library", title: "Biblioteca" },
   { href: "/admin/clients", title: "Clientes" },

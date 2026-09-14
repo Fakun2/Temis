@@ -22,6 +22,7 @@ import { useCasesQuery } from "../../../_hooks/use-cases-query";
 import { CasePickerField } from "../../case-picker-field";
 import { CaseActionSheet } from "../case-action-sheet";
 import { NotificationSettingsField } from "../notification-settings-field";
+import { ParticipantSelectorDialog } from "../participant-selector-dialog";
 import { CaseDateInput } from "../../sheet/case-date-input";
 import { CaseField } from "../../sheet/case-field";
 import { caseHearingTypeOptions } from "./constants";
@@ -130,6 +131,15 @@ export function CaseHearingSheet({
           placeholder="Detalle breve de la audiencia"
           value={draft.description}
           onChange={(event) => updateDraft("description", event.target.value)}
+        />
+      </CaseField>
+
+      <CaseField label="Integrantes que participan">
+        <ParticipantSelectorDialog
+          emptyLabel="Seleccionar integrantes"
+          onApply={(membershipIds) => updateDraft("participantMembershipIds", membershipIds)}
+          selectedMembershipIds={draft.participantMembershipIds}
+          title="Seleccionar integrantes de la audiencia"
         />
       </CaseField>
 

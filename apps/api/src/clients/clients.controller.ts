@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   HttpCode,
   HttpStatus,
@@ -31,6 +32,7 @@ import { ActiveTenant } from "../tenancy/active-tenant.decorator";
 import { TenantGuard } from "../tenancy/tenant.guard";
 import {
   ClientArchiveResponseDto,
+  ClientDeleteResponseDto,
   ClientDetailDto,
   ClientsListResponseDto,
   CreateHumanClientInputDto,
@@ -131,12 +133,22 @@ export class ClientsController {
 
   @Post(":id/archive")
   @HttpCode(HttpStatus.OK)
-  @Permissions("clients:delete")
+  @Permissions("clients:update")
   @ApiParam({ format: "uuid", name: "id", type: String })
   @ApiOkResponse({ type: ClientArchiveResponseDto })
   @ApiBadRequestResponse({ description: "El identificador no es un UUID valido." })
   @ApiNotFoundResponse({ description: "El cliente no existe en el estudio activo." })
   archive(@ActiveTenant() tenantId: string, @Param("id", new ParseUUIDPipe()) clientId: string) {
     return this.clientsService.archive(tenantId, clientId);
+  }
+
+  @Delete(":id")
+  @Permissions("clients:delete")
+  @ApiParam({ format: "uuid", name: "id", type: String })
+  @ApiOkResponse({ type: ClientDeleteResponseDto })
+  @ApiBadRequestResponse({ description: "El identificador no es un UUID valido." })
+  @ApiNotFoundResponse({ description: "El cliente no existe en el estudio activo." })
+  delete(@ActiveTenant() tenantId: string, @Param("id", new ParseUUIDPipe()) clientId: string) {
+    return this.clientsService.delete(tenantId, clientId);
   }
 }

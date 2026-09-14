@@ -12,7 +12,8 @@
     "rootDir": "src",
     "paths": {
       "@temis/ai-contracts": ["packages/ai-contracts/dist/index"],
-      "@temis/ai-core": ["packages/ai-core/dist/index"]
+      "@temis/ai-core": ["packages/ai-core/dist/index"],
+      "@temis/integration-contracts": ["packages/integration-contracts/dist/index"]
     }
   },
   "include": ["src/**/*.ts"]

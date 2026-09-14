@@ -117,7 +117,6 @@ function CurrencyTableCardHeader({
           onStatusChange={onStatusChange}
         />
       }
-      description="Monedas habilitadas para caja, gastos y configuracion operativa del estudio."
       icon={CircleDollarSign}
       title="Monedas"
     />

@@ -6,7 +6,7 @@ import {
   Logger,
   NotFoundException
 } from "@nestjs/common";
-import { DocumentStorageCleanupJobStatus, Prisma } from "@prisma/client";
+import { DocumentScope, DocumentStorageCleanupJobStatus, Prisma } from "@prisma/client";
 import type { OnModuleDestroy, OnModuleInit } from "@nestjs/common";
 import { PrismaService, type TenantPrismaClient } from "../database/prisma.service";
 import { AsyncOutboxService } from "../queue/async-outbox.service";
@@ -23,7 +23,8 @@ import type {
   ListDocumentsQuery,
   UploadDocumentImportItemsInput,
   UpdateDocumentFolderInput,
-  UpdateDocumentInput
+  UpdateDocumentInput,
+  ReplaceDocumentInput
 } from "./documents.schemas";
 
 export type UploadedDocumentFile = {
@@ -33,12 +34,15 @@ export type UploadedDocumentFile = {
   size: number;
 };
 
+type DocumentContextInput = (CreateDocumentInput | UpdateDocumentInput) & { caseId?: string | null };
+
 type CleanupReason =
   | "bulk_deleted"
   | "case_deleted"
   | "document_deleted"
   | "folder_deleted"
-  | "metadata_create_failed";
+  | "metadata_create_failed"
+  | "document_replaced";
 
 const allowedDocumentMimeTypes = new Set([
   "application/pdf",
@@ -80,6 +84,10 @@ const mimeGroups: Record<DocumentMimeGroup, string[]> = {
 const duplicateDocumentMessage = "Este archivo ya fue cargado en la carpeta seleccionada.";
 const duplicateDocumentIndexName = "documents_tenant_folder_checksum_active_key";
 const duplicateFolderIndexName = "document_folders_tenant_parent_name_key";
+const systemClientUuidFolderNote = "system:case-library:client-uuid";
+const systemClientNameFolderNote = "system:case-library:client-name";
+const systemCaseUuidFolderNote = "system:case-library:case-uuid";
+const systemCaseNameFolderNote = "system:case-library:case-name";
 const cleanupIntervalMs = 30_000;
 const cleanupProcessingTimeoutMs = 10 * 60_000;
 const maxCleanupAttempts = 5;
@@ -121,9 +129,6 @@ export class DocumentsService implements OnModuleInit, OnModuleDestroy {
     if (folderId) {
       await this.findTenantFolderOrThrow(tenantId, folderId);
     }
-    if (query.caseId) {
-      await this.findTenantCaseOrThrow(tenantId, query.caseId);
-    }
     const selectedMimeGroups = getSelectedMimeGroups(query);
 
     const andFilters: Prisma.DocumentWhereInput[] = [
@@ -145,7 +150,8 @@ export class DocumentsService implements OnModuleInit, OnModuleDestroy {
       deletedAt: null,
       status: "active",
       tenantId,
-      ...(query.caseId ? { caseId: query.caseId } : { folderId }),
+      folderId,
+      scope: DocumentScope.library,
       ...(query.categoryId ? { categoryId: query.categoryId } : {}),
       ...(selectedMimeGroups.length
         ? { mimeType: { in: selectedMimeGroups.flatMap((group) => mimeGroups[group]) } }
@@ -154,13 +160,9 @@ export class DocumentsService implements OnModuleInit, OnModuleDestroy {
     };
 
     const [folders, documents, metrics, breadcrumbs] = await Promise.all([
-      query.caseId || query.search || query.categoryId || selectedMimeGroups.length
+      query.search || query.categoryId || selectedMimeGroups.length
         ? Promise.resolve([])
-        : this.prisma.documentFolder.findMany({
-            orderBy: [{ name: "asc" }, { id: "asc" }],
-            select: documentFolderSelect,
-            where: { parentId: folderId, tenantId }
-          }),
+        : this.listVisibleChildFolders(tenantId, folderId),
       this.prisma.document.findMany({
         orderBy: [{ createdAt: "desc" }, { id: "desc" }],
         select: documentSelect,
@@ -176,7 +178,7 @@ export class DocumentsService implements OnModuleInit, OnModuleDestroy {
     const hasNextPage = documents.length > query.limit;
 
     return {
-      breadcrumbs: breadcrumbs.map(toDocumentFolderDto),
+      breadcrumbs: breadcrumbs.filter(isVisibleDocumentFolder).map(toDocumentFolderDto),
       documents: pageItems.map(toDocumentDto),
       folders: folders.map(toDocumentFolderDto),
       metrics,
@@ -234,7 +236,10 @@ export class DocumentsService implements OnModuleInit, OnModuleDestroy {
     const folders = await this.prisma.documentFolder.findMany({
       orderBy: [{ parentId: "asc" }, { name: "asc" }, { id: "asc" }],
       select: documentFolderSelect,
-      where: { tenantId }
+      where: {
+        scope: DocumentScope.library,
+        tenantId
+      }
     });
 
     return folders.map(toDocumentFolderDto);
@@ -246,11 +251,11 @@ export class DocumentsService implements OnModuleInit, OnModuleDestroy {
         await lockTenant(tx, tenantId);
         const parentId = normalizeNullableUuid(input.parentId);
         if (parentId) {
-          await this.findTenantFolderOrThrow(tenantId, parentId, tx);
+          await this.findTenantFolderOrThrow(tenantId, parentId, tx, DocumentScope.library);
         }
 
         const folder = await tx.documentFolder.create({
-          data: { name: input.name, notes: input.notes ?? null, parentId, tenantId },
+          data: { name: input.name, notes: input.notes ?? null, parentId, scope: DocumentScope.library, tenantId },
           select: documentFolderSelect
         });
 
@@ -266,7 +271,7 @@ export class DocumentsService implements OnModuleInit, OnModuleDestroy {
     try {
       return await this.prisma.runWithTenant(tenantId, async (tx) => {
         await lockTenant(tx, tenantId);
-        await this.findTenantFolderOrThrow(tenantId, folderId, tx);
+        await this.findTenantFolderOrThrow(tenantId, folderId, tx, DocumentScope.library);
         const parentId = "parentId" in input ? normalizeNullableUuid(input.parentId) : undefined;
 
         if (parentId !== undefined) {
@@ -274,7 +279,7 @@ export class DocumentsService implements OnModuleInit, OnModuleDestroy {
             throw new BadRequestException("La carpeta no puede moverse dentro de si misma.");
           }
           if (parentId) {
-            await this.findTenantFolderOrThrow(tenantId, parentId, tx);
+            await this.findTenantFolderOrThrow(tenantId, parentId, tx, DocumentScope.library);
             await assertFolderMoveDoesNotCreateCycle(tx, tenantId, folderId, parentId);
           }
         }
@@ -300,14 +305,14 @@ export class DocumentsService implements OnModuleInit, OnModuleDestroy {
   }
 
   async deleteFolder(tenantId: string, folderId: string) {
-    await this.deleteFoldersAndDocuments(tenantId, { documentIds: [], folderIds: [folderId] });
+    await this.deleteFoldersAndDocuments(tenantId, { documentIds: [], folderIds: [folderId] }, DocumentScope.library);
     return { status: "ok" as const };
   }
 
   async create(
     tenantId: string,
     uploadedByUserId: string,
-    input: CreateDocumentInput,
+    input: CreateDocumentInput & { caseId?: string },
     file?: UploadedDocumentFile
   ) {
     if (!file) {
@@ -364,6 +369,7 @@ export class DocumentsService implements OnModuleInit, OnModuleDestroy {
             originalName: file.originalname,
             sizeBytes: file.size,
             storageProvider: this.storage.getProvider(),
+            scope: normalizedInput.caseId ? DocumentScope.case : DocumentScope.library,
             tenantId,
             title: file.originalname,
             uploadedByUserId
@@ -391,7 +397,7 @@ export class DocumentsService implements OnModuleInit, OnModuleDestroy {
   async update(tenantId: string, documentId: string, input: UpdateDocumentInput) {
     const document = await this.prisma.runWithTenant(tenantId, async (tx) => {
       await lockDocuments(tx, tenantId, [documentId]);
-      await this.findTenantDocumentOrThrow(tenantId, documentId, tx);
+      await this.findTenantDocumentOrThrow(tenantId, documentId, tx, undefined, DocumentScope.library);
       const normalizedInput = await this.validateDocumentContext(tenantId, undefined, input, tx);
 
       return tx.document.update({
@@ -399,9 +405,6 @@ export class DocumentsService implements OnModuleInit, OnModuleDestroy {
           ...(input.title ? { title: input.title } : {}),
           ...(Object.prototype.hasOwnProperty.call(input, "folderId")
             ? { folderId: normalizedInput.folderId }
-            : {}),
-          ...(Object.prototype.hasOwnProperty.call(input, "caseId")
-            ? { caseId: normalizedInput.caseId }
             : {}),
           ...(Object.prototype.hasOwnProperty.call(input, "categoryId")
             ? { categoryId: normalizedInput.categoryId }
@@ -418,12 +421,83 @@ export class DocumentsService implements OnModuleInit, OnModuleDestroy {
     return toDocumentDto(document);
   }
 
+  async replace(
+    tenantId: string,
+    documentId: string,
+    input: ReplaceDocumentInput,
+    file?: UploadedDocumentFile
+  ) {
+    if (!file) {
+      throw new BadRequestException("Selecciona un documento para reemplazar.");
+    }
+    validateDocumentFile(file);
+    const objectKey = buildDocumentObjectKey({
+      documentId: randomUUID(),
+      folderId: null,
+      originalName: file.originalname,
+      tenantId
+    });
+    await this.storage.putObject({
+      body: file.buffer,
+      contentLength: file.size,
+      contentType: file.mimetype,
+      key: objectKey
+    });
+    try {
+      const document = await this.prisma.runWithTenant(tenantId, async (tx) => {
+        await lockDocuments(tx, tenantId, [documentId]);
+        const previous = await this.findTenantDocumentOrThrow(
+          tenantId,
+          documentId,
+          tx,
+          undefined,
+          DocumentScope.library
+        );
+        const updated = await tx.document.update({
+          data: {
+            bucket: this.storage.getBucket(),
+            checksum: createHash("sha256").update(file.buffer).digest("hex"),
+            extension: getFileExtension(file.originalname),
+            mimeType: file.mimetype,
+            objectKey,
+            originalName: file.originalname,
+            sizeBytes: file.size,
+            storageProvider: this.storage.getProvider(),
+            ...(input.title ? { title: input.title } : {})
+          },
+          select: documentSelect,
+          where: { id: documentId }
+        });
+        await enqueueCleanupJob(tx, this.outbox, {
+          bucket: previous.bucket,
+          documentId,
+          objectKey: previous.objectKey,
+          reason: "document_replaced",
+          storageProvider: previous.storageProvider,
+          tenantId
+        });
+        return updated;
+      });
+      return toDocumentDto(document);
+    } catch (error) {
+      await this.deleteUploadedObjectOrEnqueueCleanup({
+        bucket: this.storage.getBucket(),
+        objectKey,
+        reason: "metadata_create_failed",
+        storageProvider: this.storage.getProvider(),
+        tenantId
+      });
+      throw error;
+    }
+  }
+
   async readObject(tenantId: string, documentId: string, caseId?: string) {
     const document = await this.findTenantDocumentOrThrow(
       tenantId,
       documentId,
       this.prisma,
-      caseId
+      caseId,
+      caseId ? DocumentScope.case : DocumentScope.library
     );
     const object = await this.storage.getObject(document.objectKey);
 
@@ -434,7 +508,7 @@ export class DocumentsService implements OnModuleInit, OnModuleDestroy {
   }
 
   async delete(tenantId: string, documentId: string) {
-    await this.deleteFoldersAndDocuments(tenantId, { documentIds: [documentId], folderIds: [] });
+    await this.deleteFoldersAndDocuments(tenantId, { documentIds: [documentId], folderIds: [] }, DocumentScope.library);
     if (shouldProcessCleanupInline()) {
       await this.processDueCleanupJobs(1);
     }
@@ -442,7 +516,7 @@ export class DocumentsService implements OnModuleInit, OnModuleDestroy {
   }
 
   async bulkDelete(tenantId: string, input: BulkDeleteDocumentsInput) {
-    await this.deleteFoldersAndDocuments(tenantId, input);
+    await this.deleteFoldersAndDocuments(tenantId, input, DocumentScope.library);
     if (shouldProcessCleanupInline()) {
       await this.processDueCleanupJobs(3);
     }
@@ -459,6 +533,7 @@ export class DocumentsService implements OnModuleInit, OnModuleDestroy {
           deletedAt: null,
           id: { in: input.documentIds },
           status: "active",
+          scope: DocumentScope.library,
           tenantId
         }
       });
@@ -466,12 +541,12 @@ export class DocumentsService implements OnModuleInit, OnModuleDestroy {
         throw new NotFoundException("Uno o mas documentos no existen en el estudio activo.");
       }
       if (folderId) {
-        await this.findTenantFolderOrThrow(tenantId, folderId, tx);
+        await this.findTenantFolderOrThrow(tenantId, folderId, tx, DocumentScope.library);
       }
 
       await tx.document.updateMany({
         data: { folderId },
-        where: { id: { in: input.documentIds }, tenantId }
+        where: { id: { in: input.documentIds }, scope: DocumentScope.library, tenantId }
       });
     });
 
@@ -487,7 +562,7 @@ export class DocumentsService implements OnModuleInit, OnModuleDestroy {
 
     const job = await this.prisma.runWithTenant(tenantId, async (tx) => {
       if (folderId) {
-        await this.findTenantFolderOrThrow(tenantId, folderId, tx);
+        await this.findTenantFolderOrThrow(tenantId, folderId, tx, DocumentScope.library);
       }
       await this.findTenantMembershipOrThrow(tenantId, createdByUserId, tx);
 
@@ -585,16 +660,32 @@ export class DocumentsService implements OnModuleInit, OnModuleDestroy {
     caseId: string,
     query: { categoryId?: string; cursor?: string; limit: number }
   ) {
-    return this.list(tenantId, {
-      caseId,
-      categoryId: query.categoryId,
-      cursor: query.cursor,
-      folderId: undefined,
-      limit: query.limit
-    }).then((response) => ({
-      items: response.documents.map(toCaseDocumentDto),
-      pageInfo: { ...response.pageInfo, offset: 0 }
-    }));
+    await this.findTenantCaseOrThrow(tenantId, caseId);
+    const documents = await this.prisma.document.findMany({
+      orderBy: [{ createdAt: "desc" }, { id: "desc" }],
+      select: documentSelect,
+      take: query.limit + 1,
+      where: {
+        caseId,
+        ...(query.categoryId ? { categoryId: query.categoryId } : {}),
+        deletedAt: null,
+        scope: DocumentScope.case,
+        status: "active",
+        tenantId
+      }
+    });
+    const items = documents.slice(0, query.limit);
+    const lastItem = items.at(-1);
+    return {
+      items: items.map(toCaseDocumentDto),
+      pageInfo: {
+        hasNextPage: documents.length > query.limit,
+        limit: query.limit,
+        nextCursor: lastItem ? encodeDocumentsCursor({ createdAt: lastItem.createdAt, id: lastItem.id }) : null,
+        offset: 0,
+        total: items.length
+      }
+    };
   }
 
   async createCaseDocument(
@@ -604,6 +695,10 @@ export class DocumentsService implements OnModuleInit, OnModuleDestroy {
     input: { categoryId?: string; notes?: string },
     file?: UploadedDocumentFile
   ) {
+    if (!file) {
+      throw new BadRequestException("Selecciona un documento para subir.");
+    }
+
     return this.create(tenantId, uploadedByUserId, { ...input, caseId }, file).then(
       toCaseDocumentDto
     );
@@ -617,8 +712,9 @@ export class DocumentsService implements OnModuleInit, OnModuleDestroy {
   }
 
   async deleteCaseDocument(tenantId: string, caseId: string, documentId: string) {
-    await this.findTenantDocumentOrThrow(tenantId, documentId, this.prisma, caseId);
-    return this.delete(tenantId, documentId);
+    await this.findTenantDocumentOrThrow(tenantId, documentId, this.prisma, caseId, DocumentScope.case);
+    await this.deleteFoldersAndDocuments(tenantId, { documentIds: [documentId], folderIds: [] }, DocumentScope.case);
+    return { status: "ok" as const };
   }
 
   async enqueueCleanupForCaseDeletion(
@@ -629,7 +725,7 @@ export class DocumentsService implements OnModuleInit, OnModuleDestroy {
     await tx.$executeRaw`SELECT set_config('app.tenant_id', ${tenantId}, true)`;
     const documents = await tx.document.findMany({
       select: { bucket: true, id: true, objectKey: true, storageProvider: true },
-      where: { caseId, tenantId }
+      where: { caseId, scope: DocumentScope.case, tenantId }
     });
 
     for (const document of documents) {
@@ -697,11 +793,11 @@ export class DocumentsService implements OnModuleInit, OnModuleDestroy {
 
   private async getMetrics(tenantId: string) {
     const [folders, documents, storage] = await Promise.all([
-      this.prisma.documentFolder.count({ where: { tenantId } }),
-      this.prisma.document.count({ where: { deletedAt: null, status: "active", tenantId } }),
+      this.prisma.documentFolder.count({ where: { scope: DocumentScope.library, tenantId } }),
+      this.prisma.document.count({ where: { deletedAt: null, scope: DocumentScope.library, status: "active", tenantId } }),
       this.prisma.document.aggregate({
         _sum: { sizeBytes: true },
-        where: { deletedAt: null, status: "active", tenantId }
+        where: { deletedAt: null, scope: DocumentScope.library, status: "active", tenantId }
       })
     ]);
 
@@ -711,7 +807,7 @@ export class DocumentsService implements OnModuleInit, OnModuleDestroy {
   private async validateDocumentContext(
     tenantId: string,
     uploadedByUserId: string | undefined,
-    input: CreateDocumentInput | UpdateDocumentInput,
+    input: DocumentContextInput,
     tx: TenantPrismaClient | PrismaService = this.prisma
   ) {
     const folderId = normalizeNullableUuid(input.folderId);
@@ -775,7 +871,91 @@ export class DocumentsService implements OnModuleInit, OnModuleDestroy {
     return membership;
   }
 
-  private async deleteFoldersAndDocuments(tenantId: string, input: BulkDeleteDocumentsInput) {
+  private async ensureCaseDocumentLibraryFolder(tenantId: string, caseId: string) {
+    return this.prisma.runWithTenant(tenantId, async (tx) => {
+      await lockTenant(tx, tenantId);
+      const caseItem = await tx.case.findFirst({
+        select: {
+          caption: true,
+          caseNumber: true,
+          id: true,
+          primaryClient: {
+            select: {
+              businessName: true,
+              firstName: true,
+              id: true,
+              lastName: true,
+              type: true
+            }
+          }
+        },
+        where: { id: caseId, tenantId }
+      });
+
+      if (!caseItem) {
+        throw new BadRequestException("El expediente seleccionado no pertenece al estudio activo.");
+      }
+      if (!caseItem.primaryClient) {
+        throw new BadRequestException(
+          "El expediente debe tener un cliente principal para subir documentos."
+        );
+      }
+
+      const clientUuidFolderId = await ensureSystemDocumentFolder(tx, tenantId, {
+        name: caseItem.primaryClient.id,
+        notes: systemClientUuidFolderNote,
+        parentId: null
+      });
+      const clientNameFolderId = await ensureSystemDocumentFolder(tx, tenantId, {
+        name: getClientDisplayName(caseItem.primaryClient),
+        notes: systemClientNameFolderNote,
+        parentId: clientUuidFolderId
+      });
+      const caseUuidFolderId = await ensureSystemDocumentFolder(tx, tenantId, {
+        name: caseItem.id,
+        notes: systemCaseUuidFolderNote,
+        parentId: clientNameFolderId
+      });
+
+      return ensureSystemDocumentFolder(tx, tenantId, {
+        name: getCaseDisplayFolderName(caseItem),
+        notes: systemCaseNameFolderNote,
+        parentId: caseUuidFolderId
+      });
+    });
+  }
+
+  private async listVisibleChildFolders(tenantId: string, folderId: string | null) {
+    const directFolders = await this.prisma.documentFolder.findMany({
+      orderBy: [{ name: "asc" }, { id: "asc" }],
+      select: documentFolderSelect,
+      where: { parentId: folderId, scope: DocumentScope.library, tenantId }
+    });
+    const technicalFolders = directFolders.filter(isTechnicalDocumentFolder);
+    const visibleDirectFolders = directFolders.filter(isVisibleDocumentFolder);
+
+    if (!technicalFolders.length) {
+      return visibleDirectFolders;
+    }
+
+    const visibleNestedFolders = await this.prisma.documentFolder.findMany({
+      orderBy: [{ name: "asc" }, { id: "asc" }],
+      select: documentFolderSelect,
+      where: {
+        NOT: { notes: { in: [systemClientUuidFolderNote, systemCaseUuidFolderNote] } },
+        parentId: { in: technicalFolders.map((folder) => folder.id) },
+        tenantId
+      }
+    });
+
+    return [...visibleDirectFolders, ...visibleNestedFolders].sort(compareDocumentFoldersByName);
+  }
+
+  private async deleteFoldersAndDocuments(
+    tenantId: string,
+    input: BulkDeleteDocumentsInput,
+    scope: DocumentScope
+  ) {
     if (input.documentIds.length === 0 && input.folderIds.length === 0) {
       return;
     }
@@ -792,6 +972,14 @@ export class DocumentsService implements OnModuleInit, OnModuleDestroy {
 
       if (folderIds.length && folderIds.some((id) => !allFolderIdSet.has(id))) {
         throw new NotFoundException("Una o mas carpetas no existen en el estudio activo.");
+      }
+      if (folderIds.length) {
+        const scopedFolderCount = await tx.documentFolder.count({
+          where: { id: { in: folderIds }, scope, tenantId }
+        });
+        if (scopedFolderCount !== folderIds.length) {
+          throw new NotFoundException("Una o mas carpetas no existen en la biblioteca.");
+        }
       }
 
       if (allFolderIds.length) {
@@ -811,6 +999,7 @@ export class DocumentsService implements OnModuleInit, OnModuleDestroy {
         where: {
           deletedAt: null,
           status: "active",
+          scope,
           tenantId,
           OR: [
             ...(documentIds.length ? [{ id: { in: documentIds } }] : []),
@@ -861,7 +1050,7 @@ export class DocumentsService implements OnModuleInit, OnModuleDestroy {
         });
       }
       if (allFolderIds.length) {
-        await tx.documentFolder.deleteMany({ where: { id: { in: allFolderIds }, tenantId } });
+        await tx.documentFolder.deleteMany({ where: { id: { in: allFolderIds }, scope, tenantId } });
       }
     });
   }
@@ -869,11 +1058,12 @@ export class DocumentsService implements OnModuleInit, OnModuleDestroy {
   private async findTenantFolderOrThrow(
     tenantId: string,
     folderId: string,
-    tx: TenantPrismaClient | PrismaService = this.prisma
+    tx: TenantPrismaClient | PrismaService = this.prisma,
+    scope: DocumentScope = DocumentScope.library
   ) {
     const folder = await tx.documentFolder.findFirst({
       select: documentFolderSelect,
-      where: { id: folderId, tenantId }
+      where: { id: folderId, scope, tenantId }
     });
     if (!folder) {
       throw new NotFoundException("La carpeta no existe en el estudio activo.");
@@ -898,7 +1088,8 @@ export class DocumentsService implements OnModuleInit, OnModuleDestroy {
     tenantId: string,
     documentId: string,
     tx: TenantPrismaClient | PrismaService = this.prisma,
-    caseId?: string
+    caseId?: string,
+    scope?: DocumentScope
   ) {
     const document = await tx.document.findFirst({
       select: documentWithObjectSelect,
@@ -907,6 +1098,7 @@ export class DocumentsService implements OnModuleInit, OnModuleDestroy {
         id: documentId,
         status: "active",
         tenantId,
+        ...(scope ? { scope } : {}),
         ...(caseId ? { caseId } : {})
       }
     });
@@ -1718,6 +1910,90 @@ function validateDocumentFile(file: UploadedDocumentFile) {
   if (file.size > maxDocumentSizeBytes) {
     throw new BadRequestException("El archivo no puede superar 25 MB.");
   }
+}
+
+async function ensureSystemDocumentFolder(
+  tx: TenantPrismaClient,
+  tenantId: string,
+  input: { name: string; notes: string; parentId: string | null }
+) {
+  const name = normalizeSystemFolderName(input.name);
+  const existing = await tx.documentFolder.findFirst({
+    select: { id: true },
+    where: {
+      name: { equals: name, mode: Prisma.QueryMode.insensitive },
+      parentId: input.parentId,
+      tenantId
+    }
+  });
+  if (existing) {
+    await tx.documentFolder.update({
+      data: { notes: input.notes },
+      where: { id: existing.id }
+    });
+    return existing.id;
+  }
+
+  try {
+    const folder = await tx.documentFolder.create({
+      data: { name, notes: input.notes, parentId: input.parentId, tenantId },
+      select: { id: true }
+    });
+    return folder.id;
+  } catch (error) {
+    if (!isUniqueConstraintError(error, duplicateFolderIndexName)) {
+      throw error;
+    }
+    const folder = await tx.documentFolder.findFirst({
+      select: { id: true },
+      where: {
+        name: { equals: name, mode: Prisma.QueryMode.insensitive },
+        parentId: input.parentId,
+        tenantId
+      }
+    });
+    if (!folder) {
+      throw error;
+    }
+    return folder.id;
+  }
+}
+
+function isTechnicalDocumentFolder(folder: Pick<DocumentFolderWithSelect, "notes">) {
+  return folder.notes === systemClientUuidFolderNote || folder.notes === systemCaseUuidFolderNote;
+}
+
+function isVisibleDocumentFolder(folder: Pick<DocumentFolderWithSelect, "notes">) {
+  return !isTechnicalDocumentFolder(folder);
+}
+
+function compareDocumentFoldersByName(left: DocumentFolderWithSelect, right: DocumentFolderWithSelect) {
+  return left.name.localeCompare(right.name) || left.id.localeCompare(right.id);
+}
+
+function normalizeSystemFolderName(value: string) {
+  return value.trim().replace(/\s+/g, " ").slice(0, 120) || "Sin nombre";
+}
+
+function getCaseDisplayFolderName(caseItem: {
+  caption: string;
+  caseNumber: string;
+}) {
+  return normalizeSystemFolderName(`${caseItem.caseNumber} - ${caseItem.caption}`);
+}
+
+function getClientDisplayName(client: {
+  businessName: string | null;
+  firstName: string | null;
+  lastName: string | null;
+  type: string;
+}) {
+  const displayName =
+    client.type === "legal_entity"
+      ? client.businessName
+      : [client.firstName, client.lastName].filter(Boolean).join(" ");
+
+  return normalizeSystemFolderName(displayName || "Cliente sin nombre");
 }
 
 async function ensureImportFolderPath(

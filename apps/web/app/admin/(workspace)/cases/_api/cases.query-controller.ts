@@ -10,6 +10,8 @@ import type {
   CaseExpensesSummaryDto,
   CaseHearingsListResponse,
   NotificationOptions,
+  ParticipantOptionsQueryParams,
+  ParticipantOptionsResponse,
   CasePickerOptionsQueryParams,
   CasePickerOptionsResponse,
   CaseTasksListResponse,
@@ -17,15 +19,22 @@ import type {
   CasesQueryParams,
   CatalogResponse,
   DocumentCategoriesListResponse,
+  TenantCaseTasksListResponse,
+  TenantCaseTasksMetricsDto,
+  TenantCaseTasksQueryParams,
+  TaskBoardViewsListResponse,
   TaskAssigneeOption
 } from "../_types/cases.types";
 import {
   caseKeys,
+  getTenantCaseTaskMetrics,
   getCaseCalendar,
   getCaseDetail,
   getCaseExpense,
   getCaseExpensesSummary,
   getTenantCalendar,
+  listTenantCaseTasks,
+  listTaskBoards,
   listCaseHearings,
   listCaseExpenseAttachments,
   listCaseExpenses,
@@ -34,6 +43,7 @@ import {
   listCaseTasks,
   listCatalogOptions,
   listNotificationOptions,
+  listParticipantOptions,
   listTaskAssignees
 } from "./cases.api";
 import { listCaseDocuments, listDocumentCategories } from "./case-documents.api";
@@ -70,6 +80,30 @@ export const casesQueries = {
     };
   },
 
+  tenantTasks(params: TenantCaseTasksQueryParams): CasesQuerySpec<TenantCaseTasksListResponse> {
+    return {
+      permission: "tasks:read",
+      queryKey: caseKeys.tenantTasks(params),
+      queryFn: () => listTenantCaseTasks(params)
+    };
+  },
+
+  tenantTaskMetrics(): CasesQuerySpec<TenantCaseTasksMetricsDto> {
+    return {
+      permission: "tasks:read",
+      queryKey: caseKeys.tenantTaskMetrics(),
+      queryFn: getTenantCaseTaskMetrics
+    };
+  },
+
+  taskBoards(): CasesQuerySpec<TaskBoardViewsListResponse> {
+    return {
+      permission: "tasks:read",
+      queryKey: caseKeys.taskBoards(),
+      queryFn: listTaskBoards
+    };
+  },
+
   catalogOptions<TItem>({
     key,
     params = {},
@@ -99,6 +133,18 @@ export const casesQueries = {
       permission: "staff:read",
       queryKey: caseKeys.notificationOptions(),
       queryFn: listNotificationOptions
+    };
+  },
+
+  participantOptions(
+    params: ParticipantOptionsQueryParams,
+    enabled = true
+  ): CasesQuerySpec<ParticipantOptionsResponse> {
+    return {
+      enabled,
+      permission: "staff:read",
+      queryKey: caseKeys.participantOptions(params),
+      queryFn: () => listParticipantOptions(params)
     };
   },
 

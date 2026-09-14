@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useRef } from "react";
 import type { MutableRefObject } from "react";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { Sheet, SheetContent, SheetDescription, SheetTitle } from "@/components/ui/sheet";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import { UnauthorizedState } from "@/components/ui/not-found";
@@ -19,6 +19,8 @@ import { AdminHeaderBreadcrumbsProvider } from "./header/admin-header-breadcrumb
 
 export function AdminShell({ children }: AdminShellProps) {
   const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
   const shortcutPrefixRef = useRef<string | null>(null);
   const shortcutTimeoutRef = useRef<number | null>(null);
   const {
@@ -34,6 +36,8 @@ export function AdminShell({ children }: AdminShellProps) {
     sidebarOpen
   } = useAdminShellState();
   const canAccessAdmin = hasPermission(session, "admin:access");
+  const collapseSidebarFully =
+    pathname === "/admin/tasks" && searchParams.get("view") === "kanban" && !sidebarOpen;
   const shortcutItems = useMemo(
     () => flattenShortcutItems(getAuthorizedNavSections(session, adminNavSections)),
     [session]
@@ -94,6 +98,7 @@ export function AdminShell({ children }: AdminShellProps) {
     <SidebarProvider
       open={sidebarOpen}
       onOpenChange={setSidebarOpen}
+      collapsedWidth={collapseSidebarFully ? "0px" : undefined}
       className="min-h-[100svh] bg-[var(--admin-sidebar-bg)] text-foreground"
     >
       <AdminHeaderBreadcrumbsProvider>

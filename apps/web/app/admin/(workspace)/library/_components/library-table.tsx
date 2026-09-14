@@ -25,6 +25,7 @@ export function LibraryTable({
   onDeleteFolder,
   onOpenFolder,
   onRenameDocument,
+  onReplaceDocument,
   onToggleDocument
 }: {
   busy: boolean;
@@ -36,6 +37,7 @@ export function LibraryTable({
   onDeleteFolder: (folderId: string) => void;
   onOpenFolder: (folderId: string) => void;
   onRenameDocument: (document: LibraryDocumentDto, title: string) => void;
+  onReplaceDocument: (documentId: string, file: File) => void;
   onToggleDocument: (documentId: string, selected: boolean) => void;
 }) {
   const [folderToDelete, setFolderToDelete] = useState<DocumentFolderDto | null>(null);
@@ -55,7 +57,6 @@ export function LibraryTable({
           <tr className="border-b border-border/70">
             <th className="w-10 p-3"></th>
             <th className="p-3">Nombre</th>
-            <th className="p-3">Expediente</th>
             <th className="p-3">Tipo</th>
             <th className="p-3">Tamano</th>
             <th className="p-3">Fecha</th>
@@ -75,7 +76,6 @@ export function LibraryTable({
                   {folder.name}
                 </button>
               </td>
-              <td className="p-3 text-muted-foreground">-</td>
               <td className="p-3">Carpeta</td>
               <td className="p-3 text-muted-foreground">-</td>
               <td className="p-3">{formatLibraryDate(folder.updatedAt)}</td>
@@ -119,7 +119,6 @@ export function LibraryTable({
                 </div>
                 <div className="text-xs text-muted-foreground">{document.originalName}</div>
               </td>
-              <td className="p-3">{document.case?.caseNumber ?? "-"}</td>
               <td className="p-3">{document.extension?.toUpperCase() ?? document.mimeType}</td>
               <td className="p-3">{formatBytes(document.sizeBytes)}</td>
               <td className="p-3">{formatLibraryDate(document.updatedAt)}</td>
@@ -130,6 +129,7 @@ export function LibraryTable({
                   document={document}
                   onDelete={onDeleteDocument}
                   onRename={onRenameDocument}
+                  onReplace={onReplaceDocument}
                 />
               </td>
             </tr>

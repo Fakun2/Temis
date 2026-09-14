@@ -28,6 +28,7 @@ describe("Clients OpenAPI contract", () => {
       assert.ok(clientsPath.post);
       assert.ok(detailPath?.get);
       assert.ok(detailPath.patch);
+      assert.ok(detailPath.delete);
       assert.ok(archivePath?.post);
       assert.deepEqual(clientsPath.post.security, [{ bearer: [], tenant: [] }]);
 
@@ -68,10 +69,19 @@ describe("Clients OpenAPI contract", () => {
       assert.equal(asSchema(detailSchema.properties?.createdAt).format, "date-time");
       assert.equal(asSchema(detailSchema.properties?.updatedAt).format, "date-time");
 
+      const listSchema = schemas.ClientsListResponseDto;
+      assert.ok(listSchema && "properties" in listSchema);
+      assert.ok(listSchema.properties?.metrics);
+
       const archiveSchema = schemas.ClientArchiveResponseDto;
       assert.ok(archiveSchema && "properties" in archiveSchema);
       assert.deepEqual(asSchema(archiveSchema.properties?.clientStatus).enum, ["archived"]);
       assert.deepEqual(asSchema(archiveSchema.properties?.status).enum, ["ok"]);
+
+      const deleteSchema = schemas.ClientDeleteResponseDto;
+      assert.ok(deleteSchema && "properties" in deleteSchema);
+      assert.deepEqual(asSchema(deleteSchema.properties?.clientStatus).enum, ["deleted"]);
+      assert.deepEqual(asSchema(deleteSchema.properties?.status).enum, ["ok"]);
     } finally {
       await app.close();
     }

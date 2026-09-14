@@ -2,8 +2,7 @@ import { Injectable, Logger, OnModuleDestroy, OnModuleInit } from "@nestjs/commo
 import {
   CaseExpenseCashboxSyncJobAction,
   CaseExpenseCashboxSyncJobStatus,
-  CashboxMovementType,
-  Prisma
+  CashboxMovementType
 } from "@prisma/client";
 import { PrismaService } from "../../database/prisma.service";
 

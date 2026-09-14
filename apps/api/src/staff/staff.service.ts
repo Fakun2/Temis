@@ -8,7 +8,12 @@ import {
 import { Prisma } from "@prisma/client";
 import { hash } from "bcryptjs";
 import { PrismaService } from "../database/prisma.service";
-import type { CreateStaffInput, ListStaffQuery, UpdateStaffInput } from "./staff.schemas";
+import type {
+  CreateStaffInput,
+  ListParticipantOptionsQuery,
+  ListStaffQuery,
+  UpdateStaffInput
+} from "./staff.schemas";
 
 const statusOptions = [
   { value: "active", label: "Activo" },
@@ -429,6 +434,102 @@ export class StaffService {
       }
     };
   }
+
+  async listParticipantOptions(tenantId: string, query: ListParticipantOptionsQuery) {
+    const search = query.search?.trim() || undefined;
+    const cursor = decodeParticipantOptionsCursor(query.cursor);
+    const filters = {
+      practiceAreaId: query.practiceAreaId ?? null,
+      role: query.role ?? null,
+      search: search ?? null
+    };
+
+    if (cursor && !sameParticipantFilters(cursor, filters)) {
+      throw new BadRequestException("El cursor no corresponde a la busqueda actual.");
+    }
+
+    const where: Prisma.TenantMembershipWhereInput = {
+      tenantId,
+      status: "active",
+      ...(query.role ? { role: { code: query.role } } : {}),
+      ...(query.practiceAreaId
+        ? {
+            practiceAreas: {
+              some: { practiceArea: { id: query.practiceAreaId, tenantId } }
+            }
+          }
+        : {}),
+      ...(search
+        ? {
+            OR: [
+              { user: { fullName: { contains: search, mode: Prisma.QueryMode.insensitive } } },
+              { user: { email: { contains: search, mode: Prisma.QueryMode.insensitive } } }
+            ]
+          }
+        : {}),
+      ...(cursor
+        ? {
+            AND: [
+              {
+                OR: [
+                  { user: { fullName: { gt: cursor.fullName } } },
+                  { id: { gt: cursor.id }, user: { fullName: cursor.fullName } }
+                ]
+              }
+            ]
+          }
+        : {})
+    };
+
+    const [memberships, practiceAreas, roles] = await this.prisma.$transaction([
+      this.prisma.tenantMembership.findMany({
+        where,
+        orderBy: [{ user: { fullName: "asc" } }, { id: "asc" }],
+        take: query.limit + 1,
+        select: participantOptionSelect
+      }),
+      this.prisma.practiceArea.findMany({
+        where: { tenantId, active: true },
+        select: practiceAreaSelect,
+        orderBy: [{ name: "asc" }]
+      }),
+      this.prisma.role.findMany({
+        where: { active: true, OR: [{ isSystem: true, tenantId: null }, { tenantId }] },
+        select: { code: true, description: true, hierarchyLevel: true, name: true },
+        orderBy: [{ name: "asc" }]
+      })
+    ]);
+
+    const hasNextPage = memberships.length > query.limit;
+    const items = memberships.slice(0, query.limit);
+    const lastItem = items.at(-1);
+
+    return {
+      items: items.map(toParticipantOptionDto),
+      filterOptions: {
+        practiceAreas: practiceAreas.map(toPracticeAreaDto),
+        roles: roles.map((role) => ({
+          code: role.code,
+          name: role.name,
+          description: role.description,
+          hierarchyLevel: normalizeHierarchyLevel(role.hierarchyLevel),
+          assignable: true
+        }))
+      },
+      pageInfo: {
+        limit: query.limit,
+        nextCursor:
+          hasNextPage && lastItem
+            ? encodeParticipantOptionsCursor({
+                ...filters,
+                fullName: lastItem.user.fullName,
+                id: lastItem.id
+              })
+            : null,
+        hasNextPage
+      }
+    };
+  }
 }
 
 const practiceAreaSelect = {
@@ -473,6 +574,13 @@ const staffMembershipSelect = {
   }
 } satisfies Prisma.TenantMembershipSelect;
 
+const participantOptionSelect = {
+  id: true,
+  user: { select: { email: true, fullName: true } },
+  role: { select: { code: true, description: true, hierarchyLevel: true, name: true } },
+  practiceAreas: { select: { practiceArea: { select: practiceAreaSelect } } }
+} satisfies Prisma.TenantMembershipSelect;
+
 const roleAccessSelect = {
   code: true,
   hierarchyLevel: true,
@@ -501,6 +609,10 @@ type Worker = {
 
 type StaffMembership = Prisma.TenantMembershipGetPayload<{
   select: typeof staffMembershipSelect;
+}>;
+
+type ParticipantOptionMembership = Prisma.TenantMembershipGetPayload<{
+  select: typeof participantOptionSelect;
 }>;
 
 type PracticeAreaWithTemplate = Prisma.PracticeAreaGetPayload<{
@@ -735,6 +847,71 @@ function toPracticeAreaDto(practiceArea: PracticeAreaWithTemplate) {
     templateCode: practiceArea.template?.code ?? null,
     custom: practiceArea.templateId === null
   };
+}
+
+function toParticipantOptionDto(membership: ParticipantOptionMembership) {
+  return {
+    id: membership.id,
+    fullName: membership.user.fullName,
+    email: membership.user.email,
+    role: membership.role
+      ? {
+          code: membership.role.code,
+          name: membership.role.name,
+          description: membership.role.description,
+          hierarchyLevel: normalizeHierarchyLevel(membership.role.hierarchyLevel)
+        }
+      : null,
+    practiceAreas: membership.practiceAreas.map(({ practiceArea }) => toPracticeAreaDto(practiceArea))
+  };
+}
+
+type ParticipantOptionsCursor = {
+  fullName: string;
+  id: string;
+  practiceAreaId: string | null;
+  role: string | null;
+  search: string | null;
+};
+
+function encodeParticipantOptionsCursor(cursor: ParticipantOptionsCursor) {
+  return Buffer.from(JSON.stringify(cursor), "utf8").toString("base64url");
+}
+
+function decodeParticipantOptionsCursor(cursor?: string): ParticipantOptionsCursor | null {
+  if (!cursor) return null;
+
+  try {
+    const parsed = JSON.parse(Buffer.from(cursor, "base64url").toString("utf8")) as Partial<ParticipantOptionsCursor>;
+    if (
+      typeof parsed.fullName !== "string" ||
+      typeof parsed.id !== "string" ||
+      !isNullableString(parsed.practiceAreaId) ||
+      !isNullableString(parsed.role) ||
+      !isNullableString(parsed.search)
+    ) {
+      throw new Error("invalid cursor");
+    }
+
+    return parsed as ParticipantOptionsCursor;
+  } catch {
+    throw new BadRequestException("El cursor de participantes es invalido.");
+  }
+}
+
+function sameParticipantFilters(
+  cursor: ParticipantOptionsCursor,
+  filters: Pick<ParticipantOptionsCursor, "practiceAreaId" | "role" | "search">
+) {
+  return (
+    cursor.practiceAreaId === filters.practiceAreaId &&
+    cursor.role === filters.role &&
+    cursor.search === filters.search
+  );
+}
+
+function isNullableString(value: unknown): value is string | null {
+  return value === null || typeof value === "string";
 }
 
 function splitFullName(fullName: string) {

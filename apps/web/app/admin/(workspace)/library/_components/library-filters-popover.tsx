@@ -61,19 +61,6 @@ export function LibraryFiltersPopover({
             ]
           },
           {
-            icon: libraryFilterSectionIcons.case,
-            label: "Expediente",
-            options: [
-              { active: filters.caseId === "", label: "Todos", onSelect: () => onChange({ ...filters, caseId: "" }) },
-              {
-                active: Boolean(filters.caseId),
-                label: "Usar ID...",
-                valueLabel: filters.caseId || undefined,
-                onSelect: () => filterState.openIdDialog("caseId")
-              }
-            ]
-          },
-          {
             icon: libraryFilterSectionIcons.category,
             label: "Categoria",
             options: [

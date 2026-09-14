@@ -12,6 +12,7 @@ export type AdminNavItem = {
   iconAnimation?:
     | "account-ai"
     | "account-archive"
+    | "account-connectors"
     | "account-back"
     | "account-organization"
     | "account-plan"
@@ -22,9 +23,11 @@ export type AdminNavItem = {
     | "calendar"
     | "cashbox"
     | "cases"
+    | "clients"
     | "library"
     | "settings"
-    | "staff";
+    | "staff"
+    | "tasks";
   label: string;
   permissionMode?: PermissionMode;
   requiredPermissions?: string[];

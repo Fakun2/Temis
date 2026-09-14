@@ -17,18 +17,14 @@ estudio piloto.
 Estado actual:
 
 - El backend usa header `x-tenant-id`.
-- `TenantGuard` asigna `request.activeTenantId`.
+- `TenantGuard` exige usuario autenticado, membership activa para el tenant
+  solicitado y tenant con estado `active` antes de asignar
+  `request.activeTenantId`.
 - `RolesGuard` y `PermissionsGuard` consultan el payload JWT para rol/permisos.
 
-Gap:
-
-- `TenantGuard` no valida por si mismo que el usuario tenga membership activa
-  contra ese tenant.
-
-Decision:
-
-- En PR 5, `TenantGuard` o un servicio asociado debe validar tenant activo,
-  membership activa y estado del tenant antes de permitir rutas operativas.
+La validacion contra la base complementa el payload JWT: una membresia revocada
+o un tenant desactivado dejan de poder usar rutas operativas aun si el token no
+expira de inmediato.
 
 ## Reglas de queries
 
@@ -75,6 +71,7 @@ Pendientes:
 ## Criterios de aceptacion futuros
 
 - Tests de no acceso cross-tenant.
+- Rechazo de membership inactiva o tenant inactivo desde `TenantGuard`.
 - Guards aplicados en rutas operativas.
 - Servicios no aceptan `tenantId` arbitrario desde body.
 - Errores claros para tenant ausente, inactivo o no autorizado.

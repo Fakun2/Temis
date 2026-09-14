@@ -1,10 +1,12 @@
 import {
   getClientsControllerArchiveUrl,
   getClientsControllerCreateUrl,
+  getClientsControllerDeleteUrl,
   getClientsControllerGetDetailUrl,
   getClientsControllerListUrl,
   getClientsControllerUpdateUrl,
   type ClientArchiveResponseDto,
+  type ClientDeleteResponseDto,
   type ClientDetailDto,
   type ClientsControllerCreateBody,
   type ClientsControllerListParams,
@@ -59,5 +61,14 @@ export function archiveClient(clientId: string): Promise<ClientArchiveResponseDt
   return dashboardHttpClient.request<ClientArchiveResponseDto>({
     method: "POST",
     path: getClientsControllerArchiveUrl(clientId)
+  });
+}
+
+export function deleteClient(
+  clientId: string
+): Promise<ClientDeleteResponseDto> {
+  return dashboardHttpClient.request<ClientDeleteResponseDto>({
+    method: "DELETE",
+    path: getClientsControllerDeleteUrl(clientId)
   });
 }

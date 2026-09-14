@@ -11,9 +11,7 @@ export type DocumentFolderDto = {
 
 export type LibraryDocumentDto = {
   id: string;
-  caseId: string | null;
   folderId: string | null;
-  case: { id: string; caseNumber: string; caption: string } | null;
   category: { id: string; name: string; description: string | null } | null;
   title: string;
   originalName: string;
@@ -90,7 +88,6 @@ export type DocumentImportJobDto = {
 
 export type LibraryQueryParams = {
   folderId?: string | null;
-  caseId?: string;
   categoryId?: string;
   cursor?: string;
   limit?: number;

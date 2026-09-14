@@ -13,6 +13,7 @@ import type {
   CreateCaseHearingInput,
   CreateCaseInput,
   CreateCaseTaskInput,
+  CreateTaskBoardViewInput,
   ListCaseDocumentsQuery,
   ListCaseExpenseAttachmentsQuery,
   ListCaseExpensesQuery,
@@ -20,10 +21,13 @@ import type {
   ListCaseHearingsQuery,
   ListCasePickerOptionsQuery,
   ListCaseTasksQuery,
+  ListTenantCaseTasksQuery,
   ListCasesQuery,
   UpdateCaseExpenseInput,
   UpdateCaseHearingInput,
   UpdateCaseInput,
+  UpdateCaseTaskLocalContextInput,
+  UpdateTaskBoardViewInput,
   UpdateCaseTaskInput
 } from "./cases.schemas";
 import {
@@ -368,6 +372,38 @@ export class CasesService {
     return this.caseTasksUseCase.list(tenantId, caseId, query);
   }
 
+  async listTenantTasks(tenantId: string, query: ListTenantCaseTasksQuery) {
+    return this.caseTasksUseCase.listTenant(tenantId, query);
+  }
+
+  async getTenantTasksMetrics(tenantId: string) {
+    return this.caseTasksUseCase.getTenantMetrics(tenantId);
+  }
+
+  async listTaskBoards(tenantId: string) {
+    return this.caseTasksUseCase.listBoards(tenantId);
+  }
+
+  async createTaskBoard(
+    tenantId: string,
+    actorUserId: string,
+    input: CreateTaskBoardViewInput
+  ) {
+    return this.caseTasksUseCase.createBoard(tenantId, actorUserId, input);
+  }
+
+  async updateTaskBoard(
+    tenantId: string,
+    boardId: string,
+    input: UpdateTaskBoardViewInput
+  ) {
+    return this.caseTasksUseCase.updateBoard(tenantId, boardId, input);
+  }
+
+  async deleteTaskBoard(tenantId: string, boardId: string) {
+    return this.caseTasksUseCase.deleteBoard(tenantId, boardId);
+  }
+
   async createTask(
     tenantId: string,
     caseId: string,
@@ -385,6 +421,18 @@ export class CasesService {
     input: UpdateCaseTaskInput
   ) {
     return this.caseTasksUseCase.update(tenantId, caseId, taskId, actorUserId, input);
+  }
+
+  async updateTenantTask(tenantId: string, taskId: string, input: UpdateCaseTaskInput) {
+    return this.caseTasksUseCase.updateTenantTask(tenantId, taskId, input);
+  }
+
+  async updateTenantTaskLocalContext(
+    tenantId: string,
+    taskId: string,
+    input: UpdateCaseTaskLocalContextInput
+  ) {
+    return this.caseTasksUseCase.updateTenantTaskLocalContext(tenantId, taskId, input);
   }
 
   async markTaskSeen(tenantId: string, caseId: string, taskId: string) {

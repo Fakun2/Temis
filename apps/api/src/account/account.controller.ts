@@ -22,6 +22,7 @@ import {
 } from "@nestjs/swagger";
 import type { AuthenticatedRequest } from "../auth/auth.types";
 import { JwtAuthGuard } from "../auth/jwt-auth.guard";
+import { Permissions } from "../auth/permissions.decorator";
 import { PermissionsGuard } from "../auth/permissions.guard";
 import { ActiveTenant } from "../tenancy/active-tenant.decorator";
 import { TenantGuard } from "../tenancy/tenant.guard";
@@ -47,18 +48,21 @@ export class AccountController {
   constructor(private readonly accountService: AccountService) {}
 
   @Get()
+  @Permissions("account:read")
   @ApiOkResponse({ type: AccountResponseDto })
   getAccount(@ActiveTenant() tenantId: string, @Req() request: AuthenticatedRequest) {
     return this.accountService.getAccount(tenantId, getAuthenticatedUser(request));
   }
 
   @Get("ai-usage")
+  @Permissions("account:ai_usage_read")
   @ApiOkResponse({ type: AccountAiUsageResponseDto })
   getAiUsage(@ActiveTenant() tenantId: string, @Req() request: AuthenticatedRequest) {
     return this.accountService.getAiUsage(tenantId, getAuthenticatedUser(request));
   }
 
   @Get("avatar")
+  @Permissions("account:read")
   async getAvatar(
     @ActiveTenant() tenantId: string,
     @Req() request: AuthenticatedRequest,
@@ -77,6 +81,7 @@ export class AccountController {
   }
 
   @Post("avatar")
+  @Permissions("account:self_manage")
   @UseInterceptors(FileInterceptor("file", { limits: { fileSize: maxAccountAvatarSizeBytes } }))
   @ApiConsumes("multipart/form-data")
   @ApiBody({
@@ -102,6 +107,7 @@ export class AccountController {
   }
 
   @Patch("profile")
+  @Permissions("account:self_manage")
   @ApiOkResponse({ type: AccountResponseDto })
   updateProfile(
     @ActiveTenant() tenantId: string,
@@ -112,6 +118,7 @@ export class AccountController {
   }
 
   @Patch("studio")
+  @Permissions("account:studio_manage")
   @ApiOkResponse({ type: AccountResponseDto })
   updateStudio(
     @ActiveTenant() tenantId: string,
@@ -122,6 +129,7 @@ export class AccountController {
   }
 
   @Patch("notifications")
+  @Permissions("account:self_manage")
   @ApiOkResponse({ type: AccountResponseDto })
   updateNotifications(
     @ActiveTenant() tenantId: string,
@@ -132,6 +140,7 @@ export class AccountController {
   }
 
   @Patch("membership")
+  @Permissions("account:membership_manage")
   @ApiOkResponse({ type: AccountResponseDto })
   updateMembership(
     @ActiveTenant() tenantId: string,
@@ -142,6 +151,7 @@ export class AccountController {
   }
 
   @Patch("password/validate")
+  @Permissions("account:self_manage")
   @ApiOkResponse({ type: UpdateAccountPasswordResponseDto })
   validatePasswordChange(
     @ActiveTenant() tenantId: string,
@@ -156,6 +166,7 @@ export class AccountController {
   }
 
   @Patch("password")
+  @Permissions("account:self_manage")
   @ApiOkResponse({ type: UpdateAccountPasswordResponseDto })
   updatePassword(
     @ActiveTenant() tenantId: string,

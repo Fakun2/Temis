@@ -208,7 +208,8 @@ export const caseHearingFormSchema = z
       .trim()
       .min(3, "Minimo 3 caracteres.")
       .max(500, "Maximo 500 caracteres."),
-    notificationsEnabled: z.coerce.boolean().default(false)
+    notificationsEnabled: z.coerce.boolean().default(false),
+    participantMembershipIds: z.array(z.string().uuid()).max(50).default([])
   })
   .and(notificationSettingsFormSchema);
 

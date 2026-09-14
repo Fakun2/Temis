@@ -20,7 +20,8 @@ describe("ClientsController security metadata", () => {
     ["list", "clients:read"],
     ["getDetail", "clients:read"],
     ["update", "clients:update"],
-    ["archive", "clients:delete"]
+    ["archive", "clients:update"],
+    ["delete", "clients:delete"]
   ] as const) {
     it(`requires ${permission} on ${method}`, () => {
       const handler = ClientsController.prototype[method];

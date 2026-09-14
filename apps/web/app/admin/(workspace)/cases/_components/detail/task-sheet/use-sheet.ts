@@ -11,12 +11,16 @@ import type { CaseTaskFieldErrors } from "./types";
 export function useCaseTaskSheet({
   caseId,
   defaultDate,
+  defaultStatus,
+  localCaseId,
   onOpenChange,
   open: controlledOpen,
   task
 }: {
-  caseId: string;
+  caseId?: string;
   defaultDate?: string;
+  defaultStatus?: CaseTaskFormValues["status"];
+  localCaseId?: string | null;
   onOpenChange?: (open: boolean) => void;
   open?: boolean;
   task?: CaseTaskDto;
@@ -25,6 +29,7 @@ export function useCaseTaskSheet({
   const [errors, setErrors] = useState<CaseTaskFieldErrors>({});
   const [uncontrolledOpen, setUncontrolledOpen] = useState(false);
   const mutation = useCasesMutation(casesMutations.saveTask({ caseId, taskId: task?.id }));
+  const localContextMutation = useCasesMutation(casesMutations.updateTaskLocalContext());
   const open = controlledOpen ?? uncontrolledOpen;
 
   function setOpen(nextOpen: boolean) {
@@ -45,10 +50,10 @@ export function useCaseTaskSheet({
             ...emptyCaseTaskDraft,
             endDate: defaultDate ?? emptyCaseTaskDraft.endDate,
             notificationDate: defaultDate ?? emptyCaseTaskDraft.notificationDate,
-            startDate: defaultDate ?? emptyCaseTaskDraft.startDate
+            status: defaultStatus ?? emptyCaseTaskDraft.status
           }
     );
-  }, [defaultDate, open, task]);
+  }, [defaultDate, defaultStatus, open, task]);
 
   function updateDraft<K extends keyof CaseTaskFormValues>(key: K, value: CaseTaskFormValues[K]) {
     setDraft((current) => ({ ...current, [key]: value }));
@@ -69,7 +74,15 @@ export function useCaseTaskSheet({
 
     setErrors({});
     try {
-      await mutation.mutateAsync(parsed.data);
+      const shouldSaveTask = !task || hasTaskDraftChanges(task, parsed.data);
+
+      if (shouldSaveTask) {
+        await mutation.mutateAsync(parsed.data);
+      }
+
+      if (task && localCaseId !== undefined && localCaseId !== task.caseId) {
+        await localContextMutation.mutateAsync({ caseId: localCaseId, taskId: task.id });
+      }
       setOpen(false);
     } catch {
       // The mutation exposes its error below.
@@ -80,7 +93,11 @@ export function useCaseTaskSheet({
     draft,
     errors,
     handleSubmit,
-    mutation,
+    mutation: {
+      ...mutation,
+      error: mutation.error ?? localContextMutation.error,
+      isPending: mutation.isPending || localContextMutation.isPending
+    },
     open,
     setOpen,
     updateDraft
@@ -90,16 +107,41 @@ export function useCaseTaskSheet({
 function mapTaskToDraft(task: CaseTaskDto): CaseTaskFormValues {
   return {
     assignedMembershipId: task.assignedMembershipId ?? "",
-    endDate: task.endDate ?? "",
+    endDate: toDateInputValue(task.endDate),
     name: task.name,
     notes: task.notes ?? "",
-    notificationDate: task.notificationDate ?? "",
+    notificationDate: toDateInputValue(task.notificationDate),
     notificationEnabled: task.notificationEnabled,
     notificationMembershipIds: task.notificationMembershipIds,
     notificationPracticeAreaId: task.notificationPracticeAreaId ?? "",
     notificationRecipientMode: task.notificationRecipientMode,
     notificationTime: task.notificationTime ?? "",
-    startDate: task.startDate ?? "",
+    startDate: toDateInputValue(task.startDate),
     status: task.status
   };
+}
+
+function toDateInputValue(value: string | null | undefined) {
+  return value ? value.slice(0, 10) : "";
+}
+
+function hasTaskDraftChanges(task: CaseTaskDto, draft: CaseTaskFormValues) {
+  return (
+    task.assignedMembershipId !== (draft.assignedMembershipId || null) ||
+    toDateInputValue(task.endDate) !== (draft.endDate || "") ||
+    task.name !== draft.name ||
+    (task.notes ?? "") !== (draft.notes ?? "") ||
+    toDateInputValue(task.notificationDate) !== (draft.notificationDate || "") ||
+    task.notificationEnabled !== draft.notificationEnabled ||
+    (task.notificationPracticeAreaId ?? "") !== (draft.notificationPracticeAreaId || "") ||
+    task.notificationRecipientMode !== draft.notificationRecipientMode ||
+    (task.notificationTime ?? "") !== (draft.notificationTime || "") ||
+    toSortedKey(task.notificationMembershipIds) !== toSortedKey(draft.notificationMembershipIds) ||
+    toDateInputValue(task.startDate) !== (draft.startDate || "") ||
+    task.status !== draft.status
+  );
+}
+
+function toSortedKey(values: string[]) {
+  return [...values].sort().join("|");
 }

@@ -107,18 +107,18 @@ export function AdminCommandPalette({ open, session, onOpenChange }: AdminComman
     <DialogPrimitive.Root open={open} onOpenChange={onOpenChange}>
       <DialogPrimitive.Portal>
         <DialogPrimitive.Overlay className="fixed inset-0 z-[70] bg-foreground/25 backdrop-blur-[2px] data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:animate-in data-[state=open]:fade-in-0" />
-        <DialogPrimitive.Content className="fixed left-1/2 top-1/2 z-[80] w-[calc(100vw-32px)] max-w-[560px] -translate-x-1/2 -translate-y-1/2 overflow-hidden rounded-[22px] border border-border/70 bg-popover/95 p-2.5 text-popover-foreground shadow-[0_22px_64px_-34px_rgba(15,23,42,0.66),0_0_0_1px_color-mix(in_oklab,var(--foreground)_8%,transparent)] outline-none backdrop-blur-xl data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95 data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95">
+        <DialogPrimitive.Content className="fixed left-1/2 top-1/2 z-[80] w-[calc(100vw-32px)] max-w-[680px] -translate-x-1/2 -translate-y-1/2 overflow-hidden rounded-[22px] border border-border/70 bg-popover/95 p-3 text-popover-foreground shadow-[0_22px_64px_-34px_rgba(15,23,42,0.66),0_0_0_1px_color-mix(in_oklab,var(--foreground)_8%,transparent)] outline-none backdrop-blur-xl data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95 data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95">
           <DialogPrimitive.Title className="sr-only">Buscador global</DialogPrimitive.Title>
           <DialogPrimitive.Description className="sr-only">
             Busca acciones rapidas y destinos de navegacion del panel.
           </DialogPrimitive.Description>
           <Command
             shouldFilter={false}
-            className="rounded-[18px] bg-transparent [&_[data-slot=command-input-wrapper]>svg]:hidden [&_[data-slot=command-input-wrapper]]:h-10 [&_[data-slot=command-input-wrapper]]:rounded-[16px] [&_[data-slot=command-input-wrapper]]:border [&_[data-slot=command-input-wrapper]]:border-border/50 [&_[data-slot=command-input-wrapper]]:bg-secondary/35 [&_[data-slot=command-input-wrapper]]:px-0 [&_[data-slot=command-input-wrapper]]:shadow-inner"
+            className="rounded-[18px] bg-transparent [&_[data-slot=command-input-wrapper]>svg]:hidden [&_[data-slot=command-input-wrapper]]:h-12 [&_[data-slot=command-input-wrapper]]:rounded-[16px] [&_[data-slot=command-input-wrapper]]:border [&_[data-slot=command-input-wrapper]]:border-border/50 [&_[data-slot=command-input-wrapper]]:bg-secondary/35 [&_[data-slot=command-input-wrapper]]:px-0 [&_[data-slot=command-input-wrapper]]:shadow-inner"
           >
             <div className="relative">
               <Search
-                className="pointer-events-none absolute left-3.5 top-1/2 z-10 h-[18px] w-[18px] -translate-y-1/2 text-muted-foreground"
+                className="pointer-events-none absolute left-4 top-1/2 z-10 h-5 w-5 -translate-y-1/2 text-muted-foreground"
                 aria-hidden="true"
               />
               <CommandInput
@@ -126,11 +126,11 @@ export function AdminCommandPalette({ open, session, onOpenChange }: AdminComman
                 placeholder="Buscar expedientes, archivos, caja, tareas..."
                 value={searchInput}
                 onValueChange={setSearchInput}
-                className="h-10 pl-10 pr-3 text-base text-foreground placeholder:text-muted-foreground focus-visible:ring-0"
+                className="h-12 pl-12 pr-4 text-lg text-foreground placeholder:text-muted-foreground focus-visible:ring-0"
               />
             </div>
 
-            <CommandList className="mt-2 max-h-[min(440px,calc(100svh-128px))] overflow-y-auto scrollbar-none px-0.5 pb-0.5">
+            <CommandList className="mt-2 max-h-[min(520px,calc(100svh-128px))] overflow-y-auto scrollbar-none px-1 pb-1">
               {search ? (
                 <CommandGroup
                   heading="Resultados"
@@ -293,25 +293,25 @@ function DashboardSearchResultItem({
     <CommandItem
       value={getDashboardSearchResultValue(item)}
       onSelect={onSelect}
-      className="min-h-16 cursor-pointer items-start rounded-[14px] px-2.5 py-2 text-left text-foreground transition-colors data-[selected=true]:bg-secondary/70 data-[selected=true]:text-foreground"
+      className="min-h-20 cursor-pointer items-start rounded-[14px] px-3 py-3 text-left text-foreground transition-colors data-[selected=true]:bg-secondary/70 data-[selected=true]:text-foreground"
     >
-      <Icon className="mt-0.5 h-[18px] w-[18px] shrink-0 text-foreground" aria-hidden="true" />
+      <Icon className="mt-0.5 h-5 w-5 shrink-0 text-foreground" aria-hidden="true" />
       <span className="grid min-w-0 flex-1 gap-0.5">
-        <span className="truncate text-sm font-medium leading-5">
+        <span className="truncate text-base font-medium leading-6">
           <SearchHighlight query={query} text={title} />
         </span>
         {secondaryText ? (
-          <span className="truncate text-xs leading-5 text-muted-foreground">
+          <span className="truncate text-sm leading-5 text-muted-foreground">
             <SearchHighlight query={query} text={secondaryText} />
           </span>
         ) : null}
         {descriptionText ? (
-          <span className="truncate text-xs leading-5 text-muted-foreground">
+          <span className="truncate text-sm leading-5 text-muted-foreground">
             <SearchHighlight query={query} text={descriptionText} />
           </span>
         ) : null}
       </span>
-      <span className="ml-auto shrink-0 rounded-lg border border-border/60 bg-secondary/60 px-2 py-1 font-sans text-xs text-muted-foreground">
+      <span className="ml-auto shrink-0 rounded-lg border border-border/60 bg-secondary/60 px-2.5 py-1 font-sans text-sm text-muted-foreground">
         {metadata}
       </span>
     </CommandItem>
@@ -490,11 +490,11 @@ function CommandPaletteItem({ item, onSelect }: { item: AdminCommandItem; onSele
       value={`${item.label} ${item.href}`}
       onSelect={onSelect}
       className={cn(
-        "h-10 cursor-pointer rounded-[14px] px-2.5 text-base leading-none text-foreground transition-colors data-[selected=true]:bg-secondary/70 data-[selected=true]:text-foreground",
+        "h-12 cursor-pointer rounded-[14px] px-3 text-[17px] leading-none text-foreground transition-colors data-[selected=true]:bg-secondary/70 data-[selected=true]:text-foreground",
         item.shortcut ? "pr-3" : ""
       )}
     >
-      {Icon ? <Icon className="h-[18px] w-[18px] text-foreground" aria-hidden="true" /> : null}
+      {Icon ? <Icon className="h-5 w-5 text-foreground" aria-hidden="true" /> : null}
       <span className="truncate">{item.label}</span>
       {item.shortcut ? (
         <CommandShortcut className="ml-auto rounded-lg border border-border/60 bg-secondary/60 px-2 py-1 font-sans text-xs tracking-normal text-muted-foreground">

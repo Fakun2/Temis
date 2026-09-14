@@ -12,6 +12,7 @@ import {
   archiveClient,
   clientKeys,
   createClient,
+  deleteClient,
   getClientDetail,
   listClients,
   updateClient
@@ -59,8 +60,18 @@ export function useArchiveClientMutation() {
   const queryClient = useQueryClient();
 
   return useDashboardMutation({
-    permission: "clients:delete",
+    permission: "clients:update",
     mutationFn: (clientId: string) => archiveClient(clientId),
+    onSuccess: () => invalidateClientQueries(queryClient)
+  });
+}
+
+export function useDeleteClientMutation() {
+  const queryClient = useQueryClient();
+
+  return useDashboardMutation({
+    permission: "clients:delete",
+    mutationFn: (clientId: string) => deleteClient(clientId),
     onSuccess: () => invalidateClientQueries(queryClient)
   });
 }

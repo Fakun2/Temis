@@ -42,6 +42,7 @@ export function useCashboxPageState() {
 
   return {
     cursor,
+    cursorStack,
     currencyCode,
     date,
     pageIndex,

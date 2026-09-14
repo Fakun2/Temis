@@ -2,6 +2,7 @@ import type { AdminNavItem } from "../../../_types/admin";
 import {
   AnimatedAccountAiIcon,
   AnimatedAccountArchiveIcon,
+  AnimatedAccountConnectorsIcon,
   AnimatedAccountOrganizationIcon,
   AnimatedAccountPlanIcon,
   AnimatedAccountPreferencesIcon,
@@ -27,6 +28,12 @@ export const accountSidebarItems = [
     icon: AnimatedAccountAiIcon,
     iconAnimation: "account-ai",
     label: "IA"
+  },
+  {
+    href: "/admin/account?view=connectors",
+    icon: AnimatedAccountConnectorsIcon,
+    iconAnimation: "account-connectors",
+    label: "Conectores"
   },
   {
     href: "/admin/account#cases-import",

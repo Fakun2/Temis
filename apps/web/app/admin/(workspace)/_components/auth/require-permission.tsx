@@ -22,10 +22,10 @@ export function RequirePermission({
     return <>{children}</>;
   }
 
-  return <>{fallback ?? <RestrictedPermission permissions={permissions} />}</>;
+  return <>{fallback ?? <RestrictedPermission />}</>;
 }
 
-function RestrictedPermission({ permissions }: { permissions: string[] }) {
+function RestrictedPermission() {
   return (
     <UnauthorizedState
       title="Area restringida"

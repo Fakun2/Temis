@@ -5,7 +5,7 @@ export function formatCaseDate(value: string | null | undefined) {
     return "Sin cargar";
   }
 
-  return new Intl.DateTimeFormat("es-AR", { dateStyle: "medium" }).format(new Date(value));
+  return new Intl.DateTimeFormat("es-AR", { dateStyle: "medium" }).format(toCalendarDate(value));
 }
 
 export function formatCaseDateTime(value: string | null | undefined) {
@@ -47,4 +47,15 @@ export function getExpenseStatusClassName(status: CaseExpenseStatus) {
   };
 
   return statusClassMap[status];
+}
+
+function toCalendarDate(value: string) {
+  const [datePart] = value.split("T");
+  const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(datePart ?? "");
+
+  if (!match) {
+    return new Date(value);
+  }
+
+  return new Date(Number(match[1]), Number(match[2]) - 1, Number(match[3]));
 }

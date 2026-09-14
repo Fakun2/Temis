@@ -2,6 +2,7 @@ import { Injectable, NotFoundException } from "@nestjs/common";
 import { Prisma } from "@prisma/client";
 import { PrismaService, type TenantPrismaClient } from "../../database/prisma.service";
 import { NotificationsService } from "../../notifications/notifications.service";
+import { GoogleCalendarService } from "../../integrations/google-calendar.service";
 import type {
   CreateCaseHearingInput,
   ListCaseHearingsQuery,
@@ -12,7 +13,8 @@ import type {
 export class CaseHearingsUseCase {
   constructor(
     private readonly prisma: PrismaService,
-    private readonly notifications: NotificationsService
+    private readonly notifications: NotificationsService,
+    private readonly googleCalendar: GoogleCalendarService
   ) {}
 
   async list(tenantId: string, caseId: string, query: ListCaseHearingsQuery) {
@@ -92,7 +94,9 @@ export class CaseHearingsUseCase {
       },
       select: caseHearingSelect
     });
+    await syncHearingParticipants(prisma, tenantId, createdHearing.id, input.participantMembershipIds);
     await this.syncReminder(prisma, tenantId, caseId, actorUserId, createdHearing, input);
+    await this.googleCalendar.enqueueResource(prisma, tenantId, "case_hearing", createdHearing.id, "upsert");
 
     const reminderConfig = await this.getReminderConfig(prisma, tenantId, createdHearing.id);
     return toCaseHearingDto(createdHearing, reminderConfig);
@@ -124,7 +128,9 @@ export class CaseHearingsUseCase {
       data: toCaseHearingWriteData(input),
       select: caseHearingSelect
     });
+    await syncHearingParticipants(prisma, tenantId, updatedHearing.id, input.participantMembershipIds);
     await this.syncReminder(prisma, tenantId, caseId, actorUserId, updatedHearing, input);
+    await this.googleCalendar.enqueueResource(prisma, tenantId, "case_hearing", updatedHearing.id, "upsert");
 
     const reminderConfig = await this.getReminderConfig(prisma, tenantId, updatedHearing.id);
     return toCaseHearingDto(updatedHearing, reminderConfig);
@@ -144,6 +150,7 @@ export class CaseHearingsUseCase {
   ) {
     await this.findTenantHearingOrThrow(prisma, tenantId, caseId, hearingId);
     await this.notifications.cancelForResource(tenantId, "case_hearing", hearingId, prisma);
+    await this.googleCalendar.enqueueResource(prisma, tenantId, "case_hearing", hearingId, "delete");
     await prisma.caseHearing.delete({ where: { id: hearingId } });
 
     return { status: "ok" as const };
@@ -267,6 +274,7 @@ const caseHearingSelect = {
   description: true,
   id: true,
   notificationsEnabled: true,
+  participants: { select: { tenantMembershipId: true } },
   time: true,
   type: true,
   updatedAt: true
@@ -298,6 +306,27 @@ function toCaseHearingWriteData(input: CreateCaseHearingInput | UpdateCaseHearin
   };
 }
 
+async function syncHearingParticipants(
+  prisma: TenantPrismaClient,
+  tenantId: string,
+  hearingId: string,
+  membershipIds: string[]
+) {
+  const uniqueIds = [...new Set(membershipIds)];
+  if (uniqueIds.length > 0) {
+    const count = await prisma.tenantMembership.count({
+      where: { tenantId, id: { in: uniqueIds }, status: "active" }
+    });
+    if (count !== uniqueIds.length) throw new NotFoundException("Uno o mas participantes no pertenecen al estudio.");
+  }
+  await prisma.caseHearingParticipant.deleteMany({ where: { tenantId, hearingId } });
+  if (uniqueIds.length > 0) {
+    await prisma.caseHearingParticipant.createMany({
+      data: uniqueIds.map((tenantMembershipId) => ({ tenantId, hearingId, tenantMembershipId }))
+    });
+  }
+}
+
 function toCaseHearingDto(item: CaseHearingWithSelect, reminderConfig?: ReminderConfig) {
   return {
     id: item.id,
@@ -307,6 +336,7 @@ function toCaseHearingDto(item: CaseHearingWithSelect, reminderConfig?: Reminder
     time: item.time,
     description: item.description,
     notificationsEnabled: item.notificationsEnabled,
+    participantMembershipIds: item.participants.map((participant) => participant.tenantMembershipId),
     ...toNotificationSettingsDto(reminderConfig),
     createdAt: item.createdAt.toISOString(),
     updatedAt: item.updatedAt.toISOString()

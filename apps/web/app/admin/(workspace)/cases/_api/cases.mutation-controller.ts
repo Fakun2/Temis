@@ -10,21 +10,28 @@ import type {
   CaseExpenseAttachmentDto,
   CaseExpenseDto,
   CaseHearingDto,
-  CaseTaskDto
+  CaseTaskDto,
+  TaskBoardViewDto,
+  TaskBoardViewInput
 } from "../_types/cases.types";
 import { deleteCaseDocument, uploadCaseDocument } from "./case-documents.api";
 import {
   deleteCase,
+  deleteTaskBoard,
   deleteCaseExpense,
   deleteCaseExpenseAttachment,
   deleteCaseHearing,
   deleteCaseTask,
   markCaseTaskSeen,
+  createTaskBoard,
   saveCase,
   saveCaseExpense,
   saveCaseHearing,
   saveCaseTask,
-  uploadCaseExpenseAttachment
+  saveTenantCaseTask,
+  updateTenantCaseTaskLocalContext,
+  uploadCaseExpenseAttachment,
+  updateTaskBoard
 } from "./cases.api";
 
 export type CasesMutationSpec<TData, TVariables> = {
@@ -51,12 +58,25 @@ export const casesMutations = {
     caseId,
     taskId
   }: {
-    caseId: string;
+    caseId?: string;
     taskId?: string;
   }): CasesMutationSpec<CaseTaskDto, CaseTaskFormValues> {
     return {
-      mutationFn: (input) => saveCaseTask({ caseId, input, taskId }),
+      mutationFn: (input) =>
+        caseId
+          ? saveCaseTask({ caseId, input, taskId })
+          : saveTenantCaseTask({ input, taskId: taskId ?? "" }),
       permission: taskId ? "tasks:update" : "tasks:create"
+    };
+  },
+
+  updateTaskLocalContext(): CasesMutationSpec<
+    CaseTaskDto,
+    { caseId: string | null; taskId: string }
+  > {
+    return {
+      mutationFn: updateTenantCaseTaskLocalContext,
+      permission: "tasks:update"
     };
   },
 
@@ -71,6 +91,30 @@ export const casesMutations = {
     return {
       mutationFn: (taskId) => markCaseTaskSeen({ caseId, taskId }),
       permission: "tasks:read"
+    };
+  },
+
+  createTaskBoard(): CasesMutationSpec<TaskBoardViewDto, TaskBoardViewInput> {
+    return {
+      mutationFn: createTaskBoard,
+      permission: "tasks:update"
+    };
+  },
+
+  updateTaskBoard(): CasesMutationSpec<
+    TaskBoardViewDto,
+    { boardId: string; input: Partial<TaskBoardViewInput> }
+  > {
+    return {
+      mutationFn: updateTaskBoard,
+      permission: "tasks:update"
+    };
+  },
+
+  deleteTaskBoard(): CasesMutationSpec<{ status: "ok" }, string> {
+    return {
+      mutationFn: deleteTaskBoard,
+      permission: "tasks:update"
     };
   },
 

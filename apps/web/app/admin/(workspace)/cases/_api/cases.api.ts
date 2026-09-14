@@ -21,11 +21,19 @@ import type {
   CasePickerOptionsResponse,
   CaseTaskDto,
   CaseTasksListResponse,
+  TenantCaseTasksListResponse,
+  TenantCaseTasksMetricsDto,
+  TenantCaseTasksQueryParams,
+  TaskBoardViewDto,
+  TaskBoardViewInput,
+  TaskBoardViewsListResponse,
   CasesMetricsDto,
   CasesListResponse,
   CasesQueryParams,
   CatalogResponse,
   NotificationOptions,
+  ParticipantOptionsQueryParams,
+  ParticipantOptionsResponse,
   TaskAssigneeOption
 } from "../_types/cases.types";
 
@@ -33,8 +41,13 @@ export const caseKeys = {
   all: ["cases"] as const,
   detail: (caseId: string) => [...caseKeys.all, "detail", caseId] as const,
   metrics: () => [...caseKeys.all, "metrics"] as const,
+  tenantTasks: (params: TenantCaseTasksQueryParams) => [...caseKeys.all, "tasks", params] as const,
+  tenantTaskMetrics: () => [...caseKeys.all, "tasks", "metrics"] as const,
+  taskBoards: () => [...caseKeys.all, "tasks", "boards"] as const,
   notificationOptions: () => [...caseKeys.all, "notification-options"] as const,
   taskAssignees: () => [...caseKeys.all, "task-assignees"] as const,
+  participantOptions: (params: ParticipantOptionsQueryParams) =>
+    [...caseKeys.all, "participant-options", params] as const,
   list: (params: CasesQueryParams) => [...caseKeys.all, "list", params] as const,
   pickerOptions: (params: CasePickerOptionsQueryParams) =>
     [...caseKeys.all, "picker-options", params] as const,
@@ -105,6 +118,56 @@ export async function listCasePickerOptions(
 export async function getCaseMetrics(): Promise<CasesMetricsDto> {
   return dashboardHttpClient.request<CasesMetricsDto>({
     path: "/cases/metrics"
+  });
+}
+
+export async function listTenantCaseTasks(
+  params: TenantCaseTasksQueryParams
+): Promise<TenantCaseTasksListResponse> {
+  return dashboardHttpClient.request<TenantCaseTasksListResponse>({
+    params,
+    path: "/cases/tasks"
+  });
+}
+
+export async function getTenantCaseTaskMetrics(): Promise<TenantCaseTasksMetricsDto> {
+  return dashboardHttpClient.request<TenantCaseTasksMetricsDto>({
+    path: "/cases/tasks/metrics"
+  });
+}
+
+export async function listTaskBoards(): Promise<TaskBoardViewsListResponse> {
+  return dashboardHttpClient.request<TaskBoardViewsListResponse>({
+    path: "/cases/tasks/boards"
+  });
+}
+
+export async function createTaskBoard(input: TaskBoardViewInput): Promise<TaskBoardViewDto> {
+  return dashboardHttpClient.request<TaskBoardViewDto>({
+    body: input,
+    method: "POST",
+    path: "/cases/tasks/boards"
+  });
+}
+
+export async function updateTaskBoard({
+  boardId,
+  input
+}: {
+  boardId: string;
+  input: Partial<TaskBoardViewInput>;
+}): Promise<TaskBoardViewDto> {
+  return dashboardHttpClient.request<TaskBoardViewDto>({
+    body: input,
+    method: "PATCH",
+    path: `/cases/tasks/boards/${boardId}`
+  });
+}
+
+export async function deleteTaskBoard(boardId: string): Promise<{ status: "ok" }> {
+  return dashboardHttpClient.request<{ status: "ok" }>({
+    method: "DELETE",
+    path: `/cases/tasks/boards/${boardId}`
   });
 }
 
@@ -187,6 +250,39 @@ export async function saveCaseTask({
   });
 }
 
+export async function saveTenantCaseTask({
+  input,
+  taskId
+}: {
+  input: CaseTaskFormValues;
+  taskId: string;
+}): Promise<CaseTaskDto> {
+  return dashboardHttpClient.request<CaseTaskDto>({
+    body: {
+      ...input,
+      assignedMembershipId: input.assignedMembershipId || null,
+      endDate: input.endDate || undefined,
+      startDate: input.startDate || undefined
+    },
+    method: "PATCH",
+    path: `/cases/tasks/${taskId}`
+  });
+}
+
+export async function updateTenantCaseTaskLocalContext({
+  caseId,
+  taskId
+}: {
+  caseId: string | null;
+  taskId: string;
+}): Promise<CaseTaskDto> {
+  return dashboardHttpClient.request<CaseTaskDto>({
+    body: { caseId },
+    method: "PATCH",
+    path: `/cases/tasks/${taskId}/local-context`
+  });
+}
+
 export async function markCaseTaskSeen({
   caseId,
   taskId
@@ -207,17 +303,23 @@ export async function listTaskAssignees(): Promise<TaskAssigneeOption[]> {
 }
 
 export async function listNotificationOptions(): Promise<NotificationOptions> {
-  const response = await getStaffOptionsResponse();
+  const response = await listParticipantOptions({ limit: 1 });
 
   return {
-    members: response.workers
-      .filter((worker) => worker.status === "active")
-      .map(toTaskAssigneeOption),
     practiceAreas: response.filterOptions.practiceAreas.map((practiceArea) => ({
       id: practiceArea.id,
       name: practiceArea.name
     }))
   };
+}
+
+export async function listParticipantOptions(
+  params: ParticipantOptionsQueryParams
+): Promise<ParticipantOptionsResponse> {
+  return dashboardHttpClient.request<ParticipantOptionsResponse>({
+    params,
+    path: "/staff/participant-options"
+  });
 }
 
 async function getStaffOptionsResponse() {
@@ -233,6 +335,10 @@ async function getStaffOptionsResponse() {
       userId: string;
       fullName: string;
       email: string;
+      practiceAreas?: Array<{
+        id: string;
+        name: string;
+      }>;
       role: { name: string } | null;
       status: string;
     }>;
@@ -253,6 +359,10 @@ function toTaskAssigneeOption(worker: {
   email: string;
   fullName: string;
   id: string;
+  practiceAreas?: Array<{
+    id: string;
+    name: string;
+  }>;
   role: { name: string } | null;
   userId: string;
 }): TaskAssigneeOption {
@@ -261,6 +371,7 @@ function toTaskAssigneeOption(worker: {
     userId: worker.userId,
     fullName: worker.fullName,
     email: worker.email,
+    practiceAreas: worker.practiceAreas ?? [],
     roleName: worker.role?.name ?? null
   };
 }

@@ -11,7 +11,7 @@ export const metadata: Metadata = {
   description: "Sistema de gestión integral para estudios jurídicos motorizado por IA"
 };
 
-const variantCookieName = "justinia-theme-variant";
+const variantCookieName = "temis-theme-variant";
 
 export default async function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   const cookieStore = await cookies();

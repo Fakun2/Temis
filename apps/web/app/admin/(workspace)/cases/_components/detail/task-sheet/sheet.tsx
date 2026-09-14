@@ -32,8 +32,10 @@ export function CaseTaskSheet({
   assignees = [],
   caseId,
   defaultDate,
+  defaultStatus,
   onOpenChange,
   open: controlledOpen,
+  presentation,
   selectedCase,
   task,
   trigger
@@ -41,21 +43,24 @@ export function CaseTaskSheet({
   const [localSelectedCase, setLocalSelectedCase] = useState(selectedCase ?? null);
   const selectedCaseId = caseId ?? localSelectedCase?.id ?? "";
   const { draft, errors, handleSubmit, mutation, open, setOpen, updateDraft } = useCaseTaskSheet({
-    caseId: selectedCaseId,
+    caseId: task && !task.caseId ? undefined : selectedCaseId,
     defaultDate,
+    defaultStatus,
+    localCaseId: task ? selectedCaseId || null : undefined,
     onOpenChange,
     open: controlledOpen,
     task
   });
   const canSelectCase = !task && !caseId;
-  const isMissingCase = !selectedCaseId;
+  const canLinkImportedCase = Boolean(task && !task.caseId);
+  const isMissingCase = !task && !selectedCaseId;
   const notificationOptionsQuery = useCasesQuery(casesQueries.notificationOptions());
 
   useEffect(() => {
     if (open) {
-      setLocalSelectedCase(selectedCase ?? null);
+      setLocalSelectedCase(selectedCase ?? getTaskSelectedCase(task));
     }
-  }, [open, selectedCase]);
+  }, [open, selectedCase, task]);
 
   function handleCaseScopedSubmit(event: FormEvent<HTMLFormElement>) {
     if (isMissingCase) {
@@ -75,6 +80,7 @@ export function CaseTaskSheet({
       onOpenChange={setOpen}
       onSubmit={handleCaseScopedSubmit}
       open={open}
+      presentation={presentation}
       submitDisabled={isMissingCase}
       title={task ? "Editar tarea" : "Nueva tarea"}
       trigger={trigger}
@@ -82,6 +88,16 @@ export function CaseTaskSheet({
       {canSelectCase ? (
         <CaseField label="Expediente" required>
           <CasePickerField selectedCase={localSelectedCase} onSelect={setLocalSelectedCase} />
+        </CaseField>
+      ) : null}
+
+      {canLinkImportedCase ? (
+        <CaseField label="Expediente">
+          <CasePickerField
+            placeholder="Sin expediente"
+            selectedCase={localSelectedCase}
+            onSelect={setLocalSelectedCase}
+          />
         </CaseField>
       ) : null}
 
@@ -116,22 +132,13 @@ export function CaseTaskSheet({
         </Select>
       </CaseField>
 
-      <div className="grid gap-4 md:grid-cols-2">
-        <CaseField error={errors.startDate} label="Fecha de inicio">
-          <CaseDateInput
-            autoComplete="off"
-            value={draft.startDate ?? ""}
-            onChange={(event) => updateDraft("startDate", event.target.value)}
-          />
-        </CaseField>
-        <CaseField error={errors.endDate} label="Fecha de finalizacion">
-          <CaseDateInput
-            autoComplete="off"
-            value={draft.endDate ?? ""}
-            onChange={(event) => updateDraft("endDate", event.target.value)}
-          />
-        </CaseField>
-      </div>
+      <CaseField error={errors.endDate} label="Fecha de vencimiento">
+        <CaseDateInput
+          autoComplete="off"
+          value={draft.endDate ?? ""}
+          onChange={(event) => updateDraft("endDate", event.target.value)}
+        />
+      </CaseField>
 
       <CaseField label="Estado">
         <Select
@@ -168,4 +175,17 @@ export function CaseTaskSheet({
       />
     </CaseActionSheet>
   );
+}
+
+function getTaskSelectedCase(task: CaseTaskSheetProps["task"]) {
+  if (!task?.case) {
+    return null;
+  }
+
+  return {
+    caption: task.case.caption,
+    caseNumber: task.case.caseNumber,
+    id: task.case.id,
+    subject: null
+  };
 }

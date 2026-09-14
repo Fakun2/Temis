@@ -16,7 +16,7 @@ import { AdminTableRowsSkeleton } from "../../_components/admin-skeletons";
 import { Can } from "../../_components/auth";
 import { clientTypeLabels } from "../_constants/clients.constants";
 import { ClientRowActions } from "./client-row-actions";
-import { ClientSheetPlaceholder } from "./client-sheet-placeholder";
+import { ClientSheet } from "./client-sheet";
 import { ClientStatusBadge } from "./client-status-badge";
 
 const columnCount = 7;
@@ -39,95 +39,109 @@ export function ClientsTable({
   onRetry: () => void;
 }) {
   return (
-    <div className="max-h-[56svh] min-h-[300px] overflow-auto scrollbar-none rounded-2xl lg:min-h-0 lg:max-h-none lg:flex-1">
-      <Table className="min-w-[920px] text-xs" aria-busy={loading}>
-        <TableHeader className="bg-[color-mix(in_oklab,var(--muted)_28%,transparent)] [&_tr]:border-0">
-          <TableRow className="hover:bg-transparent">
-            <TableHead className="h-10 w-[25%] px-3 text-sm font-medium text-foreground">
-              Cliente
-            </TableHead>
-            <TableHead className="h-10 px-3 text-sm font-medium text-foreground">Tipo</TableHead>
-            <TableHead className="h-10 px-3 text-sm font-medium text-foreground">
-              Documento
-            </TableHead>
-            <TableHead className="h-10 w-[24%] px-3 text-sm font-medium text-foreground">
-              Contacto
-            </TableHead>
-            <TableHead className="h-10 px-3 text-center text-sm font-medium text-foreground">
-              Expedientes
-            </TableHead>
-            <TableHead className="h-10 px-3 text-sm font-medium text-foreground">Estado</TableHead>
-            <TableHead className="h-10 px-3 text-right text-sm font-medium text-foreground">
-              Acciones
-            </TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody className="[&_tr:last-child]:border-0">
-          {loading && clients.length === 0 ? (
-            <AdminTableRowsSkeleton columnCount={columnCount} rowCount={8} />
-          ) : error ? (
-            <StateRow
-              icon={<AlertCircle className="h-5 w-5" aria-hidden="true" />}
-              message={error.message}
-              tone="error"
-            >
-              <Button type="button" variant="outline" size="sm" onClick={onRetry}>
-                <RotateCcw className="h-4 w-4" aria-hidden="true" />
-                Reintentar
-              </Button>
-            </StateRow>
-          ) : clients.length === 0 ? (
-            <StateRow
-              message={
-                hasActiveFilters
-                  ? "No hay clientes para los filtros seleccionados."
-                  : "Todavía no hay clientes."
-              }
-            >
-              {hasActiveFilters ? (
-                <Button type="button" variant="outline" size="sm" onClick={onClearFilters}>
-                  Limpiar filtros
-                </Button>
+    <div className="min-h-0 flex-1 overflow-x-auto overflow-y-hidden scrollbar-none rounded-2xl">
+      <div className="flex h-full min-h-0 min-w-[920px] flex-col">
+        <ClientsTableHeader />
+        <div className="min-h-0 flex-1 overflow-y-auto scrollbar-none overscroll-contain [scrollbar-gutter:stable]">
+          <Table className="min-w-full text-xs" aria-busy={loading}>
+            <TableBody className="[&_tr:last-child]:border-0">
+              {loading && clients.length === 0 ? (
+                <AdminTableRowsSkeleton columnCount={columnCount} rowCount={8} />
+              ) : error ? (
+                <StateRow
+                  icon={<AlertCircle className="h-5 w-5" aria-hidden="true" />}
+                  message={error.message}
+                  tone="error"
+                >
+                  <Button type="button" variant="outline" size="sm" onClick={onRetry}>
+                    <RotateCcw className="h-4 w-4" aria-hidden="true" />
+                    Reintentar
+                  </Button>
+                </StateRow>
+              ) : clients.length === 0 ? (
+                <StateRow
+                  message={
+                    hasActiveFilters
+                      ? "No hay clientes para los filtros seleccionados."
+                      : "Todavia no hay clientes."
+                  }
+                >
+                  {hasActiveFilters ? (
+                    <Button type="button" variant="outline" size="sm" onClick={onClearFilters}>
+                      Limpiar filtros
+                    </Button>
+                  ) : (
+                    <Can permissions={["clients:create"]}>
+                      <ClientSheet compact />
+                    </Can>
+                  )}
+                </StateRow>
               ) : (
-                <Can permissions={["clients:create"]}>
-                  <ClientSheetPlaceholder compact />
-                </Can>
+                clients.map((client) => (
+                  <TableRow className="h-16 border-border/40 hover:bg-secondary/30" key={client.id}>
+                    <TableCell className="h-16 w-[25%] px-3 py-2">
+                      <p className="max-w-[260px] truncate text-sm font-medium text-foreground">
+                        {client.displayName}
+                      </p>
+                    </TableCell>
+                    <TableCell className="h-16 px-3 py-2">
+                      <ClientTypeCell client={client} />
+                    </TableCell>
+                    <TableCell className="h-16 px-3 py-2">
+                      <ClientDocumentCell client={client} />
+                    </TableCell>
+                    <TableCell className="h-16 w-[24%] px-3 py-2">
+                      <ClientContactCell client={client} />
+                    </TableCell>
+                    <TableCell className="h-16 px-3 py-2 text-center">
+                      <span className="text-sm tabular-nums text-foreground">
+                        {client.casesCount}
+                      </span>
+                    </TableCell>
+                    <TableCell className="h-16 px-3 py-2">
+                      <ClientStatusBadge status={client.status} />
+                    </TableCell>
+                    <TableCell className="h-16 px-3 py-2 text-right">
+                      <div className="flex justify-end">
+                        <ClientRowActions client={client} onArchived={onArchived} />
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))
               )}
-            </StateRow>
-          ) : (
-            clients.map((client) => (
-              <TableRow className="h-16 border-border/40 hover:bg-secondary/30" key={client.id}>
-                <TableCell className="h-16 px-3 py-2">
-                  <p className="max-w-[260px] truncate text-sm font-medium text-foreground">
-                    {client.displayName}
-                  </p>
-                </TableCell>
-                <TableCell className="h-16 px-3 py-2">
-                  <ClientTypeCell client={client} />
-                </TableCell>
-                <TableCell className="h-16 px-3 py-2">
-                  <ClientDocumentCell client={client} />
-                </TableCell>
-                <TableCell className="h-16 px-3 py-2">
-                  <ClientContactCell client={client} />
-                </TableCell>
-                <TableCell className="h-16 px-3 py-2 text-center">
-                  <span className="text-sm tabular-nums text-foreground">{client.casesCount}</span>
-                </TableCell>
-                <TableCell className="h-16 px-3 py-2">
-                  <ClientStatusBadge status={client.status} />
-                </TableCell>
-                <TableCell className="h-16 px-3 py-2 text-right">
-                  <div className="flex justify-end">
-                    <ClientRowActions client={client} onArchived={onArchived} />
-                  </div>
-                </TableCell>
-              </TableRow>
-            ))
-          )}
-        </TableBody>
-      </Table>
+            </TableBody>
+          </Table>
+        </div>
+      </div>
     </div>
+  );
+}
+
+function ClientsTableHeader() {
+  return (
+    <table className="w-full shrink-0 caption-bottom text-xs">
+      <TableHeader className="bg-[color-mix(in_oklab,var(--muted)_28%,transparent)] [&_tr]:border-0">
+        <TableRow className="hover:bg-transparent">
+          <TableHead className="h-10 w-[25%] px-3 text-sm font-medium text-foreground">
+            Cliente
+          </TableHead>
+          <TableHead className="h-10 px-3 text-sm font-medium text-foreground">Tipo</TableHead>
+          <TableHead className="h-10 px-3 text-sm font-medium text-foreground">
+            Documento
+          </TableHead>
+          <TableHead className="h-10 w-[24%] px-3 text-sm font-medium text-foreground">
+            Contacto
+          </TableHead>
+          <TableHead className="h-10 px-3 text-center text-sm font-medium text-foreground">
+            Expedientes
+          </TableHead>
+          <TableHead className="h-10 px-3 text-sm font-medium text-foreground">Estado</TableHead>
+          <TableHead className="h-10 px-3 text-right text-sm font-medium text-foreground">
+            Acciones
+          </TableHead>
+        </TableRow>
+      </TableHeader>
+    </table>
   );
 }
 
@@ -212,7 +226,7 @@ function StateRow({
 }) {
   return (
     <TableRow className="hover:bg-transparent">
-      <TableCell colSpan={columnCount} className="h-[300px] p-6 text-center">
+      <TableCell colSpan={columnCount} className="h-[260px] p-6 text-center lg:h-[420px]">
         <div className="mx-auto flex max-w-md flex-col items-center justify-center gap-3">
           {icon ? (
             <span className={tone === "error" ? "text-destructive" : "text-muted-foreground"}>

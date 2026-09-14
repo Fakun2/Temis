@@ -20,6 +20,7 @@ import { ForumsModule } from "./forums/forums.module";
 import { JudicialCentersModule } from "./judicial-centers/judicial-centers.module";
 import { OnboardingModule } from "./onboarding/onboarding.module";
 import { NotificationsModule } from "./notifications/notifications.module";
+import { NotionIntegrationModule } from "./notion-integration/notion-integration.module";
 import { PracticeAreaTemplatesModule } from "./practice-area-templates/practice-area-templates.module";
 import { ProvincesModule } from "./provinces/provinces.module";
 import { RedisModule } from "./redis/redis.module";
@@ -49,6 +50,7 @@ import { TenancyModule } from "./tenancy/tenancy.module";
     CategoriesModule,
     DocumentsModule,
     NotificationsModule,
+    NotionIntegrationModule,
     CasesModule,
     ClientsModule,
     CurrenciesModule,

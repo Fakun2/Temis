@@ -46,6 +46,7 @@ import {
   DocumentsListResponseDto,
   ListDocumentsQueryDto,
   UpdateDocumentDto,
+  ReplaceDocumentBodyDto,
   UploadDocumentImportItemsDto,
   UpdateDocumentFolderDto
 } from "./documents.schemas";
@@ -180,6 +181,22 @@ export class DocumentsController {
     @Body() input: UpdateDocumentDto
   ) {
     return this.documentsService.update(tenantId, documentId, input);
+  }
+
+  @Post(":documentId/replace")
+  @Permissions("documents:write")
+  @UseGuards(CaseDocumentUploadRateLimitGuard)
+  @UseInterceptors(FileInterceptor("file", { limits: { fileSize: maxDocumentSizeBytes } }))
+  @ApiConsumes("multipart/form-data")
+  @ApiBody({ type: ReplaceDocumentBodyDto })
+  @ApiOkResponse({ type: DocumentDto })
+  replace(
+    @ActiveTenant() tenantId: string,
+    @Param("documentId") documentId: string,
+    @Body() body: ReplaceDocumentBodyDto,
+    @UploadedFile() file: { buffer: Buffer; mimetype: string; originalname: string; size: number }
+  ) {
+    return this.documentsService.replace(tenantId, documentId, body, file);
   }
 
   @Get(":documentId/preview")

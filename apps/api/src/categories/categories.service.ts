@@ -135,16 +135,6 @@ export class CategoriesService {
   }
 }
 
-const globalCategorySelect = {
-  active: true,
-  code: true,
-  createdAt: true,
-  id: true,
-  kind: true,
-  name: true,
-  updatedAt: true
-} satisfies Prisma.GlobalFinanceCategorySelect;
-
 const tenantCategorySelect = {
   active: true,
   createdAt: true,
@@ -154,14 +144,30 @@ const tenantCategorySelect = {
   updatedAt: true
 } satisfies Prisma.TenantFinanceCategorySelect;
 
-type GlobalCategoryWithSelect = Prisma.GlobalFinanceCategoryGetPayload<{
-  select: typeof globalCategorySelect;
-}>;
 type TenantCategoryWithSelect = Prisma.TenantFinanceCategoryGetPayload<{
   select: typeof tenantCategorySelect;
 }>;
 
-type CategoryDtoLike = ReturnType<typeof toGlobalDto> | ReturnType<typeof toTenantDto>;
+type CategoryDtoLike =
+  | {
+      active: boolean;
+      code: string;
+      createdAt: Date;
+      id: string;
+      kind: FinanceCategoryKindDto;
+      name: string;
+      origin: "global";
+      updatedAt: Date;
+    }
+  | {
+      active: boolean;
+      createdAt: Date;
+      id: string;
+      kind: FinanceCategoryKindDto;
+      name: string;
+      origin: "tenant";
+      updatedAt: Date;
+    };
 type CategoryCursor = {
   id: string;
   name: string;
@@ -356,19 +362,6 @@ async function getCategoryMetrics(prisma: PrismaService, tenantId: string) {
     active: activeGlobal + activeTenant,
     global,
     tenant
-  };
-}
-
-function toGlobalDto(category: GlobalCategoryWithSelect) {
-  return {
-    active: category.active,
-    code: category.code,
-    createdAt: category.createdAt,
-    id: category.id,
-    kind: category.kind as FinanceCategoryKindDto,
-    name: category.name,
-    origin: "global" as const,
-    updatedAt: category.updatedAt
   };
 }
 

@@ -15,12 +15,16 @@ export const allCaseTasksTableColumns = Object.keys(
   caseTasksTableColumnLabels
 ) as CaseTasksTableColumn[];
 
-export function TaskColumnsMenu({
+export function TaskColumnsMenu<TColumn extends string = CaseTasksTableColumn>({
+  columns = allCaseTasksTableColumns as unknown as readonly TColumn[],
+  labels = caseTasksTableColumnLabels as unknown as Record<TColumn, string>,
   onToggleColumn,
   visibleColumns
 }: {
-  onToggleColumn: (column: CaseTasksTableColumn, checked: boolean) => void;
-  visibleColumns: CaseTasksTableColumn[];
+  columns?: readonly TColumn[];
+  labels?: Record<TColumn, string>;
+  onToggleColumn: (column: TColumn, checked: boolean) => void;
+  visibleColumns: readonly TColumn[];
 }) {
   return (
     <DropdownMenu>
@@ -30,13 +34,13 @@ export function TaskColumnsMenu({
       <DropdownMenuContent align="end" className="w-52">
         <DropdownMenuLabel>Mostrar columnas</DropdownMenuLabel>
         <DropdownMenuSeparator />
-        {allCaseTasksTableColumns.map((column) => (
+        {columns.map((column) => (
           <DropdownMenuCheckboxItem
             checked={visibleColumns.includes(column)}
             key={column}
             onCheckedChange={(value) => onToggleColumn(column, Boolean(value))}
           >
-            {caseTasksTableColumnLabels[column]}
+            {labels[column]}
           </DropdownMenuCheckboxItem>
         ))}
       </DropdownMenuContent>

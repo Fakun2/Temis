@@ -35,17 +35,18 @@ export function CaseTaskRowActions({
   canReadExpense: boolean;
   canUpdate: boolean;
   canUpdateExpense: boolean;
-  caseId: string;
+  caseId?: string;
   task: CaseTaskDto;
 }) {
   const [addExpenseOpen, setAddExpenseOpen] = useState(false);
   const [editTaskOpen, setEditTaskOpen] = useState(false);
   const [expensesOpen, setExpensesOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
-  const deleteMutation = useCasesMutation(casesMutations.deleteTask(caseId));
-  const markSeenMutation = useCasesMutation(casesMutations.markTaskSeen(caseId));
+  const deleteMutation = useCasesMutation(casesMutations.deleteTask(caseId ?? ""));
+  const markSeenMutation = useCasesMutation(casesMutations.markTaskSeen(caseId ?? ""));
   const router = useRouter();
-  const hasExpenseActions = canCreateExpense || canReadExpense;
+  const hasCase = Boolean(caseId);
+  const hasExpenseActions = hasCase && (canCreateExpense || canReadExpense);
 
   if (!canDelete && !canUpdate && !hasExpenseActions) {
     return null;
@@ -53,6 +54,10 @@ export function CaseTaskRowActions({
 
   async function handleDelete() {
     try {
+      if (!caseId) {
+        return;
+      }
+
       await deleteMutation.mutateAsync(task.id);
       router.refresh();
     } catch {
@@ -63,8 +68,10 @@ export function CaseTaskRowActions({
   async function openAfterMarkSeen(onOpen: () => void) {
     setMenuOpen(false);
     try {
-      await markSeenMutation.mutateAsync(task.id);
-      router.refresh();
+      if (caseId) {
+        await markSeenMutation.mutateAsync(task.id);
+        router.refresh();
+      }
     } catch {
       // The timestamp should not block the user from opening the task action.
     } finally {
@@ -159,7 +166,7 @@ export function CaseTaskRowActions({
         />
       ) : null}
 
-      {expensesOpen ? (
+      {expensesOpen && caseId ? (
         <CaseTaskExpensesPopup
           canDelete={canDeleteExpense}
           canUpdate={canUpdateExpense}

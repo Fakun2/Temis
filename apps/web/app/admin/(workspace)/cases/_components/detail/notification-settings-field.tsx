@@ -1,6 +1,5 @@
 "use client";
 
-import { Bell } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import {
@@ -17,6 +16,7 @@ import {
 } from "../../_constants/cases.constants";
 import { CaseDateInput } from "../sheet/case-date-input";
 import { CaseField } from "../sheet/case-field";
+import { ParticipantSelectorDialog } from "./participant-selector-dialog";
 
 type NotificationDraft = {
   notificationDate?: string | null;
@@ -51,7 +51,6 @@ export function NotificationSettingsField<TDraft extends NotificationDraft>({
   options,
   updateDraft
 }: NotificationSettingsFieldProps<TDraft>) {
-  const members = options?.members ?? [];
   const practiceAreas = options?.practiceAreas ?? [];
   const today = getBuenosAiresTodayDateString();
   const notificationsDisabled = !draft.notificationEnabled;
@@ -85,17 +84,6 @@ export function NotificationSettingsField<TDraft extends NotificationDraft>({
         defaultPracticeAreaId as TDraft["notificationPracticeAreaId"]
       );
     }
-  }
-
-  function toggleMember(memberId: string, checked: boolean) {
-    const selected = new Set(draft.notificationMembershipIds);
-    if (checked) {
-      selected.add(memberId);
-    } else {
-      selected.delete(memberId);
-    }
-
-    updateDraft("notificationMembershipIds", [...selected] as TDraft["notificationMembershipIds"]);
   }
 
   return (
@@ -195,34 +183,19 @@ export function NotificationSettingsField<TDraft extends NotificationDraft>({
           </div>
 
           {draft.notificationRecipientMode === "members" ? (
-            <CaseField error={errors.notificationMembershipIds} label="Personas" required>
-              <div className="grid max-h-44 gap-2 overflow-y-auto rounded-xl border border-border/40 bg-background/50 p-3">
-                {members.length ? (
-                  members.map((member) => (
-                    <label
-                      className="flex items-center gap-3 rounded-lg px-2 py-1.5 text-sm hover:bg-secondary/40"
-                      key={member.id}
-                    >
-                      <Checkbox
-                        checked={draft.notificationMembershipIds.includes(member.id)}
-                        disabled={notificationsDisabled}
-                        onCheckedChange={(checked) => toggleMember(member.id, checked === true)}
-                      />
-                      <span className="min-w-0">
-                        <span className="block truncate text-foreground">{member.fullName}</span>
-                        <span className="block truncate text-xs text-muted-foreground">
-                          {member.roleName ?? member.email}
-                        </span>
-                      </span>
-                    </label>
-                  ))
-                ) : (
-                  <div className="flex items-center gap-2 px-2 py-1.5 text-sm text-muted-foreground">
-                    <Bell className="h-4 w-4" aria-hidden="true" />
-                    No hay miembros activos disponibles.
-                  </div>
-                )}
-              </div>
+            <CaseField className="mt-4" error={errors.notificationMembershipIds} label="Personas" required>
+              <ParticipantSelectorDialog
+                disabled={notificationsDisabled}
+                emptyLabel="Seleccionar destinatarios"
+                onApply={(membershipIds) =>
+                  updateDraft(
+                    "notificationMembershipIds",
+                    membershipIds as TDraft["notificationMembershipIds"]
+                  )
+                }
+                selectedMembershipIds={draft.notificationMembershipIds}
+                title="Seleccionar destinatarios"
+              />
             </CaseField>
           ) : null}
         </div>

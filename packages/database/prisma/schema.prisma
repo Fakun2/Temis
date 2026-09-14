@@ -180,6 +180,7 @@ enum DocumentStorageCleanupJobReason {
   document_deleted
   folder_deleted
   metadata_create_failed
+  document_replaced
 }
 
 enum DocumentStatus {
@@ -246,6 +247,77 @@ enum AsyncOutboxEventStatus {
   failed
 }
 
+enum DocumentScope {
+  library
+  case
+}
+
+enum NotionConnectionStatus {
+  connected
+  disconnected
+  error
+}
+
+enum NotionSyncJobDirection {
+  pull
+  push
+  bidirectional
+}
+
+enum NotionSyncJobStatus {
+  pending
+  processing
+  completed
+  failed
+}
+
+enum NotionTaskSyncState {
+  synced
+  pending_push
+  pending_pull
+  conflict
+}
+
+enum NotionSyncConflictStatus {
+  open
+  resolved
+}
+
+enum GoogleCalendarConnectionStatus {
+  provisioning
+  connected
+  sync_requested
+  syncing
+  reauthorization_required
+  disconnecting
+  disconnected
+  error
+}
+
+enum GoogleCalendarEventResourceType {
+  case_task
+  case_hearing
+}
+
+enum GoogleCalendarEventLinkStatus {
+  active
+  deleted
+  failed
+}
+
+enum GoogleCalendarSyncMode {
+  global
+  custom
+}
+
+enum GoogleCalendarSyncSource {
+  all_hearings
+  my_tasks
+  my_area_tasks
+  participating_hearings
+  all_tasks
+}
+
 model Tenant {
   id                         String                          @id @default(uuid()) @db.Uuid
   name                       String
@@ -281,6 +353,15 @@ model Tenant {
   cashboxMovements           CashboxMovement[]
   notificationReminders      NotificationReminder[]
   notificationRecipients     NotificationReminderRecipient[]
+  taskBoardViews             TaskBoardView[]
+  notionConnections          NotionConnection[]
+  notionTaskBoardMappings    NotionTaskBoardMapping[]
+  notionTaskLinks            NotionTaskLink[]
+  notionSyncJobs             NotionSyncJob[]
+  notionSyncConflicts        NotionSyncConflict[]
+  googleCalendarConnections  GoogleCalendarConnection[]
+  googleCalendarEventLinks   GoogleCalendarEventLink[]
+  caseHearingParticipants    CaseHearingParticipant[]
   onboardingChecklistItems   TenantOnboardingChecklistItem[]
   asyncOutboxEvents          AsyncOutboxEvent[]
   createdAt                  DateTime                        @default(now()) @map("created_at") @db.Timestamptz(6)
@@ -312,6 +393,7 @@ model User {
   createdAt                  DateTime                    @default(now()) @map("created_at") @db.Timestamptz(6)
   updatedAt                  DateTime                    @updatedAt @map("updated_at") @db.Timestamptz(6)
   caseExpenseCashboxSyncJobs CaseExpenseCashboxSyncJob[]
+  googleCalendarConnections GoogleCalendarConnection[]
 
   @@index([dni])
   @@map("users")
@@ -630,6 +712,7 @@ model DocumentFolder {
   parentId  String?  @map("parent_id") @db.Uuid
   name      String
   notes     String?  @db.Text
+  scope     DocumentScope @default(library)
   createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
   updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz(6)
 
@@ -643,6 +726,7 @@ model DocumentFolder {
   @@unique([tenantId, id])
   @@index([tenantId])
   @@index([tenantId, parentId])
+  @@index([tenantId, scope, parentId])
   @@index([tenantId, name])
   @@map("document_folders")
 }
@@ -651,6 +735,7 @@ model Document {
   id               String         @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   tenantId         String         @map("tenant_id") @db.Uuid
   caseId           String?        @map("case_id") @db.Uuid
+  scope            DocumentScope  @default(library)
   folderId         String?        @map("folder_id") @db.Uuid
   categoryId       String?        @map("category_id") @db.Uuid
   uploadedByUserId String         @map("uploaded_by_user_id") @db.Uuid
@@ -687,6 +772,7 @@ model Document {
   @@index([tenantId, folderId])
   @@index([tenantId, folderId, createdAt])
   @@index([tenantId, caseId, createdAt])
+  @@index([tenantId, scope, folderId, createdAt])
   @@index([tenantId, categoryId])
   @@index([tenantId, status])
   @@index([tenantId, mimeType])
@@ -921,7 +1007,7 @@ model AiLegalNormChunk {
 model CaseTask {
   id                   String         @id @default(uuid()) @db.Uuid
   tenantId             String         @map("tenant_id") @db.Uuid
-  caseId               String         @map("case_id") @db.Uuid
+  caseId               String?        @map("case_id") @db.Uuid
   assignedMembershipId String?        @map("assigned_membership_id") @db.Uuid
   name                 String
   startDate            DateTime?      @map("start_date") @db.Date
@@ -933,9 +1019,10 @@ model CaseTask {
   updatedAt            DateTime       @updatedAt @map("updated_at") @db.Timestamptz(6)
 
   tenant     Tenant            @relation(fields: [tenantId], references: [id], onDelete: Cascade)
-  case       Case              @relation(fields: [caseId], references: [id], onDelete: Cascade)
+  case       Case?             @relation(fields: [caseId], references: [id], onDelete: Cascade)
   assignedTo TenantMembership? @relation("CaseTaskAssignee", fields: [assignedMembershipId], references: [id], onDelete: SetNull)
   expenses   CaseExpense[]
+  notionLink NotionTaskLink?
 
   @@index([tenantId])
   @@index([caseId])
@@ -946,6 +1033,143 @@ model CaseTask {
   @@index([tenantId, startDate])
   @@index([tenantId, endDate])
   @@map("case_tasks")
+}
+
+model TaskBoardView {
+  id                    String   @id @default(uuid()) @db.Uuid
+  tenantId              String   @map("tenant_id") @db.Uuid
+  name                  String
+  filters               Json
+  settings              Json     @default("{}")
+  createdByMembershipId String   @map("created_by_membership_id") @db.Uuid
+  createdAt             DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt             DateTime @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  tenant              Tenant           @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  createdByMembership TenantMembership @relation("TaskBoardViewCreator", fields: [tenantId, createdByMembershipId], references: [tenantId, id], onDelete: Cascade)
+
+  @@index([tenantId, createdAt])
+  @@index([tenantId, createdByMembershipId])
+  @@map("task_board_views")
+}
+
+model NotionConnection {
+  id                      String                 @id @default(uuid()) @db.Uuid
+  tenantId                String                 @map("tenant_id") @db.Uuid
+  workspaceId             String                 @map("workspace_id")
+  workspaceName           String?                @map("workspace_name")
+  workspaceIcon           String?                @map("workspace_icon")
+  botId                   String?                @map("bot_id")
+  encryptedAccessToken    String                 @map("encrypted_access_token")
+  encryptedRefreshToken   String?                @map("encrypted_refresh_token")
+  connectedByMembershipId String                 @map("connected_by_membership_id") @db.Uuid
+  status                  NotionConnectionStatus @default(connected)
+  lastSyncAt              DateTime?              @map("last_sync_at") @db.Timestamptz(6)
+  createdAt               DateTime               @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt               DateTime               @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  tenant                Tenant                   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  connectedByMembership TenantMembership         @relation("NotionConnectionConnector", fields: [tenantId, connectedByMembershipId], references: [tenantId, id], onDelete: Cascade)
+  mappings              NotionTaskBoardMapping[]
+
+  @@unique([tenantId, workspaceId])
+  @@index([tenantId, status])
+  @@index([tenantId, connectedByMembershipId])
+  @@map("notion_connections")
+}
+
+model NotionTaskBoardMapping {
+  id                  String    @id @default(uuid()) @db.Uuid
+  tenantId            String    @map("tenant_id") @db.Uuid
+  connectionId        String    @map("connection_id") @db.Uuid
+  dataSourceId        String    @map("data_source_id")
+  dataSourceName      String    @map("data_source_name")
+  enabled             Boolean   @default(true)
+  syncIntervalMinutes Int       @default(15) @map("sync_interval_minutes")
+  propertyMapping     Json      @map("property_mapping")
+  statusMapping       Json      @map("status_mapping")
+  lastPullAt          DateTime? @map("last_pull_at") @db.Timestamptz(6)
+  lastPushAt          DateTime? @map("last_push_at") @db.Timestamptz(6)
+  createdAt           DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt           DateTime  @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  tenant     Tenant                  @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  connection NotionConnection        @relation(fields: [connectionId], references: [id], onDelete: Cascade)
+  links      NotionTaskLink[]
+  jobs       NotionSyncJob[]
+  conflicts  NotionSyncConflict[]
+
+  @@unique([tenantId, dataSourceId])
+  @@index([tenantId, enabled, lastPullAt])
+  @@index([tenantId, connectionId])
+  @@map("notion_task_board_mappings")
+}
+
+model NotionTaskLink {
+  id                  String              @id @default(uuid()) @db.Uuid
+  tenantId            String              @map("tenant_id") @db.Uuid
+  taskId              String              @unique @map("task_id") @db.Uuid
+  notionPageId        String              @map("notion_page_id")
+  mappingId           String              @map("mapping_id") @db.Uuid
+  lastNotionEditedAt  DateTime?           @map("last_notion_edited_at") @db.Timestamptz(6)
+  lastBogAppUpdatedAt DateTime?           @map("last_bogapp_updated_at") @db.Timestamptz(6)
+  lastSyncedHash      String?             @map("last_synced_hash")
+  syncState           NotionTaskSyncState @default(synced) @map("sync_state")
+  createdAt           DateTime            @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt           DateTime            @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  tenant  Tenant                 @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  task    CaseTask               @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  mapping NotionTaskBoardMapping @relation(fields: [mappingId], references: [id], onDelete: Cascade)
+
+  @@unique([tenantId, notionPageId])
+  @@index([tenantId, mappingId])
+  @@index([tenantId, syncState])
+  @@map("notion_task_links")
+}
+
+model NotionSyncJob {
+  id           String                 @id @default(uuid()) @db.Uuid
+  tenantId     String                 @map("tenant_id") @db.Uuid
+  mappingId    String                 @map("mapping_id") @db.Uuid
+  direction    NotionSyncJobDirection
+  status       NotionSyncJobStatus    @default(pending)
+  attempts     Int                    @default(0)
+  errorCode    String?                @map("error_code")
+  errorMessage String?                @map("error_message")
+  startedAt    DateTime?              @map("started_at") @db.Timestamptz(6)
+  finishedAt   DateTime?              @map("finished_at") @db.Timestamptz(6)
+  createdAt    DateTime               @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt    DateTime               @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  tenant  Tenant                 @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  mapping NotionTaskBoardMapping @relation(fields: [mappingId], references: [id], onDelete: Cascade)
+
+  @@index([tenantId, status, createdAt])
+  @@index([tenantId, mappingId])
+  @@map("notion_sync_jobs")
+}
+
+model NotionSyncConflict {
+  id           String                   @id @default(uuid()) @db.Uuid
+  tenantId     String                   @map("tenant_id") @db.Uuid
+  taskId       String?                  @map("task_id") @db.Uuid
+  notionPageId String?                  @map("notion_page_id")
+  mappingId    String                   @map("mapping_id") @db.Uuid
+  fieldDiff    Json                     @map("field_diff")
+  status       NotionSyncConflictStatus @default(open)
+  detectedAt   DateTime                 @default(now()) @map("detected_at") @db.Timestamptz(6)
+  resolvedAt   DateTime?                @map("resolved_at") @db.Timestamptz(6)
+  createdAt    DateTime                 @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt    DateTime                 @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  tenant  Tenant                 @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  mapping NotionTaskBoardMapping @relation(fields: [mappingId], references: [id], onDelete: Cascade)
+
+  @@index([tenantId, status, detectedAt])
+  @@index([tenantId, mappingId])
+  @@index([tenantId, taskId])
+  @@map("notion_sync_conflicts")
 }
 
 model CaseExpense {
@@ -1020,6 +1244,7 @@ model CaseHearing {
 
   tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
   case   Case   @relation(fields: [caseId], references: [id], onDelete: Cascade)
+  participants CaseHearingParticipant[]
 
   @@index([tenantId])
   @@index([caseId])
@@ -1242,9 +1467,13 @@ model TenantMembership {
   practiceAreas            TenantMembershipPracticeArea[]
   responsibleCases         Case[]
   assignedTasks            CaseTask[]                      @relation("CaseTaskAssignee")
+  taskBoardViews           TaskBoardView[]                  @relation("TaskBoardViewCreator")
+  notionConnections        NotionConnection[]               @relation("NotionConnectionConnector")
+  googleCalendarConnections GoogleCalendarConnection[]        @relation("GoogleCalendarConnectionMembership")
   notificationRecipients   NotificationReminderRecipient[]
   settings                 TenantMembershipSettings?
   onboardingChecklistItems TenantOnboardingChecklistItem[]
+  hearingParticipations    CaseHearingParticipant[]
 
   @@unique([tenantId, userId])
   @@unique([tenantId, id])
@@ -1252,6 +1481,82 @@ model TenantMembership {
   @@index([tenantId, roleId])
   @@index([userId])
   @@map("tenant_memberships")
+}
+
+model GoogleCalendarConnection {
+  id                    String                         @id @default(uuid()) @db.Uuid
+  tenantId              String                         @map("tenant_id") @db.Uuid
+  userId                String                         @map("user_id") @db.Uuid
+  tenantMembershipId    String                         @map("tenant_membership_id") @db.Uuid
+  googleSubject         String                         @map("google_subject")
+  googleEmail           String                         @map("google_email")
+  calendarId            String                         @map("calendar_id")
+  calendarName          String                         @map("calendar_name")
+  encryptedAccessToken  String                         @map("encrypted_access_token")
+  encryptedRefreshToken String                         @map("encrypted_refresh_token")
+  accessTokenExpiresAt  DateTime?                      @map("access_token_expires_at") @db.Timestamptz(6)
+  status                GoogleCalendarConnectionStatus @default(connected)
+  syncMode              GoogleCalendarSyncMode         @default(global) @map("sync_mode")
+  syncSources           GoogleCalendarSyncSource[]     @default([]) @map("sync_sources")
+  syncLeaseToken        String?                        @map("sync_lease_token")
+  syncLeaseExpiresAt    DateTime?                      @map("sync_lease_expires_at") @db.Timestamptz(6)
+  lastSyncAt            DateTime?                      @map("last_sync_at") @db.Timestamptz(6)
+  lastError             String?                        @map("last_error")
+  createdAt             DateTime                       @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt             DateTime                       @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  tenant           Tenant           @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  user             User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tenantMembership TenantMembership @relation("GoogleCalendarConnectionMembership", fields: [tenantId, tenantMembershipId], references: [tenantId, id], onDelete: Cascade)
+  eventLinks       GoogleCalendarEventLink[]
+
+  @@unique([tenantId, tenantMembershipId])
+  @@index([tenantId, status])
+  @@index([userId])
+  @@index([syncLeaseExpiresAt])
+  @@map("google_calendar_connections")
+}
+
+model CaseHearingParticipant {
+  id                   String          @id @default(uuid()) @db.Uuid
+  tenantId             String          @map("tenant_id") @db.Uuid
+  hearingId            String          @map("hearing_id") @db.Uuid
+  tenantMembershipId   String          @map("tenant_membership_id") @db.Uuid
+  createdAt            DateTime        @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  tenant       Tenant           @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  hearing      CaseHearing      @relation(fields: [hearingId], references: [id], onDelete: Cascade)
+  membership   TenantMembership @relation(fields: [tenantId, tenantMembershipId], references: [tenantId, id], onDelete: Cascade)
+
+  @@unique([hearingId, tenantMembershipId])
+  @@index([tenantId, tenantMembershipId])
+  @@index([tenantId, hearingId])
+  @@map("case_hearing_participants")
+}
+
+model GoogleCalendarEventLink {
+  id               String                          @id @default(uuid()) @db.Uuid
+  tenantId         String                          @map("tenant_id") @db.Uuid
+  connectionId     String                          @map("connection_id") @db.Uuid
+  resourceType     GoogleCalendarEventResourceType @map("resource_type")
+  resourceId       String                          @map("resource_id") @db.Uuid
+  googleCalendarId String                          @map("google_calendar_id")
+  googleEventId    String                          @map("google_event_id")
+  googleEventEtag  String?                         @map("google_event_etag")
+  lastSyncedAt     DateTime?                       @map("last_synced_at") @db.Timestamptz(6)
+  status           GoogleCalendarEventLinkStatus   @default(active)
+  lastError        String?                         @map("last_error")
+  createdAt        DateTime                        @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt        DateTime                        @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  tenant     Tenant                  @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  connection GoogleCalendarConnection @relation(fields: [connectionId], references: [id], onDelete: Cascade)
+
+  @@unique([connectionId, resourceType, resourceId])
+  @@unique([googleCalendarId, googleEventId])
+  @@index([tenantId, connectionId])
+  @@index([tenantId, resourceType, resourceId])
+  @@map("google_calendar_event_links")
 }
 
 model TenantMembershipSettings {

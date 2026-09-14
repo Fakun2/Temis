@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef } from "react";
-import { Trash2, Upload } from "lucide-react";
+import { FileText, Trash2, Upload } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { AdminTableHeaderActionButton } from "../../_components/admin-table-header-action-button";
 import { acceptedLibraryMimeTypes } from "../_constants/library.constants";
@@ -56,8 +56,14 @@ export function LibraryToolbar({
   return (
     <header
       data-admin-table-header
-      className="flex shrink-0 flex-wrap items-center justify-end gap-3 border-b border-border/30 px-3 py-3 md:px-4 md:py-3.5 xl:px-5 xl:py-4"
+      className="flex shrink-0 flex-wrap items-center justify-between gap-3 border-b border-border/30 px-3 py-3 md:px-4 md:py-3.5 xl:px-5 xl:py-4"
     >
+      <div className="flex min-w-0 items-center gap-3">
+        <FileText className="h-5 w-5 shrink-0 text-muted-foreground" aria-hidden="true" />
+        <h2 className="truncate text-lg font-semibold text-[var(--admin-text-primary)]">
+          Documentos
+        </h2>
+      </div>
       <div className="flex shrink-0 flex-wrap items-end gap-2 sm:gap-3">
         <LibraryFiltersPopover
           disabled={busy}

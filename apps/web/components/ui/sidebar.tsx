@@ -27,9 +27,11 @@ function SidebarProvider({
   className,
   open,
   onOpenChange,
+  collapsedWidth = "64px",
   style,
   ...props
 }: React.ComponentProps<"div"> & {
+  collapsedWidth?: string;
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
 }) {
@@ -64,7 +66,7 @@ function SidebarProvider({
         className={cn("group/sidebar-wrapper min-h-[100svh]", className)}
         style={
           {
-            "--sidebar-width": currentOpen ? "256px" : "64px",
+            "--sidebar-width": currentOpen ? "256px" : collapsedWidth,
             ...style
           } as React.CSSProperties
         }
@@ -95,7 +97,7 @@ function Sidebar({ className, ...props }: React.ComponentProps<"aside">) {
       data-slot="sidebar"
       data-state={useSidebar().state}
       className={cn(
-        "fixed inset-y-0 left-0 z-30 hidden w-[var(--sidebar-width)] flex-col text-sidebar-foreground transition-[width] duration-300 ease-in-out lg:flex",
+        "fixed inset-y-0 left-0 z-30 hidden w-[var(--sidebar-width)] overflow-hidden flex-col text-sidebar-foreground transition-[width] duration-300 ease-in-out lg:flex",
         className
       )}
       {...props}

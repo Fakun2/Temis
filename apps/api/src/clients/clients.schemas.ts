@@ -461,6 +461,20 @@ export class ClientMetricsDto {
   totalCases!: number;
 }
 
+export class ClientsListMetricsDto {
+  @ApiProperty({ example: 42 })
+  total!: number;
+
+  @ApiProperty({ example: 7 })
+  withBalance!: number;
+
+  @ApiProperty({ example: 35 })
+  active!: number;
+
+  @ApiProperty({ example: 5 })
+  inactive!: number;
+}
+
 export class ClientRelatedCaseDto {
   @ApiProperty({ format: "uuid" })
   id!: string;
@@ -533,6 +547,9 @@ export class ClientsListResponseDto {
   @ApiProperty({ type: [ClientSummaryDto] })
   items!: ClientSummaryDto[];
 
+  @ApiProperty({ type: ClientsListMetricsDto })
+  metrics!: ClientsListMetricsDto;
+
   @ApiProperty({ type: ClientsPageInfoDto })
   pageInfo!: ClientsPageInfoDto;
 }
@@ -543,6 +560,17 @@ export class ClientArchiveResponseDto {
 
   @ApiProperty({ enum: ["archived"], example: "archived" })
   clientStatus!: "archived";
+
+  @ApiProperty({ enum: ["ok"], example: "ok" })
+  status!: "ok";
+}
+
+export class ClientDeleteResponseDto {
+  @ApiProperty({ format: "uuid" })
+  clientId!: string;
+
+  @ApiProperty({ enum: ["deleted"], example: "deleted" })
+  clientStatus!: "deleted";
 
   @ApiProperty({ enum: ["ok"], example: "ok" })
   status!: "ok";

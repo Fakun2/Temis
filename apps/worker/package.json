@@ -12,9 +12,11 @@
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.1096.0",
+    "@temis/integration-contracts": "0.1.0",
     "@prisma/client": "^6.19.0",
     "amqplib": "^2.0.1",
     "dotenv": "^16.4.0"
+    ,"google-auth-library": "^11.0.2"
   },
   "devDependencies": {
     "@types/amqplib": "^0.10.8",
