@@ -1479,42 +1479,6 @@ textarea {
   }
 }
 
-@keyframes temis-account-back-slide {
-  0%,
-  100% {
-    transform: translate3d(0, 0, 0) scale(1);
-  }
-
-  30% {
-    transform: translate3d(-2px, 0, 0) scale(1.08);
-  }
-
-  58% {
-    transform: translate3d(0.65px, 0, 0) scale(0.98);
-  }
-}
-
-@keyframes temis-account-back-line-nudge {
-  0%,
-  100% {
-    opacity: 1;
-    stroke-dashoffset: 0;
-    transform: translate3d(0, 0, 0) scaleX(1);
-  }
-
-  32% {
-    opacity: 1;
-    stroke-dashoffset: 0;
-    transform: translate3d(-1.15px, 0, 0) scaleX(1.16);
-  }
-
-  66% {
-    opacity: 1;
-    stroke-dashoffset: 0;
-    transform: translate3d(0.4px, 0, 0) scaleX(0.96);
-  }
-}
-
 @keyframes temis-account-profile-pop {
   0%,
   100% {
@@ -2181,16 +2145,6 @@ textarea {
   animation: temis-settings-gear-spin 1080ms cubic-bezier(0.22, 1, 0.36, 1) 420ms both;
 }
 
-.temis-account-back-trigger:hover .temis-account-back-icon,
-.temis-account-back-trigger:focus-visible .temis-account-back-icon {
-  animation: temis-account-back-slide 760ms cubic-bezier(0.22, 1, 0.36, 1) 400ms both;
-}
-
-.temis-account-back-trigger:hover .temis-account-back-icon-line,
-.temis-account-back-trigger:focus-visible .temis-account-back-icon-line {
-  animation: temis-account-back-line-nudge 760ms cubic-bezier(0.22, 1, 0.36, 1) 420ms both;
-}
-
 .temis-account-profile-trigger:hover .temis-account-profile-icon-silhouette,
 .temis-account-profile-trigger:focus-visible .temis-account-profile-icon-silhouette {
   animation: temis-account-profile-pop 860ms cubic-bezier(0.22, 1, 0.36, 1) 380ms both;
@@ -2526,10 +2480,6 @@ textarea {
   .temis-settings-trigger:focus-visible .temis-settings-icon-shell,
   .temis-settings-trigger:hover .temis-settings-icon-gear,
   .temis-settings-trigger:focus-visible .temis-settings-icon-gear,
-  .temis-account-back-trigger:hover .temis-account-back-icon,
-  .temis-account-back-trigger:focus-visible .temis-account-back-icon,
-  .temis-account-back-trigger:hover .temis-account-back-icon-line,
-  .temis-account-back-trigger:focus-visible .temis-account-back-icon-line,
   .temis-account-profile-trigger:hover .temis-account-profile-icon-silhouette,
   .temis-account-profile-trigger:focus-visible .temis-account-profile-icon-silhouette,
   .temis-account-profile-trigger:hover .temis-account-profile-icon-shine,

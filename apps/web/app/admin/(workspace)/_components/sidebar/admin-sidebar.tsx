@@ -133,8 +133,7 @@ function AccountSidebarNav({ collapsed, onClose }: { collapsed: boolean; onClose
               asChild
               isActive={false}
               className={cn(
-                collapsed ? "min-h-11 justify-center px-2" : "mb-2 min-h-10 px-3 text-sm",
-                "temis-account-back-trigger"
+                collapsed ? "min-h-11 justify-center px-2" : "mb-2 min-h-10 px-3 text-sm"
               )}
             >
               <Link href="/admin" onClick={onClose}>
