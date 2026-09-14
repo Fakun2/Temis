@@ -1,5 +1,5 @@
 import type { Prisma } from "@prisma/client";
-import type { GoogleCalendarSyncMessage as SharedGoogleCalendarSyncMessage } from "@bogaap/integration-contracts";
+import type { GoogleCalendarSyncMessage as SharedGoogleCalendarSyncMessage } from "@temis/integration-contracts";
 
 export type QueuePayload = Prisma.JsonObject & {
   deliverAt?: string;

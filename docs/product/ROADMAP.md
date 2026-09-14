@@ -1,4 +1,4 @@
-# BogApp roadmap
+# Temis roadmap
 
 Este roadmap organiza el trabajo por milestones incrementales. La regla base es
 no mezclar organizacion, cambios de producto y modulos grandes en un mismo PR.

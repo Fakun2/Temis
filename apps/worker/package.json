@@ -1,5 +1,5 @@
 {
-  "name": "@bogaap/worker",
+  "name": "@temis/worker",
   "version": "0.1.0",
   "private": true,
   "type": "commonjs",
@@ -12,7 +12,7 @@
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.1096.0",
-    "@bogaap/integration-contracts": "0.1.0",
+    "@temis/integration-contracts": "0.1.0",
     "@prisma/client": "^6.19.0",
     "amqplib": "^2.0.1",
     "dotenv": "^16.4.0"

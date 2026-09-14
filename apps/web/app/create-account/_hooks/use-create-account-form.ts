@@ -2,7 +2,7 @@
 
 import { FormEvent, useCallback, useState } from "react";
 import { useRouter } from "next/navigation";
-import { authControllerCreateAccount } from "@bogaap/api-client";
+import { authControllerCreateAccount } from "@temis/api-client";
 import { loginWithGoogleCredential } from "@/lib/auth/google-auth";
 import { getAuthenticatedRedirectPath } from "@/lib/auth/redirect";
 import { createAccountFormSchema, type CreateAccountFormValues } from "@/lib/validation/auth";

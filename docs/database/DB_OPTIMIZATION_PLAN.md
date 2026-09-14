@@ -1,4 +1,4 @@
-# BogApp DB Optimization Plan
+# Temis DB Optimization Plan
 
 Este documento deja preparado el plan por fases para optimizar queries,
 indices, aislamiento multi-tenant, RLS y RBAC a nivel base de datos.
@@ -216,7 +216,7 @@ Validacion:
 
 Validado:
 
-- `npm --workspace @bogaap/api run typecheck`
+- `npm --workspace @temis/api run typecheck`
 - `node --test -r ts-node/register -r tsconfig-paths/register test/case-calendar-list.use-case.spec.ts`
 - `node --test -r ts-node/register -r tsconfig-paths/register test/cases-hearings.e2e-spec.ts`
 
@@ -291,7 +291,7 @@ Validacion:
 
 Validado:
 
-- `npm --workspace @bogaap/api run typecheck`
+- `npm --workspace @temis/api run typecheck`
 - `node --test -r ts-node/register -r tsconfig-paths/register test/expense-overdue.use-case.spec.ts`
 - `node --test -r ts-node/register -r tsconfig-paths/register test/case-calendar-list.use-case.spec.ts`
 - `node --test -r ts-node/register -r tsconfig-paths/register test/cases-hearings.e2e-spec.ts`
@@ -423,7 +423,7 @@ Implementado:
 
 Validado:
 
-- `npm --workspace @bogaap/api run typecheck`
+- `npm --workspace @temis/api run typecheck`
 - `node --test -r ts-node/register -r tsconfig-paths/register test/expense-overdue.use-case.spec.ts`
 - `npx prisma validate --schema packages/database/prisma/schema.prisma`
 - `node scripts/with-root-env.cjs npx prisma migrate deploy --schema packages/database/prisma/schema.prisma`
@@ -487,7 +487,7 @@ Validacion:
 
 Validado:
 
-- `npm --workspace @bogaap/api run typecheck`
+- `npm --workspace @temis/api run typecheck`
 - `node --test -r ts-node/register -r tsconfig-paths/register test/expense-overdue.use-case.spec.ts`
 - `node --test -r ts-node/register -r tsconfig-paths/register test/cases-hearings.e2e-spec.ts`
 
@@ -550,7 +550,7 @@ Tareas:
   - `docs/database/DATABASE_SOURCE_OF_TRUTH.md`
   - `docs/architecture/MULTITENANCY.md`
   - `docs/architecture/RBAC.md`
-  - `docs/diagrams/bogaap-er.puml`
+  - `docs/diagrams/temis-er.puml`
 
 Validacion:
 

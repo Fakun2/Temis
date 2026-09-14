@@ -1,7 +1,7 @@
 "use client";
 
 import { UserCheck, UsersRound, UserX, WalletCards } from "lucide-react";
-import type { ClientsListResponseDto } from "@bogaap/api-client";
+import type { ClientsListResponseDto } from "@temis/api-client";
 import { AdminMetricsGrid } from "../../_components/admin-metrics-grid";
 
 export function ClientsMetrics({ data }: { data: ClientsListResponseDto | undefined }) {

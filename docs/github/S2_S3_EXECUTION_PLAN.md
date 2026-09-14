@@ -1,6 +1,6 @@
-# BogApp - Plan operativo S2/S3
+# Temis - Plan operativo S2/S3
 
-Este documento baja a ejecucion el trabajo inmediato de BogApp. La prioridad actual es presentar hoy una version profesional de `login/register` y, despues de esa demo, avanzar con S2/S3: autenticacion y gestion de clientes.
+Este documento baja a ejecucion el trabajo inmediato de Temis. La prioridad actual es presentar hoy una version profesional de `login/register` y, despues de esa demo, avanzar con S2/S3: autenticacion y gestion de clientes.
 
 ## Estado de producto
 
@@ -41,7 +41,7 @@ Cambiar la percepcion visual de la pantalla de inicio de sesion y registro sin t
 
 - Badge: `Gestion juridica privada`
 - Titulo register: `Crear cuenta`
-- Descripcion register: `Configura tu acceso a BogApp para gestionar clientes, expedientes y tareas del estudio en un solo lugar.`
+- Descripcion register: `Configura tu acceso a Temis para gestionar clientes, expedientes y tareas del estudio en un solo lugar.`
 - Titulo login: `Iniciar sesion`
 - Descripcion login: `Accede al workspace de tu estudio juridico y continua con la gestion de clientes, expedientes y vencimientos.`
 - Feature 1: `Clientes y expedientes ordenados`

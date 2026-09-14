@@ -10,7 +10,7 @@ import {
   UserRound,
   UsersRound
 } from "lucide-react";
-import type { ClientSummaryDto } from "@bogaap/api-client";
+import type { ClientSummaryDto } from "@temis/api-client";
 import type { AdminTableFilterSection } from "../../../_components/admin-table-filter-menu";
 import type {
   CaseTaskStatus,

@@ -119,7 +119,7 @@ Implementado en Prisma y no conflictivo:
 - El onboarding actual renderiza 3 pasos en un unico componente.
 - Falta store dedicado para persistir y limpiar estado del onboarding.
 - El paso 1 no tiene confirmacion de password.
-- La marca visible aun aparece como BOGAP en pantallas.
+- La marca visible aun aparece como TEMIS en pantallas.
 - El flujo de exito muestra resultado en pantalla; la decision pide redireccion
   a dashboard.
 

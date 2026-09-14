@@ -1,2 +1,2 @@
 export * from "./fetch-client";
-export * from "./generated/bogaap-api";
+export * from "./generated/temis-api";

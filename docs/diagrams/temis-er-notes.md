@@ -1,4 +1,4 @@
-# BOGAP ERD - notas de diseno
+# TEMIS ERD - notas de diseno
 
 Este modelo interpreta el documento del 04/06/2026 como una base para una SaaS B2B de abogacia. Cada `tenant` representa un estudio juridico cliente de la plataforma, mientras que `clients` representa a los clientes juridicos que atiende ese estudio.
 

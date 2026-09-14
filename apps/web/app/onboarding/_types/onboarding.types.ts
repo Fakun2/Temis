@@ -1,4 +1,4 @@
-import type { BogaapSession } from "@/lib/auth/session";
+import type { TemisSession } from "@/lib/auth/session";
 
 export type StepIndex = 0 | 1 | 2;
 
@@ -47,7 +47,7 @@ export type StartOnboardingResponse = {
   userId: string;
   tenantId: string;
   role: string;
-  tokens: BogaapSession["tokens"];
+  tokens: TemisSession["tokens"];
 };
 
 export type OnboardingResult = {

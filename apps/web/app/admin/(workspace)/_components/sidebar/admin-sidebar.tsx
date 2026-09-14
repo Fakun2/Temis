@@ -9,7 +9,7 @@ import { adminNavSections } from "../../_constants/navigation";
 import type { AdminNavSection, AdminSidebarVariant } from "../../_types/admin";
 import { getAuthorizedNavSections } from "../../_utils/authorization";
 import { isAdminRouteActive } from "../../_utils/navigation";
-import type { BogaapSession } from "@/lib/auth/session";
+import type { TemisSession } from "@/lib/auth/session";
 import { cn } from "@/lib/utils";
 import {
   Sidebar,
@@ -33,7 +33,7 @@ import { sidebarIconStrokeWidth } from "./sidebar-icon-constants";
 
 type AdminSidebarProps = {
   onClose?: () => void;
-  session: BogaapSession | null;
+  session: TemisSession | null;
   variant?: AdminSidebarVariant;
 };
 
@@ -134,7 +134,7 @@ function AccountSidebarNav({ collapsed, onClose }: { collapsed: boolean; onClose
               isActive={false}
               className={cn(
                 collapsed ? "min-h-11 justify-center px-2" : "mb-2 min-h-10 px-3 text-sm",
-                "justinia-account-back-trigger"
+                "temis-account-back-trigger"
               )}
             >
               <Link href="/admin" onClick={onClose}>
@@ -162,7 +162,7 @@ function AccountSidebarNav({ collapsed, onClose }: { collapsed: boolean; onClose
                   isActive={active}
                   className={cn(
                     collapsed ? "min-h-11 justify-center px-2" : "min-h-9 px-3 text-sm",
-                    item.iconAnimation && `justinia-${item.iconAnimation}-trigger`
+                    item.iconAnimation && `temis-${item.iconAnimation}-trigger`
                   )}
                 >
                   <Link

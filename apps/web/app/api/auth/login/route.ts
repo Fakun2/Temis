@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import type { LoginResponseDto } from "@bogaap/api-client";
+import type { LoginResponseDto } from "@temis/api-client";
 import { createAuthSessionResponse, toApiUrl, toClientSession } from "@/lib/api/server";
 
 export async function POST(request: Request) {

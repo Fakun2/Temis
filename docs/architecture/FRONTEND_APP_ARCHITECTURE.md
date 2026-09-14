@@ -29,7 +29,7 @@ compartida.
 
 ## API y datos
 
-El contrato de backend se consume desde `@bogaap/api-client`, generado con
+El contrato de backend se consume desde `@temis/api-client`, generado con
 Orval desde OpenAPI. Los endpoints no se escriben a mano en componentes.
 
 Las credenciales de autenticacion viven en cookies `HttpOnly` creadas por route

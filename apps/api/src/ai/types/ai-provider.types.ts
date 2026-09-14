@@ -1,1 +1,1 @@
-export type { AiProviderRequest, AiProviderResponse } from "@bogaap/ai-contracts";
+export type { AiProviderRequest, AiProviderResponse } from "@temis/ai-contracts";

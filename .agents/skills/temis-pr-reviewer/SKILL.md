@@ -1,16 +1,16 @@
 ---
-name: bogapp-pr-reviewer
+name: temis-pr-reviewer
 description: >-
-  Review BogApp pull requests for issue alignment, BOG-### closure wording,
+  Review Temis pull requests for issue alignment, BOG-### closure wording,
   GitHub Project workflow, dependency order, acceptance criteria, legaltech
   product quality, NestJS backend safety, Prisma/PostgreSQL migrations,
   frontend UX states, multi-tenant security, QA evidence, and reviewer-ready
   feedback. Use when preparing, reviewing, or deciding whether to approve a PR.
 ---
 
-# BogApp PR Reviewer
+# Temis PR Reviewer
 
-Use this skill in code-review stance for BogApp PRs.
+Use this skill in code-review stance for Temis PRs.
 
 ## Sources of truth
 

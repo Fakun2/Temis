@@ -1,6 +1,6 @@
 "use client";
 
-import type { BogaapSession } from "./session";
+import type { TemisSession } from "./session";
 import { saveSession } from "./session";
 
 export type GoogleCredentialResponse = {
@@ -13,13 +13,13 @@ export async function loginWithGoogleCredential(credential: string) {
     headers: { "Content-Type": "application/json" },
     method: "POST"
   });
-  const data = (await response.json().catch(() => null)) as BogaapSession | unknown;
+  const data = (await response.json().catch(() => null)) as TemisSession | unknown;
 
   if (!response.ok) {
     throw new Error(getApiErrorMessage(data));
   }
 
-  const session = data as BogaapSession;
+  const session = data as TemisSession;
   saveSession(session);
   return session;
 }

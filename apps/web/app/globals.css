@@ -1040,7 +1040,7 @@ textarea {
   transform-origin: top center;
 }
 
-@keyframes justinia-token-cell-reveal {
+@keyframes temis-token-cell-reveal {
   0% {
     opacity: 0;
     transform: translate3d(-6px, -5px, 0) scale(0.82);
@@ -1057,7 +1057,7 @@ textarea {
   }
 }
 
-@keyframes justinia-notification-bell-ring {
+@keyframes temis-notification-bell-ring {
   0% {
     transform: translate3d(0, 0, 0) rotate(0deg);
   }
@@ -1091,7 +1091,7 @@ textarea {
   }
 }
 
-@keyframes justinia-notification-badge-pulse {
+@keyframes temis-notification-badge-pulse {
   0% {
     transform: translate3d(0, 0, 0) scale(1);
   }
@@ -1113,7 +1113,7 @@ textarea {
   }
 }
 
-@keyframes justinia-notification-bell-strong-ring {
+@keyframes temis-notification-bell-strong-ring {
   0%,
   100% {
     transform: translate3d(0, 0, 0) rotate(0deg) scale(1);
@@ -1140,7 +1140,7 @@ textarea {
   }
 }
 
-@keyframes justinia-library-file-slide {
+@keyframes temis-library-file-slide {
   0%,
   100% {
     opacity: 1;
@@ -1158,10 +1158,10 @@ textarea {
   }
 }
 
-@keyframes justinia-library-stroke-reveal {
+@keyframes temis-library-stroke-reveal {
   0% {
     opacity: 0.45;
-    stroke-dashoffset: var(--justinia-icon-dash);
+    stroke-dashoffset: var(--temis-icon-dash);
   }
 
   44%,
@@ -1171,7 +1171,7 @@ textarea {
   }
 }
 
-@keyframes justinia-library-folder-tilt {
+@keyframes temis-library-folder-tilt {
   0%,
   100% {
     transform: translate3d(0, 0, 0) rotate(0deg) scale(1);
@@ -1190,7 +1190,7 @@ textarea {
   }
 }
 
-@keyframes justinia-calendar-body-pop {
+@keyframes temis-calendar-body-pop {
   0%,
   100% {
     transform: translate3d(0, 0, 0) rotate(0deg) scale(1);
@@ -1209,7 +1209,7 @@ textarea {
   }
 }
 
-@keyframes justinia-calendar-day-pulse {
+@keyframes temis-calendar-day-pulse {
   0%,
   100% {
     opacity: 0.42;
@@ -1232,7 +1232,7 @@ textarea {
   }
 }
 
-@keyframes justinia-cases-briefcase-pop {
+@keyframes temis-cases-briefcase-pop {
   0%,
   100% {
     transform: translate3d(0, 0, 0) rotate(0deg) scale(1);
@@ -1251,7 +1251,7 @@ textarea {
   }
 }
 
-@keyframes justinia-cases-sweep-draw {
+@keyframes temis-cases-sweep-draw {
   0%,
   100% {
     opacity: 1;
@@ -1264,7 +1264,7 @@ textarea {
   }
 }
 
-@keyframes justinia-cases-latch-pulse {
+@keyframes temis-cases-latch-pulse {
   0%,
   100% {
     opacity: 1;
@@ -1282,7 +1282,7 @@ textarea {
   }
 }
 
-@keyframes justinia-cashbox-drawer-open {
+@keyframes temis-cashbox-drawer-open {
   0% {
     opacity: 1;
     transform: translate3d(0, 0, 0) scale(1);
@@ -1304,7 +1304,7 @@ textarea {
   }
 }
 
-@keyframes justinia-cashbox-body-rock {
+@keyframes temis-cashbox-body-rock {
   0%,
   100% {
     transform: translate3d(0, 0, 0) rotate(0deg) scale(1);
@@ -1323,7 +1323,7 @@ textarea {
   }
 }
 
-@keyframes justinia-cashbox-coin-pop {
+@keyframes temis-cashbox-coin-pop {
   0% {
     transform: translate3d(0, 0, 0) scale(1);
   }
@@ -1349,7 +1349,7 @@ textarea {
   }
 }
 
-@keyframes justinia-cashbox-side-dot-pulse {
+@keyframes temis-cashbox-side-dot-pulse {
   0%,
   100% {
     opacity: 1;
@@ -1367,7 +1367,7 @@ textarea {
   }
 }
 
-@keyframes justinia-staff-body-pop {
+@keyframes temis-staff-body-pop {
   0%,
   100% {
     transform: translate3d(0, 0, 0) rotate(0deg) scale(1);
@@ -1386,7 +1386,7 @@ textarea {
   }
 }
 
-@keyframes justinia-staff-balance-swing {
+@keyframes temis-staff-balance-swing {
   0%,
   100% {
     transform: rotate(0deg);
@@ -1409,7 +1409,7 @@ textarea {
   }
 }
 
-@keyframes justinia-settings-shell-pop {
+@keyframes temis-settings-shell-pop {
   0%,
   100% {
     transform: translate3d(0, 0, 0) rotate(0deg) scale(1);
@@ -1428,7 +1428,7 @@ textarea {
   }
 }
 
-@keyframes justinia-settings-gear-spin {
+@keyframes temis-settings-gear-spin {
   0% {
     transform: rotate(0deg) scale(1);
   }
@@ -1446,10 +1446,10 @@ textarea {
   }
 }
 
-@keyframes justinia-icon-stroke-draw {
+@keyframes temis-icon-stroke-draw {
   0% {
     opacity: 0;
-    stroke-dashoffset: var(--justinia-icon-dash);
+    stroke-dashoffset: var(--temis-icon-dash);
   }
 
   24%,
@@ -1460,11 +1460,11 @@ textarea {
 
   100% {
     opacity: 0;
-    stroke-dashoffset: calc(var(--justinia-icon-dash) * -1);
+    stroke-dashoffset: calc(var(--temis-icon-dash) * -1);
   }
 }
 
-@keyframes justinia-icon-dot-blink {
+@keyframes temis-icon-dot-blink {
   0%,
   18%,
   100% {
@@ -1479,7 +1479,7 @@ textarea {
   }
 }
 
-@keyframes justinia-account-back-slide {
+@keyframes temis-account-back-slide {
   0%,
   100% {
     transform: translate3d(0, 0, 0) scale(1);
@@ -1494,7 +1494,7 @@ textarea {
   }
 }
 
-@keyframes justinia-account-back-line-nudge {
+@keyframes temis-account-back-line-nudge {
   0%,
   100% {
     opacity: 1;
@@ -1515,7 +1515,7 @@ textarea {
   }
 }
 
-@keyframes justinia-account-profile-pop {
+@keyframes temis-account-profile-pop {
   0%,
   100% {
     opacity: 1;
@@ -1537,7 +1537,7 @@ textarea {
   }
 }
 
-@keyframes justinia-account-profile-shine-sweep {
+@keyframes temis-account-profile-shine-sweep {
   0% {
     opacity: 0;
     stroke-dashoffset: 1;
@@ -1558,7 +1558,7 @@ textarea {
   }
 }
 
-@keyframes justinia-account-security-shield-lock {
+@keyframes temis-account-security-shield-lock {
   0%,
   100% {
     transform: translate3d(0, 0, 0) scale(1);
@@ -1573,7 +1573,7 @@ textarea {
   }
 }
 
-@keyframes justinia-account-organization-lift {
+@keyframes temis-account-organization-lift {
   0%,
   100% {
     transform: translate3d(0, 0, 0) rotate(0deg) skewX(0deg) scale(1);
@@ -1592,7 +1592,7 @@ textarea {
   }
 }
 
-@keyframes justinia-account-organization-door-open {
+@keyframes temis-account-organization-door-open {
   0%,
   100% {
     opacity: 1;
@@ -1617,7 +1617,7 @@ textarea {
   }
 }
 
-@keyframes justinia-account-archive-box-rock {
+@keyframes temis-account-archive-box-rock {
   0%,
   100% {
     transform: translate3d(0, 0, 0) rotate(0deg) scale(1);
@@ -1636,7 +1636,7 @@ textarea {
   }
 }
 
-@keyframes justinia-account-archive-lid-open {
+@keyframes temis-account-archive-lid-open {
   0%,
   100% {
     transform: translate3d(0, 0, 0) rotate(0deg);
@@ -1655,7 +1655,7 @@ textarea {
   }
 }
 
-@keyframes justinia-account-window-pulse {
+@keyframes temis-account-window-pulse {
   0%,
   100% {
     opacity: 0.54;
@@ -1678,7 +1678,7 @@ textarea {
   }
 }
 
-@keyframes justinia-account-plan-card-swipe {
+@keyframes temis-account-plan-card-swipe {
   0%,
   100% {
     transform: translate3d(0, 0, 0) rotate(0deg) scale(1);
@@ -1693,7 +1693,7 @@ textarea {
   }
 }
 
-@keyframes justinia-account-plan-chip-pop {
+@keyframes temis-account-plan-chip-pop {
   0%,
   100% {
     transform: scale(1);
@@ -1708,7 +1708,7 @@ textarea {
   }
 }
 
-@keyframes justinia-account-preferences-bell-ring {
+@keyframes temis-account-preferences-bell-ring {
   0%,
   100% {
     transform: translate3d(0, 0, 0) rotate(0deg) scale(1);
@@ -1731,7 +1731,7 @@ textarea {
   }
 }
 
-@keyframes justinia-account-ai-bob {
+@keyframes temis-account-ai-bob {
   0%,
   100% {
     transform: translate3d(0, 0, 0) rotate(0deg) scale(1);
@@ -1750,7 +1750,7 @@ textarea {
   }
 }
 
-@keyframes justinia-account-ai-eye-blink {
+@keyframes temis-account-ai-eye-blink {
   0%,
   100% {
     transform: scaleY(1);
@@ -1765,7 +1765,7 @@ textarea {
   }
 }
 
-@keyframes justinia-account-ai-antenna-ping {
+@keyframes temis-account-ai-antenna-ping {
   0%,
   100% {
     transform: translate3d(0, 0, 0) scale(1);
@@ -1780,7 +1780,7 @@ textarea {
   }
 }
 
-@keyframes justinia-ai-stars-twinkle {
+@keyframes temis-ai-stars-twinkle {
   0%,
   100% {
     transform: translate3d(0, 0, 0) rotate(0deg) scale(1);
@@ -1799,7 +1799,7 @@ textarea {
   }
 }
 
-@keyframes justinia-ai-star-spark {
+@keyframes temis-ai-star-spark {
   0%,
   100% {
     opacity: 0.42;
@@ -1825,57 +1825,57 @@ textarea {
   animation: notification-toast-out 640ms cubic-bezier(0.4, 0, 0.2, 1) both;
 }
 
-.justinia-notification-bell {
+.temis-notification-bell {
   transform-box: fill-box;
   transform-origin: 50% 12%;
   will-change: transform;
 }
 
-.justinia-notification-badge {
+.temis-notification-badge {
   will-change: transform;
 }
 
-.justinia-notification-trigger:hover .justinia-notification-bell,
-.justinia-notification-trigger:focus-visible .justinia-notification-bell {
-  animation-name: justinia-notification-bell-ring;
+.temis-notification-trigger:hover .temis-notification-bell,
+.temis-notification-trigger:focus-visible .temis-notification-bell {
+  animation-name: temis-notification-bell-ring;
   animation-duration: 460ms;
   animation-timing-function: cubic-bezier(0.2, 0.95, 0.35, 1);
   animation-delay: 0ms;
   animation-fill-mode: both;
 }
 
-.justinia-notification-trigger:hover .justinia-notification-badge,
-.justinia-notification-trigger:focus-visible .justinia-notification-badge {
-  animation-name: justinia-notification-badge-pulse;
+.temis-notification-trigger:hover .temis-notification-badge,
+.temis-notification-trigger:focus-visible .temis-notification-badge {
+  animation-name: temis-notification-badge-pulse;
   animation-duration: 460ms;
   animation-timing-function: cubic-bezier(0.2, 0.95, 0.35, 1);
   animation-delay: 0ms;
   animation-fill-mode: both;
 }
 
-.justinia-notification-trigger-incoming .justinia-notification-bell {
-  animation: justinia-notification-bell-strong-ring 860ms cubic-bezier(0.22, 1, 0.36, 1) both;
+.temis-notification-trigger-incoming .temis-notification-bell {
+  animation: temis-notification-bell-strong-ring 860ms cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
-.justinia-notification-trigger-incoming .justinia-notification-badge {
-  animation: justinia-notification-badge-pulse 860ms cubic-bezier(0.22, 1, 0.36, 1) both;
+.temis-notification-trigger-incoming .temis-notification-badge {
+  animation: temis-notification-badge-pulse 860ms cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
-.justinia-library-icon,
-.justinia-clients-icon,
-.justinia-tasks-icon,
-.justinia-ai-stars-icon,
-.justinia-cashbox-icon,
-.justinia-account-back-icon,
-.justinia-account-ai-icon,
-.justinia-account-profile-icon-shell,
-.justinia-account-security-icon-shield,
-.justinia-account-archive-icon-box,
-.justinia-account-organization-icon-shell,
-.justinia-account-plan-icon-card,
-.justinia-account-preferences-icon-bell,
-.justinia-staff-icon-shell,
-.justinia-settings-icon-shell {
+.temis-library-icon,
+.temis-clients-icon,
+.temis-tasks-icon,
+.temis-ai-stars-icon,
+.temis-cashbox-icon,
+.temis-account-back-icon,
+.temis-account-ai-icon,
+.temis-account-profile-icon-shell,
+.temis-account-security-icon-shield,
+.temis-account-archive-icon-box,
+.temis-account-organization-icon-shell,
+.temis-account-plan-icon-card,
+.temis-account-preferences-icon-bell,
+.temis-staff-icon-shell,
+.temis-settings-icon-shell {
   transform-box: fill-box;
   transform-origin: center;
 }
@@ -1889,424 +1889,424 @@ textarea {
   vector-effect: non-scaling-stroke;
 }
 
-.justinia-ai-stars-icon,
-.justinia-account-ai-icon {
+.temis-ai-stars-icon,
+.temis-account-ai-icon {
   overflow: visible;
 }
 
-.justinia-ai-stars-icon-main,
-.justinia-ai-stars-icon-small,
-.justinia-account-ai-icon-shell,
-.justinia-account-ai-icon-antenna-dot,
-.justinia-account-ai-icon-eye {
+.temis-ai-stars-icon-main,
+.temis-ai-stars-icon-small,
+.temis-account-ai-icon-shell,
+.temis-account-ai-icon-antenna-dot,
+.temis-account-ai-icon-eye {
   transform-box: fill-box;
   transform-origin: center;
 }
 
-.justinia-ai-stars-icon-small {
+.temis-ai-stars-icon-small {
   opacity: 0.42;
 }
 
-.justinia-account-ai-icon-mouth {
+.temis-account-ai-icon-mouth {
   opacity: 0.62;
   stroke-dasharray: 1;
   stroke-dashoffset: 0;
 }
 
-.justinia-account-back-icon-head,
-.justinia-account-back-icon-line,
-.justinia-account-profile-icon-shine,
-.justinia-account-security-icon-check,
-.justinia-account-archive-icon-label,
-.justinia-account-plan-icon-line,
-.justinia-account-preferences-icon-wave {
-  --justinia-icon-dash: 8;
-  stroke-dasharray: var(--justinia-icon-dash);
+.temis-account-back-icon-head,
+.temis-account-back-icon-line,
+.temis-account-profile-icon-shine,
+.temis-account-security-icon-check,
+.temis-account-archive-icon-label,
+.temis-account-plan-icon-line,
+.temis-account-preferences-icon-wave {
+  --temis-icon-dash: 8;
+  stroke-dasharray: var(--temis-icon-dash);
   stroke-dashoffset: 0;
 }
 
-.justinia-account-profile-icon-shine,
-.justinia-account-security-icon-check,
-.justinia-account-plan-icon-line,
-.justinia-account-preferences-icon-wave {
+.temis-account-profile-icon-shine,
+.temis-account-security-icon-check,
+.temis-account-plan-icon-line,
+.temis-account-preferences-icon-wave {
   opacity: 0.68;
 }
 
-.justinia-account-profile-icon,
-.justinia-account-profile-icon-silhouette,
-.justinia-account-profile-icon-shine {
+.temis-account-profile-icon,
+.temis-account-profile-icon-silhouette,
+.temis-account-profile-icon-shine {
   transform-box: fill-box;
   transform-origin: center;
 }
 
-.justinia-account-profile-icon {
+.temis-account-profile-icon {
   overflow: visible;
 }
 
-.justinia-account-profile-icon-shine {
+.temis-account-profile-icon-shine {
   fill: none;
   opacity: 0;
   stroke-dasharray: 1;
   stroke-dashoffset: 1;
 }
 
-.justinia-account-archive-icon-lid,
-.justinia-account-plan-icon-chip {
+.temis-account-archive-icon-lid,
+.temis-account-plan-icon-chip {
   transform-box: fill-box;
   transform-origin: center;
 }
 
-.justinia-account-organization-icon-windows {
+.temis-account-organization-icon-windows {
   opacity: 0.54;
 }
 
-.justinia-account-organization-icon-windows path {
+.temis-account-organization-icon-windows path {
   transform-box: fill-box;
   transform-origin: center;
 }
 
-.justinia-account-organization-icon-door {
+.temis-account-organization-icon-door {
   stroke-dasharray: 1;
   stroke-dashoffset: 0;
   transform-box: fill-box;
   transform-origin: 50% 100%;
 }
 
-.justinia-account-archive-icon-lid {
+.temis-account-archive-icon-lid {
   transform-origin: 50% 100%;
 }
 
-.justinia-library-icon-folder,
-.justinia-library-icon-files {
+.temis-library-icon-folder,
+.temis-library-icon-files {
   transform-box: fill-box;
   transform-origin: center;
 }
 
-.justinia-calendar-icon-body,
-.justinia-calendar-icon-day {
+.temis-calendar-icon-body,
+.temis-calendar-icon-day {
   transform-box: fill-box;
   transform-origin: center;
 }
 
-.justinia-calendar-icon-day {
+.temis-calendar-icon-day {
   opacity: 0.42;
 }
 
-.justinia-cases-icon-briefcase {
+.temis-cases-icon-briefcase {
   transform-box: fill-box;
   transform-origin: center;
 }
 
-.justinia-cases-icon-sweep {
+.temis-cases-icon-sweep {
   opacity: 1;
   stroke-dasharray: 1;
   stroke-dashoffset: 0;
 }
 
-.justinia-cases-icon-latch {
+.temis-cases-icon-latch {
   transform-box: fill-box;
   transform-origin: center;
 }
 
-.justinia-clients-icon-people,
-.justinia-clients-icon-partner,
-.justinia-tasks-icon-sheet,
-.justinia-tasks-icon-check,
-.justinia-account-connectors-icon-arms,
-.justinia-account-connectors-icon-nodes,
-.justinia-account-connectors-icon-plus,
-.justinia-account-connectors-icon-node-1,
-.justinia-account-connectors-icon-node-2,
-.justinia-account-connectors-icon-node-3,
-.justinia-account-connectors-icon-node-4 {
+.temis-clients-icon-people,
+.temis-clients-icon-partner,
+.temis-tasks-icon-sheet,
+.temis-tasks-icon-check,
+.temis-account-connectors-icon-arms,
+.temis-account-connectors-icon-nodes,
+.temis-account-connectors-icon-plus,
+.temis-account-connectors-icon-node-1,
+.temis-account-connectors-icon-node-2,
+.temis-account-connectors-icon-node-3,
+.temis-account-connectors-icon-node-4 {
   transform-box: fill-box;
   transform-origin: center;
 }
 
-.justinia-tasks-icon-check {
+.temis-tasks-icon-check {
   opacity: 0.42;
   stroke-dasharray: 1;
   stroke-dashoffset: 0;
 }
 
-.justinia-account-connectors-icon-nodes rect {
+.temis-account-connectors-icon-nodes rect {
   opacity: 1;
 }
 
-.justinia-account-connectors-icon-arms path {
+.temis-account-connectors-icon-arms path {
   stroke-width: 1.05;
 }
 
-.justinia-cashbox-icon-bill,
-.justinia-cashbox-icon-coin,
-.justinia-cashbox-icon-side-dot,
-.justinia-staff-icon-balance,
-.justinia-settings-icon-gear {
+.temis-cashbox-icon-bill,
+.temis-cashbox-icon-coin,
+.temis-cashbox-icon-side-dot,
+.temis-staff-icon-balance,
+.temis-settings-icon-gear {
   transform-box: fill-box;
   transform-origin: center;
 }
 
-.justinia-library-icon-top,
-.justinia-library-icon-file-line {
-  --justinia-icon-dash: 6;
+.temis-library-icon-top,
+.temis-library-icon-file-line {
+  --temis-icon-dash: 6;
   opacity: 0;
-  stroke-dasharray: var(--justinia-icon-dash);
-  stroke-dashoffset: var(--justinia-icon-dash);
+  stroke-dasharray: var(--temis-icon-dash);
+  stroke-dashoffset: var(--temis-icon-dash);
 }
 
-.justinia-library-icon-top,
-.justinia-library-icon-file-line {
+.temis-library-icon-top,
+.temis-library-icon-file-line {
   opacity: 1;
   stroke-dashoffset: 0;
 }
 
-.justinia-library-trigger:hover .justinia-library-icon-folder,
-.justinia-library-trigger:focus-visible .justinia-library-icon-folder {
-  animation: justinia-library-folder-tilt 880ms cubic-bezier(0.22, 1, 0.36, 1) 400ms both;
+.temis-library-trigger:hover .temis-library-icon-folder,
+.temis-library-trigger:focus-visible .temis-library-icon-folder {
+  animation: temis-library-folder-tilt 880ms cubic-bezier(0.22, 1, 0.36, 1) 400ms both;
 }
 
-.justinia-library-trigger:hover .justinia-library-icon-files,
-.justinia-library-trigger:focus-visible .justinia-library-icon-files {
-  animation: justinia-library-file-slide 880ms cubic-bezier(0.22, 1, 0.36, 1) 430ms both;
+.temis-library-trigger:hover .temis-library-icon-files,
+.temis-library-trigger:focus-visible .temis-library-icon-files {
+  animation: temis-library-file-slide 880ms cubic-bezier(0.22, 1, 0.36, 1) 430ms both;
 }
 
-.justinia-library-trigger:hover .justinia-library-icon-top,
-.justinia-library-trigger:focus-visible .justinia-library-icon-top,
-.justinia-library-trigger:hover .justinia-library-icon-file-line,
-.justinia-library-trigger:focus-visible .justinia-library-icon-file-line {
-  animation: justinia-library-stroke-reveal 880ms cubic-bezier(0.22, 1, 0.36, 1) 450ms both;
+.temis-library-trigger:hover .temis-library-icon-top,
+.temis-library-trigger:focus-visible .temis-library-icon-top,
+.temis-library-trigger:hover .temis-library-icon-file-line,
+.temis-library-trigger:focus-visible .temis-library-icon-file-line {
+  animation: temis-library-stroke-reveal 880ms cubic-bezier(0.22, 1, 0.36, 1) 450ms both;
 }
 
-.justinia-calendar-trigger:hover .justinia-calendar-icon-body,
-.justinia-calendar-trigger:focus-visible .justinia-calendar-icon-body {
-  animation: justinia-calendar-body-pop 980ms cubic-bezier(0.22, 1, 0.36, 1) 400ms both;
+.temis-calendar-trigger:hover .temis-calendar-icon-body,
+.temis-calendar-trigger:focus-visible .temis-calendar-icon-body {
+  animation: temis-calendar-body-pop 980ms cubic-bezier(0.22, 1, 0.36, 1) 400ms both;
 }
 
-.justinia-calendar-trigger:hover .justinia-calendar-icon-day,
-.justinia-calendar-trigger:focus-visible .justinia-calendar-icon-day {
-  animation: justinia-calendar-day-pulse 980ms cubic-bezier(0.22, 1, 0.36, 1) 400ms both;
+.temis-calendar-trigger:hover .temis-calendar-icon-day,
+.temis-calendar-trigger:focus-visible .temis-calendar-icon-day {
+  animation: temis-calendar-day-pulse 980ms cubic-bezier(0.22, 1, 0.36, 1) 400ms both;
 }
 
-.justinia-calendar-trigger:hover .justinia-calendar-icon-day-two,
-.justinia-calendar-trigger:focus-visible .justinia-calendar-icon-day-two,
-.justinia-calendar-trigger:hover .justinia-calendar-icon-day-four,
-.justinia-calendar-trigger:focus-visible .justinia-calendar-icon-day-four {
+.temis-calendar-trigger:hover .temis-calendar-icon-day-two,
+.temis-calendar-trigger:focus-visible .temis-calendar-icon-day-two,
+.temis-calendar-trigger:hover .temis-calendar-icon-day-four,
+.temis-calendar-trigger:focus-visible .temis-calendar-icon-day-four {
   animation-delay: 480ms;
 }
 
-.justinia-calendar-trigger:hover .justinia-calendar-icon-day-three,
-.justinia-calendar-trigger:focus-visible .justinia-calendar-icon-day-three,
-.justinia-calendar-trigger:hover .justinia-calendar-icon-day-five,
-.justinia-calendar-trigger:focus-visible .justinia-calendar-icon-day-five {
+.temis-calendar-trigger:hover .temis-calendar-icon-day-three,
+.temis-calendar-trigger:focus-visible .temis-calendar-icon-day-three,
+.temis-calendar-trigger:hover .temis-calendar-icon-day-five,
+.temis-calendar-trigger:focus-visible .temis-calendar-icon-day-five {
   animation-delay: 560ms;
 }
 
-.justinia-calendar-trigger:hover .justinia-calendar-icon-day-six,
-.justinia-calendar-trigger:focus-visible .justinia-calendar-icon-day-six {
+.temis-calendar-trigger:hover .temis-calendar-icon-day-six,
+.temis-calendar-trigger:focus-visible .temis-calendar-icon-day-six {
   animation-delay: 640ms;
 }
 
-.justinia-cases-trigger:hover .justinia-cases-icon-briefcase,
-.justinia-cases-trigger:focus-visible .justinia-cases-icon-briefcase {
-  animation: justinia-cases-briefcase-pop 980ms cubic-bezier(0.22, 1, 0.36, 1) 400ms both;
+.temis-cases-trigger:hover .temis-cases-icon-briefcase,
+.temis-cases-trigger:focus-visible .temis-cases-icon-briefcase {
+  animation: temis-cases-briefcase-pop 980ms cubic-bezier(0.22, 1, 0.36, 1) 400ms both;
 }
 
-.justinia-cases-trigger:hover .justinia-cases-icon-sweep,
-.justinia-cases-trigger:focus-visible .justinia-cases-icon-sweep {
-  animation: justinia-cases-sweep-draw 980ms cubic-bezier(0.22, 1, 0.36, 1) 440ms both;
+.temis-cases-trigger:hover .temis-cases-icon-sweep,
+.temis-cases-trigger:focus-visible .temis-cases-icon-sweep {
+  animation: temis-cases-sweep-draw 980ms cubic-bezier(0.22, 1, 0.36, 1) 440ms both;
 }
 
-.justinia-cases-trigger:hover .justinia-cases-icon-latch,
-.justinia-cases-trigger:focus-visible .justinia-cases-icon-latch {
-  animation: justinia-cases-latch-pulse 980ms cubic-bezier(0.22, 1, 0.36, 1) 480ms both;
+.temis-cases-trigger:hover .temis-cases-icon-latch,
+.temis-cases-trigger:focus-visible .temis-cases-icon-latch {
+  animation: temis-cases-latch-pulse 980ms cubic-bezier(0.22, 1, 0.36, 1) 480ms both;
 }
 
-.justinia-ai-stars-trigger:hover .justinia-ai-stars-icon-main,
-.justinia-ai-stars-trigger:focus-visible .justinia-ai-stars-icon-main {
-  animation: justinia-ai-stars-twinkle 820ms cubic-bezier(0.22, 1, 0.36, 1) 260ms both;
+.temis-ai-stars-trigger:hover .temis-ai-stars-icon-main,
+.temis-ai-stars-trigger:focus-visible .temis-ai-stars-icon-main {
+  animation: temis-ai-stars-twinkle 820ms cubic-bezier(0.22, 1, 0.36, 1) 260ms both;
 }
 
-.justinia-ai-stars-trigger:hover .justinia-ai-stars-icon-small,
-.justinia-ai-stars-trigger:focus-visible .justinia-ai-stars-icon-small {
-  animation: justinia-ai-star-spark 820ms cubic-bezier(0.22, 1, 0.36, 1) 320ms both;
+.temis-ai-stars-trigger:hover .temis-ai-stars-icon-small,
+.temis-ai-stars-trigger:focus-visible .temis-ai-stars-icon-small {
+  animation: temis-ai-star-spark 820ms cubic-bezier(0.22, 1, 0.36, 1) 320ms both;
 }
 
-.justinia-ai-stars-trigger:hover .justinia-ai-stars-icon-small-two,
-.justinia-ai-stars-trigger:focus-visible .justinia-ai-stars-icon-small-two {
+.temis-ai-stars-trigger:hover .temis-ai-stars-icon-small-two,
+.temis-ai-stars-trigger:focus-visible .temis-ai-stars-icon-small-two {
   animation-delay: 380ms;
 }
 
-.justinia-cashbox-trigger:hover .justinia-cashbox-icon-bill,
-.justinia-cashbox-trigger:focus-visible .justinia-cashbox-icon-bill {
-  animation: justinia-cashbox-drawer-open 1320ms cubic-bezier(0.22, 1, 0.36, 1) 400ms both;
+.temis-cashbox-trigger:hover .temis-cashbox-icon-bill,
+.temis-cashbox-trigger:focus-visible .temis-cashbox-icon-bill {
+  animation: temis-cashbox-drawer-open 1320ms cubic-bezier(0.22, 1, 0.36, 1) 400ms both;
 }
 
-.justinia-cashbox-trigger:hover .justinia-cashbox-icon,
-.justinia-cashbox-trigger:focus-visible .justinia-cashbox-icon {
-  animation: justinia-cashbox-body-rock 1320ms cubic-bezier(0.22, 1, 0.36, 1) 400ms both;
+.temis-cashbox-trigger:hover .temis-cashbox-icon,
+.temis-cashbox-trigger:focus-visible .temis-cashbox-icon {
+  animation: temis-cashbox-body-rock 1320ms cubic-bezier(0.22, 1, 0.36, 1) 400ms both;
 }
 
-.justinia-cashbox-trigger:hover .justinia-cashbox-icon-coin,
-.justinia-cashbox-trigger:focus-visible .justinia-cashbox-icon-coin {
-  animation: justinia-cashbox-coin-pop 1320ms cubic-bezier(0.22, 1, 0.36, 1) 460ms both;
+.temis-cashbox-trigger:hover .temis-cashbox-icon-coin,
+.temis-cashbox-trigger:focus-visible .temis-cashbox-icon-coin {
+  animation: temis-cashbox-coin-pop 1320ms cubic-bezier(0.22, 1, 0.36, 1) 460ms both;
 }
 
-.justinia-cashbox-trigger:hover .justinia-cashbox-icon-side-dot,
-.justinia-cashbox-trigger:focus-visible .justinia-cashbox-icon-side-dot {
-  animation: justinia-cashbox-side-dot-pulse 1320ms cubic-bezier(0.22, 1, 0.36, 1) 500ms both;
+.temis-cashbox-trigger:hover .temis-cashbox-icon-side-dot,
+.temis-cashbox-trigger:focus-visible .temis-cashbox-icon-side-dot {
+  animation: temis-cashbox-side-dot-pulse 1320ms cubic-bezier(0.22, 1, 0.36, 1) 500ms both;
 }
 
-.justinia-cashbox-trigger:hover .justinia-cashbox-icon-side-dot-right,
-.justinia-cashbox-trigger:focus-visible .justinia-cashbox-icon-side-dot-right {
+.temis-cashbox-trigger:hover .temis-cashbox-icon-side-dot-right,
+.temis-cashbox-trigger:focus-visible .temis-cashbox-icon-side-dot-right {
   animation-delay: 560ms;
 }
 
-.justinia-staff-trigger:hover .justinia-staff-icon-shell,
-.justinia-staff-trigger:focus-visible .justinia-staff-icon-shell {
-  animation: justinia-staff-body-pop 1120ms cubic-bezier(0.22, 1, 0.36, 1) 400ms both;
+.temis-staff-trigger:hover .temis-staff-icon-shell,
+.temis-staff-trigger:focus-visible .temis-staff-icon-shell {
+  animation: temis-staff-body-pop 1120ms cubic-bezier(0.22, 1, 0.36, 1) 400ms both;
 }
 
-.justinia-staff-trigger:hover .justinia-staff-icon-balance,
-.justinia-staff-trigger:focus-visible .justinia-staff-icon-balance {
-  animation: justinia-staff-balance-swing 1120ms cubic-bezier(0.22, 1, 0.36, 1) 440ms both;
+.temis-staff-trigger:hover .temis-staff-icon-balance,
+.temis-staff-trigger:focus-visible .temis-staff-icon-balance {
+  animation: temis-staff-balance-swing 1120ms cubic-bezier(0.22, 1, 0.36, 1) 440ms both;
 }
 
-.justinia-settings-trigger:hover .justinia-settings-icon-shell,
-.justinia-settings-trigger:focus-visible .justinia-settings-icon-shell {
-  animation: justinia-settings-shell-pop 1080ms cubic-bezier(0.22, 1, 0.36, 1) 400ms both;
+.temis-settings-trigger:hover .temis-settings-icon-shell,
+.temis-settings-trigger:focus-visible .temis-settings-icon-shell {
+  animation: temis-settings-shell-pop 1080ms cubic-bezier(0.22, 1, 0.36, 1) 400ms both;
 }
 
-.justinia-settings-trigger:hover .justinia-settings-icon-gear,
-.justinia-settings-trigger:focus-visible .justinia-settings-icon-gear {
-  animation: justinia-settings-gear-spin 1080ms cubic-bezier(0.22, 1, 0.36, 1) 420ms both;
+.temis-settings-trigger:hover .temis-settings-icon-gear,
+.temis-settings-trigger:focus-visible .temis-settings-icon-gear {
+  animation: temis-settings-gear-spin 1080ms cubic-bezier(0.22, 1, 0.36, 1) 420ms both;
 }
 
-.justinia-account-back-trigger:hover .justinia-account-back-icon,
-.justinia-account-back-trigger:focus-visible .justinia-account-back-icon {
-  animation: justinia-account-back-slide 760ms cubic-bezier(0.22, 1, 0.36, 1) 400ms both;
+.temis-account-back-trigger:hover .temis-account-back-icon,
+.temis-account-back-trigger:focus-visible .temis-account-back-icon {
+  animation: temis-account-back-slide 760ms cubic-bezier(0.22, 1, 0.36, 1) 400ms both;
 }
 
-.justinia-account-back-trigger:hover .justinia-account-back-icon-line,
-.justinia-account-back-trigger:focus-visible .justinia-account-back-icon-line {
-  animation: justinia-account-back-line-nudge 760ms cubic-bezier(0.22, 1, 0.36, 1) 420ms both;
+.temis-account-back-trigger:hover .temis-account-back-icon-line,
+.temis-account-back-trigger:focus-visible .temis-account-back-icon-line {
+  animation: temis-account-back-line-nudge 760ms cubic-bezier(0.22, 1, 0.36, 1) 420ms both;
 }
 
-.justinia-account-profile-trigger:hover .justinia-account-profile-icon-silhouette,
-.justinia-account-profile-trigger:focus-visible .justinia-account-profile-icon-silhouette {
-  animation: justinia-account-profile-pop 860ms cubic-bezier(0.22, 1, 0.36, 1) 380ms both;
+.temis-account-profile-trigger:hover .temis-account-profile-icon-silhouette,
+.temis-account-profile-trigger:focus-visible .temis-account-profile-icon-silhouette {
+  animation: temis-account-profile-pop 860ms cubic-bezier(0.22, 1, 0.36, 1) 380ms both;
 }
 
-.justinia-account-profile-trigger:hover .justinia-account-profile-icon-shine,
-.justinia-account-profile-trigger:focus-visible .justinia-account-profile-icon-shine {
-  animation: justinia-account-profile-shine-sweep 860ms cubic-bezier(0.22, 1, 0.36, 1) 430ms both;
+.temis-account-profile-trigger:hover .temis-account-profile-icon-shine,
+.temis-account-profile-trigger:focus-visible .temis-account-profile-icon-shine {
+  animation: temis-account-profile-shine-sweep 860ms cubic-bezier(0.22, 1, 0.36, 1) 430ms both;
 }
 
-.justinia-account-security-trigger:hover .justinia-account-security-icon-shield,
-.justinia-account-security-trigger:focus-visible .justinia-account-security-icon-shield {
-  animation: justinia-account-security-shield-lock 920ms cubic-bezier(0.22, 1, 0.36, 1) 400ms both;
+.temis-account-security-trigger:hover .temis-account-security-icon-shield,
+.temis-account-security-trigger:focus-visible .temis-account-security-icon-shield {
+  animation: temis-account-security-shield-lock 920ms cubic-bezier(0.22, 1, 0.36, 1) 400ms both;
 }
 
-.justinia-account-security-trigger:hover .justinia-account-security-icon-check,
-.justinia-account-security-trigger:focus-visible .justinia-account-security-icon-check {
-  animation: justinia-icon-stroke-draw 920ms cubic-bezier(0.22, 1, 0.36, 1) 440ms both;
+.temis-account-security-trigger:hover .temis-account-security-icon-check,
+.temis-account-security-trigger:focus-visible .temis-account-security-icon-check {
+  animation: temis-icon-stroke-draw 920ms cubic-bezier(0.22, 1, 0.36, 1) 440ms both;
 }
 
-.justinia-account-ai-trigger:hover .justinia-account-ai-icon-shell,
-.justinia-account-ai-trigger:focus-visible .justinia-account-ai-icon-shell {
-  animation: justinia-account-ai-bob 920ms cubic-bezier(0.22, 1, 0.36, 1) 400ms both;
+.temis-account-ai-trigger:hover .temis-account-ai-icon-shell,
+.temis-account-ai-trigger:focus-visible .temis-account-ai-icon-shell {
+  animation: temis-account-ai-bob 920ms cubic-bezier(0.22, 1, 0.36, 1) 400ms both;
 }
 
-.justinia-account-ai-trigger:hover .justinia-account-ai-icon-eye,
-.justinia-account-ai-trigger:focus-visible .justinia-account-ai-icon-eye {
-  animation: justinia-account-ai-eye-blink 920ms cubic-bezier(0.22, 1, 0.36, 1) 470ms both;
+.temis-account-ai-trigger:hover .temis-account-ai-icon-eye,
+.temis-account-ai-trigger:focus-visible .temis-account-ai-icon-eye {
+  animation: temis-account-ai-eye-blink 920ms cubic-bezier(0.22, 1, 0.36, 1) 470ms both;
 }
 
-.justinia-account-ai-trigger:hover .justinia-account-ai-icon-antenna-dot,
-.justinia-account-ai-trigger:focus-visible .justinia-account-ai-icon-antenna-dot {
-  animation: justinia-account-ai-antenna-ping 920ms cubic-bezier(0.22, 1, 0.36, 1) 440ms both;
+.temis-account-ai-trigger:hover .temis-account-ai-icon-antenna-dot,
+.temis-account-ai-trigger:focus-visible .temis-account-ai-icon-antenna-dot {
+  animation: temis-account-ai-antenna-ping 920ms cubic-bezier(0.22, 1, 0.36, 1) 440ms both;
 }
 
-.justinia-account-archive-trigger:hover .justinia-account-archive-icon-box,
-.justinia-account-archive-trigger:focus-visible .justinia-account-archive-icon-box {
-  animation: justinia-account-archive-box-rock 1040ms cubic-bezier(0.22, 1, 0.36, 1) 400ms both;
+.temis-account-archive-trigger:hover .temis-account-archive-icon-box,
+.temis-account-archive-trigger:focus-visible .temis-account-archive-icon-box {
+  animation: temis-account-archive-box-rock 1040ms cubic-bezier(0.22, 1, 0.36, 1) 400ms both;
 }
 
-.justinia-account-archive-trigger:hover .justinia-account-archive-icon-lid,
-.justinia-account-archive-trigger:focus-visible .justinia-account-archive-icon-lid {
-  animation: justinia-account-archive-lid-open 1040ms cubic-bezier(0.22, 1, 0.36, 1) 430ms both;
+.temis-account-archive-trigger:hover .temis-account-archive-icon-lid,
+.temis-account-archive-trigger:focus-visible .temis-account-archive-icon-lid {
+  animation: temis-account-archive-lid-open 1040ms cubic-bezier(0.22, 1, 0.36, 1) 430ms both;
 }
 
-.justinia-account-archive-trigger:hover .justinia-account-archive-icon-label,
-.justinia-account-archive-trigger:focus-visible .justinia-account-archive-icon-label {
-  animation: justinia-icon-stroke-draw 1040ms cubic-bezier(0.22, 1, 0.36, 1) 470ms both;
+.temis-account-archive-trigger:hover .temis-account-archive-icon-label,
+.temis-account-archive-trigger:focus-visible .temis-account-archive-icon-label {
+  animation: temis-icon-stroke-draw 1040ms cubic-bezier(0.22, 1, 0.36, 1) 470ms both;
 }
 
-.justinia-account-organization-trigger:hover .justinia-account-organization-icon-shell,
-.justinia-account-organization-trigger:focus-visible .justinia-account-organization-icon-shell {
-  animation: justinia-account-organization-lift 980ms cubic-bezier(0.22, 1, 0.36, 1) 400ms both;
+.temis-account-organization-trigger:hover .temis-account-organization-icon-shell,
+.temis-account-organization-trigger:focus-visible .temis-account-organization-icon-shell {
+  animation: temis-account-organization-lift 980ms cubic-bezier(0.22, 1, 0.36, 1) 400ms both;
 }
 
-.justinia-account-organization-trigger:hover .justinia-account-organization-icon-windows path,
-.justinia-account-organization-trigger:focus-visible
-  .justinia-account-organization-icon-windows
+.temis-account-organization-trigger:hover .temis-account-organization-icon-windows path,
+.temis-account-organization-trigger:focus-visible
+  .temis-account-organization-icon-windows
   path {
-  animation: justinia-account-window-pulse 980ms cubic-bezier(0.22, 1, 0.36, 1) 440ms both;
+  animation: temis-account-window-pulse 980ms cubic-bezier(0.22, 1, 0.36, 1) 440ms both;
 }
 
-.justinia-account-organization-trigger:hover .justinia-account-organization-icon-door,
-.justinia-account-organization-trigger:focus-visible .justinia-account-organization-icon-door {
-  animation: justinia-account-organization-door-open 980ms cubic-bezier(0.22, 1, 0.36, 1) 500ms both;
+.temis-account-organization-trigger:hover .temis-account-organization-icon-door,
+.temis-account-organization-trigger:focus-visible .temis-account-organization-icon-door {
+  animation: temis-account-organization-door-open 980ms cubic-bezier(0.22, 1, 0.36, 1) 500ms both;
 }
 
-.justinia-account-organization-trigger:hover .justinia-account-organization-icon-window-two,
-.justinia-account-organization-trigger:focus-visible .justinia-account-organization-icon-window-two,
-.justinia-account-organization-trigger:hover .justinia-account-organization-icon-window-three,
-.justinia-account-organization-trigger:focus-visible
-  .justinia-account-organization-icon-window-three {
+.temis-account-organization-trigger:hover .temis-account-organization-icon-window-two,
+.temis-account-organization-trigger:focus-visible .temis-account-organization-icon-window-two,
+.temis-account-organization-trigger:hover .temis-account-organization-icon-window-three,
+.temis-account-organization-trigger:focus-visible
+  .temis-account-organization-icon-window-three {
   animation-delay: 500ms;
 }
 
-.justinia-account-organization-trigger:hover .justinia-account-organization-icon-window-four,
-.justinia-account-organization-trigger:focus-visible
-  .justinia-account-organization-icon-window-four,
-.justinia-account-organization-trigger:hover .justinia-account-organization-icon-window-five,
-.justinia-account-organization-trigger:focus-visible
-  .justinia-account-organization-icon-window-five {
+.temis-account-organization-trigger:hover .temis-account-organization-icon-window-four,
+.temis-account-organization-trigger:focus-visible
+  .temis-account-organization-icon-window-four,
+.temis-account-organization-trigger:hover .temis-account-organization-icon-window-five,
+.temis-account-organization-trigger:focus-visible
+  .temis-account-organization-icon-window-five {
   animation-delay: 560ms;
 }
 
-.justinia-account-organization-trigger:hover .justinia-account-organization-icon-window-six,
-.justinia-account-organization-trigger:focus-visible
-  .justinia-account-organization-icon-window-six {
+.temis-account-organization-trigger:hover .temis-account-organization-icon-window-six,
+.temis-account-organization-trigger:focus-visible
+  .temis-account-organization-icon-window-six {
   animation-delay: 620ms;
 }
 
-.justinia-account-plan-trigger:hover .justinia-account-plan-icon-card,
-.justinia-account-plan-trigger:focus-visible .justinia-account-plan-icon-card {
-  animation: justinia-account-plan-card-swipe 960ms cubic-bezier(0.22, 1, 0.36, 1) 400ms both;
+.temis-account-plan-trigger:hover .temis-account-plan-icon-card,
+.temis-account-plan-trigger:focus-visible .temis-account-plan-icon-card {
+  animation: temis-account-plan-card-swipe 960ms cubic-bezier(0.22, 1, 0.36, 1) 400ms both;
 }
 
-.justinia-account-plan-trigger:hover .justinia-account-plan-icon-line,
-.justinia-account-plan-trigger:focus-visible .justinia-account-plan-icon-line {
-  animation: justinia-icon-stroke-draw 960ms cubic-bezier(0.22, 1, 0.36, 1) 430ms both;
+.temis-account-plan-trigger:hover .temis-account-plan-icon-line,
+.temis-account-plan-trigger:focus-visible .temis-account-plan-icon-line {
+  animation: temis-icon-stroke-draw 960ms cubic-bezier(0.22, 1, 0.36, 1) 430ms both;
 }
 
-.justinia-account-plan-trigger:hover .justinia-account-plan-icon-chip,
-.justinia-account-plan-trigger:focus-visible .justinia-account-plan-icon-chip {
-  animation: justinia-account-plan-chip-pop 960ms cubic-bezier(0.22, 1, 0.36, 1) 470ms both;
+.temis-account-plan-trigger:hover .temis-account-plan-icon-chip,
+.temis-account-plan-trigger:focus-visible .temis-account-plan-icon-chip {
+  animation: temis-account-plan-chip-pop 960ms cubic-bezier(0.22, 1, 0.36, 1) 470ms both;
 }
 
-.justinia-account-preferences-trigger:hover .justinia-account-preferences-icon-bell,
-.justinia-account-preferences-trigger:focus-visible .justinia-account-preferences-icon-bell {
-  animation: justinia-account-preferences-bell-ring 860ms cubic-bezier(0.22, 1, 0.36, 1) 400ms both;
+.temis-account-preferences-trigger:hover .temis-account-preferences-icon-bell,
+.temis-account-preferences-trigger:focus-visible .temis-account-preferences-icon-bell {
+  animation: temis-account-preferences-bell-ring 860ms cubic-bezier(0.22, 1, 0.36, 1) 400ms both;
 }
 
-.justinia-account-preferences-trigger:hover .justinia-account-preferences-icon-wave,
-.justinia-account-preferences-trigger:focus-visible .justinia-account-preferences-icon-wave {
-  animation: justinia-icon-stroke-draw 860ms cubic-bezier(0.22, 1, 0.36, 1) 440ms both;
+.temis-account-preferences-trigger:hover .temis-account-preferences-icon-wave,
+.temis-account-preferences-trigger:focus-visible .temis-account-preferences-icon-wave {
+  animation: temis-icon-stroke-draw 860ms cubic-bezier(0.22, 1, 0.36, 1) 440ms both;
 }
 
-@keyframes justinia-sidebar-icon-bob {
+@keyframes temis-sidebar-icon-bob {
   0%,
   100% {
     transform: translate3d(0, 0, 0) rotate(0deg) scale(1);
@@ -2319,7 +2319,7 @@ textarea {
   }
 }
 
-@keyframes justinia-sidebar-icon-pulse {
+@keyframes temis-sidebar-icon-pulse {
   0%,
   100% {
     opacity: 1;
@@ -2335,7 +2335,7 @@ textarea {
   }
 }
 
-@keyframes justinia-connectors-node-activate {
+@keyframes temis-connectors-node-activate {
   0% {
     opacity: 0.52;
     transform: scale(0.78);
@@ -2353,7 +2353,7 @@ textarea {
   }
 }
 
-@keyframes justinia-connectors-icon-energize {
+@keyframes temis-connectors-icon-energize {
   0% {
     transform: translate(0, 0) scale(1);
   }
@@ -2374,7 +2374,7 @@ textarea {
   }
 }
 
-@keyframes justinia-connectors-axon-grow {
+@keyframes temis-connectors-axon-grow {
   0% {
     opacity: 0.72;
     stroke-dashoffset: 1;
@@ -2390,182 +2390,182 @@ textarea {
   }
 }
 
-.justinia-clients-trigger:hover .justinia-clients-icon-people,
-.justinia-clients-trigger:focus-visible .justinia-clients-icon-people,
-.justinia-tasks-trigger:hover .justinia-tasks-icon-sheet,
-.justinia-tasks-trigger:focus-visible .justinia-tasks-icon-sheet {
-  animation: justinia-sidebar-icon-bob 900ms cubic-bezier(0.22, 1, 0.36, 1) 250ms both;
+.temis-clients-trigger:hover .temis-clients-icon-people,
+.temis-clients-trigger:focus-visible .temis-clients-icon-people,
+.temis-tasks-trigger:hover .temis-tasks-icon-sheet,
+.temis-tasks-trigger:focus-visible .temis-tasks-icon-sheet {
+  animation: temis-sidebar-icon-bob 900ms cubic-bezier(0.22, 1, 0.36, 1) 250ms both;
 }
 
-.justinia-clients-trigger:hover .justinia-clients-icon-partner,
-.justinia-clients-trigger:focus-visible .justinia-clients-icon-partner,
-.justinia-tasks-trigger:hover .justinia-tasks-icon-check,
-.justinia-tasks-trigger:focus-visible .justinia-tasks-icon-check {
-  animation: justinia-sidebar-icon-pulse 900ms cubic-bezier(0.22, 1, 0.36, 1) 360ms both;
+.temis-clients-trigger:hover .temis-clients-icon-partner,
+.temis-clients-trigger:focus-visible .temis-clients-icon-partner,
+.temis-tasks-trigger:hover .temis-tasks-icon-check,
+.temis-tasks-trigger:focus-visible .temis-tasks-icon-check {
+  animation: temis-sidebar-icon-pulse 900ms cubic-bezier(0.22, 1, 0.36, 1) 360ms both;
 }
 
-.justinia-account-connectors-trigger:hover .justinia-account-connectors-icon-axon-1,
-.justinia-account-connectors-trigger:focus-visible .justinia-account-connectors-icon-axon-1 {
-  animation: justinia-connectors-axon-grow 280ms cubic-bezier(0.22, 1, 0.36, 1) both;
+.temis-account-connectors-trigger:hover .temis-account-connectors-icon-axon-1,
+.temis-account-connectors-trigger:focus-visible .temis-account-connectors-icon-axon-1 {
+  animation: temis-connectors-axon-grow 280ms cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
-.justinia-account-connectors-trigger:hover .justinia-account-connectors-icon,
-.justinia-account-connectors-trigger:focus-visible .justinia-account-connectors-icon {
-  animation: justinia-connectors-icon-energize 1.3s cubic-bezier(0.22, 1, 0.36, 1) both;
+.temis-account-connectors-trigger:hover .temis-account-connectors-icon,
+.temis-account-connectors-trigger:focus-visible .temis-account-connectors-icon {
+  animation: temis-connectors-icon-energize 1.3s cubic-bezier(0.22, 1, 0.36, 1) both;
   transform-box: fill-box;
   transform-origin: center;
 }
 
-.justinia-account-connectors-trigger:hover .justinia-account-connectors-icon-axon-2,
-.justinia-account-connectors-trigger:focus-visible .justinia-account-connectors-icon-axon-2 {
-  animation: justinia-connectors-axon-grow 245ms cubic-bezier(0.22, 1, 0.36, 1) 595ms both;
+.temis-account-connectors-trigger:hover .temis-account-connectors-icon-axon-2,
+.temis-account-connectors-trigger:focus-visible .temis-account-connectors-icon-axon-2 {
+  animation: temis-connectors-axon-grow 245ms cubic-bezier(0.22, 1, 0.36, 1) 595ms both;
 }
 
-.justinia-account-connectors-trigger:hover .justinia-account-connectors-icon-axon-3,
-.justinia-account-connectors-trigger:focus-visible .justinia-account-connectors-icon-axon-3 {
-  animation: justinia-connectors-axon-grow 310ms cubic-bezier(0.22, 1, 0.36, 1) 260ms both;
+.temis-account-connectors-trigger:hover .temis-account-connectors-icon-axon-3,
+.temis-account-connectors-trigger:focus-visible .temis-account-connectors-icon-axon-3 {
+  animation: temis-connectors-axon-grow 310ms cubic-bezier(0.22, 1, 0.36, 1) 260ms both;
 }
 
-.justinia-account-connectors-trigger:hover .justinia-account-connectors-icon-axon-4,
-.justinia-account-connectors-trigger:focus-visible .justinia-account-connectors-icon-axon-4 {
-  animation: justinia-connectors-axon-grow 270ms cubic-bezier(0.22, 1, 0.36, 1) 920ms both;
+.temis-account-connectors-trigger:hover .temis-account-connectors-icon-axon-4,
+.temis-account-connectors-trigger:focus-visible .temis-account-connectors-icon-axon-4 {
+  animation: temis-connectors-axon-grow 270ms cubic-bezier(0.22, 1, 0.36, 1) 920ms both;
 }
 
-.justinia-account-connectors-trigger:hover .justinia-account-connectors-icon-node-1,
-.justinia-account-connectors-trigger:focus-visible .justinia-account-connectors-icon-node-1 {
-  animation: justinia-connectors-node-activate 180ms ease-out 175ms both;
+.temis-account-connectors-trigger:hover .temis-account-connectors-icon-node-1,
+.temis-account-connectors-trigger:focus-visible .temis-account-connectors-icon-node-1 {
+  animation: temis-connectors-node-activate 180ms ease-out 175ms both;
 }
 
-.justinia-account-connectors-trigger:hover .justinia-account-connectors-icon-node-2,
-.justinia-account-connectors-trigger:focus-visible .justinia-account-connectors-icon-node-2 {
-  animation: justinia-connectors-node-activate 180ms ease-out 755ms both;
+.temis-account-connectors-trigger:hover .temis-account-connectors-icon-node-2,
+.temis-account-connectors-trigger:focus-visible .temis-account-connectors-icon-node-2 {
+  animation: temis-connectors-node-activate 180ms ease-out 755ms both;
 }
 
-.justinia-account-connectors-trigger:hover .justinia-account-connectors-icon-node-3,
-.justinia-account-connectors-trigger:focus-visible .justinia-account-connectors-icon-node-3 {
-  animation: justinia-connectors-node-activate 180ms ease-out 460ms both;
+.temis-account-connectors-trigger:hover .temis-account-connectors-icon-node-3,
+.temis-account-connectors-trigger:focus-visible .temis-account-connectors-icon-node-3 {
+  animation: temis-connectors-node-activate 180ms ease-out 460ms both;
 }
 
-.justinia-account-connectors-trigger:hover .justinia-account-connectors-icon-node-4,
-.justinia-account-connectors-trigger:focus-visible .justinia-account-connectors-icon-node-4 {
-  animation: justinia-connectors-node-activate 180ms ease-out 1.08s both;
+.temis-account-connectors-trigger:hover .temis-account-connectors-icon-node-4,
+.temis-account-connectors-trigger:focus-visible .temis-account-connectors-icon-node-4 {
+  animation: temis-connectors-node-activate 180ms ease-out 1.08s both;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .justinia-notification-trigger:hover .justinia-notification-bell,
-  .justinia-notification-trigger:focus-visible .justinia-notification-bell,
-  .justinia-notification-trigger:hover .justinia-notification-badge,
-  .justinia-notification-trigger:focus-visible .justinia-notification-badge,
-  .justinia-notification-trigger-incoming .justinia-notification-bell,
-  .justinia-notification-trigger-incoming .justinia-notification-badge,
-  .justinia-library-trigger:hover .justinia-library-icon-folder,
-  .justinia-library-trigger:focus-visible .justinia-library-icon-folder,
-  .justinia-library-trigger:hover .justinia-library-icon-files,
-  .justinia-library-trigger:focus-visible .justinia-library-icon-files,
-  .justinia-library-trigger:hover .justinia-library-icon-top,
-  .justinia-library-trigger:focus-visible .justinia-library-icon-top,
-  .justinia-library-trigger:hover .justinia-library-icon-file-line,
-  .justinia-library-trigger:focus-visible .justinia-library-icon-file-line,
-  .justinia-calendar-trigger:hover .justinia-calendar-icon-body,
-  .justinia-calendar-trigger:focus-visible .justinia-calendar-icon-body,
-  .justinia-calendar-trigger:hover .justinia-calendar-icon-day,
-  .justinia-calendar-trigger:focus-visible .justinia-calendar-icon-day,
-  .justinia-cases-trigger:hover .justinia-cases-icon-briefcase,
-  .justinia-cases-trigger:focus-visible .justinia-cases-icon-briefcase,
-  .justinia-cases-trigger:hover .justinia-cases-icon-sweep,
-  .justinia-cases-trigger:focus-visible .justinia-cases-icon-sweep,
-  .justinia-cases-trigger:hover .justinia-cases-icon-latch,
-  .justinia-cases-trigger:focus-visible .justinia-cases-icon-latch,
-  .justinia-clients-trigger:hover .justinia-clients-icon-people,
-  .justinia-clients-trigger:focus-visible .justinia-clients-icon-people,
-  .justinia-clients-trigger:hover .justinia-clients-icon-partner,
-  .justinia-clients-trigger:focus-visible .justinia-clients-icon-partner,
-  .justinia-tasks-trigger:hover .justinia-tasks-icon-sheet,
-  .justinia-tasks-trigger:focus-visible .justinia-tasks-icon-sheet,
-  .justinia-tasks-trigger:hover .justinia-tasks-icon-check,
-  .justinia-tasks-trigger:focus-visible .justinia-tasks-icon-check,
-  .justinia-account-connectors-trigger:hover .justinia-account-connectors-icon,
-  .justinia-account-connectors-trigger:focus-visible .justinia-account-connectors-icon,
-  .justinia-account-connectors-trigger:hover .justinia-account-connectors-icon-axon-1,
-  .justinia-account-connectors-trigger:focus-visible .justinia-account-connectors-icon-axon-1,
-  .justinia-account-connectors-trigger:hover .justinia-account-connectors-icon-axon-2,
-  .justinia-account-connectors-trigger:focus-visible .justinia-account-connectors-icon-axon-2,
-  .justinia-account-connectors-trigger:hover .justinia-account-connectors-icon-axon-3,
-  .justinia-account-connectors-trigger:focus-visible .justinia-account-connectors-icon-axon-3,
-  .justinia-account-connectors-trigger:hover .justinia-account-connectors-icon-axon-4,
-  .justinia-account-connectors-trigger:focus-visible .justinia-account-connectors-icon-axon-4,
-  .justinia-account-connectors-trigger:hover .justinia-account-connectors-icon-nodes,
-  .justinia-account-connectors-trigger:focus-visible .justinia-account-connectors-icon-nodes,
-  .justinia-account-connectors-trigger:hover .justinia-account-connectors-icon-plus,
-  .justinia-account-connectors-trigger:focus-visible .justinia-account-connectors-icon-plus,
-  .justinia-account-connectors-trigger:hover .justinia-account-connectors-icon-node-1,
-  .justinia-account-connectors-trigger:focus-visible .justinia-account-connectors-icon-node-1,
-  .justinia-account-connectors-trigger:hover .justinia-account-connectors-icon-node-2,
-  .justinia-account-connectors-trigger:focus-visible .justinia-account-connectors-icon-node-2,
-  .justinia-account-connectors-trigger:hover .justinia-account-connectors-icon-node-3,
-  .justinia-account-connectors-trigger:focus-visible .justinia-account-connectors-icon-node-3,
-  .justinia-account-connectors-trigger:hover .justinia-account-connectors-icon-node-4,
-  .justinia-account-connectors-trigger:focus-visible .justinia-account-connectors-icon-node-4,
-  .justinia-ai-stars-trigger:hover .justinia-ai-stars-icon-main,
-  .justinia-ai-stars-trigger:focus-visible .justinia-ai-stars-icon-main,
-  .justinia-ai-stars-trigger:hover .justinia-ai-stars-icon-small,
-  .justinia-ai-stars-trigger:focus-visible .justinia-ai-stars-icon-small,
-  .justinia-cashbox-trigger:hover .justinia-cashbox-icon,
-  .justinia-cashbox-trigger:focus-visible .justinia-cashbox-icon,
-  .justinia-cashbox-trigger:hover .justinia-cashbox-icon-bill,
-  .justinia-cashbox-trigger:focus-visible .justinia-cashbox-icon-bill,
-  .justinia-cashbox-trigger:hover .justinia-cashbox-icon-coin,
-  .justinia-cashbox-trigger:focus-visible .justinia-cashbox-icon-coin,
-  .justinia-cashbox-trigger:hover .justinia-cashbox-icon-side-dot,
-  .justinia-cashbox-trigger:focus-visible .justinia-cashbox-icon-side-dot,
-  .justinia-staff-trigger:hover .justinia-staff-icon-shell,
-  .justinia-staff-trigger:focus-visible .justinia-staff-icon-shell,
-  .justinia-staff-trigger:hover .justinia-staff-icon-balance,
-  .justinia-staff-trigger:focus-visible .justinia-staff-icon-balance,
-  .justinia-settings-trigger:hover .justinia-settings-icon-shell,
-  .justinia-settings-trigger:focus-visible .justinia-settings-icon-shell,
-  .justinia-settings-trigger:hover .justinia-settings-icon-gear,
-  .justinia-settings-trigger:focus-visible .justinia-settings-icon-gear,
-  .justinia-account-back-trigger:hover .justinia-account-back-icon,
-  .justinia-account-back-trigger:focus-visible .justinia-account-back-icon,
-  .justinia-account-back-trigger:hover .justinia-account-back-icon-line,
-  .justinia-account-back-trigger:focus-visible .justinia-account-back-icon-line,
-  .justinia-account-profile-trigger:hover .justinia-account-profile-icon-silhouette,
-  .justinia-account-profile-trigger:focus-visible .justinia-account-profile-icon-silhouette,
-  .justinia-account-profile-trigger:hover .justinia-account-profile-icon-shine,
-  .justinia-account-profile-trigger:focus-visible .justinia-account-profile-icon-shine,
-  .justinia-account-security-trigger:hover .justinia-account-security-icon-shield,
-  .justinia-account-security-trigger:focus-visible .justinia-account-security-icon-shield,
-  .justinia-account-security-trigger:hover .justinia-account-security-icon-check,
-  .justinia-account-security-trigger:focus-visible .justinia-account-security-icon-check,
-  .justinia-account-ai-trigger:hover .justinia-account-ai-icon-shell,
-  .justinia-account-ai-trigger:focus-visible .justinia-account-ai-icon-shell,
-  .justinia-account-ai-trigger:hover .justinia-account-ai-icon-eye,
-  .justinia-account-ai-trigger:focus-visible .justinia-account-ai-icon-eye,
-  .justinia-account-ai-trigger:hover .justinia-account-ai-icon-antenna-dot,
-  .justinia-account-ai-trigger:focus-visible .justinia-account-ai-icon-antenna-dot,
-  .justinia-account-archive-trigger:hover .justinia-account-archive-icon-box,
-  .justinia-account-archive-trigger:focus-visible .justinia-account-archive-icon-box,
-  .justinia-account-archive-trigger:hover .justinia-account-archive-icon-lid,
-  .justinia-account-archive-trigger:focus-visible .justinia-account-archive-icon-lid,
-  .justinia-account-archive-trigger:hover .justinia-account-archive-icon-label,
-  .justinia-account-archive-trigger:focus-visible .justinia-account-archive-icon-label,
-  .justinia-account-organization-trigger:hover .justinia-account-organization-icon-shell,
-  .justinia-account-organization-trigger:focus-visible .justinia-account-organization-icon-shell,
-  .justinia-account-organization-trigger:hover .justinia-account-organization-icon-windows,
-  .justinia-account-organization-trigger:focus-visible .justinia-account-organization-icon-windows,
-  .justinia-account-organization-trigger:hover .justinia-account-organization-icon-door,
-  .justinia-account-organization-trigger:focus-visible .justinia-account-organization-icon-door,
-  .justinia-account-plan-trigger:hover .justinia-account-plan-icon-card,
-  .justinia-account-plan-trigger:focus-visible .justinia-account-plan-icon-card,
-  .justinia-account-plan-trigger:hover .justinia-account-plan-icon-line,
-  .justinia-account-plan-trigger:focus-visible .justinia-account-plan-icon-line,
-  .justinia-account-plan-trigger:hover .justinia-account-plan-icon-chip,
-  .justinia-account-plan-trigger:focus-visible .justinia-account-plan-icon-chip,
-  .justinia-account-preferences-trigger:hover .justinia-account-preferences-icon-bell,
-  .justinia-account-preferences-trigger:focus-visible .justinia-account-preferences-icon-bell,
-  .justinia-account-preferences-trigger:hover .justinia-account-preferences-icon-wave,
-  .justinia-account-preferences-trigger:focus-visible .justinia-account-preferences-icon-wave {
+  .temis-notification-trigger:hover .temis-notification-bell,
+  .temis-notification-trigger:focus-visible .temis-notification-bell,
+  .temis-notification-trigger:hover .temis-notification-badge,
+  .temis-notification-trigger:focus-visible .temis-notification-badge,
+  .temis-notification-trigger-incoming .temis-notification-bell,
+  .temis-notification-trigger-incoming .temis-notification-badge,
+  .temis-library-trigger:hover .temis-library-icon-folder,
+  .temis-library-trigger:focus-visible .temis-library-icon-folder,
+  .temis-library-trigger:hover .temis-library-icon-files,
+  .temis-library-trigger:focus-visible .temis-library-icon-files,
+  .temis-library-trigger:hover .temis-library-icon-top,
+  .temis-library-trigger:focus-visible .temis-library-icon-top,
+  .temis-library-trigger:hover .temis-library-icon-file-line,
+  .temis-library-trigger:focus-visible .temis-library-icon-file-line,
+  .temis-calendar-trigger:hover .temis-calendar-icon-body,
+  .temis-calendar-trigger:focus-visible .temis-calendar-icon-body,
+  .temis-calendar-trigger:hover .temis-calendar-icon-day,
+  .temis-calendar-trigger:focus-visible .temis-calendar-icon-day,
+  .temis-cases-trigger:hover .temis-cases-icon-briefcase,
+  .temis-cases-trigger:focus-visible .temis-cases-icon-briefcase,
+  .temis-cases-trigger:hover .temis-cases-icon-sweep,
+  .temis-cases-trigger:focus-visible .temis-cases-icon-sweep,
+  .temis-cases-trigger:hover .temis-cases-icon-latch,
+  .temis-cases-trigger:focus-visible .temis-cases-icon-latch,
+  .temis-clients-trigger:hover .temis-clients-icon-people,
+  .temis-clients-trigger:focus-visible .temis-clients-icon-people,
+  .temis-clients-trigger:hover .temis-clients-icon-partner,
+  .temis-clients-trigger:focus-visible .temis-clients-icon-partner,
+  .temis-tasks-trigger:hover .temis-tasks-icon-sheet,
+  .temis-tasks-trigger:focus-visible .temis-tasks-icon-sheet,
+  .temis-tasks-trigger:hover .temis-tasks-icon-check,
+  .temis-tasks-trigger:focus-visible .temis-tasks-icon-check,
+  .temis-account-connectors-trigger:hover .temis-account-connectors-icon,
+  .temis-account-connectors-trigger:focus-visible .temis-account-connectors-icon,
+  .temis-account-connectors-trigger:hover .temis-account-connectors-icon-axon-1,
+  .temis-account-connectors-trigger:focus-visible .temis-account-connectors-icon-axon-1,
+  .temis-account-connectors-trigger:hover .temis-account-connectors-icon-axon-2,
+  .temis-account-connectors-trigger:focus-visible .temis-account-connectors-icon-axon-2,
+  .temis-account-connectors-trigger:hover .temis-account-connectors-icon-axon-3,
+  .temis-account-connectors-trigger:focus-visible .temis-account-connectors-icon-axon-3,
+  .temis-account-connectors-trigger:hover .temis-account-connectors-icon-axon-4,
+  .temis-account-connectors-trigger:focus-visible .temis-account-connectors-icon-axon-4,
+  .temis-account-connectors-trigger:hover .temis-account-connectors-icon-nodes,
+  .temis-account-connectors-trigger:focus-visible .temis-account-connectors-icon-nodes,
+  .temis-account-connectors-trigger:hover .temis-account-connectors-icon-plus,
+  .temis-account-connectors-trigger:focus-visible .temis-account-connectors-icon-plus,
+  .temis-account-connectors-trigger:hover .temis-account-connectors-icon-node-1,
+  .temis-account-connectors-trigger:focus-visible .temis-account-connectors-icon-node-1,
+  .temis-account-connectors-trigger:hover .temis-account-connectors-icon-node-2,
+  .temis-account-connectors-trigger:focus-visible .temis-account-connectors-icon-node-2,
+  .temis-account-connectors-trigger:hover .temis-account-connectors-icon-node-3,
+  .temis-account-connectors-trigger:focus-visible .temis-account-connectors-icon-node-3,
+  .temis-account-connectors-trigger:hover .temis-account-connectors-icon-node-4,
+  .temis-account-connectors-trigger:focus-visible .temis-account-connectors-icon-node-4,
+  .temis-ai-stars-trigger:hover .temis-ai-stars-icon-main,
+  .temis-ai-stars-trigger:focus-visible .temis-ai-stars-icon-main,
+  .temis-ai-stars-trigger:hover .temis-ai-stars-icon-small,
+  .temis-ai-stars-trigger:focus-visible .temis-ai-stars-icon-small,
+  .temis-cashbox-trigger:hover .temis-cashbox-icon,
+  .temis-cashbox-trigger:focus-visible .temis-cashbox-icon,
+  .temis-cashbox-trigger:hover .temis-cashbox-icon-bill,
+  .temis-cashbox-trigger:focus-visible .temis-cashbox-icon-bill,
+  .temis-cashbox-trigger:hover .temis-cashbox-icon-coin,
+  .temis-cashbox-trigger:focus-visible .temis-cashbox-icon-coin,
+  .temis-cashbox-trigger:hover .temis-cashbox-icon-side-dot,
+  .temis-cashbox-trigger:focus-visible .temis-cashbox-icon-side-dot,
+  .temis-staff-trigger:hover .temis-staff-icon-shell,
+  .temis-staff-trigger:focus-visible .temis-staff-icon-shell,
+  .temis-staff-trigger:hover .temis-staff-icon-balance,
+  .temis-staff-trigger:focus-visible .temis-staff-icon-balance,
+  .temis-settings-trigger:hover .temis-settings-icon-shell,
+  .temis-settings-trigger:focus-visible .temis-settings-icon-shell,
+  .temis-settings-trigger:hover .temis-settings-icon-gear,
+  .temis-settings-trigger:focus-visible .temis-settings-icon-gear,
+  .temis-account-back-trigger:hover .temis-account-back-icon,
+  .temis-account-back-trigger:focus-visible .temis-account-back-icon,
+  .temis-account-back-trigger:hover .temis-account-back-icon-line,
+  .temis-account-back-trigger:focus-visible .temis-account-back-icon-line,
+  .temis-account-profile-trigger:hover .temis-account-profile-icon-silhouette,
+  .temis-account-profile-trigger:focus-visible .temis-account-profile-icon-silhouette,
+  .temis-account-profile-trigger:hover .temis-account-profile-icon-shine,
+  .temis-account-profile-trigger:focus-visible .temis-account-profile-icon-shine,
+  .temis-account-security-trigger:hover .temis-account-security-icon-shield,
+  .temis-account-security-trigger:focus-visible .temis-account-security-icon-shield,
+  .temis-account-security-trigger:hover .temis-account-security-icon-check,
+  .temis-account-security-trigger:focus-visible .temis-account-security-icon-check,
+  .temis-account-ai-trigger:hover .temis-account-ai-icon-shell,
+  .temis-account-ai-trigger:focus-visible .temis-account-ai-icon-shell,
+  .temis-account-ai-trigger:hover .temis-account-ai-icon-eye,
+  .temis-account-ai-trigger:focus-visible .temis-account-ai-icon-eye,
+  .temis-account-ai-trigger:hover .temis-account-ai-icon-antenna-dot,
+  .temis-account-ai-trigger:focus-visible .temis-account-ai-icon-antenna-dot,
+  .temis-account-archive-trigger:hover .temis-account-archive-icon-box,
+  .temis-account-archive-trigger:focus-visible .temis-account-archive-icon-box,
+  .temis-account-archive-trigger:hover .temis-account-archive-icon-lid,
+  .temis-account-archive-trigger:focus-visible .temis-account-archive-icon-lid,
+  .temis-account-archive-trigger:hover .temis-account-archive-icon-label,
+  .temis-account-archive-trigger:focus-visible .temis-account-archive-icon-label,
+  .temis-account-organization-trigger:hover .temis-account-organization-icon-shell,
+  .temis-account-organization-trigger:focus-visible .temis-account-organization-icon-shell,
+  .temis-account-organization-trigger:hover .temis-account-organization-icon-windows,
+  .temis-account-organization-trigger:focus-visible .temis-account-organization-icon-windows,
+  .temis-account-organization-trigger:hover .temis-account-organization-icon-door,
+  .temis-account-organization-trigger:focus-visible .temis-account-organization-icon-door,
+  .temis-account-plan-trigger:hover .temis-account-plan-icon-card,
+  .temis-account-plan-trigger:focus-visible .temis-account-plan-icon-card,
+  .temis-account-plan-trigger:hover .temis-account-plan-icon-line,
+  .temis-account-plan-trigger:focus-visible .temis-account-plan-icon-line,
+  .temis-account-plan-trigger:hover .temis-account-plan-icon-chip,
+  .temis-account-plan-trigger:focus-visible .temis-account-plan-icon-chip,
+  .temis-account-preferences-trigger:hover .temis-account-preferences-icon-bell,
+  .temis-account-preferences-trigger:focus-visible .temis-account-preferences-icon-bell,
+  .temis-account-preferences-trigger:hover .temis-account-preferences-icon-wave,
+  .temis-account-preferences-trigger:focus-visible .temis-account-preferences-icon-wave {
     animation: none;
   }
 }

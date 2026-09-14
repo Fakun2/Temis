@@ -1,5 +1,5 @@
 export const loginCopy = {
-  firstLoginTitle: "Bienvenido a bordo a Justinia!",
+  firstLoginTitle: "Bienvenido a bordo a Temis!",
   returningTitle: "Bienvenido de nuevo!",
   subtitle: "Inicia sesion para continuar con tu estudio.",
   submit: "Ingresar",

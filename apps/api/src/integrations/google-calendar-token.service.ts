@@ -1,5 +1,5 @@
 import { Injectable } from "@nestjs/common";
-import { GoogleCalendarTokenCipher } from "@bogaap/integration-contracts";
+import { GoogleCalendarTokenCipher } from "@temis/integration-contracts";
 
 @Injectable()
 export class GoogleCalendarTokenService {

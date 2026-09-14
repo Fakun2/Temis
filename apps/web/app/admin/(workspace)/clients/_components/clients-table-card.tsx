@@ -1,7 +1,7 @@
 "use client";
 
 import { UsersRound } from "lucide-react";
-import type { ClientsListResponseDto } from "@bogaap/api-client";
+import type { ClientsListResponseDto } from "@temis/api-client";
 import { Card, CardContent } from "@/components/ui/card";
 import { AdminTableHeader } from "../../_components/admin-table-header";
 import { Can } from "../../_components/auth";

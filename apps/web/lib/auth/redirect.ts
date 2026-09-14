@@ -1,7 +1,7 @@
-import type { BogaapSession } from "./session";
+import type { TemisSession } from "./session";
 import { hasTenantAccess } from "./session";
 
-export function getAuthenticatedRedirectPath(session: BogaapSession, nextPath: string | null) {
+export function getAuthenticatedRedirectPath(session: TemisSession, nextPath: string | null) {
   if (!hasTenantAccess(session)) {
     return "/onboarding";
   }

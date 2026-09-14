@@ -39,7 +39,7 @@ describe("CaseDocumentsUseCase", () => {
       prisma.createdDocuments[0].objectKey,
       /^tenants\/1111.*\/cases\/aaaa.*\/documents\//
     );
-    assert.equal(prisma.createdDocuments[0].bucket, "bogaap-test");
+    assert.equal(prisma.createdDocuments[0].bucket, "temis-test");
     assert.equal(prisma.createdDocuments[0].storageProvider, "minio");
   });
 
@@ -482,7 +482,7 @@ function makePrisma({
 function makeCleanupJob(input: Partial<CleanupJobRecord> = {}): CleanupJobRecord {
   return {
     attempts: 0,
-    bucket: "bogaap-test",
+    bucket: "temis-test",
     completedAt: null,
     createdAt: new Date("2026-08-18T12:00:00.000Z"),
     documentId: undefined,
@@ -515,7 +515,7 @@ function makeStorage({ failDelete = false }: { failDelete?: boolean } = {}) {
       }
       return undefined;
     },
-    getBucket: () => "bogaap-test",
+    getBucket: () => "temis-test",
     getObject: async () => ({
       body: Buffer.from("document"),
       contentLength: 8,

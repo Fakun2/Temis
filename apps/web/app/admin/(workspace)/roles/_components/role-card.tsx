@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { Loader2, Pencil, Power, ShieldCheck, Trash2 } from "lucide-react";
-import type { PermissionDto, RoleDto } from "@bogaap/api-client";
+import type { PermissionDto, RoleDto } from "@temis/api-client";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useDeleteRoleMutation } from "../_hooks/use-delete-role-mutation";

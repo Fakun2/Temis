@@ -8,8 +8,8 @@ los modelos MVP esten completos.
 - `packages/database/prisma/schema.prisma`: schema implementado y migrable hoy.
 - `packages/database/prisma/migrations/20260611125720_onboarding_foundation/migration.sql`:
   migracion inicial existente.
-- `docs/diagrams/bogaap-er.puml`: modelo objetivo amplio del dominio.
-- `docs/diagrams/bogaap-er-notes.md`: reglas de diseno del ERD.
+- `docs/diagrams/temis-er.puml`: modelo objetivo amplio del dominio.
+- `docs/diagrams/temis-er-notes.md`: reglas de diseno del ERD.
 - `TODO.md`: inventario historico.
 - Backend actual en `apps/api/src`.
 - Frontend actual en `apps/web/app/onboarding`.
@@ -244,12 +244,12 @@ Post-MVP:
 - Facturacion SaaS.
 - IA.
 
-## Decisiones de naming pendientes
+## Identidad del producto
 
-- Producto publico: BogApp.
-- Paquetes internos actuales: `@bogaap/*`.
-- ERD actual: `bogaap-er`.
-- La alineacion de marca debe hacerse en una tarea dedicada.
+- Producto publico: Temis.
+- Paquetes internos actuales: `@temis/*`.
+- ERD actual: `temis-er`.
+- Dominio oficial: `https://temis.ar`. Los nombres fisicos de recursos existentes se conservan por compatibilidad.
 
 ## Plan de migraciones
 

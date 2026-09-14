@@ -6,10 +6,10 @@ import {
   getRbacControllerUpdateRoleUrl,
   type PermissionDto,
   type RoleDto
-} from "@bogaap/api-client";
+} from "@temis/api-client";
 import { dashboardHttpClient } from "@/lib/http";
 import type { CreateRoleFormValues, UpdateRoleFormValues } from "@/lib/validation/roles";
-import type { BogaapSession } from "@/lib/auth/session";
+import type { TemisSession } from "@/lib/auth/session";
 
 export type RolesAccessResponse = {
   permissions: PermissionDto[];
@@ -38,7 +38,7 @@ export async function createRole({
   input
 }: {
   input: CreateRoleFormValues;
-  session: BogaapSession;
+  session: TemisSession;
   tenantId: string;
 }) {
   return dashboardHttpClient.request<RoleDto>({
@@ -54,7 +54,7 @@ export async function updateRole({
 }: {
   input: UpdateRoleFormValues;
   roleId: string;
-  session: BogaapSession;
+  session: TemisSession;
   tenantId: string;
 }) {
   return dashboardHttpClient.request<RoleDto>({
@@ -68,7 +68,7 @@ export async function deleteRole({
   roleId
 }: {
   roleId: string;
-  session: BogaapSession;
+  session: TemisSession;
   tenantId: string;
 }) {
   return dashboardHttpClient.request<{ deleted: boolean }>({

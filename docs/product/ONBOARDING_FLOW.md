@@ -42,13 +42,13 @@ Campos:
 - Domicilio, opcional.
 - Sitio web, opcional.
 - Areas principales, separadas por coma.
-- Como conocio BogApp, opcional.
+- Como conocio Temis, opcional.
 
 Reglas:
 
 - Si CUIT/CUIL se completa, validar formato argentino basico.
 - El resumen lateral actualiza estudio, provincia y areas.
-- Mantener copy publico con marca BogApp.
+- Mantener copy publico con marca Temis.
 
 ## Paso 3 - Configuracion / Workspace
 

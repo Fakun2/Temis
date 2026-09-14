@@ -1,7 +1,7 @@
 import type { LucideIcon } from "lucide-react";
 import type { ReactNode } from "react";
 import type { PermissionMode } from "@/lib/auth/permissions";
-import type { BogaapSession } from "@/lib/auth/session";
+import type { TemisSession } from "@/lib/auth/session";
 
 export type AdminSidebarVariant = "desktop" | "mobile";
 
@@ -51,7 +51,7 @@ export type AdminHeaderProps = {
   onOpenMobileSidebar: () => void;
   onToggleSidebar: () => void;
   scrolled: boolean;
-  session: BogaapSession | null;
+  session: TemisSession | null;
   sidebarOpen: boolean;
 };
 

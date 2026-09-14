@@ -1,6 +1,6 @@
 import { cookies } from "next/headers";
 import type { NextResponse as NextResponseType } from "next/server";
-import type { LoginResponseDto } from "@bogaap/api-client";
+import type { LoginResponseDto } from "@temis/api-client";
 import { toApiUrl } from "@/lib/api/origin";
 import { clearAuthSessionCookies, setAuthSessionCookie } from "@/lib/auth/cookie-options";
 import {
@@ -9,7 +9,7 @@ import {
   sessionCookieName
 } from "@/lib/auth/cookies";
 import { decodeJwtPayload } from "@/lib/auth/jwt";
-import type { BogaapSession } from "@/lib/auth/session";
+import type { TemisSession } from "@/lib/auth/session";
 import type { TokenPair } from "@/lib/auth/token-types";
 import {
   createAuthSession,
@@ -63,7 +63,7 @@ export async function clearAuthCookiesOnResponse(response: NextResponseType) {
   clearAuthSessionCookies(response);
 }
 
-export function toClientSession(response: LoginResponseDto): BogaapSession {
+export function toClientSession(response: LoginResponseDto): TemisSession {
   return {
     tenantAccess: decodeJwtPayload(response.tokens.accessToken).tenantAccess,
     user: response.user

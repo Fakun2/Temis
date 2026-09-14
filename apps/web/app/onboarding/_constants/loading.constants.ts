@@ -1,7 +1,7 @@
 export const onboardingLoadingCopy = {
   animatedWord: "espere",
   footerItems: ["Creando tenant...", "Asignando owner...", "Preparando workspace..."],
-  subtitle: "Estamos configurando tu estudio juridico en Justinia.",
+  subtitle: "Estamos configurando tu estudio juridico en Temis.",
   successTitle: "Estudio creado!",
   titlePrefix: "Creando estudio, "
 } as const;

@@ -1,2 +1,2 @@
-export const aiServiceName = "Justinia AI Service";
+export const aiServiceName = "Temis AI Service";
 

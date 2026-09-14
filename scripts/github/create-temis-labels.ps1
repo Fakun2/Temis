@@ -1,5 +1,5 @@
 param(
-  [string]$Repo = "Fakun2/BogApp"
+  [string]$Repo = "Fakun2/Temis"
 )
 
 $ErrorActionPreference = "Stop"

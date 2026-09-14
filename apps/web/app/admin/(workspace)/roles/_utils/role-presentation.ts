@@ -1,4 +1,4 @@
-import type { PermissionDto } from "@bogaap/api-client";
+import type { PermissionDto } from "@temis/api-client";
 
 const resourceLabels: Record<string, string> = {
   admin: "Administracion",

@@ -1,6 +1,6 @@
 "use client";
 
-import type { PermissionDto } from "@bogaap/api-client";
+import type { PermissionDto } from "@temis/api-client";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 

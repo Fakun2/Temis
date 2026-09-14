@@ -1,4 +1,4 @@
-export async function bogaapFetch<T>(url: string, options?: RequestInit): Promise<T> {
+export async function temisFetch<T>(url: string, options?: RequestInit): Promise<T> {
   const response = await fetch(toProxyApiPath(url), {
     ...options,
     headers: {
@@ -28,7 +28,7 @@ function toProxyApiPath(url: string) {
 function getErrorMessage(data: unknown, status: number) {
   if (isErrorBody(data)) {
     if (Array.isArray(data.message)) {
-      return data.message[0] ?? `BOGAP API request failed: ${status}`;
+      return data.message[0] ?? `TEMIS API request failed: ${status}`;
     }
 
     if (typeof data.message === "string" && data.message.trim()) {
@@ -36,7 +36,7 @@ function getErrorMessage(data: unknown, status: number) {
     }
   }
 
-  return `BOGAP API request failed: ${status}`;
+  return `TEMIS API request failed: ${status}`;
 }
 
 function isErrorBody(value: unknown): value is { message?: string | string[] } {

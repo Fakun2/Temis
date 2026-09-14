@@ -1,4 +1,4 @@
-# BogApp AI Service
+# Temis AI Service
 
 Servicio aislado para funcionalidades de IA. No reemplaza al monolito: recibe solicitudes internas ya autenticadas y autorizadas por `apps/api`, construye contexto con permisos limitados y ejecuta casos de uso de IA.
 

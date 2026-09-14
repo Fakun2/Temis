@@ -1,7 +1,7 @@
 ---
-name: bogapp-project-manager
+name: temis-project-manager
 description: >-
-  Manage BogApp as a professional legaltech product using the repo roadmap,
+  Manage Temis as a professional legaltech product using the repo roadmap,
   GitHub Project fields, BOG-### issue flow, dependencies, phases, sprint
   planning, PR-by-issue execution, acceptance criteria, and two-developer
   coordination. Use when planning work, prioritizing backlog, sequencing
@@ -9,9 +9,9 @@ description: >-
   deciding what should be built next without changing application code.
 ---
 
-# BogApp Project Manager
+# Temis Project Manager
 
-Use this skill to manage BogApp delivery as a SaaS-oriented legaltech product.
+Use this skill to manage Temis delivery as a SaaS-oriented legaltech product.
 
 ## Sources of truth
 

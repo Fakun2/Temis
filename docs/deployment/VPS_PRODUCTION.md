@@ -1,4 +1,4 @@
-# BogApp VPS Production Deploy
+# Temis VPS Production Deploy
 
 This guide prepares a single-VPS production deployment with Docker Compose, Nginx,
 PostgreSQL, Redis and MinIO.
@@ -13,20 +13,21 @@ PostgreSQL, Redis and MinIO.
 ## 2. Clone And Configure
 
 ```bash
-git clone <YOUR_REPOSITORY_URL> BogApp
-cd BogApp
+git clone <YOUR_REPOSITORY_URL> Temis
+cd Temis
 cp .env.production.example .env.production
 ```
 
 Edit `.env.production` and replace every `CHANGE_ME` value.
 
-Also replace the mock domain in `infra/nginx/nginx.prod.conf`:
+The production domain in `infra/nginx/nginx.prod.conf` is:
 
 ```text
-app.bogaap.example
+temis.ar
 ```
 
-Use the real subdomain in every `server_name` and certificate path.
+Use this domain consistently in every `server_name`, certificate path and public URL.
+For an existing installation, follow [the rebrand notes](TEMIS_REBRAND.md) first.
 
 Production values that must be reviewed before the first real login:
 
@@ -38,7 +39,7 @@ Production values that must be reviewed before the first real login:
 - For Google login, set `GOOGLE_AUTH_ENABLED=true` and use the same OAuth client
   id in `GOOGLE_AUTH_CLIENT_ID` and `NEXT_PUBLIC_GOOGLE_CLIENT_ID`. The Google
   OAuth client must allow the final frontend origin, for example
-  `https://app.bogaap.example`.
+  `https://temis.ar`.
 - For Google Calendar, set `GOOGLE_CALENDAR_ENABLED=true`, configure a separate
   Google OAuth Web client, and register `GOOGLE_CALENDAR_REDIRECT_URI` ending in
   `/api/integrations/google-calendar/callback`. Keep
@@ -63,13 +64,13 @@ docker compose \
   --profile certbot \
   run --rm --service-ports certbot \
   certonly --standalone \
-  -d app.bogaap.example \
-  --email admin@app.bogaap.example \
+  -d temis.ar \
+  --email admin@temis.ar \
   --agree-tos \
   --no-eff-email
 ```
 
-Replace `app.bogaap.example` and the email before running.
+Replace the email with a monitored address before running. The certificate must cover `temis.ar`.
 
 ## 4. Build And Start
 
@@ -140,7 +141,7 @@ PostgreSQL dump example:
 
 ```bash
 docker compose -f docker-compose.prod.yml --env-file .env.production exec postgres \
-  sh -c 'pg_dump -U "$POSTGRES_USER" "$POSTGRES_DB"' > bogaap-$(date +%F).sql
+  sh -c 'pg_dump -U "$POSTGRES_USER" "$POSTGRES_DB"' > temis-$(date +%F).sql
 ```
 
 Always test restore before trusting backups.

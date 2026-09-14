@@ -60,7 +60,7 @@ export const pricing = [
 
 export const faqs = [
   {
-    q: "¿Justinia esta pensado para un estudio juridico chico?",
+    q: "¿Temis esta pensado para un estudio juridico chico?",
     a: "Si. El flujo inicial prioriza clientes, expedientes, tareas, audiencias, gastos y responsables, sin exigir una configuracion pesada."
   },
   {
@@ -80,7 +80,7 @@ export const faqs = [
 export const testimonials = [
   {
     quote:
-      "Justinia nos dio una forma clara de ver expedientes, audiencias y gastos sin perseguir planillas.",
+      "Temis nos dio una forma clara de ver expedientes, audiencias y gastos sin perseguir planillas.",
     name: "Estudio Moreira",
     title: "Piloto juridico",
     initials: "EM",

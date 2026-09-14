@@ -57,7 +57,7 @@ export function ExpedientesSection({ account }: { account: AccountResponse }) {
         </div>
 
         <p className="text-xs leading-5 text-muted-foreground">
-          Las credenciales se piden en cada busqueda y no se guardan en BogApp. Los conectores en
+          Las credenciales se piden en cada busqueda y no se guardan en Temis. Los conectores en
           gris estan preparados como mapa de integraciones futuras.
         </p>
 

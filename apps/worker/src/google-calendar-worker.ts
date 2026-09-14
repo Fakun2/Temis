@@ -1,6 +1,6 @@
 import { PrismaClient } from "@prisma/client";
 import { randomUUID } from "node:crypto";
-import { GoogleCalendarTokenCipher, type GoogleCalendarResourceType, type GoogleCalendarSyncMessage } from "@bogaap/integration-contracts";
+import { GoogleCalendarTokenCipher, type GoogleCalendarResourceType, type GoogleCalendarSyncMessage } from "@temis/integration-contracts";
 import { createLogger } from "./logger";
 import { GoogleCalendarAuthorizationError, GoogleCalendarClient, GoogleCalendarProviderError, type GoogleCalendarEventInput } from "./google-calendar-client";
 

@@ -1,11 +1,11 @@
-import type { AuthUserDto, TokenPairDto } from "@bogaap/api-client";
+import type { AuthUserDto, TokenPairDto } from "@temis/api-client";
 import { decodeJwtPayload } from "./jwt";
 
 const sessionStorageKey = "bogaap.session";
 const sessionListeners = new Set<() => void>();
-let currentSession: BogaapSession | null = null;
+let currentSession: TemisSession | null = null;
 
-export type BogaapSession = {
+export type TemisSession = {
   tenantAccess?: SessionTenantAccess[];
   tokens?: Partial<TokenPairDto>;
   user: AuthUserDto;
@@ -32,7 +32,7 @@ export type SessionUserPatch = {
   status?: string;
 };
 
-export function saveSession(session: BogaapSession) {
+export function saveSession(session: TemisSession) {
   const tenantAccess =
     session.tenantAccess ??
     (session.tokens?.accessToken ? decodeJwtPayload(session.tokens.accessToken).tenantAccess : []);
@@ -55,12 +55,12 @@ export function updateSessionUser(user: SessionUserPatch) {
     user: {
       ...currentSession.user,
       ...user
-    } as BogaapSession["user"]
+    } as TemisSession["user"]
   };
   notifySessionListeners();
 }
 
-export function readSession(): BogaapSession | null {
+export function readSession(): TemisSession | null {
   removeStoredSession();
   return currentSession;
 }
@@ -94,11 +94,11 @@ export function readAccessTokenPayload(accessToken: string): SessionJwtPayload {
   return decodeJwtPayload(accessToken);
 }
 
-export function hasTenantAccess(session: BogaapSession) {
+export function hasTenantAccess(session: TemisSession) {
   return getSessionTenantAccess(session).length > 0;
 }
 
-export function getSessionTenantAccess(session: BogaapSession | null) {
+export function getSessionTenantAccess(session: TemisSession | null) {
   if (!session) {
     return [];
   }
@@ -112,6 +112,6 @@ export function getSessionTenantAccess(session: BogaapSession | null) {
     : [];
 }
 
-export function sessionHasPermission(session: BogaapSession | null, permission: string) {
+export function sessionHasPermission(session: TemisSession | null, permission: string) {
   return getSessionTenantAccess(session)[0]?.permissions.includes(permission) ?? false;
 }

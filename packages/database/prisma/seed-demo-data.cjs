@@ -100,8 +100,8 @@ async function seedDemoData() {
 
     const tenant = await tx.tenant.create({
       data: {
-        name: "Demo BogApp - Estudio Norte",
-        legalName: "Demo BogApp Estudio Juridico Norte",
+        name: "Demo Temis - Estudio Norte",
+        legalName: "Demo Temis Estudio Juridico Norte",
         taxId: demoTenantTaxId,
         status: "active",
         profile: {
@@ -113,7 +113,7 @@ async function seedDemoData() {
             province: "Tucuman",
             referralSource: "demo-data",
             size: "small",
-            website: "https://demo.bogaap.local"
+            website: "https://demo.temis.local"
           }
         },
         settings: {
@@ -229,7 +229,7 @@ async function seedDemoData() {
 async function clearPreviousDemoData() {
   await prisma.$transaction(async (tx) => {
     const demoTenant = await tx.tenant.findFirst({
-      where: { taxId: demoTenantTaxId, name: { startsWith: "Demo BogApp" } },
+      where: { taxId: demoTenantTaxId, OR: [{ name: { startsWith: "Demo Temis" } }, { name: { startsWith: "Demo BogApp" } }] },
       select: { id: true }
     });
 

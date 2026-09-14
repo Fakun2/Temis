@@ -1,5 +1,5 @@
 {
-  "name": "@bogaap/ai-service",
+  "name": "@temis/ai-service",
   "version": "0.1.0",
   "private": true,
   "type": "commonjs",
@@ -12,7 +12,7 @@
     "start": "node dist/main.js"
   },
   "dependencies": {
-    "@bogaap/ai-contracts": "0.1.0",
-    "@bogaap/ai-core": "0.1.0"
+    "@temis/ai-contracts": "0.1.0",
+    "@temis/ai-core": "0.1.0"
   }
 }

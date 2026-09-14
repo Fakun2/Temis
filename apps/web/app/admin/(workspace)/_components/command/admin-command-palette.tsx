@@ -29,11 +29,11 @@ import { useDashboardSearchQuery } from "../../_hooks/use-dashboard-search-query
 import { getAuthorizedCommandSections } from "../../_utils/authorization";
 import type { AdminCommandItem, AdminCommandSection } from "../../_types/admin";
 import type { DashboardSearchItemDto } from "../../_types/dashboard.types";
-import type { BogaapSession } from "@/lib/auth/session";
+import type { TemisSession } from "@/lib/auth/session";
 
 type AdminCommandPaletteProps = {
   open: boolean;
-  session: BogaapSession | null;
+  session: TemisSession | null;
   onOpenChange: (open: boolean) => void;
 };
 

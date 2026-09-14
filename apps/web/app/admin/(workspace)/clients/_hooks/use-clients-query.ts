@@ -5,7 +5,7 @@ import type {
   ClientsControllerCreateBody,
   ClientsControllerListParams,
   ClientsControllerUpdateBody
-} from "@bogaap/api-client";
+} from "@temis/api-client";
 import { useDashboardMutation } from "@/lib/query/use-dashboard-mutation";
 import { useDashboardQuery } from "@/lib/query/use-dashboard-query";
 import {

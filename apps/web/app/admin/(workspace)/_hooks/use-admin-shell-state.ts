@@ -6,14 +6,14 @@ import {
   readSession,
   saveSession,
   subscribeSession,
-  type BogaapSession
+  type TemisSession
 } from "@/lib/auth/session";
 
 export function useAdminShellState() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [commandOpen, setCommandOpen] = useState(false);
-  const [session, setSession] = useState<BogaapSession | null>(null);
+  const [session, setSession] = useState<TemisSession | null>(null);
   const [sessionReady, setSessionReady] = useState(false);
   const [scrolled, setScrolled] = useState(false);
 
@@ -32,7 +32,7 @@ export function useAdminShellState() {
           return;
         }
 
-        const serverSession = (await response.json()) as BogaapSession;
+        const serverSession = (await response.json()) as TemisSession;
         saveSession(serverSession);
         if (!cancelled) {
           setSession(readSession());

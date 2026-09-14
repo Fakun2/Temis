@@ -4,10 +4,10 @@ Estas decisiones son fuente de verdad funcional para los proximos PRs.
 
 ## Marca
 
-- Nombre publico: BogApp.
-- Evitar usar BOGAP como nombre comercial principal.
-- Identificadores internos heredados (`bogaap`, `@bogaap/*`, `BOGAP`) se
-  alinearan en una tarea dedicada para evitar mezclar branding con logica.
+- Nombre definitivo: Temis (TEMIS en usos de marca en mayusculas).
+- Dominio oficial: https://temis.ar.
+- Paquetes internos: `@temis/*`.
+- Las claves persistentes existentes se conservan por compatibilidad; no son marca publica.
 
 ## Owner y tenant
 

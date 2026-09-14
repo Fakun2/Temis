@@ -1,6 +1,6 @@
 # LAN access
 
-Use LAN mode when you want to open BOGAP from another device on the same local network.
+Use LAN mode when you want to open TEMIS from another device on the same local network.
 
 ## Development
 

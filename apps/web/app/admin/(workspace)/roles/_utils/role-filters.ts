@@ -1,4 +1,4 @@
-import type { RoleDto } from "@bogaap/api-client";
+import type { RoleDto } from "@temis/api-client";
 import type { RoleStatusFilter } from "../_components/roles-filters";
 
 export function filterRoles({

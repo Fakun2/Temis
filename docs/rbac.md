@@ -1,6 +1,6 @@
-# RBAC en BogApp
+# RBAC en Temis
 
-Este documento explica como funciona el sistema RBAC de BogApp en backend y UI, y que pasos seguir para asegurar una nueva feature.
+Este documento explica como funciona el sistema RBAC de Temis en backend y UI, y que pasos seguir para asegurar una nueva feature.
 
 ## Principios
 

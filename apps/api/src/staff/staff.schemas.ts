@@ -102,7 +102,7 @@ export class CreateStaffDto extends createZodDto(createStaffSchema) {
   @ApiProperty({ required: false, minLength: 0, maxLength: 15, example: "5491155555555" })
   phone?: string;
 
-  @ApiProperty({ required: false, example: "https://cdn.bogaap.local/avatar.png" })
+  @ApiProperty({ required: false, example: "https://cdn.temis.local/avatar.png" })
   avatarUrl?: string;
 }
 
@@ -134,7 +134,7 @@ export class UpdateStaffDto extends createZodDto(updateStaffSchema) {
   @ApiProperty({ required: false, minLength: 0, maxLength: 15, example: "5491155555555" })
   phone?: string;
 
-  @ApiProperty({ required: false, example: "https://cdn.bogaap.local/avatar.png" })
+  @ApiProperty({ required: false, example: "https://cdn.temis.local/avatar.png" })
   avatarUrl?: string;
 }
 

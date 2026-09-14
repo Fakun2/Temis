@@ -3,7 +3,7 @@
 import { useState } from "react";
 import type { ReactNode } from "react";
 import { Plus, ShieldPlus } from "lucide-react";
-import type { PermissionDto, RoleDto } from "@bogaap/api-client";
+import type { PermissionDto, RoleDto } from "@temis/api-client";
 import { Button } from "@/components/ui/button";
 import {
   Sheet,

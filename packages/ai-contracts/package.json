@@ -1,5 +1,5 @@
 {
-  "name": "@bogaap/ai-contracts",
+  "name": "@temis/ai-contracts",
   "version": "0.1.0",
   "private": true,
   "type": "commonjs",

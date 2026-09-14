@@ -1,6 +1,6 @@
 import { getServerAuthSession, toApiUrl } from "@/lib/api/server";
 import { getActiveTenantAccess } from "@/lib/auth/permissions";
-import type { BogaapSession } from "@/lib/auth/session";
+import type { TemisSession } from "@/lib/auth/session";
 import type {
   CaseDetailDto,
   CaseExpensesListResponse,
@@ -10,7 +10,7 @@ import type {
   CasesQueryParams
 } from "../_types/cases.types";
 
-export async function getCasesServerSession(): Promise<BogaapSession | null> {
+export async function getCasesServerSession(): Promise<TemisSession | null> {
   const session = await getServerAuthSession();
 
   return session

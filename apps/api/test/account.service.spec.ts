@@ -22,7 +22,7 @@ describe("AccountService", () => {
     const service = new AccountService(prisma);
 
     const account = await service.updateProfile(tenantId, makeUser(), {
-      avatarUrl: "https://cdn.bogaap.local/avatar.png",
+      avatarUrl: "https://cdn.temis.local/avatar.png",
       firstName: "Mateo",
       lastName: "Alvarez",
       phone: "5491155555555"

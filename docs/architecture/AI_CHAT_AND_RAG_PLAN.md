@@ -1,4 +1,4 @@
-# BogApp AI Chat And RAG Plan
+# Temis AI Chat And RAG Plan
 
 Este documento define lo que necesitamos estudiar, decidir y preparar antes de implementar IA conversacional, RAG legal, base vectorial, RBAC especifico de IA, guardrails y estrategia de chunking normativo.
 

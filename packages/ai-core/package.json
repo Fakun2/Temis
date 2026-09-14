@@ -1,5 +1,5 @@
 {
-  "name": "@bogaap/ai-core",
+  "name": "@temis/ai-core",
   "version": "0.1.0",
   "private": true,
   "type": "commonjs",
@@ -11,7 +11,7 @@
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "dependencies": {
-    "@bogaap/ai-contracts": "0.1.0",
+    "@temis/ai-contracts": "0.1.0",
     "@ai-sdk/openai-compatible": "^3.0.23",
     "ai": "^7.0.52",
     "zod": "^3.25.76"
