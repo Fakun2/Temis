@@ -23,9 +23,11 @@ export type AdminNavItem = {
     | "calendar"
     | "cashbox"
     | "cases"
+    | "clients"
     | "library"
     | "settings"
-    | "staff";
+    | "staff"
+    | "tasks";
   label: string;
   permissionMode?: PermissionMode;
   requiredPermissions?: string[];
