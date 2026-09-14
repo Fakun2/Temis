@@ -285,8 +285,8 @@ export const AnimatedAccountBackIcon = forwardRef<SVGSVGElement, LucideProps>(
       strokeWidth={strokeWidth}
       {...props}
     >
-      <path className="temis-account-back-icon-head" d="m12 19-7-7 7-7" />
-      <path className="temis-account-back-icon-line" d="M19 12H5" pathLength={1} />
+      <path d="m12 19-7-7 7-7" />
+      <path d="M19 12H5" />
     </svg>
   )
 );
