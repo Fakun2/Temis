@@ -44,6 +44,7 @@ los modelos MVP esten completos.
 - `DocumentImportJob` -> `document_import_jobs`
 - `DocumentImportItem` -> `document_import_items`
 - `CaseTask` -> `case_tasks`
+- `TaskBoardView` -> `task_board_views`
 - `CaseExpense` -> `case_expenses`
 - `CaseExpenseAttachment` -> `case_expense_attachments`
 - `CaseExpenseCashboxSyncJob` -> `case_expense_cashbox_sync_jobs`
@@ -63,6 +64,20 @@ los modelos MVP esten completos.
 - `AiLegalDocumentVersion` -> `ai_legal_document_versions`
 - `AiLegalNormUnit` -> `ai_legal_norm_units`
 - `AiLegalNormChunk` -> `ai_legal_norm_chunks`
+- `GoogleCalendarConnection` -> `google_calendar_connections`
+- `GoogleCalendarEventLink` -> `google_calendar_event_links`
+
+Las conexiones de Google Calendar son tenant-scoped y pertenecen a una
+membership. Sus credenciales se almacenan solamente cifradas; los links
+relacionan tareas y audiencias con eventos externos. Los estados
+`provisioning`, `sync_requested`, `syncing` y `disconnecting` representan
+operaciones delegadas al worker. La API crea `sync_requested`; sólo el worker
+puede reclamar el lease y pasar a `syncing`. Un recovery del worker marca como
+`error` las sincronizaciones no confirmadas, evitando estados transitorios
+permanentes. El recovery también convierte provisioning heredado y sin
+confirmación en `error`. Provisioning usa el mismo lease; por eso una reconexión que
+conserva un `calendar_id` existente puede terminar en `connected` o `error`,
+pero no queda esperando indefinidamente.
 
 ## Entidades objetivo del ERD aun no implementadas
 
@@ -94,6 +109,10 @@ Post-MVP o despues del core legal:
   mantiene como entidad futura separada.
 - `case_tasks` representa tareas operativas tenant-scoped asociadas a un
   expediente; no almacena costos contables.
+- `task_board_views` representa vistas kanban guardadas del modulo global de
+  tareas. Guarda nombre, filtros y ajustes visuales/orden en JSON tenant-scoped;
+  no cambia los estados reales de `case_tasks` ni implementa categorias custom
+  en esta fase.
 - `case_expenses` representa gastos tenant-scoped del expediente. Puede
   asociarse opcionalmente a una tarea mediante `task_id`; guarda `currency_code`
   como moneda activa del estudio y las metricas de gastos del expediente se
@@ -103,11 +122,14 @@ Post-MVP o despues del core legal:
   acceso al archivo se resuelve desde API, no exponiendo bucket/key al frontend.
 - `document_categories` representa categorias configurables tenant-scoped para
   ordenar documentos. En v1 la categoria es opcional.
-- `document_folders` representa carpetas jerarquicas tenant-scoped de la
-  biblioteca del estudio. Los nombres son unicos por tenant y carpeta padre,
+- `document_folders` representa carpetas jerarquicas tenant-scoped. Su `scope`
+  separa las carpetas de Biblioteca de los restos tecnicos historicos de
+  expediente; las nuevas carpetas de usuario son siempre `library`. Los nombres son unicos por tenant y carpeta padre,
   comparados case-insensitive desde indice funcional de PostgreSQL.
-- `documents` representa archivos privados de la biblioteca del estudio. Guarda
-  metadata tenant-scoped, carpeta opcional, expediente opcional, categoria
+- `documents` representa archivos privados tenant-scoped. Su `scope` separa
+  archivos generales de Biblioteca (`library`) y archivos de expediente (`case`);
+  los primeros no aceptan expediente y los segundos se consultan solo desde su
+  expediente. Guarda metadata, carpeta opcional, expediente opcional, categoria
   opcional y referencia privada S3-compatible; upload, preview y download se
   resuelven por API proxy sin exponer bucket/key al frontend. `status =
 deleting` oculta documentos cuyo borrado definitivo esta esperando cleanup de

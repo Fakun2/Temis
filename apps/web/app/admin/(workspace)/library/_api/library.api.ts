@@ -65,7 +65,6 @@ export async function updateDocument({
 }: {
   documentId: string;
   input: {
-    caseId?: string | null;
     categoryId?: string | null;
     folderId?: string | null;
     notes?: string;
@@ -109,13 +108,11 @@ export async function bulkMove(input: {
 }
 
 export async function uploadDocument({
-  caseId,
   categoryId,
   file,
   folderId,
   notes
 }: {
-  caseId?: string;
   categoryId?: string;
   file: File;
   folderId?: string | null;
@@ -125,9 +122,6 @@ export async function uploadDocument({
   body.set("file", file);
   if (folderId) {
     body.set("folderId", folderId);
-  }
-  if (caseId) {
-    body.set("caseId", caseId);
   }
   if (categoryId) {
     body.set("categoryId", categoryId);
@@ -141,6 +135,15 @@ export async function uploadDocument({
     throw new Error(await getUploadErrorMessage(response));
   }
 
+  return response.json() as Promise<LibraryDocumentDto>;
+}
+
+export async function replaceDocument({ documentId, file, title }: { documentId: string; file: File; title?: string }) {
+  const body = new FormData();
+  body.set("file", file);
+  if (title?.trim()) body.set("title", title.trim());
+  const response = await fetch(`/api/documents/${documentId}/replace`, { body, method: "POST" });
+  if (!response.ok) throw new Error(await getUploadErrorMessage(response));
   return response.json() as Promise<LibraryDocumentDto>;
 }
 

@@ -122,13 +122,22 @@ describe("ClientsService create", () => {
 
 describe("ClientsService list", () => {
   it("returns a normal list with ISO dates inside tenant context", async () => {
-    const context = createPrismaMock({ listRows: [makeListRow()] });
+    const context = createPrismaMock({
+      listRows: [makeListRow()],
+      metricsRow: { active: 3, inactive: 1, total: 4, withBalance: 2 }
+    });
     const service = new ClientsService(context.prisma as never);
     const result = await service.list(tenantA, listClientsQuerySchema.parse({}));
 
     assert.equal(result.items.length, 1);
     assert.equal(result.items[0]?.displayName, "Ana Perez");
     assert.equal(result.items[0]?.createdAt, "2026-08-28T12:00:00.000Z");
+    assert.deepEqual(result.metrics, {
+      active: 3,
+      inactive: 1,
+      total: 4,
+      withBalance: 2
+    });
     assert.deepEqual(context.runWithTenantCalls, [tenantA]);
   });
 
@@ -444,22 +453,57 @@ describe("ClientsService archive", () => {
   });
 });
 
+describe("ClientsService delete", () => {
+  it("permanently deletes a tenant-scoped client", async () => {
+    const context = createPrismaMock({
+      clients: [makeClient({ id: clientAId, tenantId: tenantA })]
+    });
+    const service = new ClientsService(context.prisma as never);
+
+    const result = await service.delete(tenantA, clientAId);
+
+    assert.deepEqual(result, {
+      clientId: clientAId,
+      clientStatus: "deleted",
+      status: "ok"
+    });
+    assert.equal(context.clients.length, 0);
+    assert.deepEqual(context.deleteWheres[0], { id: clientAId, tenantId: tenantA });
+  });
+
+  it("returns not found when deleting outside the active tenant", async () => {
+    const context = createPrismaMock({
+      clients: [makeClient({ id: clientAId, tenantId: tenantB })]
+    });
+    const service = new ClientsService(context.prisma as never);
+
+    await assert.rejects(() => service.delete(tenantA, clientAId), NotFoundException);
+    assert.equal(context.clients.length, 1);
+  });
+});
+
 function createPrismaMock({
   clients = [],
-  listRows = []
+  listRows = [],
+  metricsRow = { active: 0, inactive: 0, total: 0, withBalance: 0 }
 }: {
   clients?: MockClient[];
   listRows?: MockListRow[];
+  metricsRow?: MockMetricsRow;
 } = {}) {
   const state = clients.map((client) => structuredClone(client));
   const listQueries: Prisma.Sql[] = [];
   const runWithTenantCalls: string[] = [];
+  const deleteWheres: unknown[] = [];
   const updateWheres: unknown[] = [];
   let createdSequence = 1;
 
   const tx = {
     $queryRaw: async (query: Prisma.Sql) => {
       listQueries.push(query);
+      if (getSqlText(query).includes('AS "withBalance"')) {
+        return [metricsRow];
+      }
       return listRows;
     },
     client: {
@@ -468,6 +512,20 @@ function createPrismaMock({
         createdSequence += 1;
         state.push(makeClient({ ...data, id } as Partial<MockClient>));
         return { id };
+      },
+      deleteMany: async ({ where }: { where: MockClientWhere }) => {
+        deleteWheres.push(where);
+        let count = 0;
+
+        for (let index = state.length - 1; index >= 0; index -= 1) {
+          const client = state[index];
+          if (client && matchesClientWhere(client, where)) {
+            state.splice(index, 1);
+            count += 1;
+          }
+        }
+
+        return { count };
       },
       findFirst: async ({ where }: { where: MockClientWhere }) =>
         state.find((client) => matchesClientWhere(client, where)) ?? null,
@@ -493,6 +551,7 @@ function createPrismaMock({
 
   return {
     clients: state,
+    deleteWheres,
     listQueries,
     prisma: {
       runWithTenant: async (
@@ -651,4 +710,11 @@ type MockListRow = {
   status: "active" | "inactive" | "archived";
   type: "human" | "legal_entity";
   updatedAt: Date;
+};
+
+type MockMetricsRow = {
+  active: number;
+  inactive: number;
+  total: number;
+  withBalance: number;
 };

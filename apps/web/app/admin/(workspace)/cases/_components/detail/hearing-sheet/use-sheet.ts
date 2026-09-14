@@ -103,6 +103,7 @@ function mapHearingToDraft(hearing: CaseHearingDto): CaseHearingFormValues {
     notificationRecipientMode: hearing.notificationRecipientMode,
     notificationTime: hearing.notificationTime ?? "",
     notificationsEnabled: hearing.notificationsEnabled,
+    participantMembershipIds: hearing.participantMembershipIds,
     time: hearing.time,
     type: hearing.type
   };

@@ -125,7 +125,6 @@ export function CashboxTableCard({
             <ColumnMenu visibleColumns={visibleColumns} onToggleColumn={toggleColumn} />
           </div>
         }
-        description="Movimientos de caja multimoneda del estudio."
         icon={Banknote}
         title="Caja"
       />

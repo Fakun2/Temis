@@ -19,14 +19,19 @@ export function AdminTableHeader({
   icon?: LucideIcon;
   title: string;
 }) {
+  const hasDescription = Boolean(description);
+
   return (
     <CardHeader
       data-admin-table-header
       className={`flex shrink-0 flex-row items-center justify-between gap-3 border-b border-border/30 px-3 py-3 md:px-4 md:py-3.5 xl:px-5 xl:py-4 ${className}`}
     >
-      <div className="flex min-w-0 items-start gap-3">
+      <div className={cn("flex min-w-0 gap-3", hasDescription ? "items-start" : "items-center")}>
         {Icon ? (
-          <Icon className="mt-0.5 h-5 w-5 shrink-0 text-muted-foreground" aria-hidden="true" />
+          <Icon
+            className={cn("h-5 w-5 shrink-0 text-muted-foreground", hasDescription && "mt-0.5")}
+            aria-hidden="true"
+          />
         ) : null}
         <div className="min-w-0">
           <CardTitle className={`truncate text-lg font-semibold ${adminSurfacePrimaryClassName}`}>

@@ -13,6 +13,7 @@
     "paths": {
       "@bogaap/ai-contracts": ["packages/ai-contracts/dist/index"],
       "@bogaap/ai-core": ["packages/ai-core/dist/index"]
+      ,"@bogaap/integration-contracts": ["packages/integration-contracts/dist/index"]
     }
   },
   "include": ["src/**/*.ts"]

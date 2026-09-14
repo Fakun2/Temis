@@ -12,6 +12,7 @@ export type AdminNavItem = {
   iconAnimation?:
     | "account-ai"
     | "account-archive"
+    | "account-connectors"
     | "account-back"
     | "account-organization"
     | "account-plan"

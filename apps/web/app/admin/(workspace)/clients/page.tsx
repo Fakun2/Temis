@@ -1,7 +1,9 @@
 "use client";
 
 import { UnauthorizedState } from "@/components/ui/not-found";
+import { AdminMetricsSkeletonGrid } from "../_components/admin-skeletons";
 import { RequirePermission } from "../_components/auth";
+import { ClientsMetrics } from "./_components/clients-metrics";
 import { ClientsTableCard } from "./_components/clients-table-card";
 import { useClientsPageState } from "./_hooks/use-clients-page-state";
 import { useClientsQuery } from "./_hooks/use-clients-query";
@@ -17,6 +19,12 @@ export default function ClientsPage() {
   return (
     <RequirePermission permissions={["clients:read"]} fallback={<RestrictedClients />}>
       <div className="flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto scrollbar-none md:gap-4">
+        {clientsQuery.isLoading && !clientsQuery.data ? (
+          <AdminMetricsSkeletonGrid />
+        ) : (
+          <ClientsMetrics data={clientsQuery.data} />
+        )}
+
         <ClientsTableCard
           data={clientsQuery.data}
           error={clientsQuery.error}

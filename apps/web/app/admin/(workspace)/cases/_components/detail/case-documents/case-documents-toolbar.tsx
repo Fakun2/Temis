@@ -23,13 +23,12 @@ export function CaseDocumentsToolbar({
   onCategoryFilterChange: (value: string) => void;
 }) {
   return (
-    <div className="flex flex-col gap-3 border-b border-border/30 pb-4 md:flex-row md:items-start md:justify-between">
+    <div className="flex flex-col gap-3 border-b border-border/30 pb-4 md:flex-row md:items-center md:justify-between">
       <div className="min-w-0">
         <h2 className="flex items-center gap-2 text-base font-semibold text-foreground">
           <FileText className="h-4 w-4" aria-hidden="true" />
           Documentos
         </h2>
-        <p className="mt-1 text-sm text-muted-foreground">Archivos privados del expediente.</p>
       </div>
       <Select
         value={categoryFilter}

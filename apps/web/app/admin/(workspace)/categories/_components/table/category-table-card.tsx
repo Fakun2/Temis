@@ -112,7 +112,6 @@ function CategoryTableCardHeader({
           onSort={onSort}
         />
       }
-      description="Categorias financieras globales y propias del estudio para caja, gastos y cuenta corriente."
       icon={Tags}
       title="Categorias"
     />

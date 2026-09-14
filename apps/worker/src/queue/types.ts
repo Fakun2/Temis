@@ -14,6 +14,8 @@ export type DocumentCleanupRunMessage = QueuePayload & {
   tenantId: string;
 };
 
+export type { GoogleCalendarSyncMessage } from "@bogaap/integration-contracts";
+
 export type OutboxEventInput = {
   availableAt?: Date;
   payload: QueuePayload;

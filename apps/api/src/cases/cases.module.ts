@@ -1,5 +1,6 @@
 import { Module } from "@nestjs/common";
 import { PermissionsGuard } from "../auth/permissions.guard";
+import { IntegrationsModule } from "../integrations/integrations.module";
 import { DatabaseModule } from "../database/database.module";
 import { DocumentsModule } from "../documents/documents.module";
 import { NotificationsModule } from "../notifications/notifications.module";
@@ -19,7 +20,7 @@ import { CaseTasksUseCase } from "./use-cases/case-tasks.use-case";
 import { ExpenseOverdueUseCase } from "./use-cases/expense-overdue.use-case";
 
 @Module({
-  imports: [DatabaseModule, StorageModule, DocumentsModule, NotificationsModule],
+  imports: [DatabaseModule, StorageModule, DocumentsModule, NotificationsModule, IntegrationsModule],
   controllers: [CasesController, DocumentCategoriesController],
   providers: [
     CasesService,

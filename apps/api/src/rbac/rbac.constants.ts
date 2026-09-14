@@ -2,6 +2,13 @@ export const ADMIN_ACCESS_PERMISSION = "admin:access";
 
 export const RBAC_PERMISSIONS = [
   { code: "admin:access", resource: "admin", action: "access" },
+  { code: "account:read", resource: "account", action: "read" },
+  { code: "account:self_manage", resource: "account", action: "self_manage" },
+  { code: "account:ai_usage_read", resource: "account", action: "ai_usage_read" },
+  { code: "account:studio_manage", resource: "account", action: "studio_manage" },
+  { code: "account:membership_manage", resource: "account", action: "membership_manage" },
+  { code: "notifications:read", resource: "notifications", action: "read" },
+  { code: "notifications:update", resource: "notifications", action: "update" },
   { code: "staff:read", resource: "staff", action: "read" },
   { code: "staff:create", resource: "staff", action: "create" },
   { code: "staff:update", resource: "staff", action: "update" },
@@ -52,6 +59,17 @@ export const RBAC_PERMISSIONS = [
   { code: "finance:update", resource: "finance", action: "update" },
   { code: "finance:delete", resource: "finance", action: "delete" },
   { code: "integrations:sae_import", resource: "integrations", action: "sae_import" },
+  { code: "integrations:notion_manage", resource: "integrations", action: "notion_manage" },
+  {
+    code: "integrations:google_calendar_manage",
+    resource: "integrations",
+    action: "google_calendar_manage"
+  },
+  {
+    code: "integrations:google_calendar_read",
+    resource: "integrations",
+    action: "google_calendar_read"
+  },
   { code: "billing:manage", resource: "billing", action: "manage" }
 ] as const;
 
@@ -60,6 +78,13 @@ export const TENANT_BLOCKED_PERMISSION_CODES = [
   "currencies:update",
   "currencies:delete"
 ] as const;
+
+const SELF_SERVICE_PERMISSION_CODES = [
+  "account:read",
+  "account:self_manage",
+  "notifications:read",
+  "notifications:update"
+];
 
 export function isTenantAssignablePermission(permissionCode: string) {
   return !TENANT_BLOCKED_PERMISSION_CODES.some((blockedCode) => blockedCode === permissionCode);
@@ -80,16 +105,21 @@ export const RBAC_ROLES = [
     name: "Admin",
     description: "Administra el estudio, equipo, roles y configuracion operativa.",
     hierarchyLevel: 2,
-    permissions: RBAC_PERMISSIONS.filter(
-      (permission) =>
-        permission.code !== "billing:manage" &&
-        permission.resource !== "roles" &&
-        permission.resource !== "cases" &&
-        permission.resource !== "ai" &&
-        permission.resource !== "expenses" &&
-        permission.resource !== "integrations" &&
-        isTenantAssignablePermission(permission.code)
-    ).map((permission) => permission.code)
+    permissions: [
+      ...RBAC_PERMISSIONS.filter(
+        (permission) =>
+          permission.code !== "billing:manage" &&
+          permission.resource !== "roles" &&
+          permission.resource !== "cases" &&
+          permission.resource !== "ai" &&
+          permission.resource !== "expenses" &&
+          permission.resource !== "hearings" &&
+          permission.code !== "integrations:sae_import" &&
+          isTenantAssignablePermission(permission.code)
+      ).map((permission) => permission.code),
+      "cases:read",
+      "clients:read"
+    ]
   },
   {
     code: "lawyer",
@@ -98,6 +128,7 @@ export const RBAC_ROLES = [
     hierarchyLevel: 1,
     permissions: [
       ADMIN_ACCESS_PERMISSION,
+      ...SELF_SERVICE_PERMISSION_CODES,
       "clients:read",
       "clients:create",
       "clients:update",
@@ -120,7 +151,9 @@ export const RBAC_ROLES = [
       "hearings:read",
       "hearings:create",
       "hearings:update",
-      "hearings:delete"
+      "hearings:delete",
+      "integrations:google_calendar_manage",
+      "integrations:google_calendar_read"
     ]
   },
   {
@@ -130,6 +163,7 @@ export const RBAC_ROLES = [
     hierarchyLevel: 1,
     permissions: [
       ADMIN_ACCESS_PERMISSION,
+      ...SELF_SERVICE_PERMISSION_CODES,
       "cases:read",
       "forums:read",
       "provinces:read",
@@ -142,7 +176,9 @@ export const RBAC_ROLES = [
       "expenses:update",
       "hearings:read",
       "hearings:create",
-      "hearings:update"
+      "hearings:update",
+      "integrations:google_calendar_manage",
+      "integrations:google_calendar_read"
     ]
   },
   {
@@ -152,6 +188,7 @@ export const RBAC_ROLES = [
     hierarchyLevel: 1,
     permissions: [
       ADMIN_ACCESS_PERMISSION,
+      ...SELF_SERVICE_PERMISSION_CODES,
       "currencies:read",
       "categories:read",
       "categories:create",
@@ -170,6 +207,7 @@ export const RBAC_ROLES = [
     hierarchyLevel: 1,
     permissions: [
       ADMIN_ACCESS_PERMISSION,
+      ...SELF_SERVICE_PERMISSION_CODES,
       "clients:read",
       "forums:read",
       "provinces:read",
@@ -177,7 +215,8 @@ export const RBAC_ROLES = [
       "documents:read",
       "tasks:read",
       "hearings:read",
-      "finance:read"
+      "finance:read",
+      "integrations:google_calendar_read"
     ]
   }
 ] as const;

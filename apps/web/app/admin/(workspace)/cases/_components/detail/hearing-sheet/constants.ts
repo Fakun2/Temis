@@ -5,6 +5,7 @@ import { caseHearingTypeLabels } from "../../../_constants/cases.constants";
 export const caseHearingTypeOptions = mapRecordToOptions(caseHearingTypeLabels);
 
 export const emptyCaseHearingDraft: CaseHearingFormValues = {
+  participantMembershipIds: [],
   date: "",
   description: "",
   notificationDate: "",

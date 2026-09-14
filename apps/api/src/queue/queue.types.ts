@@ -1,4 +1,5 @@
 import type { Prisma } from "@prisma/client";
+import type { GoogleCalendarSyncMessage as SharedGoogleCalendarSyncMessage } from "@bogaap/integration-contracts";
 
 export type QueuePayload = Prisma.JsonObject & {
   deliverAt?: string;
@@ -15,6 +16,8 @@ export type DocumentCleanupRunMessage = QueuePayload & {
   nextRunAt: string;
   tenantId: string;
 };
+
+export type GoogleCalendarSyncMessage = QueuePayload & SharedGoogleCalendarSyncMessage;
 
 export type EnqueueOutboxEventInput = {
   payload: QueuePayload;

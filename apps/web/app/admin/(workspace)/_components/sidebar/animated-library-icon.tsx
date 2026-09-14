@@ -1,6 +1,6 @@
 "use client";
 
-import { forwardRef } from "react";
+import { forwardRef, useEffect, useRef, useState } from "react";
 import type { LucideProps } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -100,6 +100,61 @@ export const AnimatedCasesIcon = forwardRef<SVGSVGElement, LucideProps>(
 );
 
 AnimatedCasesIcon.displayName = "AnimatedCasesIcon";
+
+export const AnimatedClientsIcon = forwardRef<SVGSVGElement, LucideProps>(
+  ({ className, strokeWidth = 1.65, ...props }, ref) => (
+    <svg
+      ref={ref}
+      viewBox="0 0 24 24"
+      className={cn("justinia-clients-icon", className)}
+      fill="none"
+      stroke="currentColor"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      strokeWidth={strokeWidth}
+      {...props}
+    >
+      <g className="justinia-clients-icon-people">
+        <circle cx="9" cy="8" r="3" />
+        <path d="M3.75 20c.45-3.4 2.35-5.25 5.25-5.25s4.8 1.85 5.25 5.25" />
+        <path
+          className="justinia-clients-icon-partner"
+          d="M16.2 5.55a2.55 2.55 0 0 1 0 4.9M17.3 14.9c1.75.5 2.75 1.95 2.95 4.1"
+        />
+      </g>
+    </svg>
+  )
+);
+
+AnimatedClientsIcon.displayName = "AnimatedClientsIcon";
+
+export const AnimatedTasksIcon = forwardRef<SVGSVGElement, LucideProps>(
+  ({ className, strokeWidth = 1.65, ...props }, ref) => (
+    <svg
+      ref={ref}
+      viewBox="0 0 24 24"
+      className={cn("justinia-tasks-icon", className)}
+      fill="none"
+      stroke="currentColor"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      strokeWidth={strokeWidth}
+      {...props}
+    >
+      <g className="justinia-tasks-icon-sheet">
+        <rect width="15" height="18" x="4.5" y="3" rx="2" />
+        <path d="M8.5 8h7M8.5 12h7M8.5 16h4" />
+      </g>
+      <path
+        className="justinia-tasks-icon-check"
+        d="m6.9 12.1.9.9 1.7-1.9"
+        pathLength={1}
+      />
+    </svg>
+  )
+);
+
+AnimatedTasksIcon.displayName = "AnimatedTasksIcon";
 
 export const AnimatedCashboxIcon = forwardRef<SVGSVGElement, LucideProps>(
   ({ className, strokeWidth = 1.6, ...props }, ref) => (
@@ -326,6 +381,124 @@ export const AnimatedAccountAiIcon = forwardRef<SVGSVGElement, LucideProps>(
 );
 
 AnimatedAccountAiIcon.displayName = "AnimatedAccountAiIcon";
+
+export const AnimatedAccountConnectorsIcon = forwardRef<SVGSVGElement, LucideProps>(
+  ({ className, onFocus, onMouseEnter, strokeWidth = 1.7, ...props }, ref) => {
+    const [animationRun, setAnimationRun] = useState(0);
+    const armAnimations = useRef<Array<SVGAnimateElement | null>>([]);
+    const replayAnimation = () => setAnimationRun((current) => current + 1);
+
+    useEffect(() => {
+      if (animationRun === 0) {
+        return;
+      }
+
+      const delays = [0, 595, 260, 920];
+      const timers = delays.map((delay, index) =>
+        window.setTimeout(() => armAnimations.current[index]?.beginElement(), delay)
+      );
+
+      return () => timers.forEach((timer) => window.clearTimeout(timer));
+    }, [animationRun]);
+
+    return (
+      <svg
+      ref={ref}
+      viewBox="0 0 24 24"
+      className={cn("justinia-account-connectors-icon", className)}
+      fill="none"
+      stroke="currentColor"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      strokeWidth={strokeWidth}
+      onFocus={(event) => {
+        onFocus?.(event);
+        replayAnimation();
+      }}
+      onMouseEnter={(event) => {
+        onMouseEnter?.(event);
+        replayAnimation();
+      }}
+      {...props}
+    >
+      <g className="justinia-account-connectors-icon-arms">
+        <path d="M12 12C12 11.23 12 10.47 12 9.7">
+          {animationRun > 0 ? (
+            <animate
+              key={`connectors-arm-1-${animationRun}`}
+              attributeName="d"
+              begin="indefinite"
+              dur="360ms"
+              fill="freeze"
+              keyTimes="0; 0.55; 1"
+              ref={(element) => {
+                armAnimations.current[0] = element;
+              }}
+              values="M12 12C12 11.23 12 10.47 12 9.7;M12 12C12 10.65 10.95 9.6 8.35 8.35;M12 12C12 11.23 12 10.47 12 9.7"
+            />
+          ) : null}
+        </path>
+        <path d="M12 12C12.77 12 13.53 12 14.3 12">
+          {animationRun > 0 ? (
+            <animate
+              key={`connectors-arm-2-${animationRun}`}
+              attributeName="d"
+              begin="indefinite"
+              dur="350ms"
+              fill="freeze"
+              keyTimes="0; 0.55; 1"
+              ref={(element) => {
+                armAnimations.current[1] = element;
+              }}
+              values="M12 12C12.77 12 13.53 12 14.3 12;M12 12C13.35 12 14.4 10.95 15.65 8.35;M12 12C12.77 12 13.53 12 14.3 12"
+            />
+          ) : null}
+        </path>
+        <path d="M12 12C12 12.77 12 13.53 12 14.3">
+          {animationRun > 0 ? (
+            <animate
+              key={`connectors-arm-3-${animationRun}`}
+              attributeName="d"
+              begin="indefinite"
+              dur="410ms"
+              fill="freeze"
+              keyTimes="0; 0.55; 1"
+              ref={(element) => {
+                armAnimations.current[2] = element;
+              }}
+              values="M12 12C12 12.77 12 13.53 12 14.3;M12 12C12 13.35 13.05 14.4 15.65 15.65;M12 12C12 12.77 12 13.53 12 14.3"
+            />
+          ) : null}
+        </path>
+        <path d="M12 12C11.23 12 10.47 12 9.7 12">
+          {animationRun > 0 ? (
+            <animate
+              key={`connectors-arm-4-${animationRun}`}
+              attributeName="d"
+              begin="indefinite"
+              dur="390ms"
+              fill="freeze"
+              keyTimes="0; 0.55; 1"
+              ref={(element) => {
+                armAnimations.current[3] = element;
+              }}
+              values="M12 12C11.23 12 10.47 12 9.7 12;M12 12C10.65 12 9.6 13.05 8.35 15.65;M12 12C11.23 12 10.47 12 9.7 12"
+            />
+          ) : null}
+        </path>
+      </g>
+      <g className="justinia-account-connectors-icon-nodes">
+        <rect className="justinia-account-connectors-icon-node-1" width="5.2" height="5.2" x="3.15" y="3.15" rx="1.35" />
+        <rect className="justinia-account-connectors-icon-node-2" width="5.2" height="5.2" x="15.65" y="3.15" rx="1.35" />
+        <rect className="justinia-account-connectors-icon-node-3" width="5.2" height="5.2" x="15.65" y="15.65" rx="1.35" />
+        <rect className="justinia-account-connectors-icon-node-4" width="5.2" height="5.2" x="3.15" y="15.65" rx="1.35" />
+      </g>
+      </svg>
+    );
+  }
+);
+
+AnimatedAccountConnectorsIcon.displayName = "AnimatedAccountConnectorsIcon";
 
 export const AnimatedAccountArchiveIcon = forwardRef<SVGSVGElement, LucideProps>(
   ({ className, strokeWidth = 1.7, ...props }, ref) => (

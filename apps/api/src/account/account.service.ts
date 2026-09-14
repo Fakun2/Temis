@@ -20,8 +20,8 @@ import type {
   UpdateAccountStudioInput
 } from "./account.schemas";
 
-const studioManagePermissions = ["tenants:manage"];
-const membershipManagePermissions = ["tenants:manage", "billing:manage"];
+const studioManagePermissions = ["account:studio_manage"];
+const membershipManagePermissions = ["account:membership_manage"];
 const saeImportPermissions = ["integrations:sae_import"];
 const accountAvatarUrl = "/api/account/avatar";
 const allowedAccountAvatarMimeTypes = new Set([

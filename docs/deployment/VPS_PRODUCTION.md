@@ -39,6 +39,13 @@ Production values that must be reviewed before the first real login:
   id in `GOOGLE_AUTH_CLIENT_ID` and `NEXT_PUBLIC_GOOGLE_CLIENT_ID`. The Google
   OAuth client must allow the final frontend origin, for example
   `https://app.bogaap.example`.
+- For Google Calendar, set `GOOGLE_CALENDAR_ENABLED=true`, configure a separate
+  Google OAuth Web client, and register `GOOGLE_CALENDAR_REDIRECT_URI` ending in
+  `/api/integrations/google-calendar/callback`. Keep
+  `GOOGLE_CALENDAR_CLIENT_SECRET` and
+  `GOOGLE_CALENDAR_TOKEN_ENCRYPTION_KEY` private and identical in API and worker.
+  The `worker` service in Compose is the only process that consumes Google
+  Calendar queues and must be redeployed after changing its image or secrets.
 - For real AI responses, set `AI_PROVIDER=openai-compatible`,
   `AI_OPENAI_API_KEY` or `OPENAI_API_KEY`, and the selected model variables.
 - For SAE Tucuman imports, set `SAE_TUCUMAN_LOGIN_URL`,

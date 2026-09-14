@@ -58,6 +58,7 @@ export default function LibraryPage() {
                 onDeleteFolder={(folderId) => void library.deleteFolder(folderId)}
                 onOpenFolder={library.resetPage}
                 onRenameDocument={(document, title) => void library.renameDocument(document, title)}
+                onReplaceDocument={(documentId, file) => void library.replaceDocument(documentId, file)}
                 onToggleDocument={library.toggleDocumentSelection}
               />
             )}

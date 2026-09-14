@@ -33,7 +33,6 @@ export const listDocumentsQuerySchema = z.object({
   limit: z.coerce.number().int().min(1).max(50).default(20),
   cursor: optionalTrimmedString,
   folderId: optionalNullableUuid,
-  caseId: optionalUuid,
   search: optionalTrimmedString,
   categoryId: optionalUuid,
   mimeGroup: documentMimeGroupSchema.optional(),
@@ -54,17 +53,19 @@ export const updateDocumentFolderSchema = z.object({
 
 export const createDocumentBodySchema = z.object({
   folderId: optionalNullableUuid,
-  caseId: optionalUuid,
   categoryId: optionalUuid,
   notes: optionalTrimmedString.pipe(z.string().max(500).optional())
 });
 
 export const updateDocumentSchema = z.object({
   folderId: optionalNullableUuid,
-  caseId: optionalNullableUuid,
   categoryId: optionalNullableUuid,
   title: z.string().trim().min(1).max(180).optional(),
   notes: optionalTrimmedString.pipe(z.string().max(500).optional())
+});
+
+export const replaceDocumentBodySchema = z.object({
+  title: z.string().trim().min(1).max(180).optional()
 });
 
 export const bulkDeleteDocumentsSchema = z.object({
@@ -101,6 +102,10 @@ export class CreateDocumentBodyDto extends createZodDto(createDocumentBodySchema
   file!: unknown;
 }
 export class UpdateDocumentDto extends createZodDto(updateDocumentSchema) {}
+export class ReplaceDocumentBodyDto extends createZodDto(replaceDocumentBodySchema) {
+  @ApiProperty({ type: "string", format: "binary" })
+  file!: unknown;
+}
 export class BulkDeleteDocumentsDto extends createZodDto(bulkDeleteDocumentsSchema) {}
 export class BulkMoveDocumentsDto extends createZodDto(bulkMoveDocumentsSchema) {}
 export class CreateDocumentImportJobDto extends createZodDto(createDocumentImportJobSchema) {}
@@ -268,6 +273,7 @@ export type CreateDocumentFolderInput = z.infer<typeof createDocumentFolderSchem
 export type UpdateDocumentFolderInput = z.infer<typeof updateDocumentFolderSchema>;
 export type CreateDocumentInput = z.infer<typeof createDocumentBodySchema>;
 export type UpdateDocumentInput = z.infer<typeof updateDocumentSchema>;
+export type ReplaceDocumentInput = z.infer<typeof replaceDocumentBodySchema>;
 export type BulkDeleteDocumentsInput = z.infer<typeof bulkDeleteDocumentsSchema>;
 export type BulkMoveDocumentsInput = z.infer<typeof bulkMoveDocumentsSchema>;
 export type CreateDocumentImportJobInput = z.infer<typeof createDocumentImportJobSchema>;

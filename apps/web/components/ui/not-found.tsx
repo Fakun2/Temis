@@ -1,8 +1,7 @@
 import type { ComponentType, SVGProps } from "react";
 import Link from "next/link";
-import { ArrowLeft, Home, Search } from "lucide-react";
+import { ArrowLeft, Home } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 
 type StatusAction = {

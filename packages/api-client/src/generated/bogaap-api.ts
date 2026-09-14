@@ -593,6 +593,58 @@ export interface SaeImportResponseDto {
   items: SaeImportItemDto[];
 }
 
+export type GoogleCalendarStatusDtoStatus = { [key: string]: unknown };
+
+export type GoogleCalendarStatusDtoGoogleEmail = { [key: string]: unknown };
+
+export type GoogleCalendarStatusDtoCalendarName = { [key: string]: unknown };
+
+export type GoogleCalendarStatusDtoLastSyncAt = { [key: string]: unknown };
+
+export type GoogleCalendarStatusDtoLastError = { [key: string]: unknown };
+
+export type GoogleCalendarStatusDtoSyncMode =
+  (typeof GoogleCalendarStatusDtoSyncMode)[keyof typeof GoogleCalendarStatusDtoSyncMode];
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const GoogleCalendarStatusDtoSyncMode = {
+  global: "global",
+  custom: "custom"
+} as const;
+
+export type GoogleCalendarStatusDtoSyncSourcesItem =
+  (typeof GoogleCalendarStatusDtoSyncSourcesItem)[keyof typeof GoogleCalendarStatusDtoSyncSourcesItem];
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const GoogleCalendarStatusDtoSyncSourcesItem = {
+  all_hearings: "all_hearings",
+  my_tasks: "my_tasks",
+  my_area_tasks: "my_area_tasks",
+  participating_hearings: "participating_hearings",
+  all_tasks: "all_tasks"
+} as const;
+
+export interface GoogleCalendarStatusDto {
+  connected: boolean;
+  status?: GoogleCalendarStatusDtoStatus;
+  googleEmail?: GoogleCalendarStatusDtoGoogleEmail;
+  calendarName?: GoogleCalendarStatusDtoCalendarName;
+  lastSyncAt?: GoogleCalendarStatusDtoLastSyncAt;
+  lastError?: GoogleCalendarStatusDtoLastError;
+  activeEventCount: number;
+  requiresReauthorization: boolean;
+  syncMode: GoogleCalendarStatusDtoSyncMode;
+  syncSources: GoogleCalendarStatusDtoSyncSourcesItem[];
+}
+
+export interface GoogleCalendarSyncPreferencesDto {
+  [key: string]: unknown;
+}
+
+export interface GoogleCalendarOAuthStartDto {
+  authorizationUrl: string;
+}
+
 export interface CashboxCurrencyDto {
   name: string;
   code: string;
@@ -984,6 +1036,102 @@ export interface NotificationReadResponseDto {
   status: string;
 }
 
+export type NotionConnectionDtoWorkspaceName = { [key: string]: unknown };
+
+export type NotionConnectionDtoWorkspaceId = { [key: string]: unknown };
+
+export type NotionConnectionDtoLastSyncAt = { [key: string]: unknown };
+
+export interface NotionConnectionDto {
+  connected: boolean;
+  workspaceName?: NotionConnectionDtoWorkspaceName;
+  workspaceId?: NotionConnectionDtoWorkspaceId;
+  lastSyncAt?: NotionConnectionDtoLastSyncAt;
+}
+
+export type NotionMappingDtoPropertyMapping = { [key: string]: unknown };
+
+export type NotionMappingDtoStatusMapping = {
+  [key: string]: "pending" | "in_progress" | "completed" | "cancelled";
+};
+
+export type NotionMappingDtoLastPullAt = { [key: string]: unknown };
+
+export type NotionMappingDtoLastPushAt = { [key: string]: unknown };
+
+export interface NotionMappingDto {
+  id: string;
+  dataSourceId: string;
+  dataSourceName: string;
+  enabled: boolean;
+  syncIntervalMinutes: number;
+  propertyMapping: NotionMappingDtoPropertyMapping;
+  statusMapping: NotionMappingDtoStatusMapping;
+  lastPullAt?: NotionMappingDtoLastPullAt;
+  lastPushAt?: NotionMappingDtoLastPushAt;
+}
+
+export interface NotionIntegrationStatusDto {
+  connection: NotionConnectionDto;
+  mappings: NotionMappingDto[];
+  openConflicts: number;
+}
+
+export interface NotionOAuthStartDto {
+  authorizationUrl: string;
+}
+
+export interface NotionDataSourceDto {
+  id: string;
+  title: string;
+}
+
+export type NotionDataSourcesResponseDtoNextCursor = { [key: string]: unknown };
+
+export interface NotionDataSourcesResponseDto {
+  items: NotionDataSourceDto[];
+  nextCursor?: NotionDataSourcesResponseDtoNextCursor;
+}
+
+export interface CreateNotionMappingDto {
+  [key: string]: unknown;
+}
+
+export interface UpdateNotionMappingDto {
+  [key: string]: unknown;
+}
+
+export interface NotionSyncResultDto {
+  status: string;
+  imported: number;
+  updated: number;
+  pushed: number;
+  conflicts: number;
+}
+
+export type NotionConflictDtoTaskId = { [key: string]: unknown };
+
+export type NotionConflictDtoNotionPageId = { [key: string]: unknown };
+
+export type NotionConflictDtoFieldDiff = { [key: string]: unknown };
+
+export interface NotionConflictDto {
+  id: string;
+  taskId?: NotionConflictDtoTaskId;
+  notionPageId?: NotionConflictDtoNotionPageId;
+  dataSourceName: string;
+  fieldDiff: NotionConflictDtoFieldDiff;
+  detectedAt: string;
+}
+
+export interface NotionConflictsResponseDto {
+  items: NotionConflictDto[];
+}
+
+export interface ResolveNotionConflictDto {
+  [key: string]: unknown;
+}
+
 export interface CaseProvinceDto {
   id: string;
   code: string;
@@ -1212,6 +1360,314 @@ export interface CasePickerOptionsResponseDto {
   pageInfo: CasesPageInfoDto;
 }
 
+export interface TenantCaseTasksMetricsDto {
+  todo: number;
+  done: number;
+  dueSoon: number;
+  overdue: number;
+}
+
+export type TaskBoardFiltersDtoDueStatus =
+  (typeof TaskBoardFiltersDtoDueStatus)[keyof typeof TaskBoardFiltersDtoDueStatus];
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const TaskBoardFiltersDtoDueStatus = {
+  due_soon: "due_soon",
+  overdue: "overdue"
+} as const;
+
+export type TaskBoardFiltersDtoStatus =
+  (typeof TaskBoardFiltersDtoStatus)[keyof typeof TaskBoardFiltersDtoStatus];
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const TaskBoardFiltersDtoStatus = {
+  pending: "pending",
+  in_progress: "in_progress",
+  completed: "completed",
+  cancelled: "cancelled"
+} as const;
+
+export interface TaskBoardFiltersDto {
+  assignedMembershipId?: string;
+  practiceAreaId?: string;
+  caseId?: string;
+  clientId?: string;
+  dueStatus?: TaskBoardFiltersDtoDueStatus;
+  endDateFrom?: string;
+  endDateTo?: string;
+  search?: string;
+  status?: TaskBoardFiltersDtoStatus;
+}
+
+export type TaskBoardSettingsDtoChartGroupBy =
+  (typeof TaskBoardSettingsDtoChartGroupBy)[keyof typeof TaskBoardSettingsDtoChartGroupBy];
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const TaskBoardSettingsDtoChartGroupBy = {
+  status: "status",
+  client: "client",
+  case: "case",
+  assignedTo: "assignedTo"
+} as const;
+
+export type TaskBoardSettingsDtoChartShowHorizontalLines = { [key: string]: unknown };
+
+export type TaskBoardSettingsDtoChartSortBy =
+  (typeof TaskBoardSettingsDtoChartSortBy)[keyof typeof TaskBoardSettingsDtoChartSortBy];
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const TaskBoardSettingsDtoChartSortBy = {
+  count: "count",
+  label: "label"
+} as const;
+
+export type TaskBoardSettingsDtoChartSortDirection =
+  (typeof TaskBoardSettingsDtoChartSortDirection)[keyof typeof TaskBoardSettingsDtoChartSortDirection];
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const TaskBoardSettingsDtoChartSortDirection = {
+  asc: "asc",
+  desc: "desc"
+} as const;
+
+export type TaskBoardSettingsDtoChartType =
+  (typeof TaskBoardSettingsDtoChartType)[keyof typeof TaskBoardSettingsDtoChartType];
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const TaskBoardSettingsDtoChartType = {
+  vertical_bar: "vertical_bar",
+  horizontal_bar: "horizontal_bar",
+  line: "line",
+  pie: "pie"
+} as const;
+
+export type TaskBoardSettingsDtoHideZeroValues = { [key: string]: unknown };
+
+export type TaskBoardSettingsDtoKanbanCardLayout =
+  (typeof TaskBoardSettingsDtoKanbanCardLayout)[keyof typeof TaskBoardSettingsDtoKanbanCardLayout];
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const TaskBoardSettingsDtoKanbanCardLayout = {
+  compact: "compact",
+  list: "list"
+} as const;
+
+export type TaskBoardSettingsDtoKanbanCardSize =
+  (typeof TaskBoardSettingsDtoKanbanCardSize)[keyof typeof TaskBoardSettingsDtoKanbanCardSize];
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const TaskBoardSettingsDtoKanbanCardSize = {
+  small: "small",
+  medium: "medium",
+  large: "large"
+} as const;
+
+export type TaskBoardSettingsDtoKanbanColorColumns = { [key: string]: unknown };
+
+export type TaskBoardSettingsDtoOpenTaskIn =
+  (typeof TaskBoardSettingsDtoOpenTaskIn)[keyof typeof TaskBoardSettingsDtoOpenTaskIn];
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const TaskBoardSettingsDtoOpenTaskIn = {
+  side_sheet: "side_sheet",
+  center_modal: "center_modal"
+} as const;
+
+export type TaskBoardSettingsDtoViewMode =
+  (typeof TaskBoardSettingsDtoViewMode)[keyof typeof TaskBoardSettingsDtoViewMode];
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const TaskBoardSettingsDtoViewMode = {
+  table: "table",
+  kanban: "kanban",
+  calendar: "calendar",
+  bar_chart: "bar_chart"
+} as const;
+
+export type TaskBoardSettingsDtoVisiblePropertiesItem =
+  (typeof TaskBoardSettingsDtoVisiblePropertiesItem)[keyof typeof TaskBoardSettingsDtoVisiblePropertiesItem];
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const TaskBoardSettingsDtoVisiblePropertiesItem = {
+  case: "case",
+  client: "client",
+  assignedTo: "assignedTo",
+  endDate: "endDate",
+  status: "status",
+  notes: "notes"
+} as const;
+
+export type TaskBoardSettingsDtoSortBy =
+  (typeof TaskBoardSettingsDtoSortBy)[keyof typeof TaskBoardSettingsDtoSortBy];
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const TaskBoardSettingsDtoSortBy = {
+  name: "name",
+  status: "status",
+  endDate: "endDate",
+  client: "client",
+  case: "case",
+  assignedTo: "assignedTo",
+  createdAt: "createdAt"
+} as const;
+
+export type TaskBoardSettingsDtoSortDirection =
+  (typeof TaskBoardSettingsDtoSortDirection)[keyof typeof TaskBoardSettingsDtoSortDirection];
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const TaskBoardSettingsDtoSortDirection = {
+  asc: "asc",
+  desc: "desc"
+} as const;
+
+export interface TaskBoardSettingsDto {
+  chartGroupBy: TaskBoardSettingsDtoChartGroupBy;
+  chartShowHorizontalLines: TaskBoardSettingsDtoChartShowHorizontalLines;
+  chartSortBy: TaskBoardSettingsDtoChartSortBy;
+  chartSortDirection: TaskBoardSettingsDtoChartSortDirection;
+  chartType: TaskBoardSettingsDtoChartType;
+  hideZeroValues: TaskBoardSettingsDtoHideZeroValues;
+  kanbanCardLayout: TaskBoardSettingsDtoKanbanCardLayout;
+  kanbanCardSize: TaskBoardSettingsDtoKanbanCardSize;
+  kanbanColorColumns: TaskBoardSettingsDtoKanbanColorColumns;
+  openTaskIn: TaskBoardSettingsDtoOpenTaskIn;
+  viewMode: TaskBoardSettingsDtoViewMode;
+  visibleProperties: TaskBoardSettingsDtoVisiblePropertiesItem[];
+  sortBy: TaskBoardSettingsDtoSortBy;
+  sortDirection: TaskBoardSettingsDtoSortDirection;
+}
+
+export interface TaskBoardViewDto {
+  id: string;
+  name: string;
+  filters: TaskBoardFiltersDto;
+  settings: TaskBoardSettingsDto;
+  createdByMembershipId: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface TaskBoardViewsListResponseDto {
+  items: TaskBoardViewDto[];
+}
+
+export interface CreateTaskBoardViewDto {
+  [key: string]: unknown;
+}
+
+export interface UpdateTaskBoardViewDto {
+  [key: string]: unknown;
+}
+
+export interface CaseDeleteResponseDto {
+  status: string;
+}
+
+export interface CaseTaskAssigneeDto {
+  id: string;
+  userId: string;
+  fullName: string;
+  email: string;
+  /** @nullable */
+  roleName: string | null;
+}
+
+export interface GlobalCaseTaskCaseDto {
+  id: string;
+  caseNumber: string;
+  caption: string;
+}
+
+export interface GlobalCaseTaskClientDto {
+  id: string;
+  displayName: string;
+}
+
+/**
+ * @nullable
+ */
+export type GlobalCaseTaskDtoAssignedTo = CaseTaskAssigneeDto | null;
+
+export type GlobalCaseTaskDtoStatus =
+  (typeof GlobalCaseTaskDtoStatus)[keyof typeof GlobalCaseTaskDtoStatus];
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const GlobalCaseTaskDtoStatus = {
+  pending: "pending",
+  in_progress: "in_progress",
+  completed: "completed",
+  cancelled: "cancelled"
+} as const;
+
+export type GlobalCaseTaskDtoNotificationRecipientMode =
+  (typeof GlobalCaseTaskDtoNotificationRecipientMode)[keyof typeof GlobalCaseTaskDtoNotificationRecipientMode];
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const GlobalCaseTaskDtoNotificationRecipientMode = {
+  self: "self",
+  tenant: "tenant",
+  practice_area: "practice_area",
+  members: "members"
+} as const;
+
+/**
+ * @nullable
+ */
+export type GlobalCaseTaskDtoCase = GlobalCaseTaskCaseDto | null;
+
+/**
+ * @nullable
+ */
+export type GlobalCaseTaskDtoClient = GlobalCaseTaskClientDto | null;
+
+export interface GlobalCaseTaskDto {
+  id: string;
+  /** @nullable */
+  caseId: string | null;
+  /** @nullable */
+  assignedMembershipId: string | null;
+  /** @nullable */
+  assignedTo: GlobalCaseTaskDtoAssignedTo;
+  name: string;
+  /** @nullable */
+  startDate: string | null;
+  /** @nullable */
+  endDate: string | null;
+  status: GlobalCaseTaskDtoStatus;
+  /** @nullable */
+  notes: string | null;
+  notificationEnabled: boolean;
+  /** @nullable */
+  notificationDate: string | null;
+  /** @nullable */
+  notificationTime: string | null;
+  notificationRecipientMode: GlobalCaseTaskDtoNotificationRecipientMode;
+  /** @nullable */
+  notificationPracticeAreaId: string | null;
+  notificationMembershipIds: string[];
+  /** @nullable */
+  lastSeenAt: string | null;
+  createdAt: string;
+  updatedAt: string;
+  /** @nullable */
+  case: GlobalCaseTaskDtoCase;
+  /** @nullable */
+  client: GlobalCaseTaskDtoClient;
+}
+
+export interface TenantCaseTasksListResponseDto {
+  items: GlobalCaseTaskDto[];
+  pageInfo: CasesPageInfoDto;
+}
+
+export interface UpdateCaseTaskDto {
+  [key: string]: unknown;
+}
+
+export interface UpdateCaseTaskLocalContextDto {
+  [key: string]: unknown;
+}
+
 export interface CreateCaseDto {
   [key: string]: unknown;
 }
@@ -1300,15 +1756,6 @@ export interface CaseDetailDto {
   metrics: CaseMetricsDto;
 }
 
-export interface CaseTaskAssigneeDto {
-  id: string;
-  userId: string;
-  fullName: string;
-  email: string;
-  /** @nullable */
-  roleName: string | null;
-}
-
 /**
  * @nullable
  */
@@ -1337,7 +1784,8 @@ export const CaseTaskDtoNotificationRecipientMode = {
 
 export interface CaseTaskDto {
   id: string;
-  caseId: string;
+  /** @nullable */
+  caseId: string | null;
   /** @nullable */
   assignedMembershipId: string | null;
   /** @nullable */
@@ -1372,14 +1820,6 @@ export interface CaseTasksListResponseDto {
 
 export interface CreateCaseTaskDto {
   [key: string]: unknown;
-}
-
-export interface UpdateCaseTaskDto {
-  [key: string]: unknown;
-}
-
-export interface CaseDeleteResponseDto {
-  status: string;
 }
 
 export interface DocumentCategoryDto {
@@ -1450,6 +1890,7 @@ export interface CaseHearingDto {
   time: string;
   description: string;
   notificationsEnabled: boolean;
+  participantMembershipIds: string[];
   notificationEnabled: boolean;
   /** @nullable */
   notificationDate: string | null;
@@ -1979,6 +2420,13 @@ export interface ClientSummaryDto {
   updatedAt: string;
 }
 
+export interface ClientsListMetricsDto {
+  total: number;
+  withBalance: number;
+  active: number;
+  inactive: number;
+}
+
 export interface ClientsPageInfoDto {
   limit: number;
   /** @nullable */
@@ -1988,6 +2436,7 @@ export interface ClientsPageInfoDto {
 
 export interface ClientsListResponseDto {
   items: ClientSummaryDto[];
+  metrics: ClientsListMetricsDto;
   pageInfo: ClientsPageInfoDto;
 }
 
@@ -2011,6 +2460,28 @@ export interface ClientArchiveResponseDto {
   clientId: string;
   clientStatus: ClientArchiveResponseDtoClientStatus;
   status: ClientArchiveResponseDtoStatus;
+}
+
+export type ClientDeleteResponseDtoClientStatus =
+  (typeof ClientDeleteResponseDtoClientStatus)[keyof typeof ClientDeleteResponseDtoClientStatus];
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const ClientDeleteResponseDtoClientStatus = {
+  deleted: "deleted"
+} as const;
+
+export type ClientDeleteResponseDtoStatus =
+  (typeof ClientDeleteResponseDtoStatus)[keyof typeof ClientDeleteResponseDtoStatus];
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const ClientDeleteResponseDtoStatus = {
+  ok: "ok"
+} as const;
+
+export interface ClientDeleteResponseDto {
+  clientId: string;
+  clientStatus: ClientDeleteResponseDtoClientStatus;
+  status: ClientDeleteResponseDtoStatus;
 }
 
 export interface CurrencyDto {
@@ -2366,6 +2837,31 @@ export interface StaffListResponseDto {
   pageInfo: StaffPageInfoDto;
 }
 
+/**
+ * @nullable
+ */
+export type ParticipantOptionDtoRole = StaffRoleOptionDto | null;
+
+export interface ParticipantOptionDto {
+  id: string;
+  fullName: string;
+  email: string;
+  /** @nullable */
+  role: ParticipantOptionDtoRole;
+  practiceAreas: StaffPracticeAreaDto[];
+}
+
+export interface ParticipantFilterOptionsDto {
+  practiceAreas: StaffPracticeAreaDto[];
+  roles: StaffRoleOptionDto[];
+}
+
+export interface ParticipantOptionsResponseDto {
+  items: ParticipantOptionDto[];
+  filterOptions: ParticipantFilterOptionsDto;
+  pageInfo: StaffPageInfoDto;
+}
+
 export type CreateStaffDtoStatus = (typeof CreateStaffDtoStatus)[keyof typeof CreateStaffDtoStatus];
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
@@ -2519,6 +3015,27 @@ export interface StaffDeleteResponseDto {
 export type AccountControllerUploadAvatarBody = {
   file: Blob;
 };
+
+export type GoogleCalendarControllerCallbackParams = {
+  code: string;
+  state: string;
+  error: string;
+};
+
+export type GoogleCalendarControllerUpdatePreferences202 = { [key: string]: unknown };
+
+export type GoogleCalendarControllerSync202 = { [key: string]: unknown };
+
+export type GoogleCalendarControllerDisconnect200 = { [key: string]: unknown };
+
+export type NotionIntegrationControllerDisconnect200 = { [key: string]: unknown };
+
+export type NotionIntegrationControllerCompleteOAuthParams = {
+  code: string;
+  state: string;
+};
+
+export type NotionIntegrationControllerResolveConflict200 = { [key: string]: unknown };
 
 export type CasesControllerCreateExpenseAttachmentBody = {
   file: Blob;
@@ -3397,6 +3914,190 @@ export const integrationsControllerImportSaeCases = async (
   );
 };
 
+export type googleCalendarControllerCallbackResponse200 = {
+  data: void;
+  status: 200;
+};
+
+export type googleCalendarControllerCallbackResponseSuccess =
+  googleCalendarControllerCallbackResponse200 & {
+    headers: Headers;
+  };
+export type googleCalendarControllerCallbackResponse =
+  googleCalendarControllerCallbackResponseSuccess;
+
+export const getGoogleCalendarControllerCallbackUrl = (
+  params: GoogleCalendarControllerCallbackParams
+) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? "null" : value.toString());
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0
+    ? `/api/integrations/google-calendar/callback?${stringifiedParams}`
+    : `/api/integrations/google-calendar/callback`;
+};
+
+export const googleCalendarControllerCallback = async (
+  params: GoogleCalendarControllerCallbackParams,
+  options?: RequestInit
+): Promise<googleCalendarControllerCallbackResponse> => {
+  return bogaapFetch<googleCalendarControllerCallbackResponse>(
+    getGoogleCalendarControllerCallbackUrl(params),
+    {
+      ...options,
+      method: "GET"
+    }
+  );
+};
+
+export type googleCalendarControllerStatusResponse200 = {
+  data: GoogleCalendarStatusDto;
+  status: 200;
+};
+
+export type googleCalendarControllerStatusResponseSuccess =
+  googleCalendarControllerStatusResponse200 & {
+    headers: Headers;
+  };
+export type googleCalendarControllerStatusResponse = googleCalendarControllerStatusResponseSuccess;
+
+export const getGoogleCalendarControllerStatusUrl = () => {
+  return `/api/integrations/google-calendar/status`;
+};
+
+export const googleCalendarControllerStatus = async (
+  options?: RequestInit
+): Promise<googleCalendarControllerStatusResponse> => {
+  return bogaapFetch<googleCalendarControllerStatusResponse>(
+    getGoogleCalendarControllerStatusUrl(),
+    {
+      ...options,
+      method: "GET"
+    }
+  );
+};
+
+export type googleCalendarControllerConnectResponse200 = {
+  data: GoogleCalendarOAuthStartDto;
+  status: 200;
+};
+
+export type googleCalendarControllerConnectResponseSuccess =
+  googleCalendarControllerConnectResponse200 & {
+    headers: Headers;
+  };
+export type googleCalendarControllerConnectResponse =
+  googleCalendarControllerConnectResponseSuccess;
+
+export const getGoogleCalendarControllerConnectUrl = () => {
+  return `/api/integrations/google-calendar/connect`;
+};
+
+export const googleCalendarControllerConnect = async (
+  googleCalendarSyncPreferencesDto: GoogleCalendarSyncPreferencesDto,
+  options?: RequestInit
+): Promise<googleCalendarControllerConnectResponse> => {
+  return bogaapFetch<googleCalendarControllerConnectResponse>(
+    getGoogleCalendarControllerConnectUrl(),
+    {
+      ...options,
+      method: "POST",
+      headers: { "Content-Type": "application/json", ...options?.headers },
+      body: JSON.stringify(googleCalendarSyncPreferencesDto)
+    }
+  );
+};
+
+export type googleCalendarControllerUpdatePreferencesResponse202 = {
+  data: GoogleCalendarControllerUpdatePreferences202;
+  status: 202;
+};
+
+export type googleCalendarControllerUpdatePreferencesResponseSuccess =
+  googleCalendarControllerUpdatePreferencesResponse202 & {
+    headers: Headers;
+  };
+export type googleCalendarControllerUpdatePreferencesResponse =
+  googleCalendarControllerUpdatePreferencesResponseSuccess;
+
+export const getGoogleCalendarControllerUpdatePreferencesUrl = () => {
+  return `/api/integrations/google-calendar/preferences`;
+};
+
+export const googleCalendarControllerUpdatePreferences = async (
+  googleCalendarSyncPreferencesDto: GoogleCalendarSyncPreferencesDto,
+  options?: RequestInit
+): Promise<googleCalendarControllerUpdatePreferencesResponse> => {
+  return bogaapFetch<googleCalendarControllerUpdatePreferencesResponse>(
+    getGoogleCalendarControllerUpdatePreferencesUrl(),
+    {
+      ...options,
+      method: "PATCH",
+      headers: { "Content-Type": "application/json", ...options?.headers },
+      body: JSON.stringify(googleCalendarSyncPreferencesDto)
+    }
+  );
+};
+
+export type googleCalendarControllerSyncResponse202 = {
+  data: GoogleCalendarControllerSync202;
+  status: 202;
+};
+
+export type googleCalendarControllerSyncResponseSuccess =
+  googleCalendarControllerSyncResponse202 & {
+    headers: Headers;
+  };
+export type googleCalendarControllerSyncResponse = googleCalendarControllerSyncResponseSuccess;
+
+export const getGoogleCalendarControllerSyncUrl = () => {
+  return `/api/integrations/google-calendar/sync`;
+};
+
+export const googleCalendarControllerSync = async (
+  options?: RequestInit
+): Promise<googleCalendarControllerSyncResponse> => {
+  return bogaapFetch<googleCalendarControllerSyncResponse>(getGoogleCalendarControllerSyncUrl(), {
+    ...options,
+    method: "POST"
+  });
+};
+
+export type googleCalendarControllerDisconnectResponse200 = {
+  data: GoogleCalendarControllerDisconnect200;
+  status: 200;
+};
+
+export type googleCalendarControllerDisconnectResponseSuccess =
+  googleCalendarControllerDisconnectResponse200 & {
+    headers: Headers;
+  };
+export type googleCalendarControllerDisconnectResponse =
+  googleCalendarControllerDisconnectResponseSuccess;
+
+export const getGoogleCalendarControllerDisconnectUrl = () => {
+  return `/api/integrations/google-calendar/disconnect`;
+};
+
+export const googleCalendarControllerDisconnect = async (
+  options?: RequestInit
+): Promise<googleCalendarControllerDisconnectResponse> => {
+  return bogaapFetch<googleCalendarControllerDisconnectResponse>(
+    getGoogleCalendarControllerDisconnectUrl(),
+    {
+      ...options,
+      method: "DELETE"
+    }
+  );
+};
+
 export type cashboxControllerSummaryResponse200 = {
   data: CashboxSummaryDto;
   status: 200;
@@ -4203,6 +4904,313 @@ export const notificationsControllerMarkRead = async (
   );
 };
 
+export type notionIntegrationControllerGetStatusResponse200 = {
+  data: NotionIntegrationStatusDto;
+  status: 200;
+};
+
+export type notionIntegrationControllerGetStatusResponseSuccess =
+  notionIntegrationControllerGetStatusResponse200 & {
+    headers: Headers;
+  };
+export type notionIntegrationControllerGetStatusResponse =
+  notionIntegrationControllerGetStatusResponseSuccess;
+
+export const getNotionIntegrationControllerGetStatusUrl = () => {
+  return `/api/account/integrations/notion`;
+};
+
+export const notionIntegrationControllerGetStatus = async (
+  options?: RequestInit
+): Promise<notionIntegrationControllerGetStatusResponse> => {
+  return bogaapFetch<notionIntegrationControllerGetStatusResponse>(
+    getNotionIntegrationControllerGetStatusUrl(),
+    {
+      ...options,
+      method: "GET"
+    }
+  );
+};
+
+export type notionIntegrationControllerDisconnectResponse200 = {
+  data: NotionIntegrationControllerDisconnect200;
+  status: 200;
+};
+
+export type notionIntegrationControllerDisconnectResponseSuccess =
+  notionIntegrationControllerDisconnectResponse200 & {
+    headers: Headers;
+  };
+export type notionIntegrationControllerDisconnectResponse =
+  notionIntegrationControllerDisconnectResponseSuccess;
+
+export const getNotionIntegrationControllerDisconnectUrl = () => {
+  return `/api/account/integrations/notion`;
+};
+
+export const notionIntegrationControllerDisconnect = async (
+  options?: RequestInit
+): Promise<notionIntegrationControllerDisconnectResponse> => {
+  return bogaapFetch<notionIntegrationControllerDisconnectResponse>(
+    getNotionIntegrationControllerDisconnectUrl(),
+    {
+      ...options,
+      method: "DELETE"
+    }
+  );
+};
+
+export type notionIntegrationControllerStartOAuthResponse200 = {
+  data: NotionOAuthStartDto;
+  status: 200;
+};
+
+export type notionIntegrationControllerStartOAuthResponseSuccess =
+  notionIntegrationControllerStartOAuthResponse200 & {
+    headers: Headers;
+  };
+export type notionIntegrationControllerStartOAuthResponse =
+  notionIntegrationControllerStartOAuthResponseSuccess;
+
+export const getNotionIntegrationControllerStartOAuthUrl = () => {
+  return `/api/account/integrations/notion/oauth/start`;
+};
+
+export const notionIntegrationControllerStartOAuth = async (
+  options?: RequestInit
+): Promise<notionIntegrationControllerStartOAuthResponse> => {
+  return bogaapFetch<notionIntegrationControllerStartOAuthResponse>(
+    getNotionIntegrationControllerStartOAuthUrl(),
+    {
+      ...options,
+      method: "GET"
+    }
+  );
+};
+
+export type notionIntegrationControllerCompleteOAuthResponse200 = {
+  data: NotionIntegrationStatusDto;
+  status: 200;
+};
+
+export type notionIntegrationControllerCompleteOAuthResponseSuccess =
+  notionIntegrationControllerCompleteOAuthResponse200 & {
+    headers: Headers;
+  };
+export type notionIntegrationControllerCompleteOAuthResponse =
+  notionIntegrationControllerCompleteOAuthResponseSuccess;
+
+export const getNotionIntegrationControllerCompleteOAuthUrl = (
+  params: NotionIntegrationControllerCompleteOAuthParams
+) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? "null" : value.toString());
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0
+    ? `/api/account/integrations/notion/oauth/callback?${stringifiedParams}`
+    : `/api/account/integrations/notion/oauth/callback`;
+};
+
+export const notionIntegrationControllerCompleteOAuth = async (
+  params: NotionIntegrationControllerCompleteOAuthParams,
+  options?: RequestInit
+): Promise<notionIntegrationControllerCompleteOAuthResponse> => {
+  return bogaapFetch<notionIntegrationControllerCompleteOAuthResponse>(
+    getNotionIntegrationControllerCompleteOAuthUrl(params),
+    {
+      ...options,
+      method: "GET"
+    }
+  );
+};
+
+export type notionIntegrationControllerListDataSourcesResponse200 = {
+  data: NotionDataSourcesResponseDto;
+  status: 200;
+};
+
+export type notionIntegrationControllerListDataSourcesResponseSuccess =
+  notionIntegrationControllerListDataSourcesResponse200 & {
+    headers: Headers;
+  };
+export type notionIntegrationControllerListDataSourcesResponse =
+  notionIntegrationControllerListDataSourcesResponseSuccess;
+
+export const getNotionIntegrationControllerListDataSourcesUrl = () => {
+  return `/api/account/integrations/notion/data-sources`;
+};
+
+export const notionIntegrationControllerListDataSources = async (
+  options?: RequestInit
+): Promise<notionIntegrationControllerListDataSourcesResponse> => {
+  return bogaapFetch<notionIntegrationControllerListDataSourcesResponse>(
+    getNotionIntegrationControllerListDataSourcesUrl(),
+    {
+      ...options,
+      method: "GET"
+    }
+  );
+};
+
+export type notionIntegrationControllerCreateMappingResponse201 = {
+  data: NotionMappingDto;
+  status: 201;
+};
+
+export type notionIntegrationControllerCreateMappingResponseSuccess =
+  notionIntegrationControllerCreateMappingResponse201 & {
+    headers: Headers;
+  };
+export type notionIntegrationControllerCreateMappingResponse =
+  notionIntegrationControllerCreateMappingResponseSuccess;
+
+export const getNotionIntegrationControllerCreateMappingUrl = () => {
+  return `/api/account/integrations/notion/mappings`;
+};
+
+export const notionIntegrationControllerCreateMapping = async (
+  createNotionMappingDto: CreateNotionMappingDto,
+  options?: RequestInit
+): Promise<notionIntegrationControllerCreateMappingResponse> => {
+  return bogaapFetch<notionIntegrationControllerCreateMappingResponse>(
+    getNotionIntegrationControllerCreateMappingUrl(),
+    {
+      ...options,
+      method: "POST",
+      headers: { "Content-Type": "application/json", ...options?.headers },
+      body: JSON.stringify(createNotionMappingDto)
+    }
+  );
+};
+
+export type notionIntegrationControllerUpdateMappingResponse200 = {
+  data: NotionMappingDto;
+  status: 200;
+};
+
+export type notionIntegrationControllerUpdateMappingResponseSuccess =
+  notionIntegrationControllerUpdateMappingResponse200 & {
+    headers: Headers;
+  };
+export type notionIntegrationControllerUpdateMappingResponse =
+  notionIntegrationControllerUpdateMappingResponseSuccess;
+
+export const getNotionIntegrationControllerUpdateMappingUrl = (mappingId: string) => {
+  return `/api/account/integrations/notion/mappings/${mappingId}`;
+};
+
+export const notionIntegrationControllerUpdateMapping = async (
+  mappingId: string,
+  updateNotionMappingDto: UpdateNotionMappingDto,
+  options?: RequestInit
+): Promise<notionIntegrationControllerUpdateMappingResponse> => {
+  return bogaapFetch<notionIntegrationControllerUpdateMappingResponse>(
+    getNotionIntegrationControllerUpdateMappingUrl(mappingId),
+    {
+      ...options,
+      method: "PATCH",
+      headers: { "Content-Type": "application/json", ...options?.headers },
+      body: JSON.stringify(updateNotionMappingDto)
+    }
+  );
+};
+
+export type notionIntegrationControllerSyncMappingResponse200 = {
+  data: NotionSyncResultDto;
+  status: 200;
+};
+
+export type notionIntegrationControllerSyncMappingResponseSuccess =
+  notionIntegrationControllerSyncMappingResponse200 & {
+    headers: Headers;
+  };
+export type notionIntegrationControllerSyncMappingResponse =
+  notionIntegrationControllerSyncMappingResponseSuccess;
+
+export const getNotionIntegrationControllerSyncMappingUrl = (mappingId: string) => {
+  return `/api/account/integrations/notion/mappings/${mappingId}/sync`;
+};
+
+export const notionIntegrationControllerSyncMapping = async (
+  mappingId: string,
+  options?: RequestInit
+): Promise<notionIntegrationControllerSyncMappingResponse> => {
+  return bogaapFetch<notionIntegrationControllerSyncMappingResponse>(
+    getNotionIntegrationControllerSyncMappingUrl(mappingId),
+    {
+      ...options,
+      method: "POST"
+    }
+  );
+};
+
+export type notionIntegrationControllerListConflictsResponse200 = {
+  data: NotionConflictsResponseDto;
+  status: 200;
+};
+
+export type notionIntegrationControllerListConflictsResponseSuccess =
+  notionIntegrationControllerListConflictsResponse200 & {
+    headers: Headers;
+  };
+export type notionIntegrationControllerListConflictsResponse =
+  notionIntegrationControllerListConflictsResponseSuccess;
+
+export const getNotionIntegrationControllerListConflictsUrl = () => {
+  return `/api/account/integrations/notion/conflicts`;
+};
+
+export const notionIntegrationControllerListConflicts = async (
+  options?: RequestInit
+): Promise<notionIntegrationControllerListConflictsResponse> => {
+  return bogaapFetch<notionIntegrationControllerListConflictsResponse>(
+    getNotionIntegrationControllerListConflictsUrl(),
+    {
+      ...options,
+      method: "GET"
+    }
+  );
+};
+
+export type notionIntegrationControllerResolveConflictResponse200 = {
+  data: NotionIntegrationControllerResolveConflict200;
+  status: 200;
+};
+
+export type notionIntegrationControllerResolveConflictResponseSuccess =
+  notionIntegrationControllerResolveConflictResponse200 & {
+    headers: Headers;
+  };
+export type notionIntegrationControllerResolveConflictResponse =
+  notionIntegrationControllerResolveConflictResponseSuccess;
+
+export const getNotionIntegrationControllerResolveConflictUrl = (conflictId: string) => {
+  return `/api/account/integrations/notion/conflicts/${conflictId}/resolve`;
+};
+
+export const notionIntegrationControllerResolveConflict = async (
+  conflictId: string,
+  resolveNotionConflictDto: ResolveNotionConflictDto,
+  options?: RequestInit
+): Promise<notionIntegrationControllerResolveConflictResponse> => {
+  return bogaapFetch<notionIntegrationControllerResolveConflictResponse>(
+    getNotionIntegrationControllerResolveConflictUrl(conflictId),
+    {
+      ...options,
+      method: "POST",
+      headers: { "Content-Type": "application/json", ...options?.headers },
+      body: JSON.stringify(resolveNotionConflictDto)
+    }
+  );
+};
+
 export type casesControllerListResponse200 = {
   data: CasesListResponseDto;
   status: 200;
@@ -4327,6 +5335,238 @@ export const casesControllerListPickerOptions = async (
     {
       ...options,
       method: "GET"
+    }
+  );
+};
+
+export type casesControllerGetTenantTasksMetricsResponse200 = {
+  data: TenantCaseTasksMetricsDto;
+  status: 200;
+};
+
+export type casesControllerGetTenantTasksMetricsResponseSuccess =
+  casesControllerGetTenantTasksMetricsResponse200 & {
+    headers: Headers;
+  };
+export type casesControllerGetTenantTasksMetricsResponse =
+  casesControllerGetTenantTasksMetricsResponseSuccess;
+
+export const getCasesControllerGetTenantTasksMetricsUrl = () => {
+  return `/api/cases/tasks/metrics`;
+};
+
+export const casesControllerGetTenantTasksMetrics = async (
+  options?: RequestInit
+): Promise<casesControllerGetTenantTasksMetricsResponse> => {
+  return bogaapFetch<casesControllerGetTenantTasksMetricsResponse>(
+    getCasesControllerGetTenantTasksMetricsUrl(),
+    {
+      ...options,
+      method: "GET"
+    }
+  );
+};
+
+export type casesControllerListTaskBoardsResponse200 = {
+  data: TaskBoardViewsListResponseDto;
+  status: 200;
+};
+
+export type casesControllerListTaskBoardsResponseSuccess =
+  casesControllerListTaskBoardsResponse200 & {
+    headers: Headers;
+  };
+export type casesControllerListTaskBoardsResponse = casesControllerListTaskBoardsResponseSuccess;
+
+export const getCasesControllerListTaskBoardsUrl = () => {
+  return `/api/cases/tasks/boards`;
+};
+
+export const casesControllerListTaskBoards = async (
+  options?: RequestInit
+): Promise<casesControllerListTaskBoardsResponse> => {
+  return bogaapFetch<casesControllerListTaskBoardsResponse>(getCasesControllerListTaskBoardsUrl(), {
+    ...options,
+    method: "GET"
+  });
+};
+
+export type casesControllerCreateTaskBoardResponse201 = {
+  data: TaskBoardViewDto;
+  status: 201;
+};
+
+export type casesControllerCreateTaskBoardResponseSuccess =
+  casesControllerCreateTaskBoardResponse201 & {
+    headers: Headers;
+  };
+export type casesControllerCreateTaskBoardResponse = casesControllerCreateTaskBoardResponseSuccess;
+
+export const getCasesControllerCreateTaskBoardUrl = () => {
+  return `/api/cases/tasks/boards`;
+};
+
+export const casesControllerCreateTaskBoard = async (
+  createTaskBoardViewDto: CreateTaskBoardViewDto,
+  options?: RequestInit
+): Promise<casesControllerCreateTaskBoardResponse> => {
+  return bogaapFetch<casesControllerCreateTaskBoardResponse>(
+    getCasesControllerCreateTaskBoardUrl(),
+    {
+      ...options,
+      method: "POST",
+      headers: { "Content-Type": "application/json", ...options?.headers },
+      body: JSON.stringify(createTaskBoardViewDto)
+    }
+  );
+};
+
+export type casesControllerUpdateTaskBoardResponse200 = {
+  data: TaskBoardViewDto;
+  status: 200;
+};
+
+export type casesControllerUpdateTaskBoardResponseSuccess =
+  casesControllerUpdateTaskBoardResponse200 & {
+    headers: Headers;
+  };
+export type casesControllerUpdateTaskBoardResponse = casesControllerUpdateTaskBoardResponseSuccess;
+
+export const getCasesControllerUpdateTaskBoardUrl = (boardId: string) => {
+  return `/api/cases/tasks/boards/${boardId}`;
+};
+
+export const casesControllerUpdateTaskBoard = async (
+  boardId: string,
+  updateTaskBoardViewDto: UpdateTaskBoardViewDto,
+  options?: RequestInit
+): Promise<casesControllerUpdateTaskBoardResponse> => {
+  return bogaapFetch<casesControllerUpdateTaskBoardResponse>(
+    getCasesControllerUpdateTaskBoardUrl(boardId),
+    {
+      ...options,
+      method: "PATCH",
+      headers: { "Content-Type": "application/json", ...options?.headers },
+      body: JSON.stringify(updateTaskBoardViewDto)
+    }
+  );
+};
+
+export type casesControllerDeleteTaskBoardResponse200 = {
+  data: CaseDeleteResponseDto;
+  status: 200;
+};
+
+export type casesControllerDeleteTaskBoardResponseSuccess =
+  casesControllerDeleteTaskBoardResponse200 & {
+    headers: Headers;
+  };
+export type casesControllerDeleteTaskBoardResponse = casesControllerDeleteTaskBoardResponseSuccess;
+
+export const getCasesControllerDeleteTaskBoardUrl = (boardId: string) => {
+  return `/api/cases/tasks/boards/${boardId}`;
+};
+
+export const casesControllerDeleteTaskBoard = async (
+  boardId: string,
+  options?: RequestInit
+): Promise<casesControllerDeleteTaskBoardResponse> => {
+  return bogaapFetch<casesControllerDeleteTaskBoardResponse>(
+    getCasesControllerDeleteTaskBoardUrl(boardId),
+    {
+      ...options,
+      method: "DELETE"
+    }
+  );
+};
+
+export type casesControllerListTenantTasksResponse200 = {
+  data: TenantCaseTasksListResponseDto;
+  status: 200;
+};
+
+export type casesControllerListTenantTasksResponseSuccess =
+  casesControllerListTenantTasksResponse200 & {
+    headers: Headers;
+  };
+export type casesControllerListTenantTasksResponse = casesControllerListTenantTasksResponseSuccess;
+
+export const getCasesControllerListTenantTasksUrl = () => {
+  return `/api/cases/tasks`;
+};
+
+export const casesControllerListTenantTasks = async (
+  options?: RequestInit
+): Promise<casesControllerListTenantTasksResponse> => {
+  return bogaapFetch<casesControllerListTenantTasksResponse>(
+    getCasesControllerListTenantTasksUrl(),
+    {
+      ...options,
+      method: "GET"
+    }
+  );
+};
+
+export type casesControllerUpdateTenantTaskResponse200 = {
+  data: GlobalCaseTaskDto;
+  status: 200;
+};
+
+export type casesControllerUpdateTenantTaskResponseSuccess =
+  casesControllerUpdateTenantTaskResponse200 & {
+    headers: Headers;
+  };
+export type casesControllerUpdateTenantTaskResponse =
+  casesControllerUpdateTenantTaskResponseSuccess;
+
+export const getCasesControllerUpdateTenantTaskUrl = (taskId: string) => {
+  return `/api/cases/tasks/${taskId}`;
+};
+
+export const casesControllerUpdateTenantTask = async (
+  taskId: string,
+  updateCaseTaskDto: UpdateCaseTaskDto,
+  options?: RequestInit
+): Promise<casesControllerUpdateTenantTaskResponse> => {
+  return bogaapFetch<casesControllerUpdateTenantTaskResponse>(
+    getCasesControllerUpdateTenantTaskUrl(taskId),
+    {
+      ...options,
+      method: "PATCH",
+      headers: { "Content-Type": "application/json", ...options?.headers },
+      body: JSON.stringify(updateCaseTaskDto)
+    }
+  );
+};
+
+export type casesControllerUpdateTenantTaskLocalContextResponse200 = {
+  data: GlobalCaseTaskDto;
+  status: 200;
+};
+
+export type casesControllerUpdateTenantTaskLocalContextResponseSuccess =
+  casesControllerUpdateTenantTaskLocalContextResponse200 & {
+    headers: Headers;
+  };
+export type casesControllerUpdateTenantTaskLocalContextResponse =
+  casesControllerUpdateTenantTaskLocalContextResponseSuccess;
+
+export const getCasesControllerUpdateTenantTaskLocalContextUrl = (taskId: string) => {
+  return `/api/cases/tasks/${taskId}/local-context`;
+};
+
+export const casesControllerUpdateTenantTaskLocalContext = async (
+  taskId: string,
+  updateCaseTaskLocalContextDto: UpdateCaseTaskLocalContextDto,
+  options?: RequestInit
+): Promise<casesControllerUpdateTenantTaskLocalContextResponse> => {
+  return bogaapFetch<casesControllerUpdateTenantTaskLocalContextResponse>(
+    getCasesControllerUpdateTenantTaskLocalContextUrl(taskId),
+    {
+      ...options,
+      method: "PATCH",
+      headers: { "Content-Type": "application/json", ...options?.headers },
+      body: JSON.stringify(updateCaseTaskLocalContextDto)
     }
   );
 };
@@ -5389,6 +6629,49 @@ export const clientsControllerUpdate = async (
   });
 };
 
+export type clientsControllerDeleteResponse200 = {
+  data: ClientDeleteResponseDto;
+  status: 200;
+};
+
+export type clientsControllerDeleteResponse400 = {
+  data: void;
+  status: 400;
+};
+
+export type clientsControllerDeleteResponse404 = {
+  data: void;
+  status: 404;
+};
+
+export type clientsControllerDeleteResponseSuccess = clientsControllerDeleteResponse200 & {
+  headers: Headers;
+};
+export type clientsControllerDeleteResponseError = (
+  | clientsControllerDeleteResponse400
+  | clientsControllerDeleteResponse404
+) & {
+  headers: Headers;
+};
+
+export type clientsControllerDeleteResponse =
+  | clientsControllerDeleteResponseSuccess
+  | clientsControllerDeleteResponseError;
+
+export const getClientsControllerDeleteUrl = (id: string) => {
+  return `/api/clients/${id}`;
+};
+
+export const clientsControllerDelete = async (
+  id: string,
+  options?: RequestInit
+): Promise<clientsControllerDeleteResponse> => {
+  return bogaapFetch<clientsControllerDeleteResponse>(getClientsControllerDeleteUrl(id), {
+    ...options,
+    method: "DELETE"
+  });
+};
+
 export type clientsControllerArchiveResponse200 = {
   data: ClientArchiveResponseDto;
   status: 200;
@@ -5789,6 +7072,34 @@ export const staffControllerCreate = async (
     headers: { "Content-Type": "application/json", ...options?.headers },
     body: JSON.stringify(createStaffDto)
   });
+};
+
+export type staffControllerParticipantOptionsResponse200 = {
+  data: ParticipantOptionsResponseDto;
+  status: 200;
+};
+
+export type staffControllerParticipantOptionsResponseSuccess =
+  staffControllerParticipantOptionsResponse200 & {
+    headers: Headers;
+  };
+export type staffControllerParticipantOptionsResponse =
+  staffControllerParticipantOptionsResponseSuccess;
+
+export const getStaffControllerParticipantOptionsUrl = () => {
+  return `/api/staff/participant-options`;
+};
+
+export const staffControllerParticipantOptions = async (
+  options?: RequestInit
+): Promise<staffControllerParticipantOptionsResponse> => {
+  return bogaapFetch<staffControllerParticipantOptionsResponse>(
+    getStaffControllerParticipantOptionsUrl(),
+    {
+      ...options,
+      method: "GET"
+    }
+  );
 };
 
 export type staffControllerUpdateResponse200 = {

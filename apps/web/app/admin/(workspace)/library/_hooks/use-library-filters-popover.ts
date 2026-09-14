@@ -4,7 +4,7 @@ import { useState, type FormEvent } from "react";
 import type { LibraryFilters } from "../_types/library-filters.types";
 import type { DocumentMimeGroup } from "../_types/library.types";
 
-type LibraryIdFilterKey = "caseId" | "categoryId";
+type LibraryIdFilterKey = "categoryId";
 
 export function useLibraryFiltersPopover({
   filters,
@@ -19,7 +19,7 @@ export function useLibraryFiltersPopover({
     open: boolean;
     title: string;
     value: string;
-  }>(getIdDialogState("caseId", ""));
+  }>(getIdDialogState("categoryId", ""));
 
   function openIdDialog(key: LibraryIdFilterKey) {
     setIdDialog(getIdDialogState(key, filters[key], true));
@@ -60,13 +60,11 @@ export function useLibraryFiltersPopover({
 }
 
 function getIdDialogState(key: LibraryIdFilterKey, value: string, open = false) {
-  const isCase = key === "caseId";
   return {
     key,
-    label: isCase ? "ID del expediente" : "ID de la categoria",
+    label: "ID de la categoria",
     open,
-    title: isCase ? "Filtrar por expediente" : "Filtrar por categoria",
+    title: "Filtrar por categoria",
     value
   };
 }
-

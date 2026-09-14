@@ -805,7 +805,7 @@ function toPaymentDueCalendarEvent(
 
 function toTaskDueCalendarEvent(
   task: {
-    case?: CalendarCaseContext;
+    case?: CalendarCaseContext | null;
     endDate: Date | null;
     id: string;
     name: string;
@@ -824,7 +824,7 @@ function toTaskDueCalendarEvent(
       date: taskDate?.toISOString().slice(0, 10) ?? "",
       status: task.status
     },
-    includeCaseContext ? task.case : undefined
+    includeCaseContext ? task.case ?? undefined : undefined
   );
 }
 

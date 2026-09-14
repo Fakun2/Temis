@@ -7,7 +7,7 @@ import { AdminTableHeader } from "../../_components/admin-table-header";
 import { Can } from "../../_components/auth";
 import { adminSurfaceClassName } from "../../_constants/dashboard";
 import type { ClientStatusFilter, ClientTypeFilter } from "../_hooks/use-clients-page-state";
-import { ClientSheetPlaceholder } from "./client-sheet-placeholder";
+import { ClientSheet } from "./client-sheet";
 import { ClientsPagination } from "./clients-pagination";
 import { ClientsTable } from "./clients-table";
 import { ClientsToolbar } from "./clients-toolbar";
@@ -57,24 +57,25 @@ export function ClientsTableCard({
     >
       <AdminTableHeader
         actions={
-          <Can permissions={["clients:create"]}>
-            <ClientSheetPlaceholder />
-          </Can>
+          <>
+            <ClientsToolbar
+              busy={loading && Boolean(data)}
+              hasActiveFilters={hasActiveFilters}
+              search={search}
+              status={status}
+              type={type}
+              onClearFilters={onClearFilters}
+              onSearchChange={onSearchChange}
+              onStatusChange={onStatusChange}
+              onTypeChange={onTypeChange}
+            />
+            <Can permissions={["clients:create"]}>
+              <ClientSheet />
+            </Can>
+          </>
         }
-        description="Gestioná personas y empresas vinculadas a tus expedientes."
         icon={UsersRound}
         title="Clientes"
-      />
-      <ClientsToolbar
-        busy={loading && Boolean(data)}
-        hasActiveFilters={hasActiveFilters}
-        search={search}
-        status={status}
-        type={type}
-        onClearFilters={onClearFilters}
-        onSearchChange={onSearchChange}
-        onStatusChange={onStatusChange}
-        onTypeChange={onTypeChange}
       />
       <CardContent className="flex min-h-0 flex-1 flex-col overflow-visible px-3 md:px-4 lg:overflow-hidden">
         <ClientsTable

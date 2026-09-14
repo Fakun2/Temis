@@ -6,6 +6,10 @@ import { NotificationsWorker } from "./notifications/notifications-worker";
 import {
   documentCleanupQueueName,
   documentCleanupRoutingKey,
+  googleCalendarDisconnectRoutingKey,
+  googleCalendarInitialSyncRoutingKey,
+  googleCalendarProvisionRoutingKey,
+  googleCalendarRoutingKey,
   notificationQueueName,
   notificationReminderRoutingKey
 } from "./queue/constants";
@@ -13,8 +17,9 @@ import { AsyncOutbox } from "./queue/outbox";
 import { AsyncOutboxPublisher } from "./queue/publisher";
 import { RabbitMq } from "./queue/rabbitmq";
 import { sleep } from "./queue/retry";
-import type { DocumentCleanupRunMessage, NotificationReminderDueMessage } from "./queue/types";
+import type { DocumentCleanupRunMessage, GoogleCalendarSyncMessage, NotificationReminderDueMessage } from "./queue/types";
 import { ObjectStorage } from "./storage/object-storage";
+import { GoogleCalendarWorker } from "./google-calendar-worker";
 
 loadEnv();
 
@@ -25,6 +30,7 @@ const outbox = new AsyncOutbox(prisma);
 const notifications = new NotificationsWorker(prisma, outbox);
 const documentCleanup = new DocumentCleanupWorker(prisma, outbox, new ObjectStorage());
 const publisher = new AsyncOutboxPublisher(outbox, rabbitMq);
+const googleCalendar = new GoogleCalendarWorker(prisma);
 let isShuttingDown = false;
 
 async function bootstrap() {
@@ -36,7 +42,15 @@ async function bootstrap() {
   }
 
   documentCleanup.startRecoveryLoop();
-  logger.info("BogApp lightweight worker started.");
+  await googleCalendar.recoverStaleSynchronizations();
+  const googleCalendarRecoveryIntervalMs = getPositiveNumberEnv("GOOGLE_CALENDAR_STALE_SYNC_RECOVERY_INTERVAL_MS", 60_000);
+  const googleCalendarRecoveryTimer = setInterval(() => {
+    void googleCalendar.recoverStaleSynchronizations().catch((error) =>
+      logger.error("Google Calendar stale synchronization recovery failed.", error)
+    );
+  }, googleCalendarRecoveryIntervalMs);
+  googleCalendarRecoveryTimer.unref?.();
+  logger.info("Temis integration worker started.");
 }
 
 function startConsumersSupervisor() {
@@ -87,11 +101,31 @@ async function registerConsumers() {
       await documentCleanup.processCleanupJobMessage(payload);
     }
   );
+  await rabbitMq.consume<GoogleCalendarSyncMessage>(
+    "bogaap.google-calendar",
+    googleCalendarRoutingKey,
+    async (payload) => googleCalendar.process(payload)
+  );
+  await rabbitMq.consume<GoogleCalendarSyncMessage>(
+    "bogaap.google-calendar-initial-sync",
+    googleCalendarInitialSyncRoutingKey,
+    async (payload) => googleCalendar.process(payload)
+  );
+  await rabbitMq.consume<GoogleCalendarSyncMessage>(
+    "bogaap.google-calendar-provision",
+    googleCalendarProvisionRoutingKey,
+    async (payload) => googleCalendar.process(payload)
+  );
+  await rabbitMq.consume<GoogleCalendarSyncMessage>(
+    "bogaap.google-calendar-disconnect",
+    googleCalendarDisconnectRoutingKey,
+    async (payload) => googleCalendar.process(payload)
+  );
 }
 
 async function shutdown() {
   isShuttingDown = true;
-  logger.info("Stopping BogApp lightweight worker.");
+  logger.info("Stopping Temis integration worker.");
   publisher.stop();
   await rabbitMq.close();
   await prisma.$disconnect();

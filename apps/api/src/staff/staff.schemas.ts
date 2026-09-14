@@ -44,6 +44,14 @@ export const listStaffQuerySchema = z.object({
   status: z.enum(["active", "invited", "suspended"]).optional()
 });
 
+export const listParticipantOptionsQuerySchema = z.object({
+  cursor: optionalTrimmedString,
+  limit: z.coerce.number().int().min(1).max(50).default(20),
+  practiceAreaId: optionalTrimmedString,
+  role: optionalTrimmedString,
+  search: optionalTrimmedString.pipe(z.string().max(120).optional())
+});
+
 export const createStaffSchema = z.object({
   firstName: requiredName,
   lastName: requiredName,
@@ -64,6 +72,7 @@ export const updateStaffSchema = createStaffSchema
   });
 
 export class ListStaffQueryDto extends createZodDto(listStaffQuerySchema) {}
+export class ListParticipantOptionsQueryDto extends createZodDto(listParticipantOptionsQuerySchema) {}
 
 export class CreateStaffDto extends createZodDto(createStaffSchema) {
   @ApiProperty({ minLength: 3, maxLength: 50, example: "Mateo" })
@@ -228,6 +237,14 @@ export class StaffFilterOptionsDto {
   statuses!: StaffStatusOptionDto[];
 }
 
+export class ParticipantFilterOptionsDto {
+  @ApiProperty({ type: [StaffPracticeAreaDto] })
+  practiceAreas!: StaffPracticeAreaDto[];
+
+  @ApiProperty({ type: [StaffRoleOptionDto] })
+  roles!: StaffRoleOptionDto[];
+}
+
 export class StaffPageInfoDto {
   @ApiProperty({ example: 6 })
   limit!: number;
@@ -253,6 +270,34 @@ export class StaffListResponseDto {
   pageInfo!: StaffPageInfoDto;
 }
 
+export class ParticipantOptionDto {
+  @ApiProperty({ format: "uuid" })
+  id!: string;
+
+  @ApiProperty({ example: "Mateo Alvarez" })
+  fullName!: string;
+
+  @ApiProperty({ example: "mateo@estudio.com" })
+  email!: string;
+
+  @ApiProperty({ nullable: true, type: StaffRoleOptionDto })
+  role!: StaffRoleOptionDto | null;
+
+  @ApiProperty({ type: [StaffPracticeAreaDto] })
+  practiceAreas!: StaffPracticeAreaDto[];
+}
+
+export class ParticipantOptionsResponseDto {
+  @ApiProperty({ type: [ParticipantOptionDto] })
+  items!: ParticipantOptionDto[];
+
+  @ApiProperty({ type: ParticipantFilterOptionsDto })
+  filterOptions!: ParticipantFilterOptionsDto;
+
+  @ApiProperty({ type: StaffPageInfoDto })
+  pageInfo!: StaffPageInfoDto;
+}
+
 export class StaffCreateResponseDto extends StaffWorkerDto {}
 export class StaffUpdateResponseDto extends StaffWorkerDto {}
 
@@ -262,5 +307,6 @@ export class StaffDeleteResponseDto {
 }
 
 export type ListStaffQuery = z.infer<typeof listStaffQuerySchema>;
+export type ListParticipantOptionsQuery = z.infer<typeof listParticipantOptionsQuerySchema>;
 export type CreateStaffInput = z.infer<typeof createStaffSchema>;
 export type UpdateStaffInput = z.infer<typeof updateStaffSchema>;

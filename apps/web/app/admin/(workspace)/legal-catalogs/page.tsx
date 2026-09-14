@@ -115,7 +115,6 @@ export default function LegalCatalogsPage() {
           className={`${adminSurfaceClassName} flex min-h-0 flex-1 flex-col overflow-hidden border-0 py-0 shadow-[var(--admin-card-shadow)]`}
         >
           <AdminTableHeader
-            descriptionClassName="hidden md:line-clamp-2"
             actions={
               <div className="flex flex-wrap items-center gap-2">
                 <AdminTableHeaderActionButton
@@ -140,7 +139,6 @@ export default function LegalCatalogsPage() {
                 />
               </div>
             }
-            description="Consulta provincias globales y fueros disponibles para expedientes."
             icon={Gavel}
             title="Catalogos legales"
           />

@@ -100,7 +100,7 @@ export const caseTasksTableColumnLabels = {
   name: "Descripcion",
   assignedTo: "Asignado",
   startDate: "Inicio",
-  endDate: "Finalizacion",
+  endDate: "Vencimiento",
   status: "Estado",
   lastSeenAt: "Ultima apertura",
   notes: "Observaciones"

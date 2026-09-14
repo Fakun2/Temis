@@ -351,6 +351,32 @@
   display: none;
 }
 
+.temis-calendar-options-scroll {
+  scrollbar-color: color-mix(in oklab, var(--primary) 52%, var(--muted) 48%)
+    color-mix(in oklab, var(--muted) 28%, transparent);
+  scrollbar-width: thin;
+}
+
+.temis-calendar-options-scroll::-webkit-scrollbar {
+  width: 6px;
+}
+
+.temis-calendar-options-scroll::-webkit-scrollbar-track {
+  background: color-mix(in oklab, var(--muted) 28%, transparent);
+  border-radius: 999px;
+}
+
+.temis-calendar-options-scroll::-webkit-scrollbar-thumb {
+  background: color-mix(in oklab, var(--primary) 52%, var(--muted) 48%);
+  border: 1px solid transparent;
+  border-radius: 999px;
+  background-clip: padding-box;
+}
+
+.temis-calendar-options-scroll::-webkit-scrollbar-thumb:hover {
+  background: color-mix(in oklab, var(--primary) 72%, var(--muted) 28%);
+}
+
 @keyframes landing-marquee {
   from {
     transform: translateX(0);
@@ -749,6 +775,161 @@ textarea {
 .theme-light-dark .cashbox-date-input::-webkit-calendar-picker-indicator {
   filter: invert(1) brightness(1.25);
   opacity: 1;
+}
+
+[data-task-kanban-column] {
+  --task-kanban-add-bg: rgba(255, 255, 255, 0.72);
+  --task-kanban-add-border: rgba(7, 24, 39, 0.1);
+  --task-kanban-add-fg: var(--task-kanban-column-title);
+  --task-kanban-add-hover-bg: rgba(255, 255, 255, 0.92);
+  --task-kanban-column-bg: color-mix(in oklab, var(--card) 92%, transparent);
+  --task-kanban-column-fg: var(--foreground);
+  --task-kanban-column-title: var(--foreground);
+  --task-kanban-skeleton-bg: color-mix(in oklab, var(--background) 76%, transparent);
+}
+
+[data-task-kanban-card] {
+  --task-kanban-card-bg: #ffffff;
+  --task-kanban-card-border: rgba(7, 24, 39, 0.1);
+  --task-kanban-card-fg: #2c2c2b;
+  --task-kanban-card-hover-border: rgba(7, 24, 39, 0.18);
+  --task-kanban-card-link-hover: var(--primary);
+  --task-kanban-card-muted-fg: rgba(44, 44, 43, 0.7);
+}
+
+[data-task-kanban-column="todo"] {
+  --task-kanban-add-border: rgba(136, 135, 131, 0.22);
+  --task-kanban-add-hover-bg: rgba(255, 255, 255, 0.98);
+  --task-kanban-column-fg: #888783;
+  --task-kanban-column-title: #888783;
+}
+
+[data-task-kanban-column="in_progress"] {
+  --task-kanban-add-bg: rgba(239, 248, 255, 0.76);
+  --task-kanban-add-border: rgba(37, 131, 221, 0.22);
+  --task-kanban-add-hover-bg: rgba(239, 248, 255, 0.96);
+  --task-kanban-column-fg: #2583dd;
+  --task-kanban-column-title: #2583dd;
+}
+
+[data-task-kanban-column="done"] {
+  --task-kanban-add-bg: rgba(247, 252, 249, 0.76);
+  --task-kanban-add-border: rgba(57, 168, 116, 0.22);
+  --task-kanban-add-hover-bg: rgba(247, 252, 249, 0.96);
+  --task-kanban-column-fg: #39a874;
+  --task-kanban-column-title: #39a874;
+}
+
+[data-task-kanban-column="overdue"] {
+  --task-kanban-add-bg: rgba(255, 251, 226, 0.76);
+  --task-kanban-add-border: rgba(154, 122, 24, 0.22);
+  --task-kanban-add-hover-bg: rgba(255, 251, 226, 0.96);
+  --task-kanban-column-fg: #9a7a18;
+  --task-kanban-column-title: #9a7a18;
+}
+
+.theme-navy-slate [data-task-kanban-column="todo"] {
+  --task-kanban-column-bg: rgba(66, 35, 3, 0.03);
+}
+
+.theme-navy-slate.dark [data-task-kanban-column="todo"],
+.theme-light-dark [data-task-kanban-column="todo"],
+.theme-light-dark.dark [data-task-kanban-column="todo"] {
+  --task-kanban-column-bg: rgba(252, 252, 252, 0.03);
+}
+
+.theme-navy-slate [data-task-kanban-column="in_progress"] {
+  --task-kanban-column-bg: rgba(0, 128, 213, 0.047);
+}
+
+.theme-navy-slate.dark [data-task-kanban-column="in_progress"],
+.theme-light-dark [data-task-kanban-column="in_progress"],
+.theme-light-dark.dark [data-task-kanban-column="in_progress"] {
+  --task-kanban-column-bg: rgba(41, 139, 253, 0.063);
+}
+
+.theme-navy-slate [data-task-kanban-column="overdue"] {
+  --task-kanban-column-bg: rgba(255, 246, 173, 0.22);
+}
+
+.theme-navy-slate.dark [data-task-kanban-column="overdue"],
+.theme-light-dark [data-task-kanban-column="overdue"],
+.theme-light-dark.dark [data-task-kanban-column="overdue"] {
+  --task-kanban-column-bg: rgba(255, 246, 173, 0.075);
+  --task-kanban-column-fg: #d6b84a;
+  --task-kanban-column-title: #d6b84a;
+}
+
+.theme-navy-slate [data-task-kanban-column="done"] {
+  --task-kanban-column-bg: rgba(3, 87, 31, 0.035);
+}
+
+.theme-navy-slate.dark [data-task-kanban-column="done"],
+.theme-light-dark [data-task-kanban-column="done"],
+.theme-light-dark.dark [data-task-kanban-column="done"] {
+  --task-kanban-column-bg: rgba(83, 255, 140, 0.035);
+}
+
+.dark [data-task-kanban-card],
+.theme-light-dark [data-task-kanban-card] {
+  --task-kanban-card-border: rgba(255, 255, 255, 0.045);
+  --task-kanban-card-fg: #f2f4f7;
+  --task-kanban-card-hover-border: rgba(255, 255, 255, 0.1);
+  --task-kanban-card-link-hover: #ffffff;
+  --task-kanban-card-muted-fg: rgba(242, 244, 247, 0.72);
+}
+
+.dark [data-task-kanban-column],
+.theme-light-dark [data-task-kanban-column] {
+  --task-kanban-add-bg: rgba(255, 255, 255, 0.025);
+  --task-kanban-add-border: rgba(255, 255, 255, 0.075);
+  --task-kanban-add-hover-bg: rgba(255, 255, 255, 0.045);
+}
+
+.dark [data-task-kanban-column="todo"],
+.theme-light-dark [data-task-kanban-column="todo"] {
+  --task-kanban-add-border: rgba(136, 135, 131, 0.2);
+}
+
+.dark [data-task-kanban-column="in_progress"],
+.theme-light-dark [data-task-kanban-column="in_progress"] {
+  --task-kanban-add-bg: rgba(37, 131, 221, 0.045);
+  --task-kanban-add-border: rgba(37, 131, 221, 0.24);
+  --task-kanban-add-hover-bg: rgba(37, 131, 221, 0.075);
+}
+
+.dark [data-task-kanban-column="done"],
+.theme-light-dark [data-task-kanban-column="done"] {
+  --task-kanban-add-bg: rgba(57, 168, 116, 0.045);
+  --task-kanban-add-border: rgba(57, 168, 116, 0.24);
+  --task-kanban-add-hover-bg: rgba(57, 168, 116, 0.075);
+}
+
+.dark [data-task-kanban-column="overdue"],
+.theme-light-dark [data-task-kanban-column="overdue"] {
+  --task-kanban-add-bg: rgba(214, 184, 74, 0.05);
+  --task-kanban-add-border: rgba(214, 184, 74, 0.24);
+  --task-kanban-add-hover-bg: rgba(214, 184, 74, 0.08);
+}
+
+.dark [data-task-kanban-card="todo"],
+.theme-light-dark [data-task-kanban-card="todo"] {
+  --task-kanban-card-bg: #2c2c2b;
+}
+
+.dark [data-task-kanban-card="in_progress"],
+.theme-light-dark [data-task-kanban-card="in_progress"] {
+  --task-kanban-card-bg: #213041;
+}
+
+.dark [data-task-kanban-card="done"],
+.theme-light-dark [data-task-kanban-card="done"] {
+  --task-kanban-card-bg: #24342b;
+}
+
+.dark [data-task-kanban-card="overdue"],
+.theme-light-dark [data-task-kanban-card="overdue"] {
+  --task-kanban-card-bg: #332f22;
 }
 
 @keyframes create-account-loading-bar {
@@ -1681,6 +1862,8 @@ textarea {
 }
 
 .justinia-library-icon,
+.justinia-clients-icon,
+.justinia-tasks-icon,
 .justinia-ai-stars-icon,
 .justinia-cashbox-icon,
 .justinia-account-back-icon,
@@ -1823,6 +2006,35 @@ textarea {
 .justinia-cases-icon-latch {
   transform-box: fill-box;
   transform-origin: center;
+}
+
+.justinia-clients-icon-people,
+.justinia-clients-icon-partner,
+.justinia-tasks-icon-sheet,
+.justinia-tasks-icon-check,
+.justinia-account-connectors-icon-arms,
+.justinia-account-connectors-icon-nodes,
+.justinia-account-connectors-icon-plus,
+.justinia-account-connectors-icon-node-1,
+.justinia-account-connectors-icon-node-2,
+.justinia-account-connectors-icon-node-3,
+.justinia-account-connectors-icon-node-4 {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+.justinia-tasks-icon-check {
+  opacity: 0.42;
+  stroke-dasharray: 1;
+  stroke-dashoffset: 0;
+}
+
+.justinia-account-connectors-icon-nodes rect {
+  opacity: 1;
+}
+
+.justinia-account-connectors-icon-arms path {
+  stroke-width: 1.05;
 }
 
 .justinia-cashbox-icon-bill,
@@ -2094,6 +2306,151 @@ textarea {
   animation: justinia-icon-stroke-draw 860ms cubic-bezier(0.22, 1, 0.36, 1) 440ms both;
 }
 
+@keyframes justinia-sidebar-icon-bob {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) rotate(0deg) scale(1);
+  }
+  34% {
+    transform: translate3d(0, -0.8px, 0) rotate(-5deg) scale(1.07);
+  }
+  66% {
+    transform: translate3d(0, 0.2px, 0) rotate(3deg) scale(0.99);
+  }
+}
+
+@keyframes justinia-sidebar-icon-pulse {
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  42% {
+    opacity: 0.45;
+    transform: scale(1.14);
+  }
+  70% {
+    opacity: 1;
+    transform: scale(0.98);
+  }
+}
+
+@keyframes justinia-connectors-node-activate {
+  0% {
+    opacity: 0.52;
+    transform: scale(0.78);
+  }
+  55% {
+    opacity: 1;
+    transform: scale(1.22);
+  }
+  78% {
+    transform: scale(0.96);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes justinia-connectors-icon-energize {
+  0% {
+    transform: translate(0, 0) scale(1);
+  }
+  18% {
+    transform: translate(-0.3px, -0.3px) scale(1.035);
+  }
+  42% {
+    transform: translate(0.25px, 0.25px) scale(1.025);
+  }
+  65% {
+    transform: translate(0.3px, -0.2px) scale(1.04);
+  }
+  86% {
+    transform: translate(-0.25px, 0.25px) scale(1.025);
+  }
+  100% {
+    transform: translate(0, 0) scale(1);
+  }
+}
+
+@keyframes justinia-connectors-axon-grow {
+  0% {
+    opacity: 0.72;
+    stroke-dashoffset: 1;
+  }
+  42%,
+  58% {
+    opacity: 1;
+    stroke-dashoffset: 0;
+  }
+  100% {
+    opacity: 0.72;
+    stroke-dashoffset: 1;
+  }
+}
+
+.justinia-clients-trigger:hover .justinia-clients-icon-people,
+.justinia-clients-trigger:focus-visible .justinia-clients-icon-people,
+.justinia-tasks-trigger:hover .justinia-tasks-icon-sheet,
+.justinia-tasks-trigger:focus-visible .justinia-tasks-icon-sheet {
+  animation: justinia-sidebar-icon-bob 900ms cubic-bezier(0.22, 1, 0.36, 1) 250ms both;
+}
+
+.justinia-clients-trigger:hover .justinia-clients-icon-partner,
+.justinia-clients-trigger:focus-visible .justinia-clients-icon-partner,
+.justinia-tasks-trigger:hover .justinia-tasks-icon-check,
+.justinia-tasks-trigger:focus-visible .justinia-tasks-icon-check {
+  animation: justinia-sidebar-icon-pulse 900ms cubic-bezier(0.22, 1, 0.36, 1) 360ms both;
+}
+
+.justinia-account-connectors-trigger:hover .justinia-account-connectors-icon-axon-1,
+.justinia-account-connectors-trigger:focus-visible .justinia-account-connectors-icon-axon-1 {
+  animation: justinia-connectors-axon-grow 280ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.justinia-account-connectors-trigger:hover .justinia-account-connectors-icon,
+.justinia-account-connectors-trigger:focus-visible .justinia-account-connectors-icon {
+  animation: justinia-connectors-icon-energize 1.3s cubic-bezier(0.22, 1, 0.36, 1) both;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+.justinia-account-connectors-trigger:hover .justinia-account-connectors-icon-axon-2,
+.justinia-account-connectors-trigger:focus-visible .justinia-account-connectors-icon-axon-2 {
+  animation: justinia-connectors-axon-grow 245ms cubic-bezier(0.22, 1, 0.36, 1) 595ms both;
+}
+
+.justinia-account-connectors-trigger:hover .justinia-account-connectors-icon-axon-3,
+.justinia-account-connectors-trigger:focus-visible .justinia-account-connectors-icon-axon-3 {
+  animation: justinia-connectors-axon-grow 310ms cubic-bezier(0.22, 1, 0.36, 1) 260ms both;
+}
+
+.justinia-account-connectors-trigger:hover .justinia-account-connectors-icon-axon-4,
+.justinia-account-connectors-trigger:focus-visible .justinia-account-connectors-icon-axon-4 {
+  animation: justinia-connectors-axon-grow 270ms cubic-bezier(0.22, 1, 0.36, 1) 920ms both;
+}
+
+.justinia-account-connectors-trigger:hover .justinia-account-connectors-icon-node-1,
+.justinia-account-connectors-trigger:focus-visible .justinia-account-connectors-icon-node-1 {
+  animation: justinia-connectors-node-activate 180ms ease-out 175ms both;
+}
+
+.justinia-account-connectors-trigger:hover .justinia-account-connectors-icon-node-2,
+.justinia-account-connectors-trigger:focus-visible .justinia-account-connectors-icon-node-2 {
+  animation: justinia-connectors-node-activate 180ms ease-out 755ms both;
+}
+
+.justinia-account-connectors-trigger:hover .justinia-account-connectors-icon-node-3,
+.justinia-account-connectors-trigger:focus-visible .justinia-account-connectors-icon-node-3 {
+  animation: justinia-connectors-node-activate 180ms ease-out 460ms both;
+}
+
+.justinia-account-connectors-trigger:hover .justinia-account-connectors-icon-node-4,
+.justinia-account-connectors-trigger:focus-visible .justinia-account-connectors-icon-node-4 {
+  animation: justinia-connectors-node-activate 180ms ease-out 1.08s both;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .justinia-notification-trigger:hover .justinia-notification-bell,
   .justinia-notification-trigger:focus-visible .justinia-notification-bell,
@@ -2119,6 +2476,36 @@ textarea {
   .justinia-cases-trigger:focus-visible .justinia-cases-icon-sweep,
   .justinia-cases-trigger:hover .justinia-cases-icon-latch,
   .justinia-cases-trigger:focus-visible .justinia-cases-icon-latch,
+  .justinia-clients-trigger:hover .justinia-clients-icon-people,
+  .justinia-clients-trigger:focus-visible .justinia-clients-icon-people,
+  .justinia-clients-trigger:hover .justinia-clients-icon-partner,
+  .justinia-clients-trigger:focus-visible .justinia-clients-icon-partner,
+  .justinia-tasks-trigger:hover .justinia-tasks-icon-sheet,
+  .justinia-tasks-trigger:focus-visible .justinia-tasks-icon-sheet,
+  .justinia-tasks-trigger:hover .justinia-tasks-icon-check,
+  .justinia-tasks-trigger:focus-visible .justinia-tasks-icon-check,
+  .justinia-account-connectors-trigger:hover .justinia-account-connectors-icon,
+  .justinia-account-connectors-trigger:focus-visible .justinia-account-connectors-icon,
+  .justinia-account-connectors-trigger:hover .justinia-account-connectors-icon-axon-1,
+  .justinia-account-connectors-trigger:focus-visible .justinia-account-connectors-icon-axon-1,
+  .justinia-account-connectors-trigger:hover .justinia-account-connectors-icon-axon-2,
+  .justinia-account-connectors-trigger:focus-visible .justinia-account-connectors-icon-axon-2,
+  .justinia-account-connectors-trigger:hover .justinia-account-connectors-icon-axon-3,
+  .justinia-account-connectors-trigger:focus-visible .justinia-account-connectors-icon-axon-3,
+  .justinia-account-connectors-trigger:hover .justinia-account-connectors-icon-axon-4,
+  .justinia-account-connectors-trigger:focus-visible .justinia-account-connectors-icon-axon-4,
+  .justinia-account-connectors-trigger:hover .justinia-account-connectors-icon-nodes,
+  .justinia-account-connectors-trigger:focus-visible .justinia-account-connectors-icon-nodes,
+  .justinia-account-connectors-trigger:hover .justinia-account-connectors-icon-plus,
+  .justinia-account-connectors-trigger:focus-visible .justinia-account-connectors-icon-plus,
+  .justinia-account-connectors-trigger:hover .justinia-account-connectors-icon-node-1,
+  .justinia-account-connectors-trigger:focus-visible .justinia-account-connectors-icon-node-1,
+  .justinia-account-connectors-trigger:hover .justinia-account-connectors-icon-node-2,
+  .justinia-account-connectors-trigger:focus-visible .justinia-account-connectors-icon-node-2,
+  .justinia-account-connectors-trigger:hover .justinia-account-connectors-icon-node-3,
+  .justinia-account-connectors-trigger:focus-visible .justinia-account-connectors-icon-node-3,
+  .justinia-account-connectors-trigger:hover .justinia-account-connectors-icon-node-4,
+  .justinia-account-connectors-trigger:focus-visible .justinia-account-connectors-icon-node-4,
   .justinia-ai-stars-trigger:hover .justinia-ai-stars-icon-main,
   .justinia-ai-stars-trigger:focus-visible .justinia-ai-stars-icon-main,
   .justinia-ai-stars-trigger:hover .justinia-ai-stars-icon-small,

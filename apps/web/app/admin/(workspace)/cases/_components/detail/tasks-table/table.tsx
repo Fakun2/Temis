@@ -89,7 +89,6 @@ export function CaseTasksTable({
             <TaskColumnsMenu onToggleColumn={toggleColumn} visibleColumns={visibleColumns} />
           </>
         }
-        description="Seguimiento operativo, fechas y observaciones del expediente."
         icon={ListTodo}
         title="Tareas del expediente"
       />

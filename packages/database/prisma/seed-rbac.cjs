@@ -11,6 +11,13 @@ const adminAccessPermission = "admin:access";
 
 const permissions = [
   { code: "admin:access", resource: "admin", action: "access" },
+  { code: "account:read", resource: "account", action: "read" },
+  { code: "account:self_manage", resource: "account", action: "self_manage" },
+  { code: "account:ai_usage_read", resource: "account", action: "ai_usage_read" },
+  { code: "account:studio_manage", resource: "account", action: "studio_manage" },
+  { code: "account:membership_manage", resource: "account", action: "membership_manage" },
+  { code: "notifications:read", resource: "notifications", action: "read" },
+  { code: "notifications:update", resource: "notifications", action: "update" },
   { code: "staff:read", resource: "staff", action: "read" },
   { code: "staff:create", resource: "staff", action: "create" },
   { code: "staff:update", resource: "staff", action: "update" },
@@ -61,6 +68,17 @@ const permissions = [
   { code: "finance:update", resource: "finance", action: "update" },
   { code: "finance:delete", resource: "finance", action: "delete" },
   { code: "integrations:sae_import", resource: "integrations", action: "sae_import" },
+  { code: "integrations:notion_manage", resource: "integrations", action: "notion_manage" },
+  {
+    code: "integrations:google_calendar_manage",
+    resource: "integrations",
+    action: "google_calendar_manage"
+  },
+  {
+    code: "integrations:google_calendar_read",
+    resource: "integrations",
+    action: "google_calendar_read"
+  },
   { code: "billing:manage", resource: "billing", action: "manage" }
 ];
 
@@ -69,6 +87,12 @@ const tenantBlockedPermissionCodes = [
   "currencies:create",
   "currencies:update",
   "currencies:delete"
+];
+const selfServicePermissionCodes = [
+  "account:read",
+  "account:self_manage",
+  "notifications:read",
+  "notifications:update"
 ];
 const stalePermissionCodes = ["clients:write", "tasks:write"];
 
@@ -95,7 +119,7 @@ const systemRoles = [
         !permissionCode.startsWith("ai:") &&
         !permissionCode.startsWith("expenses:") &&
         !permissionCode.startsWith("hearings:") &&
-        !permissionCode.startsWith("integrations:") &&
+        permissionCode !== "integrations:sae_import" &&
         isTenantAssignablePermission(permissionCode)
     )
   },
@@ -107,6 +131,7 @@ const systemRoles = [
     name: "Abogado",
     permissions: [
       adminAccessPermission,
+      ...selfServicePermissionCodes,
       "clients:read",
       "clients:create",
       "clients:update",
@@ -129,7 +154,9 @@ const systemRoles = [
       "hearings:read",
       "hearings:create",
       "hearings:update",
-      "hearings:delete"
+      "hearings:delete",
+      "integrations:google_calendar_manage",
+      "integrations:google_calendar_read"
     ]
   },
   {
@@ -140,6 +167,7 @@ const systemRoles = [
     name: "Paralegal",
     permissions: [
       adminAccessPermission,
+      ...selfServicePermissionCodes,
       "cases:read",
       "forums:read",
       "provinces:read",
@@ -152,7 +180,9 @@ const systemRoles = [
       "expenses:update",
       "hearings:read",
       "hearings:create",
-      "hearings:update"
+      "hearings:update",
+      "integrations:google_calendar_manage",
+      "integrations:google_calendar_read"
     ]
   },
   {
@@ -163,6 +193,7 @@ const systemRoles = [
     name: "Contabilidad",
     permissions: [
       adminAccessPermission,
+      ...selfServicePermissionCodes,
       "currencies:read",
       "categories:read",
       "categories:create",
@@ -182,6 +213,7 @@ const systemRoles = [
     name: "Lectura",
     permissions: [
       adminAccessPermission,
+      ...selfServicePermissionCodes,
       "clients:read",
       "forums:read",
       "provinces:read",
@@ -189,7 +221,8 @@ const systemRoles = [
       "documents:read",
       "tasks:read",
       "hearings:read",
-      "finance:read"
+      "finance:read",
+      "integrations:google_calendar_read"
     ]
   }
 ];

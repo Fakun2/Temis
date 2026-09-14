@@ -16,7 +16,6 @@ export function useLibraryPageController() {
   const searchParamFolderId = searchParams.get("folderId");
   const [folderId, setFolderId] = useState<string | null>(searchParamFolderId);
   const [filters, setFilters] = useState<LibraryFilters>({
-    caseId: "",
     categoryId: "",
     mimeGroups: []
   });
@@ -27,7 +26,6 @@ export function useLibraryPageController() {
   const pagination = useLibraryPagination();
 
   const query = useLibraryQuery({
-    caseId: filters.caseId || undefined,
     categoryId: filters.categoryId || undefined,
     cursor: pagination.cursor,
     folderId,
@@ -37,7 +35,7 @@ export function useLibraryPageController() {
   const mutations = useLibraryMutations();
   const busy = Object.values(mutations).some((mutation) => mutation.isPending);
   const canWrite = mutations.createFolder.hasPermission;
-  const hasActiveFilters = Boolean(filters.mimeGroups.length || filters.caseId || filters.categoryId);
+  const hasActiveFilters = Boolean(filters.mimeGroups.length || filters.categoryId);
 
   useEffect(() => {
     setFolderId(searchParamFolderId);
@@ -58,7 +56,7 @@ export function useLibraryPageController() {
   }
 
   function clearFilters() {
-    updateFilters({ caseId: "", categoryId: "", mimeGroups: [] });
+    updateFilters({ categoryId: "", mimeGroups: [] });
   }
 
   async function createFolder() {
@@ -86,7 +84,6 @@ export function useLibraryPageController() {
       return;
     }
     await mutations.uploadDocument.mutateAsync({
-      caseId: filters.caseId || undefined,
       categoryId: filters.categoryId || undefined,
       file,
       folderId
@@ -101,6 +98,10 @@ export function useLibraryPageController() {
       documentId: document.id,
       input: { title: title.trim() }
     });
+  }
+
+  async function replaceDocument(documentId: string, file: File) {
+    await mutations.replaceDocument.mutateAsync({ documentId, file });
   }
 
   async function bulkMove() {
@@ -161,6 +162,7 @@ export function useLibraryPageController() {
     },
     query,
     renameDocument,
+    replaceDocument,
     refresh: query.refetch,
     resetPage,
     selectedDocuments: selection.selectedDocuments,

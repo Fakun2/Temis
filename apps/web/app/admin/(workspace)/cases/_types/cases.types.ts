@@ -94,7 +94,7 @@ export type CaseDto = {
 
 export type CaseTaskDto = NotificationSettingsDto & {
   id: string;
-  caseId: string;
+  caseId: string | null;
   assignedMembershipId: string | null;
   assignedTo: TaskAssigneeOption | null;
   name: string;
@@ -107,11 +107,24 @@ export type CaseTaskDto = NotificationSettingsDto & {
   updatedAt: string;
 };
 
+export type GlobalCaseTaskDto = CaseTaskDto & {
+  case: {
+    id: string;
+    caseNumber: string;
+    caption: string;
+  } | null;
+  client: {
+    id: string;
+    displayName: string;
+  } | null;
+};
+
 export type TaskAssigneeOption = {
   id: string;
   userId: string;
   fullName: string;
   email: string;
+  practiceAreas: PracticeAreaOption[];
   roleName: string | null;
 };
 
@@ -121,8 +134,36 @@ export type PracticeAreaOption = {
 };
 
 export type NotificationOptions = {
-  members: TaskAssigneeOption[];
   practiceAreas: PracticeAreaOption[];
+};
+
+export type ParticipantOption = {
+  id: string;
+  fullName: string;
+  email: string;
+  role: { code: string; name: string } | null;
+  practiceAreas: PracticeAreaOption[];
+};
+
+export type ParticipantOptionsQueryParams = {
+  cursor?: string;
+  limit: number;
+  practiceAreaId?: string;
+  role?: string;
+  search?: string;
+};
+
+export type ParticipantOptionsResponse = {
+  items: ParticipantOption[];
+  filterOptions: {
+    practiceAreas: PracticeAreaOption[];
+    roles: Array<{ code: string; name: string }>;
+  };
+  pageInfo: {
+    hasNextPage: boolean;
+    limit: number;
+    nextCursor: string | null;
+  };
 };
 
 export type CaseExpenseDto = NotificationSettingsDto & {
@@ -177,6 +218,7 @@ export type CaseHearingDto = NotificationSettingsDto & {
   time: string;
   description: string;
   notificationsEnabled: boolean;
+  participantMembershipIds: string[];
   createdAt: string;
   updatedAt: string;
 };
@@ -200,8 +242,92 @@ export type CasesMetricsDto = {
   pendingTasks: number;
 };
 
+export type TenantCaseTasksMetricsDto = {
+  todo: number;
+  done: number;
+  dueSoon: number;
+  overdue: number;
+};
+
+export type TaskBoardFiltersDto = Partial<{
+  assignedMembershipId: string;
+  caseId: string;
+  clientId: string;
+  dueStatus: TenantCaseTasksDueStatus;
+  endDateFrom: string;
+  endDateTo: string;
+  practiceAreaId: string;
+  search: string;
+  status: CaseTaskStatus;
+}>;
+
+export type TaskBoardVisibleProperty =
+  | "case"
+  | "client"
+  | "assignedTo"
+  | "endDate"
+  | "status"
+  | "notes";
+
+export type TaskBoardSortKey =
+  | "name"
+  | "status"
+  | "endDate"
+  | "client"
+  | "case"
+  | "assignedTo"
+  | "createdAt";
+
+export type TaskBoardSettingsDto = {
+  chartGroupBy: "status" | "client" | "case" | "assignedTo";
+  chartShowHorizontalLines: boolean;
+  chartSortBy: "count" | "label";
+  chartSortDirection: CaseSortDirection;
+  chartType: "vertical_bar" | "horizontal_bar" | "line" | "pie";
+  hideZeroValues: boolean;
+  kanbanCardLayout: "compact" | "list";
+  kanbanCardSize: "small" | "medium" | "large";
+  kanbanColorColumns: boolean;
+  openTaskIn: "side_sheet" | "center_modal";
+  sortBy: TaskBoardSortKey;
+  sortDirection: CaseSortDirection;
+  viewMode: "table" | "kanban" | "calendar" | "bar_chart";
+  visibleProperties: TaskBoardVisibleProperty[];
+};
+
+export type TaskBoardViewDto = {
+  id: string;
+  name: string;
+  filters: TaskBoardFiltersDto;
+  settings: TaskBoardSettingsDto;
+  createdByMembershipId: string;
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type TaskBoardViewsListResponse = {
+  items: TaskBoardViewDto[];
+};
+
+export type TaskBoardViewInput = {
+  name: string;
+  filters: TaskBoardFiltersDto;
+  settings?: TaskBoardSettingsDto;
+};
+
 export type CaseTasksListResponse = {
   items: CaseTaskDto[];
+  pageInfo: {
+    hasNextPage: boolean;
+    limit: number;
+    nextCursor: string | null;
+    offset: number;
+    total: number;
+  };
+};
+
+export type TenantCaseTasksListResponse = {
+  items: GlobalCaseTaskDto[];
   pageInfo: {
     hasNextPage: boolean;
     limit: number;
@@ -364,6 +490,25 @@ export type CasePickerOptionsQueryParams = {
   limit: number;
   offset: number;
   search?: string;
+};
+
+export type TenantCaseTasksDueStatus = "due_soon" | "overdue";
+
+export type TenantCaseTasksQueryParams = {
+  assignedMembershipId?: string;
+  caseId?: string;
+  clientId?: string;
+  cursor?: string;
+  dueStatus?: TenantCaseTasksDueStatus;
+  endDateFrom?: string;
+  endDateTo?: string;
+  limit: number;
+  offset?: number;
+  practiceAreaId?: string;
+  search?: string;
+  sortBy?: TaskBoardSortKey;
+  sortDirection?: CaseSortDirection;
+  status?: CaseTaskStatus;
 };
 
 export type CasesTableColumn =

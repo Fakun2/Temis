@@ -12,6 +12,7 @@ import {
   libraryKeys,
   listLibrary,
   updateDocument,
+  replaceDocument,
   updateFolder,
   uploadDocument
 } from "../_api/library.api";
@@ -60,6 +61,11 @@ export function useLibraryMutations() {
     }),
     updateDocument: useDashboardMutation({
       mutationFn: (variables: Parameters<typeof updateDocument>[0]) => updateDocument(variables),
+      onSuccess: invalidate,
+      permission: "documents:write"
+    }),
+    replaceDocument: useDashboardMutation({
+      mutationFn: (variables: Parameters<typeof replaceDocument>[0]) => replaceDocument(variables),
       onSuccess: invalidate,
       permission: "documents:write"
     }),

@@ -14,6 +14,13 @@ RBAC se resuelve por tenant mediante `tenant_memberships`.
 ## Permisos actuales en codigo
 
 - `tenants:manage`
+- `account:read`
+- `account:self_manage`
+- `account:ai_usage_read`
+- `account:studio_manage`
+- `account:membership_manage`
+- `notifications:read`
+- `notifications:update`
 - `staff:read`
 - `staff:create`
 - `staff:update`
@@ -64,6 +71,13 @@ RBAC se resuelve por tenant mediante `tenant_memberships`.
 - `currencies:delete` (reservado para super admin, no asignado a roles tenant)
 - `billing:manage`
 
+Los permisos de autoservicio (`account:read`, `account:self_manage` y
+`notifications:*`) se asignan a todos los roles, incluidos los custom: los
+servicios los limitan al usuario autenticado y al tenant activo. Los permisos
+de configuracion sensible se conservan segun la politica previa:
+`tenants:manage` habilita IA y estudio; `tenants:manage` o `billing:manage`
+habilita membresia/plan.
+
 ## Matriz esperada
 
 ### owner
@@ -109,10 +123,11 @@ Puede ver informacion autorizada. No crea, edita ni elimina.
 - `OnboardingService.start` upsertea permisos, roles y relaciones.
 - `RolesGuard` valida rol requerido contra `request.user.tenantAccess`.
 - `PermissionsGuard` valida permisos requeridos contra `request.user.tenantAccess`.
+- `AccountController` y `NotificationsController` declaran permisos por ruta;
+  no dependen del comportamiento permisivo de un handler sin metadata.
 
 ## Gaps
 
-- Falta validacion robusta de membership activa por request.
 - Falta granularidad ABAC para causas/documentos asignados.
 - Faltan modulos operativos donde aplicar permisos reales.
 - `billing:manage` existe en permisos pero facturacion SaaS queda post-MVP.

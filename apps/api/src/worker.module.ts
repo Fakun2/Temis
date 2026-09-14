@@ -4,9 +4,11 @@ import { existsSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { DatabaseModule } from "./database/database.module";
 import { DocumentsModule } from "./documents/documents.module";
+import { IntegrationsModule } from "./integrations/integrations.module";
 import { NotificationsModule } from "./notifications/notifications.module";
 import { QueueConsumersService } from "./queue/queue-consumers.service";
 import { QueueModule } from "./queue/queue.module";
+import { RedisModule } from "./redis/redis.module";
 
 @Module({
   imports: [
@@ -17,7 +19,9 @@ import { QueueModule } from "./queue/queue.module";
     DatabaseModule,
     QueueModule,
     DocumentsModule,
-    NotificationsModule
+    NotificationsModule,
+    IntegrationsModule,
+    RedisModule
   ],
   providers: [QueueConsumersService]
 })

@@ -26,15 +26,17 @@ export class ClientsService {
   list(tenantId: string, query: ListClientsQuery) {
     return this.prisma.runWithTenant(tenantId, async (tx) => {
       const cursor = getValidatedCursor(query);
-      const rows = await tx.$queryRaw<ClientListRow[]>(
-        buildClientsListQuery(tenantId, query, cursor)
-      );
+      const [rows, metrics] = await Promise.all([
+        tx.$queryRaw<ClientListRow[]>(buildClientsListQuery(tenantId, query, cursor)),
+        getClientsListMetrics(tx, tenantId)
+      ]);
       const hasNextPage = rows.length > query.limit;
       const pageRows = rows.slice(0, query.limit);
       const lastRow = pageRows.at(-1);
 
       return {
         items: pageRows.map(toClientSummaryDto),
+        metrics,
         pageInfo: {
           hasNextPage,
           limit: query.limit,
@@ -113,6 +115,24 @@ export class ClientsService {
       };
     });
   }
+
+  delete(tenantId: string, clientId: string) {
+    return this.prisma.runWithTenant(tenantId, async (tx) => {
+      const deleted = await tx.client.deleteMany({
+        where: { id: clientId, tenantId }
+      });
+
+      if (deleted.count === 0) {
+        throw clientNotFound();
+      }
+
+      return {
+        clientId,
+        clientStatus: "deleted" as const,
+        status: "ok" as const
+      };
+    });
+  }
 }
 
 const relatedCaseSelect = {
@@ -165,6 +185,13 @@ type ClientIdentifiers = {
   cuil?: string | null;
   cuit?: string | null;
   dni?: string | null;
+};
+
+type ClientsMetricsRow = {
+  active: bigint | number;
+  inactive: bigint | number;
+  total: bigint | number;
+  withBalance: bigint | number;
 };
 
 async function findClientDetailOrThrow(tx: TenantPrismaClient, tenantId: string, clientId: string) {
@@ -255,6 +282,37 @@ function toClientSummaryDto(row: ClientListRow) {
     status: row.status,
     type: row.type,
     updatedAt: row.updatedAt.toISOString()
+  };
+}
+
+async function getClientsListMetrics(tx: TenantPrismaClient, tenantId: string) {
+  const [row] = await tx.$queryRaw<ClientsMetricsRow[]>(Prisma.sql`
+    SELECT
+      COUNT(*) FILTER (WHERE "status" <> 'archived'::"ClientStatus")::integer AS "total",
+      COUNT(*) FILTER (WHERE "status" = 'active'::"ClientStatus")::integer AS "active",
+      COUNT(*) FILTER (WHERE "status" = 'inactive'::"ClientStatus")::integer AS "inactive",
+      (
+        SELECT COUNT(DISTINCT client_with_balance."id")::integer
+        FROM "clients" client_with_balance
+        INNER JOIN "cases" balance_case
+          ON balance_case."tenant_id" = client_with_balance."tenant_id"
+          AND balance_case."primary_client_id" = client_with_balance."id"
+        INNER JOIN "case_expenses" balance_expense
+          ON balance_expense."tenant_id" = balance_case."tenant_id"
+          AND balance_expense."case_id" = balance_case."id"
+        WHERE client_with_balance."tenant_id" = ${tenantId}::uuid
+          AND client_with_balance."status" <> 'archived'::"ClientStatus"
+          AND balance_expense."status" IN ('pending'::"CaseExpenseStatus", 'overdue'::"CaseExpenseStatus")
+      ) AS "withBalance"
+    FROM "clients"
+    WHERE "tenant_id" = ${tenantId}::uuid
+  `);
+
+  return {
+    active: Number(row?.active ?? 0),
+    inactive: Number(row?.inactive ?? 0),
+    total: Number(row?.total ?? 0),
+    withBalance: Number(row?.withBalance ?? 0)
   };
 }
 

@@ -54,7 +54,6 @@ export function CaseHearingsTable({
             />
           ) : null
         }
-        description="Fechas procesales, tipo de audiencia y avisos asociados."
         icon={CalendarPlus}
         title="Audiencias del expediente"
       />

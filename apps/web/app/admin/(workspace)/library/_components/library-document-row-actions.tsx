@@ -1,6 +1,7 @@
 "use client";
 
-import { Download, Eye, MoreHorizontal, Pencil, Trash2 } from "lucide-react";
+import { Download, Eye, MoreHorizontal, Pencil, RefreshCw, Trash2 } from "lucide-react";
+import { useRef } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -33,14 +34,17 @@ export function LibraryDocumentRowActions({
   canWrite,
   document,
   onDelete,
-  onRename
+  onRename,
+  onReplace
 }: {
   busy: boolean;
   canWrite: boolean;
   document: LibraryDocumentDto;
   onDelete: (documentId: string) => void;
   onRename: (document: LibraryDocumentDto, title: string) => void;
+  onReplace: (documentId: string, file: File) => void;
 }) {
+  const replaceInputRef = useRef<HTMLInputElement>(null);
   const actions = useLibraryDocumentRowActions({ document, onDelete, onRename });
 
   return (
@@ -70,6 +74,10 @@ export function LibraryDocumentRowActions({
                 <Pencil className="h-4 w-4" />
                 Renombrar
               </DropdownMenuItem>
+              <DropdownMenuItem disabled={busy} onSelect={() => replaceInputRef.current?.click()}>
+                <RefreshCw className="h-4 w-4" />
+                Reemplazar archivo
+              </DropdownMenuItem>
               <DropdownMenuItem disabled={busy} onSelect={() => actions.setDeleteOpen(true)}>
                 <Trash2 className="h-4 w-4" />
                 Eliminar
@@ -78,6 +86,16 @@ export function LibraryDocumentRowActions({
           ) : null}
         </DropdownMenuContent>
       </DropdownMenu>
+      <input
+        ref={replaceInputRef}
+        className="hidden"
+        type="file"
+        onChange={(event) => {
+          const file = event.target.files?.[0];
+          if (file) onReplace(document.id, file);
+          event.currentTarget.value = "";
+        }}
+      />
 
       <Sheet open={actions.renameOpen} onOpenChange={actions.setRenameOpen}>
         <SheetContent className="w-[420px] max-w-[94vw] border-border bg-card sm:max-w-[420px]">
