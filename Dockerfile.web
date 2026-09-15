@@ -17,7 +17,10 @@ COPY packages/api-client/package.json packages/api-client/package.json
 COPY packages/ai-contracts/package.json packages/ai-contracts/package.json
 COPY packages/ai-core/package.json packages/ai-core/package.json
 COPY packages/database/package.json packages/database/package.json
-RUN npm ci
+RUN npm ci \
+  && npm install --no-save --package-lock=false --ignore-scripts \
+    @next/swc-linux-x64-musl@16.2.7 \
+    lightningcss-linux-x64-musl@1.32.0
 
 FROM base AS builder
 ARG NEXT_PUBLIC_API_BASE_URL=/api
