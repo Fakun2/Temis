@@ -83,6 +83,10 @@ async function forwardRequest(
     body: requestBody,
     headers,
     method: request.method
+    // OAuth callbacks must redirect in the browser. Following a 302 here would
+    // perform the frontend navigation from the server, without the user's
+    // session cookie, and the admin proxy would return the login page.
+    redirect: "manual"
   });
 
   return toProxyResponse(response);
@@ -118,6 +122,13 @@ async function refreshAccessToken() {
 }
 
 async function toProxyResponse(response: Response) {
+  if (response.status >= 300 && response.status < 400) {
+    const location = response.headers.get("Location");
+    const headers = new Headers();
+    if (location) headers.set("Location", location);
+    return new NextResponse(null, { headers, status: response.status });
+  }
+
   const body = await response.arrayBuffer();
   const text = new TextDecoder().decode(body);
   const json = parseJson(text);
