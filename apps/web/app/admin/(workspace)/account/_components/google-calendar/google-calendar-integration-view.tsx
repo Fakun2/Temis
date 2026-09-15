@@ -111,7 +111,8 @@ export function GoogleCalendarIntegrationView() {
   const isConnected = status?.status === "connected";
   const isApplyingPreferences = pendingPreferenceSync !== null;
   const isSynchronizing = isBusy || sync.isPending || updatePreferences.isPending || isApplyingPreferences;
-  const showConnectionDetails = isConnected || isApplyingPreferences;
+  const connectionDetails =
+    status && (isConnected || isApplyingPreferences) ? status : null;
 
   return (
     <main className="mx-auto flex w-full max-w-4xl flex-1 flex-col gap-5 px-4 py-6 sm:px-6">
@@ -135,13 +136,13 @@ export function GoogleCalendarIntegrationView() {
           {statusQuery.isLoading ? <div className="flex items-center gap-2 text-sm text-muted-foreground"><Loader2 className="size-4 animate-spin" />Cargando estado…</div> : null}
           {statusQuery.error ? <Notice tone="error">No pudimos consultar el estado de la integración.</Notice> : null}
 
-          {showConnectionDetails ? (
+          {connectionDetails ? (
             <div className="grid gap-4 rounded-xl border border-border/60 bg-secondary/20 p-4">
-              <div className="grid gap-1 text-sm"><span className="text-muted-foreground">Cuenta</span><span className="font-medium text-foreground">{status.googleEmail}</span></div>
-              <div className="grid gap-1 text-sm"><span className="text-muted-foreground">Calendario</span><span className="font-medium text-foreground">{status.calendarName}</span></div>
+              <div className="grid gap-1 text-sm"><span className="text-muted-foreground">Cuenta</span><span className="font-medium text-foreground">{connectionDetails.googleEmail}</span></div>
+              <div className="grid gap-1 text-sm"><span className="text-muted-foreground">Calendario</span><span className="font-medium text-foreground">{connectionDetails.calendarName}</span></div>
               <div className="grid gap-1 text-sm"><span className="text-muted-foreground">Sincronización</span><span className="font-medium text-foreground">{preferences.syncMode === "global" ? "Global" : "Personalizada"}</span></div>
-              <div className="grid gap-1 text-sm"><span className="text-muted-foreground">Eventos publicados</span><span className="font-medium text-foreground">{status.activeEventCount}</span></div>
-              {status.lastError ? <Notice tone="error">{status.lastError}</Notice> : null}
+              <div className="grid gap-1 text-sm"><span className="text-muted-foreground">Eventos publicados</span><span className="font-medium text-foreground">{connectionDetails.activeEventCount}</span></div>
+              {connectionDetails.lastError ? <Notice tone="error">{connectionDetails.lastError}</Notice> : null}
               <div className="flex flex-wrap gap-2">
                 <Button disabled={isSynchronizing} onClick={() => { setNotice(null); sync.mutate(undefined); }} type="button"><RefreshCw className={`mr-2 size-4 ${isSynchronizing ? "animate-spin" : ""}`} />{isSynchronizing ? "Sincronizando…" : "Sincronizar ahora"}</Button>
                 <Button disabled={disconnect.isPending || isBusy} onClick={() => setDisconnectDialogOpen(true)} type="button" variant="outline"><Unplug className="mr-2 size-4" />Desconectar</Button>

@@ -387,6 +387,10 @@ export const AnimatedAccountConnectorsIcon = forwardRef<SVGSVGElement, LucidePro
     const [animationRun, setAnimationRun] = useState(0);
     const armAnimations = useRef<Array<SVGAnimateElement | null>>([]);
     const replayAnimation = () => setAnimationRun((current) => current + 1);
+    const setArmAnimation = (index: number, element: SVGElement | null) => {
+      armAnimations.current[index] =
+        element instanceof SVGAnimateElement ? element : null;
+    };
 
     useEffect(() => {
       if (animationRun === 0) {
@@ -432,7 +436,7 @@ export const AnimatedAccountConnectorsIcon = forwardRef<SVGSVGElement, LucidePro
               fill="freeze"
               keyTimes="0; 0.55; 1"
               ref={(element) => {
-                armAnimations.current[0] = element;
+                setArmAnimation(0, element);
               }}
               values="M12 12C12 11.23 12 10.47 12 9.7;M12 12C12 10.65 10.95 9.6 8.35 8.35;M12 12C12 11.23 12 10.47 12 9.7"
             />
@@ -448,7 +452,7 @@ export const AnimatedAccountConnectorsIcon = forwardRef<SVGSVGElement, LucidePro
               fill="freeze"
               keyTimes="0; 0.55; 1"
               ref={(element) => {
-                armAnimations.current[1] = element;
+                setArmAnimation(1, element);
               }}
               values="M12 12C12.77 12 13.53 12 14.3 12;M12 12C13.35 12 14.4 10.95 15.65 8.35;M12 12C12.77 12 13.53 12 14.3 12"
             />
@@ -464,7 +468,7 @@ export const AnimatedAccountConnectorsIcon = forwardRef<SVGSVGElement, LucidePro
               fill="freeze"
               keyTimes="0; 0.55; 1"
               ref={(element) => {
-                armAnimations.current[2] = element;
+                setArmAnimation(2, element);
               }}
               values="M12 12C12 12.77 12 13.53 12 14.3;M12 12C12 13.35 13.05 14.4 15.65 15.65;M12 12C12 12.77 12 13.53 12 14.3"
             />
@@ -480,7 +484,7 @@ export const AnimatedAccountConnectorsIcon = forwardRef<SVGSVGElement, LucidePro
               fill="freeze"
               keyTimes="0; 0.55; 1"
               ref={(element) => {
-                armAnimations.current[3] = element;
+                setArmAnimation(3, element);
               }}
               values="M12 12C11.23 12 10.47 12 9.7 12;M12 12C10.65 12 9.6 13.05 8.35 15.65;M12 12C11.23 12 10.47 12 9.7 12"
             />

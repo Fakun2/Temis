@@ -81,18 +81,20 @@ export function ParticipantSelectorDialog({
   const participantsQuery = useCasesQuery(casesQueries.participantOptions(params, open));
 
   useEffect(() => {
-    const page = participantsQuery.data?.items;
-    if (!open || !page) return;
+    const participantData = participantsQuery.data;
+    if (!open || !participantData) return;
 
     setLoadedItems((current) =>
-      cursor ? mergeParticipantPages(current, page) : page
+      cursor
+        ? mergeParticipantPages(current, participantData.items)
+        : participantData.items
     );
-    setFilterOptions(participantsQuery.data.filterOptions);
+    setFilterOptions(participantData.filterOptions);
     setPageInfo({
-      hasNextPage: participantsQuery.data.pageInfo.hasNextPage,
-      nextCursor: participantsQuery.data.pageInfo.nextCursor
+      hasNextPage: participantData.pageInfo.hasNextPage,
+      nextCursor: participantData.pageInfo.nextCursor
     });
-  }, [cursor, open, participantsQuery.data?.items]);
+  }, [cursor, open, participantsQuery.data]);
 
   const selectedIds = new Set(draftSelectedIds);
   const selectedNames = loadedItems
