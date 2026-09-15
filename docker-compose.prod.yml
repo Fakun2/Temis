@@ -163,6 +163,7 @@ services:
       NOTION_CLIENT_SECRET: ${NOTION_CLIENT_SECRET:-}
       NOTION_REDIRECT_URI: ${NOTION_REDIRECT_URI:-}
       NOTION_TOKEN_ENCRYPTION_KEY: ${NOTION_TOKEN_ENCRYPTION_KEY:-}
+      NOTION_OAUTH_STATE_SECRET: ${NOTION_OAUTH_STATE_SECRET}
     depends_on:
       postgres:
         condition: service_healthy
