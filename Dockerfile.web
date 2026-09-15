@@ -2,6 +2,11 @@ FROM node:24-alpine AS base
 WORKDIR /app
 ENV NEXT_TELEMETRY_DISABLED=1
 
+# Next resolves the package manager from apps/web, which has no lockfile.
+# Remove the Yarn binary bundled in the Node image so Next consistently falls
+# back to this repository's npm lockfile during the production build.
+RUN rm -f /usr/local/bin/yarn /usr/local/bin/yarnpkg
+
 FROM base AS deps
 COPY package.json package-lock.json turbo.json tsconfig.base.json ./
 COPY apps/ai-service/package.json apps/ai-service/package.json
