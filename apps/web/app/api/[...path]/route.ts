@@ -82,7 +82,7 @@ async function forwardRequest(
   const response = await fetch(targetUrl, {
     body: requestBody,
     headers,
-    method: request.method
+    method: request.method,
     // OAuth callbacks must redirect in the browser. Following a 302 here would
     // perform the frontend navigation from the server, without the user's
     // session cookie, and the admin proxy would return the login page.
