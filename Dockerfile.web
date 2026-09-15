@@ -17,6 +17,7 @@ COPY packages/api-client/package.json packages/api-client/package.json
 COPY packages/ai-contracts/package.json packages/ai-contracts/package.json
 COPY packages/ai-core/package.json packages/ai-core/package.json
 COPY packages/database/package.json packages/database/package.json
+COPY packages/integration-contracts/package.json packages/integration-contracts/package.json
 RUN npm ci \
   && npm install --no-save --package-lock=false --ignore-scripts \
     @next/swc-linux-x64-musl@16.2.7 \
