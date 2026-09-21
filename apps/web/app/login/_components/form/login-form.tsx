@@ -24,7 +24,7 @@ export function LoginForm({ firstLogin, initialEmail }: LoginFormProps) {
   return (
     <>
       <div className="my-auto w-full max-w-[390px]">
-        <div className="mb-9">
+        <div className="mb-9 text-center md:text-left">
           <h1 className="text-balance text-3xl font-semibold leading-tight tracking-normal text-foreground md:text-[34px]">
             {title}
           </h1>

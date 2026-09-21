@@ -10,10 +10,10 @@ import { Label } from "@/components/ui/label";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 export const accountInputClassName =
-  "h-12 rounded-2xl border-border/40 bg-card px-4 shadow-none focus-visible:border-ring/40 focus-visible:ring-2 focus-visible:ring-ring/10";
+  "h-11 rounded-2xl border-border/40 bg-card px-3 shadow-none focus-visible:border-ring/40 focus-visible:ring-2 focus-visible:ring-ring/10 sm:h-12 sm:px-4";
 
 export const accountControlCardClassName =
-  "flex min-h-12 items-center gap-3 rounded-2xl border border-border/40 bg-card px-4 py-3 text-sm font-medium text-foreground shadow-none transition-colors hover:bg-secondary/30";
+  "flex min-h-11 min-w-0 items-center gap-2 rounded-2xl border border-border/40 bg-card px-3 py-2.5 text-sm font-medium text-foreground shadow-none transition-colors hover:bg-secondary/30 sm:min-h-12 sm:gap-3 sm:px-4 sm:py-3";
 
 type AccountCardProps = {
   actionLabel?: string;
@@ -65,13 +65,13 @@ export function AccountCard({
 
   return (
     <Card id={id} className="scroll-mt-20 border-border/60 bg-card shadow-sm">
-      <CardContent className="grid gap-5 p-4 md:p-5">
+      <CardContent className="grid min-w-0 gap-4 p-3 sm:gap-5 sm:p-4 md:p-5">
         <div className="flex items-center justify-between gap-3">
-          <div className="flex min-w-0 items-center gap-3">
+          <div className="flex min-w-0 items-center gap-2 sm:gap-3">
             <span className="grid size-9 shrink-0 place-items-center rounded-xl bg-btn-secondary text-muted-foreground">
               <Icon className="h-4 w-4" strokeWidth={1.75} aria-hidden="true" />
             </span>
-            <h2 className="truncate text-base font-semibold text-foreground">{title}</h2>
+            <h2 className="truncate text-sm font-semibold text-foreground sm:text-base">{title}</h2>
           </div>
           {editing ? (
             <Button type="button" size="sm" variant="outline" onClick={onCancel} disabled={saving}>
@@ -158,11 +158,11 @@ export function CheckboxField({
 
 export function InfoGrid({ items }: { items: Array<[string, string]> }) {
   return (
-    <div className="grid gap-4 md:grid-cols-2">
+    <div className="grid min-w-0 gap-3 sm:gap-4 md:grid-cols-2">
       {items.map(([label, value]) => (
         <div key={label} className="min-w-0">
           <p className="text-xs text-muted-foreground">{label}</p>
-          <p className="mt-1 truncate text-sm font-medium text-foreground">{value}</p>
+          <p className="mt-1 break-words text-sm font-medium text-foreground">{value}</p>
         </div>
       ))}
     </div>

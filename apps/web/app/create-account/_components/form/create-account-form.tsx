@@ -12,7 +12,7 @@ type CreateAccountFormProps = {
 
 export function CreateAccountForm({ state }: CreateAccountFormProps) {
   return (
-    <form data-create-account-form className="relative grid gap-3 xl:gap-4" onSubmit={state.submit}>
+    <form data-create-account-form className="relative grid w-full gap-3 xl:gap-4" onSubmit={state.submit}>
       {createAccountFieldMap.map((field) => {
         const isPassword = field.name === "password";
         const inputType = isPassword && state.showPassword ? "text" : field.type;
@@ -27,7 +27,7 @@ export function CreateAccountForm({ state }: CreateAccountFormProps) {
             <div className={isPassword ? "relative" : undefined}>
               <Input
                 autoComplete={field.autoComplete}
-                className="h-10 w-full rounded-2xl border-field-border bg-field px-4 text-sm text-field-foreground 2xl:h-12 xl:text-base"
+                className="h-12 w-full rounded-2xl border-field-border bg-field px-4 text-sm text-field-foreground sm:h-10 2xl:h-12 xl:text-base"
                 id={`create-account-${field.name}`}
                 inputMode={field.inputMode}
                 placeholder={field.placeholder}

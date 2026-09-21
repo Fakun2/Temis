@@ -19,7 +19,7 @@ export function CreateAccountPageShell({
 
   return (
     <main
-      className="fixed inset-0 h-[100dvh] max-h-[100dvh] w-full overflow-hidden bg-background p-2 text-foreground transition-colors supports-[height:100dvh]:h-[100dvh] supports-[height:100dvh]:max-h-[100dvh] xl:p-3"
+      className="fixed inset-0 h-[100svh] max-h-[100svh] w-full overflow-hidden bg-background text-foreground transition-colors supports-[height:100dvh]:h-[100dvh] supports-[height:100dvh]:max-h-[100dvh]"
     >
       {children}
       <CreateAccountLoadingDialog
