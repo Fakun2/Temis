@@ -22,7 +22,7 @@ export function ExpedientesSection({ account }: { account: AccountResponse }) {
 
   return (
     <Card id="cases-import" className="scroll-mt-20 border-border/60 bg-card shadow-sm">
-      <CardContent className="grid gap-5 p-4 md:p-5">
+      <CardContent className="grid min-w-0 gap-4 p-3 sm:gap-5 sm:p-4 md:p-5">
         <div className="flex items-start justify-between gap-3">
           <div className="flex min-w-0 items-center gap-3">
             <span className="grid size-9 shrink-0 place-items-center rounded-xl bg-btn-secondary text-muted-foreground">
@@ -39,9 +39,9 @@ export function ExpedientesSection({ account }: { account: AccountResponse }) {
         </div>
 
         {!account.permissions.canImportSae ? (
-          <div className="flex items-center gap-3 rounded-xl border border-border/60 bg-secondary/20 px-3 py-3 text-sm text-muted-foreground">
-            <Lock className="h-4 w-4" aria-hidden="true" />
-            Solo owners pueden importar expedientes desde sistemas externos.
+          <div className="flex min-w-0 items-start gap-2 rounded-xl border border-border/60 bg-secondary/20 px-3 py-3 text-sm text-muted-foreground">
+            <Lock className="mt-0.5 h-4 w-4 shrink-0" aria-hidden="true" />
+            <span className="min-w-0 break-words">Solo owners pueden importar expedientes desde sistemas externos.</span>
           </div>
         ) : null}
 

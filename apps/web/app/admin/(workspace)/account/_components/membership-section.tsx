@@ -33,7 +33,7 @@ export function MembershipSection({ account }: { account: AccountResponse }) {
       onEdit={() => undefined}
     >
       <div className="grid gap-5">
-        <div className="grid gap-4 md:grid-cols-[minmax(0,1fr)_260px]">
+        <div className="grid min-w-0 gap-3 sm:gap-4 md:grid-cols-[minmax(0,1fr)_260px]">
           <InfoGrid
             items={[
               ["Plan", account.membership.accountPlan],
@@ -43,13 +43,13 @@ export function MembershipSection({ account }: { account: AccountResponse }) {
             ]}
           />
 
-          <div className="rounded-xl border border-border/60 bg-secondary/20 p-4">
+          <div className="min-w-0 rounded-xl border border-border/60 bg-secondary/20 p-3 sm:p-4">
             <div className="flex items-center justify-between gap-3">
               <span className="text-sm font-medium text-foreground">Tokens usados</span>
               <span className="text-sm text-muted-foreground">{usagePercent}%</span>
             </div>
             <Progress className="mt-3" value={usagePercent} />
-            <p className="mt-3 text-xs text-muted-foreground">
+            <p className="mt-3 break-words text-xs text-muted-foreground">
               {formatNumber(account.tokenUsage.usedTokens)} usados ·{" "}
               {formatNumber(account.tokenUsage.remainingTokens)} disponibles
             </p>
