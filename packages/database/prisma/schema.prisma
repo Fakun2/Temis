@@ -234,6 +234,14 @@ enum NotificationRecipientStatus {
   read
 }
 
+enum NotificationEmailDeliveryStatus {
+  pending
+  processing
+  delivered
+  skipped
+  failed
+}
+
 enum TenantOnboardingChecklistStatus {
   pending
   completed
@@ -353,6 +361,8 @@ model Tenant {
   cashboxMovements           CashboxMovement[]
   notificationReminders      NotificationReminder[]
   notificationRecipients     NotificationReminderRecipient[]
+  notificationPreferences    NotificationChannelPreference[]
+  notificationEmailDeliveries NotificationEmailDelivery[]
   taskBoardViews             TaskBoardView[]
   notionConnections          NotionConnection[]
   notionTaskBoardMappings    NotionTaskBoardMapping[]
@@ -394,6 +404,7 @@ model User {
   updatedAt                  DateTime                    @updatedAt @map("updated_at") @db.Timestamptz(6)
   caseExpenseCashboxSyncJobs CaseExpenseCashboxSyncJob[]
   googleCalendarConnections GoogleCalendarConnection[]
+  passwordResetCodes       PasswordResetCode[]
 
   @@index([dni])
   @@map("users")
@@ -1035,6 +1046,22 @@ model CaseTask {
   @@map("case_tasks")
 }
 
+model PasswordResetCode {
+  id            String   @id @default(uuid()) @db.Uuid
+  userId        String   @map("user_id") @db.Uuid
+  codeHash      String   @map("code_hash")
+  expiresAt     DateTime @map("expires_at") @db.Timestamptz(6)
+  attempts      Int      @default(0)
+  consumedAt    DateTime? @map("consumed_at") @db.Timestamptz(6)
+  invalidatedAt DateTime? @map("invalidated_at") @db.Timestamptz(6)
+  createdAt     DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt])
+  @@index([userId, consumedAt, invalidatedAt, expiresAt])
+  @@map("password_reset_codes")
+}
+
 model TaskBoardView {
   id                    String   @id @default(uuid()) @db.Uuid
   tenantId              String   @map("tenant_id") @db.Uuid
@@ -1471,6 +1498,7 @@ model TenantMembership {
   notionConnections        NotionConnection[]               @relation("NotionConnectionConnector")
   googleCalendarConnections GoogleCalendarConnection[]        @relation("GoogleCalendarConnectionMembership")
   notificationRecipients   NotificationReminderRecipient[]
+  notificationPreferences  NotificationChannelPreference[]
   settings                 TenantMembershipSettings?
   onboardingChecklistItems TenantOnboardingChecklistItem[]
   hearingParticipations    CaseHearingParticipant[]
@@ -1575,6 +1603,24 @@ model TenantMembershipSettings {
   @@map("tenant_membership_settings")
 }
 
+model NotificationChannelPreference {
+  id                   String                           @id @default(uuid()) @db.Uuid
+  tenantId             String                           @map("tenant_id") @db.Uuid
+  tenantMembershipId   String                           @map("tenant_membership_id") @db.Uuid
+  resourceType         NotificationReminderResourceType @map("resource_type")
+  inAppEnabled         Boolean                          @default(true) @map("in_app_enabled")
+  emailEnabled         Boolean                          @default(false) @map("email_enabled")
+  createdAt            DateTime                         @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt            DateTime                         @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  tenant           Tenant           @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  tenantMembership TenantMembership @relation(fields: [tenantId, tenantMembershipId], references: [tenantId, id], onDelete: Cascade)
+
+  @@unique([tenantId, tenantMembershipId, resourceType])
+  @@index([tenantId, tenantMembershipId])
+  @@map("notification_channel_preferences")
+}
+
 model TenantOnboardingChecklistItem {
   id                 String                          @id @default(uuid()) @db.Uuid
   tenantId           String                          @map("tenant_id") @db.Uuid
@@ -1644,12 +1690,36 @@ model NotificationReminderRecipient {
   reminder            NotificationReminder @relation(fields: [tenantId, reminderId], references: [tenantId, id], onDelete: Cascade)
   tenant              Tenant               @relation(fields: [tenantId], references: [id], onDelete: Cascade)
   recipientMembership TenantMembership     @relation(fields: [tenantId, recipientMembershipId], references: [tenantId, id], onDelete: Cascade)
+  emailDeliveries     NotificationEmailDelivery[]
 
   @@unique([reminderId, recipientMembershipId])
+  @@unique([tenantId, id])
   @@index([tenantId, recipientMembershipId, readAt])
   @@index([tenantId, status])
   @@index([tenantId, reminderId])
   @@map("notification_reminder_recipients")
+}
+
+model NotificationEmailDelivery {
+  id                    String                          @id @default(uuid()) @db.Uuid
+  tenantId              String                          @map("tenant_id") @db.Uuid
+  reminderRecipientId   String                          @map("reminder_recipient_id") @db.Uuid
+  status                NotificationEmailDeliveryStatus @default(pending)
+  attempts              Int                             @default(0)
+  nextRunAt             DateTime                        @default(now()) @map("next_run_at") @db.Timestamptz(6)
+  lastError             String?                         @map("last_error")
+  deliveredAt           DateTime?                       @map("delivered_at") @db.Timestamptz(6)
+  skippedAt             DateTime?                       @map("skipped_at") @db.Timestamptz(6)
+  createdAt             DateTime                        @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt             DateTime                        @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  tenant            Tenant                        @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  reminderRecipient NotificationReminderRecipient @relation(fields: [tenantId, reminderRecipientId], references: [tenantId, id], onDelete: Cascade)
+
+  @@unique([tenantId, reminderRecipientId])
+  @@index([status, nextRunAt])
+  @@index([tenantId, status])
+  @@map("notification_email_deliveries")
 }
 
 model AsyncOutboxEvent {

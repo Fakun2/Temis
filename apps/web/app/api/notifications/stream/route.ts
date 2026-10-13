@@ -40,6 +40,7 @@ async function forwardStream(request: NextRequest, accessTokenOverride?: string)
   }
 
   const response = await fetch(toApiUrl("/api/notifications/stream"), {
+    cache: "no-store",
     headers: {
       Accept: "text/event-stream",
       Authorization: `Bearer ${accessToken}`,
@@ -84,8 +85,10 @@ async function refreshAccessToken() {
 
 function getStreamHeaders(response: Response) {
   return {
-    "Cache-Control": "no-cache, no-transform",
+    "Cache-Control": "no-cache, no-transform, no-store",
     Connection: "keep-alive",
-    "Content-Type": response.headers.get("Content-Type") ?? "text/event-stream"
+    "Content-Type": response.headers.get("Content-Type") ?? "text/event-stream",
+    "Content-Encoding": "none",
+    "X-Accel-Buffering": "no"
   };
 }

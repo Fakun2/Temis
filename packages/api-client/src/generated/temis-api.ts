@@ -228,6 +228,28 @@ export interface GoogleLoginDto {
   idToken: string;
 }
 
+export interface PasswordRecoveryRequestDto {
+  email: string;
+}
+
+export interface PasswordRecoveryResponseDto {
+  status: string;
+}
+
+export interface PasswordRecoveryConfirmDto {
+  email: string;
+  /**
+   * @minLength 6
+   * @maxLength 6
+   */
+  code: string;
+  /**
+   * @minLength 8
+   * @maxLength 72
+   */
+  newPassword: string;
+}
+
 export interface RefreshTokenDto {
   refreshToken: string;
 }
@@ -990,6 +1012,10 @@ export interface CreateDocumentBodyDto {
 
 export interface UpdateDocumentDto {
   [key: string]: unknown;
+}
+
+export interface ReplaceDocumentBodyDto {
+  file: Blob;
 }
 
 export interface BulkDeleteDocumentsDto {
@@ -3429,6 +3455,68 @@ export const authControllerGoogleLogin = async (
   });
 };
 
+export type authControllerRequestPasswordRecoveryResponse200 = {
+  data: PasswordRecoveryResponseDto;
+  status: 200;
+};
+
+export type authControllerRequestPasswordRecoveryResponseSuccess =
+  authControllerRequestPasswordRecoveryResponse200 & {
+    headers: Headers;
+  };
+export type authControllerRequestPasswordRecoveryResponse =
+  authControllerRequestPasswordRecoveryResponseSuccess;
+
+export const getAuthControllerRequestPasswordRecoveryUrl = () => {
+  return `/api/auth/password-recovery/request`;
+};
+
+export const authControllerRequestPasswordRecovery = async (
+  passwordRecoveryRequestDto: PasswordRecoveryRequestDto,
+  options?: RequestInit
+): Promise<authControllerRequestPasswordRecoveryResponse> => {
+  return temisFetch<authControllerRequestPasswordRecoveryResponse>(
+    getAuthControllerRequestPasswordRecoveryUrl(),
+    {
+      ...options,
+      method: "POST",
+      headers: { "Content-Type": "application/json", ...options?.headers },
+      body: JSON.stringify(passwordRecoveryRequestDto)
+    }
+  );
+};
+
+export type authControllerConfirmPasswordRecoveryResponse200 = {
+  data: PasswordRecoveryResponseDto;
+  status: 200;
+};
+
+export type authControllerConfirmPasswordRecoveryResponseSuccess =
+  authControllerConfirmPasswordRecoveryResponse200 & {
+    headers: Headers;
+  };
+export type authControllerConfirmPasswordRecoveryResponse =
+  authControllerConfirmPasswordRecoveryResponseSuccess;
+
+export const getAuthControllerConfirmPasswordRecoveryUrl = () => {
+  return `/api/auth/password-recovery/confirm`;
+};
+
+export const authControllerConfirmPasswordRecovery = async (
+  passwordRecoveryConfirmDto: PasswordRecoveryConfirmDto,
+  options?: RequestInit
+): Promise<authControllerConfirmPasswordRecoveryResponse> => {
+  return temisFetch<authControllerConfirmPasswordRecoveryResponse>(
+    getAuthControllerConfirmPasswordRecoveryUrl(),
+    {
+      ...options,
+      method: "POST",
+      headers: { "Content-Type": "application/json", ...options?.headers },
+      body: JSON.stringify(passwordRecoveryConfirmDto)
+    }
+  );
+};
+
 export type authControllerRefreshResponse201 = {
   data: TokenPairDto;
   status: 201;
@@ -4717,6 +4805,38 @@ export const documentsControllerDelete = async (
     {
       ...options,
       method: "DELETE"
+    }
+  );
+};
+
+export type documentsControllerReplaceResponse200 = {
+  data: DocumentDto;
+  status: 200;
+};
+
+export type documentsControllerReplaceResponseSuccess = documentsControllerReplaceResponse200 & {
+  headers: Headers;
+};
+export type documentsControllerReplaceResponse = documentsControllerReplaceResponseSuccess;
+
+export const getDocumentsControllerReplaceUrl = (documentId: string) => {
+  return `/api/documents/${documentId}/replace`;
+};
+
+export const documentsControllerReplace = async (
+  documentId: string,
+  replaceDocumentBodyDto: ReplaceDocumentBodyDto,
+  options?: RequestInit
+): Promise<documentsControllerReplaceResponse> => {
+  const formData = new FormData();
+  formData.append(`file`, replaceDocumentBodyDto.file);
+
+  return temisFetch<documentsControllerReplaceResponse>(
+    getDocumentsControllerReplaceUrl(documentId),
+    {
+      ...options,
+      method: "POST",
+      body: formData
     }
   );
 };

@@ -2,6 +2,7 @@ import { getPositiveNumberEnv } from "../config";
 
 export const rabbitExchangeName = process.env.RABBITMQ_EXCHANGE ?? "bogaap.jobs";
 export const notificationReminderRoutingKey = "notification.reminder.due";
+export const notificationEmailRoutingKey = "notification.email.send";
 export const documentCleanupRoutingKey = "document.cleanup.run";
 export const googleCalendarRoutingKey = "google-calendar.event";
 export const googleCalendarInitialSyncRoutingKey = "google-calendar.initial-sync";
@@ -10,6 +11,8 @@ export const googleCalendarDisconnectRoutingKey = "google-calendar.connection-di
 
 export const notificationQueueName =
   process.env.RABBITMQ_NOTIFICATIONS_QUEUE ?? "bogaap.notifications";
+export const notificationEmailQueueName =
+  process.env.RABBITMQ_NOTIFICATION_EMAIL_QUEUE ?? "bogaap.notification-emails";
 export const documentCleanupQueueName =
   process.env.RABBITMQ_DOCUMENT_CLEANUP_QUEUE ?? "bogaap.document-cleanup";
 

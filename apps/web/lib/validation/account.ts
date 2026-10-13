@@ -55,7 +55,16 @@ export const accountNotificationsSchema = z.object({
   inAppReminders: z.boolean(),
   emailReminders: z.boolean(),
   dailyDigest: z.boolean(),
-  reminderLeadTime: z.coerce.number().int().min(0).max(720)
+  reminderLeadTime: z.coerce.number().int().min(0).max(720),
+  preferences: z
+    .array(
+      z.object({
+        resourceType: z.enum(["case_task", "case_expense", "case_hearing", "meeting"]),
+        inAppEnabled: z.boolean(),
+        emailEnabled: z.boolean()
+      })
+    )
+    .length(4)
 });
 
 export const accountMembershipSchema = z.object({

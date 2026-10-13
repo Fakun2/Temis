@@ -1,15 +1,26 @@
 import {
   BadRequestException,
+  Inject,
   Injectable,
   Logger,
   NotFoundException,
+  OnModuleDestroy,
+  OnModuleInit,
+  Optional,
   type MessageEvent
 } from "@nestjs/common";
+import type Redis from "ioredis";
 import { Prisma } from "@prisma/client";
+import {
+  notificationDeliveredChannel,
+  parseDeliveredNotificationEvent,
+  type DeliveredNotificationEvent
+} from "@temis/integration-contracts";
 import { Observable, Subject } from "rxjs";
 import { PrismaService, type TenantPrismaClient } from "../database/prisma.service";
 import { AsyncOutboxService } from "../queue/async-outbox.service";
 import { notificationReminderRoutingKey } from "../queue/queue.constants";
+import { REDIS_CLIENT } from "../redis/redis.constants";
 import type { ListNotificationsQuery, NotificationSettingsInput } from "./notifications.schemas";
 
 type ReminderResourceType = "case_task" | "case_expense" | "case_hearing" | "meeting";
@@ -41,14 +52,32 @@ type ReminderConfig = {
 };
 
 @Injectable()
-export class NotificationsService {
+export class NotificationsService implements OnModuleInit, OnModuleDestroy {
   private readonly logger = new Logger(NotificationsService.name);
   private readonly streams = new Map<string, Subject<NotificationStreamEvent>>();
+  private notificationSubscriber: Redis | null = null;
 
   constructor(
     private readonly prisma: PrismaService,
-    private readonly outbox: AsyncOutboxService
+    private readonly outbox: AsyncOutboxService,
+    @Optional() @Inject(REDIS_CLIENT) private readonly redis?: Redis
   ) {}
+
+  async onModuleInit() {
+    if (!this.redis) return;
+    this.notificationSubscriber = this.redis.duplicate();
+    await this.notificationSubscriber.subscribe(notificationDeliveredChannel);
+    this.notificationSubscriber.on("message", (channel, message) => {
+      if (channel !== notificationDeliveredChannel) return;
+      const event = parseDeliveredNotificationEvent(message);
+      if (event) void this.publishRecipientNotification(event);
+    });
+  }
+
+  async onModuleDestroy() {
+    await this.notificationSubscriber?.quit().catch(() => undefined);
+    this.notificationSubscriber = null;
+  }
 
   async scheduleForResource(input: ScheduleReminderInput, prisma?: TenantPrismaClient) {
     if (prisma) {
@@ -470,6 +499,20 @@ export class NotificationsService {
         unreadCount
       });
     }
+  }
+
+  private async publishRecipientNotification(event: DeliveredNotificationEvent) {
+    const notification = await this.prisma.notificationReminderRecipient.findFirst({
+      select: notificationRecipientSelect,
+      where: {
+        id: event.notificationId,
+        recipientMembershipId: event.recipientMembershipId,
+        status: "delivered",
+        tenantId: event.tenantId
+      }
+    });
+    if (!notification) return;
+    await this.publishDeliveredNotifications(event.tenantId, [notification]);
   }
 
   private async enqueueReminderOutbox(

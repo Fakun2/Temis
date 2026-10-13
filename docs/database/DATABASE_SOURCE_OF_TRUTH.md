@@ -50,6 +50,8 @@ los modelos MVP esten completos.
 - `CaseExpenseCashboxSyncJob` -> `case_expense_cashbox_sync_jobs`
 - `NotificationReminder` -> `notification_reminders`
 - `NotificationReminderRecipient` -> `notification_reminder_recipients`
+- `NotificationChannelPreference` -> `notification_channel_preferences`
+- `NotificationEmailDelivery` -> `notification_email_deliveries`
 - `AsyncOutboxEvent` -> `async_outbox_events`
 - `Currency` -> `currencies`
 - `GlobalFinanceCategory` -> `global_finance_categories`
@@ -66,6 +68,7 @@ los modelos MVP esten completos.
 - `AiLegalNormChunk` -> `ai_legal_norm_chunks`
 - `GoogleCalendarConnection` -> `google_calendar_connections`
 - `GoogleCalendarEventLink` -> `google_calendar_event_links`
+- `PasswordResetCode` -> `password_reset_codes`
 
 Las conexiones de Google Calendar son tenant-scoped y pertenecen a una
 membership. Sus credenciales se almacenan solamente cifradas; los links
@@ -173,6 +176,10 @@ deleting` oculta documentos cuyo borrado definitivo esta esperando cleanup de
   cuando sea posible: no mezclar leyes, articulos ni versiones normativas dentro
   de un mismo chunk.
 - `users` es global y no lleva `tenant_id`.
+- `password_reset_codes` pertenece a un usuario global y conserva solamente el
+  hash bcrypt de un código efímero; no es una entidad tenant-scoped ni guarda
+  el código en claro. El flujo invalida códigos anteriores, limita intentos y
+  consume el código de manera atómica al restablecer la contraseña.
 - `currencies` es global y no lleva `tenant_id`.
   El catalogo global guarda `name`, `code`, `symbol` y `active`; los tenants lo
   referencian desde configuraciones y futuros modulos financieros.

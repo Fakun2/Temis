@@ -130,3 +130,15 @@ Motivo: evita mezclar navegacion y permisos operativos sin migrar binarios ni
 duplicar la infraestructura de storage.
 
 Estado: aceptado.
+
+## ADR-013 - Entrega de recordatorios por canal
+
+Decision: las preferencias de recordatorios se resuelven por membresia, tenant,
+tipo de recurso y canal. Los emails se materializan como entregas idempotentes
+en outbox y se consumen desde una cola exclusiva por workers escalables.
+
+Motivo: permite que cada profesional controle sus canales sin filtrar datos
+legales sensibles al correo y evita que un fan-out grande bloquee el worker de
+recordatorios.
+
+Estado: aceptado.

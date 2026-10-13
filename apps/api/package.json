@@ -20,9 +20,6 @@
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.1096.0",
-    "@temis/ai-contracts": "0.1.0",
-    "@temis/ai-core": "0.1.0",
-    "@temis/database": "0.1.0",
     "@nestjs/common": "^11.1.19",
     "@nestjs/config": "^4.0.0",
     "@nestjs/core": "^11.1.19",
@@ -30,6 +27,10 @@
     "@nestjs/passport": "^11.0.0",
     "@nestjs/platform-express": "^11.1.19",
     "@nestjs/swagger": "^11.0.0",
+    "@temis/ai-contracts": "0.1.0",
+    "@temis/ai-core": "0.1.0",
+    "@temis/database": "0.1.0",
+    "@temis/integration-contracts": "0.1.0",
     "amqplib": "^2.0.1",
     "bcryptjs": "^3.0.0",
     "dotenv": "^16.4.0",
@@ -39,6 +40,7 @@
     "passport": "^0.7.0",
     "passport-jwt": "^4.0.1",
     "reflect-metadata": "^0.2.0",
+    "resend": "^6.32.1",
     "rxjs": "^7.8.0",
     "zod": "^3.25.0"
   },

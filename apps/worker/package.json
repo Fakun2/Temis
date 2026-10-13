@@ -15,8 +15,10 @@
     "@temis/integration-contracts": "0.1.0",
     "@prisma/client": "^6.19.0",
     "amqplib": "^2.0.1",
-    "dotenv": "^16.4.0"
-    ,"google-auth-library": "^11.0.2"
+    "dotenv": "^16.4.0",
+    "google-auth-library": "^11.0.2",
+    "ioredis": "^5.0.0",
+    "resend": "^6.32.1"
   },
   "devDependencies": {
     "@types/amqplib": "^0.10.8",

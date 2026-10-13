@@ -43,6 +43,7 @@ export function toNotificationsDraft(account: AccountResponse): AccountNotificat
     dailyDigest: account.notifications.dailyDigest,
     emailReminders: account.notifications.emailReminders,
     inAppReminders: account.notifications.inAppReminders,
-    reminderLeadTime: account.notifications.reminderLeadTime
+    reminderLeadTime: account.notifications.reminderLeadTime,
+    preferences: account.notifications.preferences
   };
 }

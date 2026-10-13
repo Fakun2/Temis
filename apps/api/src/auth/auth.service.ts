@@ -1,18 +1,31 @@
 import {
+  BadRequestException,
   ConflictException,
   ForbiddenException,
   Injectable,
   UnauthorizedException
 } from "@nestjs/common";
+import { randomInt } from "node:crypto";
 import { ConfigService } from "@nestjs/config";
 import { JwtService, JwtSignOptions } from "@nestjs/jwt";
 import { compare, hash } from "bcryptjs";
 import { PrismaService } from "../database/prisma.service";
+import { EmailService } from "../email/email.service";
 import { RbacService } from "../rbac/rbac.service";
-import { CreateAccountDto, GoogleLoginDto, LoginDto } from "./auth.schemas";
+import {
+  CreateAccountDto,
+  GoogleLoginDto,
+  LoginDto,
+  PasswordRecoveryConfirmDto,
+  PasswordRecoveryRequestDto
+} from "./auth.schemas";
 import { JwtPayload } from "./auth.types";
 import { GoogleAuthService, type GoogleAuthProfile } from "./google-auth.service";
 import { getRequiredJwtConfig } from "./jwt-config";
+import { PasswordRecoveryRateLimiterService } from "./password-recovery-rate-limiter.service";
+
+const passwordRecoveryCodeLifetimeMs = 10 * 60_000;
+const passwordRecoveryCodeMaxAttempts = 5;
 
 type LoginUser = {
   avatarUrl: string | null;
@@ -30,7 +43,9 @@ export class AuthService {
     private readonly config: ConfigService,
     private readonly prisma: PrismaService,
     private readonly rbacService: RbacService,
-    private readonly googleAuthService: GoogleAuthService
+    private readonly googleAuthService: GoogleAuthService,
+    private readonly emailService: EmailService,
+    private readonly passwordRecoveryRateLimiter: PasswordRecoveryRateLimiterService
   ) {}
 
   async createAccount(input: CreateAccountDto) {
@@ -114,6 +129,146 @@ export class AuthService {
     }
 
     return this.issueLoginSession(user);
+  }
+
+  async requestPasswordRecovery(input: PasswordRecoveryRequestDto, ip: string) {
+    const email = input.email.toLowerCase();
+    await this.passwordRecoveryRateLimiter.assertCanRequest(email, ip);
+
+    const user = await this.prisma.user.findUnique({
+      where: { email },
+      select: { id: true, passwordHash: true, status: true }
+    });
+
+    if (!user || user.status !== "active" || !user.passwordHash) {
+      return { status: "ok" as const };
+    }
+
+    const now = new Date();
+    const code = randomInt(100_000, 1_000_000).toString();
+    const resetCode = await this.prisma.$transaction(async (tx) => {
+      await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${user.id}))`;
+      await tx.passwordResetCode.updateMany({
+        where: {
+          userId: user.id,
+          consumedAt: null,
+          invalidatedAt: null
+        },
+        data: { invalidatedAt: now }
+      });
+
+      return tx.passwordResetCode.create({
+        data: {
+          codeHash: await hash(code, 12),
+          expiresAt: new Date(now.getTime() + passwordRecoveryCodeLifetimeMs),
+          userId: user.id
+        }
+      });
+    });
+
+    try {
+      await this.emailService.sendPasswordRecoveryCode({
+        code,
+        email,
+        expiresInMinutes: passwordRecoveryCodeLifetimeMs / 60_000
+      });
+    } catch (error) {
+      await this.prisma.passwordResetCode.update({
+        where: { id: resetCode.id },
+        data: { invalidatedAt: new Date() }
+      });
+      throw error;
+    }
+
+    return { status: "ok" as const };
+  }
+
+  async confirmPasswordRecovery(input: PasswordRecoveryConfirmDto, ip: string) {
+    await this.passwordRecoveryRateLimiter.assertCanConfirm(ip);
+
+    const user = await this.prisma.user.findUnique({
+      where: { email: input.email.toLowerCase() },
+      select: { id: true, status: true }
+    });
+    const invalidCode = () => new BadRequestException("El código es inválido o expiró.");
+
+    if (!user || user.status !== "active") {
+      throw invalidCode();
+    }
+
+    const resetCode = await this.prisma.passwordResetCode.findFirst({
+      where: {
+        userId: user.id,
+        consumedAt: null,
+        invalidatedAt: null,
+        expiresAt: { gt: new Date() }
+      },
+      orderBy: { createdAt: "desc" }
+    });
+
+    if (!resetCode || resetCode.attempts >= passwordRecoveryCodeMaxAttempts) {
+      if (resetCode) {
+        await this.prisma.passwordResetCode.update({
+          where: { id: resetCode.id },
+          data: { invalidatedAt: new Date() }
+        });
+      }
+      throw invalidCode();
+    }
+
+    if (!(await compare(input.code, resetCode.codeHash))) {
+      const attempts = resetCode.attempts + 1;
+      await this.prisma.passwordResetCode.update({
+        where: { id: resetCode.id },
+        data: {
+          attempts,
+          ...(attempts >= passwordRecoveryCodeMaxAttempts ? { invalidatedAt: new Date() } : {})
+        }
+      });
+      throw invalidCode();
+    }
+
+    const now = new Date();
+    const updated = await this.prisma.$transaction(async (tx) => {
+      const consumed = await tx.passwordResetCode.updateMany({
+        where: {
+          id: resetCode.id,
+          consumedAt: null,
+          invalidatedAt: null,
+          expiresAt: { gt: now }
+        },
+        data: { consumedAt: now }
+      });
+
+      if (consumed.count !== 1) {
+        return false;
+      }
+
+      await tx.user.update({
+        where: { id: user.id },
+        data: {
+          passwordHash: await hash(input.newPassword, 12),
+          sessionVersion: { increment: 1 }
+        }
+      });
+      await tx.passwordResetCode.updateMany({
+        where: {
+          userId: user.id,
+          id: { not: resetCode.id },
+          consumedAt: null,
+          invalidatedAt: null
+        },
+        data: { invalidatedAt: now }
+      });
+
+      return true;
+    });
+
+    if (!updated) {
+      throw invalidCode();
+    }
+
+    return { status: "ok" as const };
   }
 
   async refresh(refreshToken: string) {
@@ -289,11 +444,7 @@ export class AuthService {
   private async assertSessionIsValid(payload: JwtPayload) {
     const user = await this.getUserSessionState(payload.sub);
 
-    if (
-      !user ||
-      user.status !== "active" ||
-      user.sessionVersion !== payload.sessionVersion
-    ) {
+    if (!user || user.status !== "active" || user.sessionVersion !== payload.sessionVersion) {
       throw new UnauthorizedException("Sesion invalida.");
     }
   }

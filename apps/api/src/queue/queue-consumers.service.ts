@@ -24,8 +24,13 @@ export class QueueConsumersService implements OnModuleInit, OnModuleDestroy {
   ) {}
 
   async onModuleInit() {
+    if (process.env.QUEUE_CONSUMERS_ENABLED !== "true") {
+      this.logger.log("API queue consumers disabled; the worker owns background delivery.");
+      return;
+    }
+
     if (!shouldUseRabbitMq()) {
-      this.logger.log("RabbitMQ consumers disabled.");
+      this.logger.log("RabbitMQ consumers disabled because RabbitMQ is not configured.");
       return;
     }
 

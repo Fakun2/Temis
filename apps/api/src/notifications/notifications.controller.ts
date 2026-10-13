@@ -6,6 +6,7 @@ import {
   Query,
   Req,
   Sse,
+  UnauthorizedException,
   UseGuards,
   type MessageEvent
 } from "@nestjs/common";
@@ -70,7 +71,7 @@ export class NotificationsController {
 
 function getAuthenticatedUserId(request: AuthenticatedRequest) {
   if (!request.user?.sub) {
-    throw new Error("No se pudo identificar al usuario autenticado.");
+    throw new UnauthorizedException("No se pudo identificar al usuario autenticado.");
   }
 
   return request.user.sub;

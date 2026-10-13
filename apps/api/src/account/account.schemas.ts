@@ -42,13 +42,38 @@ export const updateAccountStudioSchema = z.object({
   logoUrl: optionalUrl
 });
 
-export const updateAccountNotificationsSchema = z.object({
-  browserNotifications: z.boolean(),
-  inAppReminders: z.boolean(),
-  emailReminders: z.boolean(),
-  dailyDigest: z.boolean(),
-  reminderLeadTime: z.coerce.number().int().min(0).max(720)
+export const notificationPreferenceResourceTypeSchema = z.enum([
+  "case_task",
+  "case_expense",
+  "case_hearing",
+  "meeting"
+]);
+
+export const notificationPreferenceSchema = z.object({
+  resourceType: notificationPreferenceResourceTypeSchema,
+  inAppEnabled: z.boolean(),
+  emailEnabled: z.boolean()
 });
+
+export const updateAccountNotificationsSchema = z
+  .object({
+    browserNotifications: z.boolean(),
+    inAppReminders: z.boolean(),
+    emailReminders: z.boolean(),
+    dailyDigest: z.boolean(),
+    reminderLeadTime: z.coerce.number().int().min(0).max(720),
+    preferences: z.array(notificationPreferenceSchema).length(4)
+  })
+  .superRefine((input, context) => {
+    const resourceTypes = input.preferences.map((preference) => preference.resourceType);
+    if (new Set(resourceTypes).size !== resourceTypes.length) {
+      context.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Cada tipo de recordatorio debe configurarse una sola vez.",
+        path: ["preferences"]
+      });
+    }
+  });
 
 export const updateAccountMembershipSchema = z.object({
   accountPlan: z.string().trim().min(2).max(40),
@@ -114,6 +139,17 @@ export class UpdateAccountStudioDto extends createZodDto(updateAccountStudioSche
   logoUrl?: string;
 }
 
+export class NotificationChannelPreferenceDto {
+  @ApiProperty({ enum: notificationPreferenceResourceTypeSchema.options })
+  resourceType!: z.infer<typeof notificationPreferenceResourceTypeSchema>;
+
+  @ApiProperty({ example: true })
+  inAppEnabled!: boolean;
+
+  @ApiProperty({ example: false })
+  emailEnabled!: boolean;
+}
+
 export class UpdateAccountNotificationsDto extends createZodDto(updateAccountNotificationsSchema) {
   @ApiProperty({ example: false })
   browserNotifications!: boolean;
@@ -129,6 +165,9 @@ export class UpdateAccountNotificationsDto extends createZodDto(updateAccountNot
 
   @ApiProperty({ example: 24 })
   reminderLeadTime!: number;
+
+  @ApiProperty({ type: [NotificationChannelPreferenceDto] })
+  preferences!: NotificationChannelPreferenceDto[];
 }
 
 export class UpdateAccountMembershipDto extends createZodDto(updateAccountMembershipSchema) {
@@ -256,6 +295,9 @@ export class AccountNotificationsDto {
 
   @ApiProperty({ example: 24 })
   reminderLeadTime!: number;
+
+  @ApiProperty({ type: [NotificationChannelPreferenceDto] })
+  preferences!: NotificationChannelPreferenceDto[];
 }
 
 export class AccountTokenUsageDto {

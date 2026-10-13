@@ -437,7 +437,14 @@ function NotificationsSetup({
     dailyDigest: false,
     emailReminders: false,
     inAppReminders: true,
-    reminderLeadTime: 24
+    reminderLeadTime: 24,
+    preferences: (["case_task", "case_expense", "case_hearing", "meeting"] as const).map(
+      (resourceType) => ({
+        resourceType,
+        inAppEnabled: true,
+        emailEnabled: false
+      })
+    )
   });
   const [hydrated, setHydrated] = useState(false);
   const [browserPermission, setBrowserPermission] = useState<
@@ -458,7 +465,8 @@ function NotificationsSetup({
       dailyDigest: initial.dailyDigest,
       emailReminders: initial.emailReminders,
       inAppReminders: initial.inAppReminders,
-      reminderLeadTime: initial.reminderLeadTime
+      reminderLeadTime: initial.reminderLeadTime,
+      preferences: initial.preferences
     });
     setHydrated(true);
   }, [hydrated, initial]);

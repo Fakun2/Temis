@@ -36,6 +36,16 @@ export const refreshTokenSchema = z.object({
   refreshToken: z.string().min(1)
 });
 
+export const passwordRecoveryRequestSchema = z.object({
+  email: emailSchema
+});
+
+export const passwordRecoveryConfirmSchema = z.object({
+  email: emailSchema,
+  code: z.string().regex(/^\d{6}$/, "Ingresá el código de 6 dígitos."),
+  newPassword: passwordSchema
+});
+
 export class CreateAccountDto extends createZodDto(createAccountSchema) {
   @ApiProperty({ example: "Mateo Alvarez" })
   fullName!: string;
@@ -83,7 +93,11 @@ export class AuthUserDto {
   @ApiProperty({ required: false, nullable: true, example: "+54 9 11 5555-5555" })
   phone!: string | null;
 
-  @ApiProperty({ required: false, nullable: true, example: "https://lh3.googleusercontent.com/a/..." })
+  @ApiProperty({
+    required: false,
+    nullable: true,
+    example: "https://lh3.googleusercontent.com/a/..."
+  })
   avatarUrl!: string | null;
 
   @ApiProperty({ example: "active" })
@@ -98,6 +112,27 @@ export class CreateAccountResponseDto {
 export class RefreshTokenDto extends createZodDto(refreshTokenSchema) {
   @ApiProperty()
   refreshToken!: string;
+}
+
+export class PasswordRecoveryRequestDto extends createZodDto(passwordRecoveryRequestSchema) {
+  @ApiProperty({ example: "mateo@estudio.com" })
+  email!: string;
+}
+
+export class PasswordRecoveryConfirmDto extends createZodDto(passwordRecoveryConfirmSchema) {
+  @ApiProperty({ example: "mateo@estudio.com" })
+  email!: string;
+
+  @ApiProperty({ example: "123456", minLength: 6, maxLength: 6 })
+  code!: string;
+
+  @ApiProperty({ example: "password456", minLength: 8, maxLength: 72 })
+  newPassword!: string;
+}
+
+export class PasswordRecoveryResponseDto {
+  @ApiProperty({ example: "ok" })
+  status!: "ok";
 }
 
 export class TokenPairDto {

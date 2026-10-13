@@ -8,6 +8,11 @@ export type NotificationReminderDueMessage = QueuePayload & {
   tenantId: string;
 };
 
+export type NotificationEmailDeliveryMessage = QueuePayload & {
+  deliveryId: string;
+  tenantId: string;
+};
+
 export type DocumentCleanupRunMessage = QueuePayload & {
   jobId: string;
   nextRunAt: string;

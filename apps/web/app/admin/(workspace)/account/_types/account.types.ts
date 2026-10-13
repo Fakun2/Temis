@@ -36,6 +36,11 @@ export type AccountResponse = {
     emailReminders: boolean;
     inAppReminders: boolean;
     reminderLeadTime: number;
+    preferences: Array<{
+      resourceType: "case_task" | "case_expense" | "case_hearing" | "meeting";
+      inAppEnabled: boolean;
+      emailEnabled: boolean;
+    }>;
   };
   tokenUsage: {
     periodEnd: string;

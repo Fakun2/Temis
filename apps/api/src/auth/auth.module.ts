@@ -8,14 +8,17 @@ import { GoogleAuthService } from "./google-auth.service";
 import { getRequiredJwtConfig } from "./jwt-config";
 import { JwtStrategy } from "./jwt.strategy";
 import { DatabaseModule } from "../database/database.module";
+import { EmailModule } from "../email/email.module";
 import { RbacModule } from "../rbac/rbac.module";
 import { PermissionsGuard } from "./permissions.guard";
 import { RolesGuard } from "./roles.guard";
+import { PasswordRecoveryRateLimiterService } from "./password-recovery-rate-limiter.service";
 
 @Module({
   imports: [
     ConfigModule,
     DatabaseModule,
+    EmailModule,
     RbacModule,
     PassportModule,
     JwtModule.registerAsync({
@@ -30,7 +33,14 @@ import { RolesGuard } from "./roles.guard";
     })
   ],
   controllers: [AuthController],
-  providers: [AuthService, GoogleAuthService, JwtStrategy, RolesGuard, PermissionsGuard],
+  providers: [
+    AuthService,
+    GoogleAuthService,
+    JwtStrategy,
+    RolesGuard,
+    PermissionsGuard,
+    PasswordRecoveryRateLimiterService
+  ],
   exports: [AuthService, RolesGuard, PermissionsGuard]
 })
 export class AuthModule {}

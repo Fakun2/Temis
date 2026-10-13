@@ -13,8 +13,8 @@ export class NotificationsScheduler implements OnModuleInit, OnModuleDestroy {
   constructor(private readonly notificationsService: NotificationsService) {}
 
   onModuleInit() {
-    if (process.env.NOTIFICATIONS_SCHEDULER_ENABLED === "false") {
-      this.logger.log("Notification reminder scheduler disabled.");
+    if (process.env.NOTIFICATIONS_SCHEDULER_ENABLED !== "true") {
+      this.logger.log("Notification reminder scheduler disabled; delivery is owned by the worker.");
       return;
     }
 
