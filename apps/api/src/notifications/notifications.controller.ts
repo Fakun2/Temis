@@ -7,17 +7,14 @@ import {
   Req,
   Sse,
   UnauthorizedException,
-  UseGuards,
   type MessageEvent
 } from "@nestjs/common";
 import { ApiBearerAuth, ApiOkResponse, ApiSecurity, ApiTags } from "@nestjs/swagger";
 import type { Observable } from "rxjs";
 import type { AuthenticatedRequest } from "../auth/auth.types";
-import { JwtAuthGuard } from "../auth/jwt-auth.guard";
 import { Permissions } from "../auth/permissions.decorator";
-import { PermissionsGuard } from "../auth/permissions.guard";
+import { TenantEndpoint } from "../auth/tenant-endpoint.decorator";
 import { ActiveTenant } from "../tenancy/active-tenant.decorator";
-import { TenantGuard } from "../tenancy/tenant.guard";
 import {
   ListNotificationsQueryDto,
   NotificationReadResponseDto,
@@ -29,7 +26,7 @@ import { NotificationsService } from "./notifications.service";
 @ApiBearerAuth()
 @ApiSecurity("tenant")
 @Controller("notifications")
-@UseGuards(JwtAuthGuard, TenantGuard, PermissionsGuard)
+@TenantEndpoint()
 export class NotificationsController {
   constructor(private readonly notificationsService: NotificationsService) {}
 

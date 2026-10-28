@@ -20,6 +20,9 @@ const nextConfig: NextConfig = {
     root: workspaceRoot
   },
   transpilePackages: ["@temis/api-client"],
+  async headers() {
+    return [{ source: "/:path*", headers: [{ key: "Content-Security-Policy", value: "frame-src https://www.youtube-nocookie.com https://player.vimeo.com" }] }];
+  },
   allowedDevOrigins: lanAllowedDevOrigins
 };
 

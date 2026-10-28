@@ -1,12 +1,16 @@
 # Temis VPS Production Deploy
 
+> `status.temis.ar` no se publica desde este VPS. Su CNAME apunta al proyecto
+> Vercel independiente documentado en `docs/operations/STATUS_PAGE.md`; no debe
+> agregarse a Nginx ni al certificado de `temis.ar` de este despliegue.
+
 This guide prepares a single-VPS production deployment with Docker Compose, Nginx,
 PostgreSQL, Redis and MinIO.
 
 ## 1. Server Prerequisites
 
 - A Linux VPS with Docker and Docker Compose installed.
-- DNS A record pointing your subdomain to the VPS public IP.
+- A DNS A record for `temis.ar` pointing to the VPS.
 - Ports `80` and `443` open in the VPS firewall.
 - SSH access with a non-root deploy user.
 
@@ -20,7 +24,7 @@ cp .env.production.example .env.production
 
 Edit `.env.production` and replace every `CHANGE_ME` value.
 
-The production domain in `infra/nginx/nginx.prod.conf` is:
+The canonical production host is:
 
 ```text
 temis.ar
@@ -33,6 +37,8 @@ Production values that must be reviewed before the first real login:
 
 - `FRONTEND_PUBLIC_URL`, `API_PUBLIC_URL` and `API_CORS_ALLOWED_ORIGINS` must use
   the final HTTPS domain.
+- Set `PLATFORM_PUBLIC_URL=https://temis.ar` and choose an explicit
+  `PLATFORM_SECURITY_MODE=disabled|required`; see the platform security runbook.
 - `JWT_ACCESS_SECRET`, `JWT_REFRESH_SECRET`, `POSTGRES_PASSWORD`,
   `RABBITMQ_PASSWORD`, `STORAGE_ACCESS_KEY_ID` and `STORAGE_SECRET_ACCESS_KEY`
   must be strong private values.
@@ -70,7 +76,8 @@ docker compose \
   --no-eff-email
 ```
 
-Replace the email with a monitored address before running. The certificate must cover `temis.ar`.
+Replace the email with a monitored address before running. The certificate must
+cover the canonical application host.
 
 ## 4. Build And Start
 

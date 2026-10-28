@@ -36,17 +36,20 @@ class InMemoryPrismaService {
       where: { email?: string; id?: string };
     }) => {
       const user = where.email
-        ? this.users.get(where.email) ?? null
-        : [...this.users.values()].find((candidate) => candidate.id === where.id) ?? null;
+        ? (this.users.get(where.email) ?? null)
+        : ([...this.users.values()].find((candidate) => candidate.id === where.id) ?? null);
 
       if (!user || !select) {
         return user;
       }
 
       return {
+        ...user,
         email: user.email,
         id: user.id,
         memberships: [],
+        platformRoleAssignment: null,
+        _count: { memberships: 0 },
         sessionVersion: 0
       };
     },
@@ -157,6 +160,18 @@ class InMemoryPrismaService {
 
   readonly tenantMembership = {
     findMany: async () => []
+  };
+
+  readonly platformRoleAssignment = {
+    findUnique: async () => null
+  };
+
+  readonly platformSession = {
+    updateMany: async () => ({ count: 0 })
+  };
+
+  readonly platformSecurityEvent = {
+    create: async () => ({ id: "security-event-1" })
   };
 
   $transaction<T>(callback: (tx: this) => Promise<T>) {
@@ -289,6 +304,11 @@ describe("Auth endpoints (e2e)", () => {
     assert.equal(response.body.tokens.tokenType, "Bearer");
     assert.equal(typeof response.body.tokens.accessToken, "string");
     assert.equal(typeof response.body.tokens.refreshToken, "string");
+    const payload = JSON.parse(
+      Buffer.from(response.body.tokens.accessToken.split(".")[1], "base64url").toString("utf8")
+    );
+    assert.equal(payload.sessionKind, "tenant");
+    assert.equal("platformAccess" in payload, false);
   });
 
   it("rejects invalid login email and password with Zod validation", async () => {

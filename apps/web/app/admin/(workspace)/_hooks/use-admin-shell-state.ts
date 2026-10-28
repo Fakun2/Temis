@@ -6,14 +6,14 @@ import {
   readSession,
   saveSession,
   subscribeSession,
-  type TemisSession
+  type TenantSession
 } from "@/lib/auth/session";
 
 export function useAdminShellState() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [commandOpen, setCommandOpen] = useState(false);
-  const [session, setSession] = useState<TemisSession | null>(null);
+  const [session, setSession] = useState<TenantSession | null>(null);
   const [sessionReady, setSessionReady] = useState(false);
   const [scrolled, setScrolled] = useState(false);
 
@@ -32,7 +32,7 @@ export function useAdminShellState() {
           return;
         }
 
-        const serverSession = (await response.json()) as TemisSession;
+        const serverSession = (await response.json()) as TenantSession;
         saveSession(serverSession);
         if (!cancelled) {
           setSession(readSession());

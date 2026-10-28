@@ -33,7 +33,7 @@ export async function GET(request: NextRequest) {
 async function forwardStream(request: NextRequest, accessTokenOverride?: string) {
   const accessToken = accessTokenOverride ?? (await getAccessTokenCookie());
   const payload = accessToken ? decodeJwtPayload(accessToken) : null;
-  const tenantId = payload?.tenantAccess[0]?.tenantId;
+  const tenantId = payload?.sessionKind === "tenant" ? payload.tenantAccess[0]?.tenantId : null;
 
   if (!accessToken || !tenantId) {
     return NextResponse.json({ message: "No hay una sesion activa." }, { status: 401 });

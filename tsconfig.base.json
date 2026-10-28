@@ -14,7 +14,8 @@
       "@temis/database": ["packages/database/src"],
       "@temis/api-client": ["packages/api-client/src"],
       "@temis/ai-contracts": ["packages/ai-contracts/src"],
-      "@temis/ai-core": ["packages/ai-core/src"]
+      "@temis/ai-core": ["packages/ai-core/src"],
+      "@temis/brand-ui": ["packages/brand-ui/src"]
     }
   }
 }

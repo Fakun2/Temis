@@ -1,10 +1,13 @@
-import type { SessionJwtPayload } from "./session";
+import type { TenantSessionJwtPayload } from "./session";
+import type { PlatformSessionJwtPayload } from "./superadmin-session";
 
-export function decodeJwtPayload(token: string): SessionJwtPayload {
+export type SessionJwtPayload = TenantSessionJwtPayload | PlatformSessionJwtPayload;
+
+export function decodeJwtPayload(token: string): SessionJwtPayload | null {
   try {
     const payload = token.split(".")[1];
     if (!payload) {
-      return { tenantAccess: [] };
+      return null;
     }
 
     const decoded = JSON.parse(decodeBase64Url(payload)) as Partial<SessionJwtPayload> & {
@@ -12,17 +15,24 @@ export function decodeJwtPayload(token: string): SessionJwtPayload {
     };
 
     if (decoded.exp && decoded.exp * 1000 < Date.now()) {
-      return { tenantAccess: [] };
+      return null;
     }
 
-    return {
-      sub: decoded.sub,
-      email: decoded.email,
-      sessionVersion: decoded.sessionVersion,
-      tenantAccess: Array.isArray(decoded.tenantAccess) ? decoded.tenantAccess : []
-    };
+    if (decoded.sessionKind === "tenant" && Array.isArray(decoded.tenantAccess) && !("platformAccess" in decoded)) {
+      return decoded as TenantSessionJwtPayload;
+    }
+    if (
+      decoded.sessionKind === "platform" &&
+      decoded.platformAccess &&
+      typeof decoded.platformAccess === "object" &&
+      (decoded.platformAccess as { role?: unknown }).role === "super_admin" &&
+      !("tenantAccess" in decoded)
+    ) {
+      return decoded as PlatformSessionJwtPayload;
+    }
+    return null;
   } catch {
-    return { tenantAccess: [] };
+    return null;
   }
 }
 

@@ -35,6 +35,10 @@ export async function DELETE(request: NextRequest, context: RouteContext) {
 }
 
 async function proxyRequest(request: NextRequest, context: RouteContext) {
+  const { path } = await context.params;
+  if (["platform", "platform-auth", "superadmin", "superadmin-auth"].includes(path[0] ?? "")) {
+    return NextResponse.json({ message: "Ruta no encontrada." }, { status: 404 });
+  }
   const requestBody = await getReusableRequestBody(request);
   const initial = await forwardRequest(request, context, requestBody);
   if (initial.status !== 401) {
@@ -65,7 +69,7 @@ async function forwardRequest(
   const headers = new Headers();
   const contentType = request.headers.get("Content-Type");
   const payload = accessToken ? decodeJwtPayload(accessToken) : null;
-  const tenantId = payload?.tenantAccess[0]?.tenantId;
+  const tenantId = payload?.sessionKind === "tenant" ? payload.tenantAccess[0]?.tenantId : null;
 
   if (contentType) {
     headers.set("Content-Type", contentType);
@@ -106,9 +110,10 @@ async function refreshAccessToken() {
     return null;
   }
 
+  const headers = new Headers({ "Content-Type": "application/json" });
   const response = await fetch(toApiUrl("/api/auth/refresh"), {
     body: JSON.stringify({ refreshToken }),
-    headers: { "Content-Type": "application/json" },
+    headers,
     method: "POST"
   });
 

@@ -12,6 +12,25 @@ contratos compartidos y comandos unificados.
 
 Estado: aceptado.
 
+## ADR-016 - Página de estado fuera del plano principal
+
+Decision: `status.temis.ar` se sirve desde una aplicación Next.js independiente
+desplegada en Vercel. OpenStatus ejecuta los chequeos externos y mantiene la
+fuente pública de componentes, incidentes y mantenimientos. La aplicación de
+estado consume únicamente el feed JSON público y no usa la base, Redis,
+RabbitMQ ni las sesiones de Temis.
+
+Los componentes públicos representan capacidades reconocibles por el usuario:
+Aplicación web, API, Inicio de sesión, Documentos y Notificaciones e
+integraciones. Los nombres y métricas de PostgreSQL, Redis, RabbitMQ, storage y
+workers permanecen en la observabilidad autenticada de Super Admin.
+
+Motivo: una página alojada junto al producto dejaría de estar disponible durante
+una caída total y expondría detalles operativos innecesarios. Separar el plano de
+comunicación permite informar incidentes aun cuando el VPS principal no responde.
+
+Estado: aceptado.
+
 ## ADR-011 - Integracion unidireccional con Google Calendar
 
 Decision: Google Calendar se integra por usuario y tenant, con OAuth separado
@@ -140,5 +159,54 @@ en outbox y se consumen desde una cola exclusiva por workers escalables.
 Motivo: permite que cada profesional controle sus canales sin filtrar datos
 legales sensibles al correo y evita que un fan-out grande bloquee el worker de
 recordatorios.
+
+Estado: aceptado.
+
+## ADR-014 - Super Admin global separado de tenants
+
+Decision: `super_admin` se asigna mediante `platform_role_assignments` y no por
+`tenant_memberships`. Las cuentas de plataforma son exclusivas y no pueden
+operar dentro de estudios.
+
+Motivo: el RBAC tenant-scoped no es una frontera segura para operaciones SaaS
+globales. La plataforma conserva guards, rutas y permisos propios.
+
+Estado: aceptado.
+
+## ADR-015 - Acceso de Super Admin aislado y configurable por despliegue
+
+Decision: una cuenta `super_admin` usa un flujo, host, cookie y sesiones
+separados del acceso tenant. `PLATFORM_SECURITY_MODE` admite únicamente
+`disabled` o `required`; un valor ausente o inválido impide arrancar en
+producción. `disabled` exige contraseña y step-up de contraseña. `required`
+exige además FIDO2, certificado mTLS de un dispositivo Windows administrado y
+postura conforme obtenida mediante `DevicePostureProvider`. El cambio de modo
+se realiza por configuración y redeploy, nunca desde la web, y revoca las
+sesiones creadas bajo el modo anterior.
+
+Las sesiones de plataforma son revocables, rotatorias, duran como máximo ocho
+horas y no son intercambiables con sesiones tenant. Cada JWT declara
+`sessionKind` y no puede combinar `tenantAccess` con `platformAccess`. El panel
+reside en `/superadmin` dentro del mismo origen público; su autenticación BFF vive en
+`/api/superadmin-auth/*` y sus operaciones en `/api/superadmin/*`. El backend
+expone autenticación independiente en `/api/platform-auth/*` y operaciones en
+`/api/platform/*`. La ruta determina el contexto de autenticación; el host no
+participa en la selección de cookies o sesiones.
+
+El frontend mantiene árboles y shells independientes: `/admin` usa únicamente
+sesión tenant y `/superadmin` únicamente sesión de plataforma. Sólo se comparten
+componentes presentacionales bajo `components/dashboard`; esos componentes no
+deciden permisos, rutas, cookies ni renovaciones de sesión.
+
+La primera integración es MetaDefender Access mediante
+`OpswatDevicePostureProvider`. Nginx valida el certificado de cliente y reemplaza
+los headers internos de identidad; la aplicación nunca acepta un identificador
+de dispositivo declarado libremente por el navegador. Nuevos accesos fallan
+cerrados si el proveedor no está disponible.
+
+Motivo: mantener operable el panel durante la preparación inicial sin extender
+mTLS o OPSWAT a usuarios tenant, y permitir activar fail-closed fuerte cuando
+el enrolamiento esté listo. La abstracción conserva la frontera de dominio y
+permite sustituir el proveedor sin debilitar el guard.
 
 Estado: aceptado.

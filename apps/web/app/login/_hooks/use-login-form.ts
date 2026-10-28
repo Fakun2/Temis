@@ -5,7 +5,7 @@ import { useSearchParams } from "next/navigation";
 import { z } from "zod";
 import { loginWithGoogleCredential } from "@/lib/auth/google-auth";
 import { getAuthenticatedRedirectPath } from "@/lib/auth/redirect";
-import { saveSession, type TemisSession } from "@/lib/auth/session";
+import { saveSession, type TenantSession } from "@/lib/auth/session";
 import { loginFormSchema, type LoginFormValues } from "@/lib/validation/auth";
 import {
   loginInitialForm,
@@ -69,13 +69,13 @@ export function useLoginForm(initialEmail: string | null) {
         headers: { "Content-Type": "application/json" },
         method: "POST"
       });
-      const data = (await response.json().catch(() => null)) as TemisSession | unknown;
+      const data = (await response.json().catch(() => null)) as TenantSession | unknown;
 
       if (!response.ok) {
         throw new Error(getApiErrorMessage(data));
       }
 
-      const session = data as TemisSession;
+      const session = data as TenantSession;
       saveSession(session);
       const elapsed = Date.now() - transitionStartedAt;
       await wait(Math.max(loginLoadingTotalMs - elapsed, 0));
@@ -120,7 +120,9 @@ export function useLoginForm(initialEmail: string | null) {
         shouldHideTransition = false;
         window.location.assign(getAuthenticatedRedirectPath(session, searchParams.get("next")));
       } catch (caught) {
-        setError(caught instanceof Error ? caught.message : "No se pudo iniciar sesion con Google.");
+        setError(
+          caught instanceof Error ? caught.message : "No se pudo iniciar sesion con Google."
+        );
       } finally {
         if (shouldHideTransition) {
           transition.reset();
@@ -159,6 +161,9 @@ function toFieldErrors(error: z.ZodError) {
 }
 
 function getApiErrorMessage(data: unknown) {
+  const originError = getInvalidOriginErrorMessage(data);
+  if (originError) return originError;
+
   if (typeof data === "object" && data && "message" in data) {
     const message = (data as { message?: unknown }).message;
     return Array.isArray(message) ? message.join(", ") : String(message);
@@ -166,3 +171,38 @@ function getApiErrorMessage(data: unknown) {
 
   return "No se pudo iniciar sesion.";
 }
+
+function getInvalidOriginErrorMessage(data: unknown) {
+  if (!data || typeof data !== "object" || !("code" in data)) return null;
+  if ((data as { code?: unknown }).code !== "invalid_request_origin" || !("details" in data)) {
+    return null;
+  }
+
+  const details = (data as { details?: unknown }).details;
+  if (!details || typeof details !== "object") return null;
+  const values = details as {
+    expectedOrigins?: unknown;
+    reason?: unknown;
+    receivedOrigin?: unknown;
+  };
+  const received = typeof values.receivedOrigin === "string" ? values.receivedOrigin : "ausente";
+  const expected = Array.isArray(values.expectedOrigins)
+    ? values.expectedOrigins
+        .filter((value): value is string => typeof value === "string")
+        .join(", ")
+    : "sin configurar";
+  const reason =
+    typeof values.reason === "string"
+      ? (originReasonLabels[values.reason] ?? values.reason)
+      : "desconocido";
+
+  return `Origen de solicitud invalido. Recibido: ${received}. Esperado: ${expected || "sin configurar"}. Motivo: ${reason}.`;
+}
+
+const originReasonLabels: Record<string, string> = {
+  invalid_origin: "el encabezado Origin no es una URL valida",
+  missing_origin: "falta el encabezado Origin",
+  origin_mismatch: "el origen no coincide con este host",
+  platform_host_mismatch: "la solicitud no llego por el host del panel de plataforma",
+  platform_url_not_configured: "falta configurar PLATFORM_PUBLIC_URL"
+};

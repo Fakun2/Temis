@@ -13,12 +13,22 @@ import { RbacModule } from "../rbac/rbac.module";
 import { PermissionsGuard } from "./permissions.guard";
 import { RolesGuard } from "./roles.guard";
 import { PasswordRecoveryRateLimiterService } from "./password-recovery-rate-limiter.service";
+import { RedisModule } from "../redis/redis.module";
+import { DEVICE_POSTURE_PROVIDER } from "./device-posture.provider";
+import { OpswatDevicePostureProvider } from "./opswat-device-posture.provider";
+import { PlatformAuthService } from "./platform-auth.service";
+import { PlatformSecurityModeService } from "./platform-security-mode.service";
+import { PlatformAuthController } from "./platform-auth.controller";
+import { TenantAuthGuard } from "./tenant-auth.guard";
+import { PlatformAuthTransactionService } from "./platform-auth-transaction.service";
+import { PlatformSecurityAuditService } from "./platform-security-audit.service";
 
 @Module({
   imports: [
     ConfigModule,
     DatabaseModule,
     EmailModule,
+    RedisModule,
     RbacModule,
     PassportModule,
     JwtModule.registerAsync({
@@ -32,15 +42,29 @@ import { PasswordRecoveryRateLimiterService } from "./password-recovery-rate-lim
       })
     })
   ],
-  controllers: [AuthController],
+  controllers: [AuthController, PlatformAuthController],
   providers: [
     AuthService,
     GoogleAuthService,
     JwtStrategy,
+    TenantAuthGuard,
     RolesGuard,
     PermissionsGuard,
-    PasswordRecoveryRateLimiterService
+    PasswordRecoveryRateLimiterService,
+    PlatformSecurityModeService,
+    PlatformAuthTransactionService,
+    PlatformSecurityAuditService,
+    PlatformAuthService,
+    OpswatDevicePostureProvider,
+    { provide: DEVICE_POSTURE_PROVIDER, useExisting: OpswatDevicePostureProvider }
   ],
-  exports: [AuthService, RolesGuard, PermissionsGuard]
+  exports: [
+    AuthService,
+    TenantAuthGuard,
+    RolesGuard,
+    PermissionsGuard,
+    PlatformAuthService,
+    PlatformSecurityModeService
+  ]
 })
 export class AuthModule {}

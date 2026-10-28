@@ -19,7 +19,7 @@ import {
   PasswordRecoveryConfirmDto,
   PasswordRecoveryRequestDto
 } from "./auth.schemas";
-import { JwtPayload } from "./auth.types";
+import { TenantJwtPayload } from "./auth.types";
 import { GoogleAuthService, type GoogleAuthProfile } from "./google-auth.service";
 import { getRequiredJwtConfig } from "./jwt-config";
 import { PasswordRecoveryRateLimiterService } from "./password-recovery-rate-limiter.service";
@@ -76,10 +76,11 @@ export class AuthService {
   async login(input: LoginDto) {
     const email = input.email.toLowerCase();
     const user = await this.prisma.user.findUnique({
+      include: { platformRoleAssignment: { select: { status: true } } },
       where: { email }
     });
 
-    if (!user) {
+    if (!user || user.platformRoleAssignment?.status === "active") {
       throw new UnauthorizedException("Email o contrasena invalidos.");
     }
 
@@ -128,6 +129,14 @@ export class AuthService {
       throw new ForbiddenException("Esta cuenta se encuentra suspendida.");
     }
 
+    const platformAssignment = await this.prisma.platformRoleAssignment.findUnique({
+      where: { userId: user.id },
+      select: { status: true }
+    });
+    if (platformAssignment?.status === "active") {
+      throw new UnauthorizedException("No se pudo iniciar sesion con Google.");
+    }
+
     return this.issueLoginSession(user);
   }
 
@@ -137,10 +146,15 @@ export class AuthService {
 
     const user = await this.prisma.user.findUnique({
       where: { email },
-      select: { id: true, passwordHash: true, status: true }
+      select: { id: true, passwordHash: true, status: true, platformRoleAssignment: true }
     });
 
-    if (!user || user.status !== "active" || !user.passwordHash) {
+    if (
+      !user ||
+      user.status !== "active" ||
+      !user.passwordHash ||
+      user.platformRoleAssignment?.status === "active"
+    ) {
       return { status: "ok" as const };
     }
 
@@ -188,11 +202,11 @@ export class AuthService {
 
     const user = await this.prisma.user.findUnique({
       where: { email: input.email.toLowerCase() },
-      select: { id: true, status: true }
+      select: { id: true, status: true, platformRoleAssignment: true }
     });
     const invalidCode = () => new BadRequestException("El código es inválido o expiró.");
 
-    if (!user || user.status !== "active") {
+    if (!user || user.status !== "active" || user.platformRoleAssignment?.status === "active") {
       throw invalidCode();
     }
 
@@ -272,16 +286,24 @@ export class AuthService {
   }
 
   async refresh(refreshToken: string) {
-    const payload = await this.jwtService.verifyAsync<JwtPayload>(refreshToken, {
+    const payload = await this.jwtService.verifyAsync<TenantJwtPayload>(refreshToken, {
       secret: getRequiredJwtConfig(this.config, "JWT_REFRESH_SECRET")
     });
+    if (
+      payload.sessionKind !== "tenant" ||
+      !Array.isArray(payload.tenantAccess) ||
+      "platformAccess" in payload ||
+      "sid" in payload
+    ) {
+      throw new UnauthorizedException("Sesion invalida.");
+    }
 
     await this.assertSessionIsValid(payload);
 
     return this.issueTokens(await this.buildJwtPayload(payload.sub));
   }
 
-  async issueTokens(payload: JwtPayload) {
+  async issueTokens(payload: TenantJwtPayload) {
     const tokenPayload = this.toTokenPayload(payload);
     const accessToken = await this.jwtService.signAsync(tokenPayload);
     const refreshToken = await this.jwtService.signAsync(tokenPayload, {
@@ -380,8 +402,9 @@ export class AuthService {
     });
   }
 
-  private toTokenPayload(payload: JwtPayload): JwtPayload {
+  private toTokenPayload(payload: TenantJwtPayload): TenantJwtPayload {
     return {
+      sessionKind: "tenant",
       sub: payload.sub,
       email: payload.email,
       sessionVersion: payload.sessionVersion,
@@ -400,7 +423,7 @@ export class AuthService {
     };
   }
 
-  private async buildJwtPayload(userId: string): Promise<JwtPayload> {
+  private async buildJwtPayload(userId: string): Promise<TenantJwtPayload> {
     const user = await this.prisma.user.findUnique({
       where: { id: userId },
       select: {
@@ -415,6 +438,9 @@ export class AuthService {
             role: true
           }
         },
+        platformRoleAssignment: {
+          select: { roleCode: true, status: true }
+        },
         sessionVersion: true
       }
     });
@@ -423,17 +449,23 @@ export class AuthService {
       throw new UnauthorizedException("Sesion invalida.");
     }
 
+    const platformAssignment = user.platformRoleAssignment;
+    if (platformAssignment?.status === "active" && platformAssignment.roleCode === "super_admin") {
+      throw new UnauthorizedException("Sesion invalida.");
+    }
+
     const tenantAccess = await Promise.all(
-      user.memberships.map(async (membership) => ({
-        tenantId: membership.tenantId,
-        role: membership.role?.code ?? null,
-        permissions: membership.role
-          ? await this.rbacService.getPermissionsForRole(membership.role.code)
-          : []
-      }))
-    );
+          user.memberships.map(async (membership) => ({
+            tenantId: membership.tenantId,
+            role: membership.role?.code ?? null,
+            permissions: membership.role
+              ? await this.rbacService.getPermissionsForRole(membership.role.code)
+              : []
+          }))
+        );
 
     return {
+      sessionKind: "tenant",
       sub: user.id,
       email: user.email,
       sessionVersion: user.sessionVersion,
@@ -441,7 +473,7 @@ export class AuthService {
     };
   }
 
-  private async assertSessionIsValid(payload: JwtPayload) {
+  private async assertSessionIsValid(payload: TenantJwtPayload) {
     const user = await this.getUserSessionState(payload.sub);
 
     if (!user || user.status !== "active" || user.sessionVersion !== payload.sessionVersion) {

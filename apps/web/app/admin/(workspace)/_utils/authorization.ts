@@ -1,9 +1,9 @@
 import { hasPermissions } from "@/lib/auth/permissions";
-import type { TemisSession } from "@/lib/auth/session";
+import type { TenantSession } from "@/lib/auth/session";
 import type { AdminCommandSection, AdminNavItem, AdminNavSection } from "../_types/admin";
 
 export function getAuthorizedNavSections(
-  session: TemisSession | null,
+  session: TenantSession | null,
   sections: AdminNavSection[]
 ): AdminNavSection[] {
   return sections
@@ -17,7 +17,7 @@ export function getAuthorizedNavSections(
 }
 
 export function getAuthorizedCommandSections(
-  session: TemisSession | null,
+  session: TenantSession | null,
   sections: AdminCommandSection[]
 ): AdminCommandSection[] {
   return sections
@@ -29,7 +29,7 @@ export function getAuthorizedCommandSections(
 }
 
 function isAuthorizedItem(
-  session: TemisSession | null,
+  session: TenantSession | null,
   item: {
     permissionMode?: "all" | "any";
     requiredPermissions?: string[];
@@ -43,7 +43,7 @@ function isAuthorizedItem(
   return hasPermissions(session, item.requiredPermissions, item.permissionMode);
 }
 
-function getAuthorizedNavItem(session: TemisSession | null, item: AdminNavItem): AdminNavItem | null {
+function getAuthorizedNavItem(session: TenantSession | null, item: AdminNavItem): AdminNavItem | null {
   if (item.status === "soon") {
     return null;
   }

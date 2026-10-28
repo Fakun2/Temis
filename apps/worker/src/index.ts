@@ -15,7 +15,9 @@ import {
   notificationQueueName,
   notificationEmailQueueName,
   notificationEmailRoutingKey,
-  notificationReminderRoutingKey
+  notificationReminderRoutingKey,
+  platformSecurityAlertQueueName,
+  platformSecurityAlertRoutingKey
 } from "./queue/constants";
 import { AsyncOutbox } from "./queue/outbox";
 import { AsyncOutboxPublisher } from "./queue/publisher";
@@ -25,10 +27,12 @@ import type {
   DocumentCleanupRunMessage,
   GoogleCalendarSyncMessage,
   NotificationEmailDeliveryMessage,
-  NotificationReminderDueMessage
+  NotificationReminderDueMessage,
+  PlatformSecurityAlertMessage
 } from "./queue/types";
 import { ObjectStorage } from "./storage/object-storage";
 import { GoogleCalendarWorker } from "./google-calendar-worker";
+import { PlatformSecurityAlertWorker } from "./platform-security-alert-worker";
 
 loadEnv();
 
@@ -40,18 +44,24 @@ const notificationEmail = new NotificationEmailWorker(prisma, outbox);
 const documentCleanup = new DocumentCleanupWorker(prisma, outbox, new ObjectStorage());
 const publisher = new AsyncOutboxPublisher(outbox, rabbitMq);
 const googleCalendar = new GoogleCalendarWorker(prisma);
+const platformSecurityAlerts = new PlatformSecurityAlertWorker();
 let isShuttingDown = false;
 const workerRole = process.env.WORKER_ROLE ?? "all";
 const isEmailWorker = workerRole === "email";
 const notificationEvents = isEmailWorker
   ? null
   : new Redis(process.env.REDIS_URL ?? "redis://localhost:6379");
+const platformHeartbeat = new Redis(process.env.REDIS_URL ?? "redis://localhost:6379");
 const notifications = notificationEvents
   ? new NotificationsWorker(prisma, outbox, notificationEvents)
   : null;
+const platformWorkerHeartbeatKey = "temis:platform:worker:heartbeat";
+const platformWorkerHeartbeatTtlSeconds = 45;
+const platformWorkerHeartbeatIntervalMs = 15_000;
 
 async function bootstrap() {
   await prisma.$connect();
+  startPlatformHeartbeat();
   startConsumersSupervisor();
 
   if (getBooleanEnv("ASYNC_OUTBOX_PUBLISHER_ENABLED", true)) {
@@ -78,6 +88,25 @@ async function bootstrap() {
   }, googleCalendarRecoveryIntervalMs);
   googleCalendarRecoveryTimer.unref?.();
   logger.info("Temis integration worker started.");
+}
+
+function startPlatformHeartbeat() {
+  const heartbeat = async () => {
+    try {
+      await platformHeartbeat.set(
+        platformWorkerHeartbeatKey,
+        new Date().toISOString(),
+        "EX",
+        platformWorkerHeartbeatTtlSeconds
+      );
+    } catch (error) {
+      logger.warn("Platform worker heartbeat failed.", error);
+    }
+  };
+
+  void heartbeat();
+  const timer = setInterval(() => void heartbeat(), platformWorkerHeartbeatIntervalMs);
+  timer.unref?.();
 }
 
 function startConsumersSupervisor() {
@@ -167,6 +196,11 @@ async function registerConsumers() {
     googleCalendarDisconnectRoutingKey,
     async (payload) => googleCalendar.process(payload)
   );
+  await rabbitMq.consume<PlatformSecurityAlertMessage>(
+    platformSecurityAlertQueueName,
+    platformSecurityAlertRoutingKey,
+    async (payload) => platformSecurityAlerts.process(payload)
+  );
 }
 
 async function shutdown() {
@@ -175,6 +209,7 @@ async function shutdown() {
   publisher.stop();
   await rabbitMq.close();
   await notificationEvents?.quit();
+  await platformHeartbeat.quit();
   await prisma.$disconnect();
   process.exit(0);
 }
@@ -186,6 +221,7 @@ void bootstrap().catch(async (error) => {
   logger.error("Worker bootstrap failed.", error);
   await rabbitMq.close();
   await notificationEvents?.quit();
+  await platformHeartbeat.quit();
   await prisma.$disconnect();
   process.exit(1);
 });

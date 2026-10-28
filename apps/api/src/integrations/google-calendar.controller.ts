@@ -8,7 +8,6 @@ import {
   Query,
   Redirect,
   Req,
-  UseGuards,
   Patch
 } from "@nestjs/common";
 import {
@@ -19,11 +18,9 @@ import {
   ApiTags
 } from "@nestjs/swagger";
 import type { AuthenticatedRequest } from "../auth/auth.types";
-import { JwtAuthGuard } from "../auth/jwt-auth.guard";
 import { Permissions } from "../auth/permissions.decorator";
-import { PermissionsGuard } from "../auth/permissions.guard";
+import { TenantEndpoint } from "../auth/tenant-endpoint.decorator";
 import { ActiveTenant } from "../tenancy/active-tenant.decorator";
-import { TenantGuard } from "../tenancy/tenant.guard";
 import { GoogleCalendarService } from "./google-calendar.service";
 import {
   GoogleCalendarOAuthStartDto,
@@ -57,7 +54,7 @@ export class GoogleCalendarController {
   }
 
   @Get("status")
-  @UseGuards(JwtAuthGuard, TenantGuard, PermissionsGuard)
+  @TenantEndpoint()
   @Permissions("integrations:google_calendar_read")
   @ApiBearerAuth()
   @ApiSecurity("tenant")
@@ -67,7 +64,7 @@ export class GoogleCalendarController {
   }
 
   @Post("connect")
-  @UseGuards(JwtAuthGuard, TenantGuard, PermissionsGuard)
+  @TenantEndpoint()
   @Permissions("integrations:google_calendar_manage")
   @ApiBearerAuth()
   @ApiSecurity("tenant")
@@ -82,7 +79,7 @@ export class GoogleCalendarController {
 
   @Patch("preferences")
   @HttpCode(202)
-  @UseGuards(JwtAuthGuard, TenantGuard, PermissionsGuard)
+  @TenantEndpoint()
   @Permissions("integrations:google_calendar_manage")
   @ApiBearerAuth()
   @ApiSecurity("tenant")
@@ -97,7 +94,7 @@ export class GoogleCalendarController {
 
   @Post("sync")
   @HttpCode(202)
-  @UseGuards(JwtAuthGuard, TenantGuard, PermissionsGuard)
+  @TenantEndpoint()
   @Permissions("integrations:google_calendar_manage")
   @ApiBearerAuth()
   @ApiSecurity("tenant")
@@ -107,7 +104,7 @@ export class GoogleCalendarController {
   }
 
   @Delete("disconnect")
-  @UseGuards(JwtAuthGuard, TenantGuard, PermissionsGuard)
+  @TenantEndpoint()
   @Permissions("integrations:google_calendar_manage")
   @ApiBearerAuth()
   @ApiSecurity("tenant")

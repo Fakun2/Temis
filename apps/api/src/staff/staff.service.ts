@@ -50,7 +50,10 @@ export class StaffService {
       }),
       input.dni ? findTenantMembershipByUserDni(this.prisma, tenantId, input.dni) : null,
       findTenantMembershipByFullName(this.prisma, tenantId, fullName),
-      this.prisma.user.findUnique({ where: { email } }),
+      this.prisma.user.findUnique({
+        where: { email },
+        include: { platformRoleAssignment: { select: { status: true } } }
+      }),
       findAssignableRole(this.prisma, tenantId, input.role),
       practiceAreaIds.length
         ? this.prisma.practiceArea.findMany({
@@ -70,6 +73,10 @@ export class StaffService {
 
     if (existingTenantName) {
       throw new ConflictException("Ya existe un empleado con ese nombre y apellido.");
+    }
+
+    if (existingUser?.platformRoleAssignment?.status === "active") {
+      throw new ConflictException("Esta cuenta pertenece a la administracion de plataforma.");
     }
 
     if (!role) {

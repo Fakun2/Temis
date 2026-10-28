@@ -27,11 +27,9 @@ import {
   ApiTags
 } from "@nestjs/swagger";
 import type { AuthenticatedRequest } from "../auth/auth.types";
-import { JwtAuthGuard } from "../auth/jwt-auth.guard";
 import { Permissions } from "../auth/permissions.decorator";
-import { PermissionsGuard } from "../auth/permissions.guard";
+import { TenantEndpoint } from "../auth/tenant-endpoint.decorator";
 import { ActiveTenant } from "../tenancy/active-tenant.decorator";
-import { TenantGuard } from "../tenancy/tenant.guard";
 import { CaseDocumentUploadRateLimitGuard } from "../cases/guards/case-document-upload-rate-limit.guard";
 import {
   BulkDeleteDocumentsDto,
@@ -60,7 +58,7 @@ import {
 @ApiBearerAuth()
 @ApiSecurity("tenant")
 @Controller("documents")
-@UseGuards(JwtAuthGuard, TenantGuard, PermissionsGuard)
+@TenantEndpoint()
 export class DocumentsController {
   constructor(private readonly documentsService: DocumentsService) {}
 
@@ -132,7 +130,8 @@ export class DocumentsController {
     @ActiveTenant() tenantId: string,
     @Param("importJobId") importJobId: string,
     @Body() body: UploadDocumentImportItemsDto,
-    @UploadedFiles() files: Array<{ buffer: Buffer; mimetype: string; originalname: string; size: number }>
+    @UploadedFiles()
+    files: Array<{ buffer: Buffer; mimetype: string; originalname: string; size: number }>
   ) {
     return this.documentsService.uploadImportItems(tenantId, importJobId, body, files);
   }
@@ -204,7 +203,8 @@ export class DocumentsController {
   async preview(
     @ActiveTenant() tenantId: string,
     @Param("documentId") documentId: string,
-    @Res({ passthrough: true }) response: { setHeader: (name: string, value: string | number) => void }
+    @Res({ passthrough: true })
+    response: { setHeader: (name: string, value: string | number) => void }
   ) {
     const { document, object } = await this.documentsService.readObject(tenantId, documentId);
 
@@ -225,7 +225,8 @@ export class DocumentsController {
   async download(
     @ActiveTenant() tenantId: string,
     @Param("documentId") documentId: string,
-    @Res({ passthrough: true }) response: { setHeader: (name: string, value: string | number) => void }
+    @Res({ passthrough: true })
+    response: { setHeader: (name: string, value: string | number) => void }
   ) {
     const { document, object } = await this.documentsService.readObject(tenantId, documentId);
 

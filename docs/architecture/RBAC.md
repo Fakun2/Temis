@@ -136,3 +136,37 @@ Puede ver informacion autorizada. No crea, edita ni elimina.
 
 Para MVP, implementar RBAC base y documentar ABAC/permisos granulares como
 post-MVP o como extension incremental cuando existan causas/documentos.
+
+## Acceso de plataforma
+
+`super_admin` no es un rol tenant y no vive en `roles` ni en
+`tenant_memberships`. Su asignacion global se conserva en
+`platform_role_assignments`, se provisiona solamente por CLI en VPS y se
+valida por guards de plataforma contra la base.
+
+Permisos activos:
+
+- `platform:access`
+- `platform:account:self_manage` (solo permite modificar el perfil y la contraseña propia)
+- `platform:observability:read`
+- `platform:users:read` (permite consultar métricas y el directorio global de usuarios, sin exponer contenido legal ni habilitar acciones sobre cuentas)
+- `platform:announcements:manage` (permite crear, programar, publicar, editar borradores y cancelar comunicados globales o segmentados)
+
+El mismo permiso controla la creación y gestión de newsletters y sus imágenes. Su lectura requiere `admin:access` y una membresía tenant activa; la API verifica también la audiencia y vigencia antes de entregar contenido o archivos. La lectura es individual por usuario y revisión.
+
+Scope reservado: estudios, usuarios tenant, noticias, suscripciones SaaS y
+revenue. El Super Admin no puede leer contenido legal tenant, impersonar
+usuarios, operar infraestructura, consultar secretos o ejecutar billing en la
+primera version.
+
+El rol no basta para acceder: `PlatformGuard` exige una `platform_session`
+activa cuyo `securityMode` coincida con `PLATFORM_SECURITY_MODE`. En `disabled`
+la sesión usa `amr=["pwd"]`, no tiene dispositivo y las acciones sensibles
+requieren contraseña reciente. En `required`, la sesión se liga al
+`platform_device` presentado por mTLS y las acciones sensibles requieren una
+verificación WebAuthn reciente. El login Google y la recuperación de contraseña
+por correo no están habilitados para identidades de plataforma. Las rutas de
+plataforma sólo se sirven bajo `/superadmin`; las rutas tenant permanecen bajo
+`/admin` en el mismo origen. `TenantAuthGuard` rechaza JWT de
+plataforma antes de evaluar tenant, y `PlatformGuard` rechaza JWT tenant antes
+de comprobar permisos o dispositivo.

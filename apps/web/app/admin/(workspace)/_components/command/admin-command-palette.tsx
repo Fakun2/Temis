@@ -29,18 +29,22 @@ import { useDashboardSearchQuery } from "../../_hooks/use-dashboard-search-query
 import { getAuthorizedCommandSections } from "../../_utils/authorization";
 import type { AdminCommandItem, AdminCommandSection } from "../../_types/admin";
 import type { DashboardSearchItemDto } from "../../_types/dashboard.types";
-import type { TemisSession } from "@/lib/auth/session";
+import type { TenantSession } from "@/lib/auth/session";
 
 type AdminCommandPaletteProps = {
   open: boolean;
-  session: TemisSession | null;
+  session: TenantSession | null;
   onOpenChange: (open: boolean) => void;
 };
 
 const dashboardSearchDebounceMs = 350;
 const dashboardSearchPageSize = 8;
 
-export function AdminCommandPalette({ open, session, onOpenChange }: AdminCommandPaletteProps) {
+export function AdminCommandPalette({
+  open,
+  session,
+  onOpenChange
+}: AdminCommandPaletteProps) {
   const router = useRouter();
   const [searchInput, setSearchInput] = useState("");
   const [search, setSearch] = useState("");

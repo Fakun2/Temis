@@ -3,8 +3,7 @@
 import { useEffect, useMemo, useRef } from "react";
 import type { MutableRefObject } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { Sheet, SheetContent, SheetDescription, SheetTitle } from "@/components/ui/sheet";
-import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
+import { DashboardShell } from "@/components/dashboard/dashboard-shell";
 import { UnauthorizedState } from "@/components/ui/not-found";
 import { hasPermission } from "@/lib/auth/permissions";
 import { adminNavSections } from "../_constants/navigation";
@@ -16,8 +15,9 @@ import { AdminCommandPalette } from "./command/admin-command-palette";
 import { AdminHeader } from "./admin-header";
 import { AdminSidebar } from "./admin-sidebar";
 import { AdminHeaderBreadcrumbsProvider } from "./header/admin-header-breadcrumbs-context";
+import { PlatformAnnouncementsBanner } from "./platform-announcements-banner";
 
-export function AdminShell({ children }: AdminShellProps) {
+export function TenantAdminShell({ children }: AdminShellProps) {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -95,52 +95,36 @@ export function AdminShell({ children }: AdminShellProps) {
   }
 
   return (
-    <SidebarProvider
-      open={sidebarOpen}
-      onOpenChange={setSidebarOpen}
-      collapsedWidth={collapseSidebarFully ? "0px" : undefined}
-      className="min-h-[100svh] bg-[var(--admin-sidebar-bg)] text-foreground"
-    >
-      <AdminHeaderBreadcrumbsProvider>
-        <AdminSidebar session={session} />
-
-        <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
-          <SheetContent
-            side="left"
-            showCloseButton={false}
-            className="w-[280px] max-w-[85vw] gap-0 border-border bg-card p-0"
-          >
-            <SheetTitle className="sr-only">Navegacion admin</SheetTitle>
-            <SheetDescription className="sr-only">
-              Menu principal del panel de administracion.
-            </SheetDescription>
-            <AdminSidebar session={session} variant="mobile" onClose={() => setMobileOpen(false)} />
-          </SheetContent>
-        </Sheet>
-
-        <SidebarInset className="h-[100svh] overflow-hidden p-2 pt-2 md:p-3 md:pt-3">
-          <div className="flex h-full w-full min-w-0 flex-col overflow-hidden rounded-[var(--admin-card-radius)] bg-[var(--admin-page-bg)] shadow-[0_0_0_1px_rgba(15,23,42,0.05),0_1px_4px_rgba(15,23,42,0.08)]">
-            <AdminHeader
+    <AdminHeaderBreadcrumbsProvider>
+      <DashboardShell
+        authorized={canAccessAdmin}
+        banner={<PlatformAnnouncementsBanner />}
+        sidebar={<AdminSidebar session={session} />}
+        mobileSidebar={<AdminSidebar session={session} variant="mobile" onClose={() => setMobileOpen(false)} />}
+        header={<AdminHeader
               onOpenCommand={() => setCommandOpen(true)}
               onOpenMobileSidebar={() => setMobileOpen(true)}
               onToggleSidebar={() => setSidebarOpen(!sidebarOpen)}
               scrolled={scrolled}
               session={session}
               sidebarOpen={sidebarOpen}
-            />
-
-            <div
-              className="flex min-h-0 flex-1 flex-col overflow-x-hidden overflow-y-auto px-3 py-2 scrollbar-none md:px-4 md:py-3 xl:px-5 2xl:px-6"
-              onScroll={(event) => setScrolled(event.currentTarget.scrollTop > 4)}
-            >
-              {canAccessAdmin ? children : <RestrictedAdminAccess />}
-            </div>
-          </div>
-        </SidebarInset>
-
-        <AdminCommandPalette open={commandOpen} session={session} onOpenChange={setCommandOpen} />
-      </AdminHeaderBreadcrumbsProvider>
-    </SidebarProvider>
+            />}
+        commandPalette={<AdminCommandPalette
+          open={commandOpen}
+          session={session}
+          onOpenChange={setCommandOpen}
+        />}
+        mobileOpen={mobileOpen}
+        onMobileOpenChange={setMobileOpen}
+        onScroll={setScrolled}
+        onSidebarOpenChange={setSidebarOpen}
+        restricted={<RestrictedAdminAccess />}
+        sidebarOpen={sidebarOpen}
+        collapseSidebarFully={collapseSidebarFully}
+      >
+        {children}
+      </DashboardShell>
+    </AdminHeaderBreadcrumbsProvider>
   );
 }
 

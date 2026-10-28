@@ -2,6 +2,7 @@ import { Readable } from "node:stream";
 import {
   DeleteObjectCommand,
   GetObjectCommand,
+  HeadBucketCommand,
   PutObjectCommand,
   S3Client
 } from "@aws-sdk/client-s3";
@@ -42,6 +43,10 @@ export class S3CompatibleStorageStrategy implements ObjectStorageStrategy {
 
   getBucket() {
     return this.config.bucket;
+  }
+
+  async checkHealth() {
+    await this.client.send(new HeadBucketCommand({ Bucket: this.config.bucket }));
   }
 
   async putObject(input: PutObjectInput) {

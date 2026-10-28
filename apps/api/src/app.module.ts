@@ -22,6 +22,8 @@ import { OnboardingModule } from "./onboarding/onboarding.module";
 import { NotificationsModule } from "./notifications/notifications.module";
 import { NotionIntegrationModule } from "./notion-integration/notion-integration.module";
 import { PracticeAreaTemplatesModule } from "./practice-area-templates/practice-area-templates.module";
+import { PlatformModule } from "./platform/platform.module";
+import { AnnouncementsModule } from "./announcements/announcements.module";
 import { ProvincesModule } from "./provinces/provinces.module";
 import { RedisModule } from "./redis/redis.module";
 import { RbacModule } from "./rbac/rbac.module";
@@ -58,6 +60,8 @@ import { TenancyModule } from "./tenancy/tenancy.module";
     ForumsModule,
     JudicialCentersModule,
     StaffModule,
+    PlatformModule,
+    AnnouncementsModule,
     HealthModule
   ]
 })

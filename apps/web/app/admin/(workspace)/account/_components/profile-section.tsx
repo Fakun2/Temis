@@ -1,13 +1,6 @@
 "use client";
 
-import {
-  useEffect,
-  useRef,
-  useState,
-  type ChangeEvent,
-  type FormEvent,
-  type ReactNode
-} from "react";
+import { useEffect, useRef, useState, type ChangeEvent, type FormEvent } from "react";
 import { Camera, Crown, MapPin, UserRound } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
@@ -22,7 +15,12 @@ import {
 import type { AccountResponse } from "../_types/account.types";
 import { getInitials } from "../_utils/account-format";
 import { toProfileDraft } from "../_utils/account-drafts";
-import { AccountCard, InfoGrid, accountInputClassName } from "./account-form-ui";
+import {
+  AccountCard,
+  AccountDialogField,
+  InfoGrid,
+  accountInputClassName
+} from "./account-form-ui";
 
 const avatarMimeTypes = new Set(["image/jpeg", "image/png", "image/svg+xml", "image/webp"]);
 const avatarMaxSizeBytes = 5 * 1024 * 1024;
@@ -216,27 +214,27 @@ function ProfileEditDialog({
           </div>
 
           <div className="overflow-hidden rounded-2xl border border-border/60 bg-background/35">
-            <ProfileDialogField label="Nombre">
+            <AccountDialogField label="Nombre">
               <Input
                 className={accountInputClassName}
                 value={draft.firstName}
                 onChange={(event) => setDraft({ ...draft, firstName: event.target.value })}
               />
-            </ProfileDialogField>
-            <ProfileDialogField label="Apellido">
+            </AccountDialogField>
+            <AccountDialogField label="Apellido">
               <Input
                 className={accountInputClassName}
                 value={draft.lastName}
                 onChange={(event) => setDraft({ ...draft, lastName: event.target.value })}
               />
-            </ProfileDialogField>
-            <ProfileDialogField label="Telefono">
+            </AccountDialogField>
+            <AccountDialogField label="Telefono">
               <Input
                 className={accountInputClassName}
                 value={draft.phone ?? ""}
                 onChange={(event) => setDraft({ ...draft, phone: event.target.value })}
               />
-            </ProfileDialogField>
+            </AccountDialogField>
           </div>
 
           {error ? (
@@ -262,15 +260,6 @@ function ProfileEditDialog({
         </form>
       </DialogContent>
     </Dialog>
-  );
-}
-
-function ProfileDialogField({ children, label }: { children: ReactNode; label: string }) {
-  return (
-    <div className="grid gap-2.5 border-b border-border/50 px-4 py-3.5 last:border-b-0 sm:grid-cols-[1fr_240px] sm:items-center">
-      <span className="text-sm font-medium text-foreground/80">{label}</span>
-      {children}
-    </div>
   );
 }
 

@@ -80,6 +80,10 @@ export class RabbitMqService implements OnModuleDestroy {
     );
   }
 
+  async checkHealth() {
+    await this.getChannel();
+  }
+
   private async getChannel() {
     if (this.channel) {
       return this.channel;

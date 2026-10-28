@@ -1,8 +1,8 @@
 import { CanActivate, ExecutionContext, Injectable } from "@nestjs/common";
-import { AuthenticatedRequest } from "../auth/auth.types";
+import { TenantAuthenticatedRequest } from "../auth/auth.types";
 import { PrismaService } from "../database/prisma.service";
 
-type RequestWithHeaders = AuthenticatedRequest & {
+type RequestWithHeaders = TenantAuthenticatedRequest & {
   headers: Record<string, string | string[] | undefined>;
 };
 
@@ -16,7 +16,7 @@ export class TenantGuard implements CanActivate {
     const tenantId = (Array.isArray(rawTenantId) ? rawTenantId[0] : rawTenantId)?.trim();
     const userId = request.user?.sub;
 
-    if (!tenantId || !userId) {
+    if (!tenantId || !userId || request.user?.sessionKind !== "tenant") {
       return false;
     }
 

@@ -3,11 +3,10 @@
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import {
-  Beaker,
   Check,
   ChevronLeft,
   ChevronDown,
-  FileText,
+  Newspaper,
   LogOut,
   Moon,
   Palette,
@@ -24,10 +23,13 @@ import {
   DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu";
 import { redirectToLoginForLogout } from "@/lib/auth/logout";
-import type { TemisSession } from "@/lib/auth/session";
+import type { TenantSession } from "@/lib/auth/session";
 import { useTheme, type ColorMode, type ThemeVariant } from "@/lib/theme/theme-provider";
 import { cn } from "@/lib/utils";
 import { getInitials, getSessionDisplayUser } from "../../_utils/user";
+import { dashboardHttpClient } from "@/lib/http";
+import { useDashboardQuery } from "@/lib/query/use-dashboard-query";
+import { NewsletterDialog, type NewsletterSummary } from "./newsletter-dialog";
 
 const appearanceColorOptions: Array<{
   colorMode: ColorMode;
@@ -57,7 +59,7 @@ const appearanceVariants: Array<{
 
 type AdminUserMenuProps = {
   collapsed?: boolean;
-  session: TemisSession | null;
+  session: TenantSession | null;
   triggerVariant?: "avatar" | "pill";
 };
 
@@ -69,6 +71,8 @@ export function AdminUserMenu({
   const router = useRouter();
   const theme = useTheme();
   const [menuOpen, setMenuOpen] = useState(false);
+  const [newsletterOpen, setNewsletterOpen] = useState(false);
+  const newsletter = useDashboardQuery({ queryKey: ["newsletter-summary"], permission: "admin:access", queryFn: () => dashboardHttpClient.request<NewsletterSummary>({ path: "/announcements/newsletters/summary" }), refetchInterval: 60_000, refetchOnWindowFocus: true });
   const [themePickerOpen, setThemePickerOpen] = useState(false);
   const [activeColorMode, setActiveColorMode] = useState<ColorMode | null>(null);
   const closeVariantMenuTimeoutRef = useRef<number | null>(null);
@@ -114,7 +118,7 @@ export function AdminUserMenu({
   }
 
   return (
-    <DropdownMenu open={menuOpen} onOpenChange={handleMenuOpenChange}>
+    <><DropdownMenu open={menuOpen} onOpenChange={handleMenuOpenChange}>
       <DropdownMenuTrigger asChild>
         <button
           data-admin-surface={triggerVariant === "pill" ? true : undefined}
@@ -127,7 +131,7 @@ export function AdminUserMenu({
           )}
           aria-label="Abrir menu de usuario"
         >
-          <Avatar
+          <span className="relative"><Avatar
             size={collapsed ? "default" : "lg"}
             className={cn(collapsed ? "size-6" : "size-8", triggerVariant === "pill" && "size-8")}
           >
@@ -135,7 +139,7 @@ export function AdminUserMenu({
             <AvatarFallback className="grid place-items-center border-0 bg-secondary/80 text-xs font-semibold leading-none text-muted-foreground">
               {initials}
             </AvatarFallback>
-          </Avatar>
+          </Avatar>{(newsletter.data?.unreadCount ?? 0) > 0 && <span aria-hidden="true" className="absolute -right-0.5 -top-0.5 size-2.5 rounded-full border-2 border-background bg-primary" />}</span>
           {!collapsed ? (
             <span className="min-w-0">
               <span className="block truncate text-[13px] font-medium">{displayName}</span>
@@ -162,13 +166,10 @@ export function AdminUserMenu({
           <User className="h-4 w-4 opacity-70" />
           Cuenta
         </DropdownMenuItem>
-        <DropdownMenuItem className="px-3 py-2 text-[13px] text-muted-foreground">
-          <Beaker className="h-4 w-4 opacity-70" />
-          Funciones beta
-        </DropdownMenuItem>
-        <DropdownMenuItem className="px-3 py-2 text-[13px] text-muted-foreground">
-          <FileText className="h-4 w-4 opacity-70" />
-          Novedades
+        <DropdownMenuItem className="px-3 py-2 text-[13px] text-muted-foreground" onSelect={() => { setMenuOpen(false); setNewsletterOpen(true); }}>
+          <Newspaper className="h-4 w-4 opacity-70" />
+          Newsletter
+          {(newsletter.data?.unreadCount ?? 0) > 0 && <span className="ml-auto rounded-full bg-primary px-2 py-0.5 text-xs font-semibold text-primary-foreground" aria-label={`${newsletter.data!.unreadCount} publicaciones sin leer`}>{newsletter.data!.unreadCount > 99 ? "99+" : newsletter.data!.unreadCount}</span>}
         </DropdownMenuItem>
 
         <DropdownMenuSeparator className="mt-1" />
@@ -317,7 +318,7 @@ export function AdminUserMenu({
           Log out
         </DropdownMenuItem>
       </DropdownMenuContent>
-    </DropdownMenu>
+    </DropdownMenu><NewsletterDialog open={newsletterOpen} onOpenChange={setNewsletterOpen} /></>
   );
 }
 

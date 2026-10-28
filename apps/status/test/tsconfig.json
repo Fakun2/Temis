@@ -1,0 +1,14 @@
+{
+  "extends": "../tsconfig.json",
+  "compilerOptions": {
+    "jsx": "react-jsx",
+    "module": "CommonJS",
+    "moduleResolution": "Node"
+  },
+  "include": [
+    "../components/**/*.tsx",
+    "../lib/**/*.ts",
+    "../../packages/brand-ui/src/**/*.tsx",
+    "./**/*.ts"
+  ]
+}

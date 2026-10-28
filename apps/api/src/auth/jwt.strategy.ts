@@ -20,6 +20,9 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
   }
 
   async validate(payload: JwtPayload) {
+    if (!isValidPayloadShape(payload)) {
+      throw new UnauthorizedException("Sesion invalida.");
+    }
     const [user] = await this.prisma.$queryRaw<Array<{ sessionVersion: number; status: string }>>`
       SELECT "session_version" AS "sessionVersion", "status"
       FROM "users"
@@ -37,4 +40,19 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
 
     return payload;
   }
+}
+
+function isValidPayloadShape(payload: JwtPayload) {
+  if (payload.sessionKind === "tenant") {
+    return Array.isArray(payload.tenantAccess) && !("platformAccess" in payload) && !("sid" in payload);
+  }
+  if (payload.sessionKind === "platform") {
+    return Boolean(
+      payload.sid &&
+        payload.platformAccess?.role === "super_admin" &&
+        Array.isArray(payload.amr) &&
+        !("tenantAccess" in payload)
+    );
+  }
+  return false;
 }

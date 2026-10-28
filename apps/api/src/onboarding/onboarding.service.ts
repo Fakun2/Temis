@@ -7,7 +7,7 @@ import {
 } from "@nestjs/common";
 import { PrismaService } from "../database/prisma.service";
 import { AuthService } from "../auth/auth.service";
-import { JwtPayload } from "../auth/auth.types";
+import { TenantJwtPayload } from "../auth/auth.types";
 import { RBAC_PERMISSIONS, RBAC_ROLES } from "../rbac/rbac.constants";
 import { RbacService } from "../rbac/rbac.service";
 import {
@@ -67,7 +67,8 @@ export class OnboardingService {
 
   async start(userId: string, input: StartOnboardingDto) {
     const existingUser = await this.prisma.user.findUnique({
-      where: { id: userId }
+      where: { id: userId },
+      include: { platformRoleAssignment: { select: { status: true } } }
     });
 
     if (!existingUser) {
@@ -76,6 +77,10 @@ export class OnboardingService {
 
     if (existingUser.status !== "active") {
       throw new ConflictException("El usuario no está activo.");
+    }
+
+    if (existingUser.platformRoleAssignment?.status === "active") {
+      throw new ForbiddenException("Una cuenta de plataforma no puede crear estudios.");
     }
 
     const requestedEmail = input.owner?.email?.toLowerCase();
@@ -123,6 +128,7 @@ export class OnboardingService {
 
       const tenant = await tx.tenant.create({
         data: {
+          createdByUserId: user.id,
           name: input.tenant.name,
           legalName: input.tenant.legalName,
           taxId: input.tenant.taxId,
@@ -198,7 +204,7 @@ export class OnboardingService {
         });
       }
 
-      await tx.tenantMembership.create({
+      const ownerMembership = await tx.tenantMembership.create({
         data: {
           tenantId: tenant.id,
           userId: user.id,
@@ -208,10 +214,16 @@ export class OnboardingService {
         }
       });
 
+      await tx.tenant.update({
+        where: { id: tenant.id },
+        data: { createdByMembershipId: ownerMembership.id }
+      });
+
       return { user, tenant };
     });
 
-    const payload: JwtPayload = {
+    const payload: TenantJwtPayload = {
+      sessionKind: "tenant",
       sub: result.user.id,
       email: result.user.email,
       sessionVersion: await this.getUserSessionVersion(result.user.id),
@@ -274,7 +286,7 @@ export class OnboardingService {
     };
   }
 
-  async checklist(tenantId: string, user: JwtPayload) {
+  async checklist(tenantId: string, user: TenantJwtPayload) {
     const membership = await this.findActiveMembershipOrThrow(tenantId, user.sub);
     const visibleSteps = onboardingChecklistSteps.filter((step) =>
       hasPermissions(user, tenantId, step.permissions, step.permissionMode ?? "all")
@@ -320,7 +332,7 @@ export class OnboardingService {
 
   async updateChecklistStep(
     tenantId: string,
-    user: JwtPayload,
+    user: TenantJwtPayload,
     stepId: OnboardingChecklistStepId,
     input: UpdateOnboardingChecklistStepDto
   ) {
@@ -489,7 +501,7 @@ function getCurrencySymbol(code: string) {
 }
 
 function hasPermissions(
-  user: JwtPayload,
+  user: TenantJwtPayload,
   tenantId: string,
   permissions: string[],
   mode: "all" | "any"

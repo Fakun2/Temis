@@ -1,10 +1,4 @@
-import {
-  BarChart3,
-  CircleDollarSign,
-  Gavel,
-  Home,
-  Tags,
-} from "lucide-react";
+import { BarChart3, CircleDollarSign, Gavel, Home, Tags } from "lucide-react";
 import type { AdminNavSection, AdminPageTitle } from "../_types/admin";
 import {
   AnimatedAiStarsIcon,
@@ -15,7 +9,7 @@ import {
   AnimatedLibraryIcon,
   AnimatedSettingsIcon,
   AnimatedStaffIcon,
-  AnimatedTasksIcon,
+  AnimatedTasksIcon
 } from "../_components/sidebar/animated-library-icon";
 
 export const adminNavSections: AdminNavSection[] = [

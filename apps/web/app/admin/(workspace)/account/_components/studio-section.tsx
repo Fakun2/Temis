@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, type FormEvent, type ReactNode } from "react";
+import { useEffect, useState, type FormEvent } from "react";
 import { Building2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -18,7 +18,12 @@ import { useAccountStudioMutation } from "../_hooks/use-account-mutations";
 import type { AccountResponse } from "../_types/account.types";
 import { toStudioDraft } from "../_utils/account-drafts";
 import { getErrorMessage } from "../_utils/account-format";
-import { AccountCard, InfoGrid, accountInputClassName } from "./account-form-ui";
+import {
+  AccountCard,
+  AccountDialogField,
+  InfoGrid,
+  accountInputClassName
+} from "./account-form-ui";
 
 export function StudioSection({ account }: { account: AccountResponse }) {
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -114,21 +119,21 @@ function StudioEditDialog({
           </DialogHeader>
 
           <div className="overflow-hidden rounded-2xl border border-border/60 bg-background/35">
-            <StudioDialogField label="Nombre del estudio">
+            <AccountDialogField label="Nombre del estudio">
               <Input
                 className={accountInputClassName}
                 value={draft.name}
                 onChange={(event) => setDraft({ ...draft, name: event.target.value })}
               />
-            </StudioDialogField>
-            <StudioDialogField label="Razon social">
+            </AccountDialogField>
+            <AccountDialogField label="Razon social">
               <Input
                 className={accountInputClassName}
                 value={draft.legalName ?? ""}
                 onChange={(event) => setDraft({ ...draft, legalName: event.target.value })}
               />
-            </StudioDialogField>
-            <StudioDialogField label="CUIT / Tax ID">
+            </AccountDialogField>
+            <AccountDialogField label="CUIT / Tax ID">
               <Input
                 className={accountInputClassName}
                 inputMode="numeric"
@@ -139,22 +144,22 @@ function StudioEditDialog({
                   setDraft({ ...draft, taxId: event.target.value.replace(/\D/g, "") })
                 }
               />
-            </StudioDialogField>
-            <StudioDialogField label="Sitio web">
+            </AccountDialogField>
+            <AccountDialogField label="Sitio web">
               <Input
                 className={accountInputClassName}
                 value={draft.website ?? ""}
                 onChange={(event) => setDraft({ ...draft, website: event.target.value })}
               />
-            </StudioDialogField>
-            <StudioDialogField label="Pais">
+            </AccountDialogField>
+            <AccountDialogField label="Pais">
               <Input
                 className={accountInputClassName}
                 value={draft.country}
                 onChange={(event) => setDraft({ ...draft, country: event.target.value })}
               />
-            </StudioDialogField>
-            <StudioDialogField label="Provincia">
+            </AccountDialogField>
+            <AccountDialogField label="Provincia">
               <Select
                 value={draft.province || undefined}
                 onValueChange={(value) => setDraft({ ...draft, province: value })}
@@ -170,21 +175,21 @@ function StudioEditDialog({
                   ))}
                 </SelectContent>
               </Select>
-            </StudioDialogField>
-            <StudioDialogField label="Ciudad">
+            </AccountDialogField>
+            <AccountDialogField label="Ciudad">
               <Input
                 className={accountInputClassName}
                 value={draft.city}
                 onChange={(event) => setDraft({ ...draft, city: event.target.value })}
               />
-            </StudioDialogField>
-            <StudioDialogField label="Direccion">
+            </AccountDialogField>
+            <AccountDialogField label="Direccion">
               <Input
                 className={accountInputClassName}
                 value={draft.address ?? ""}
                 onChange={(event) => setDraft({ ...draft, address: event.target.value })}
               />
-            </StudioDialogField>
+            </AccountDialogField>
           </div>
 
           {error ? (
@@ -210,14 +215,5 @@ function StudioEditDialog({
         </form>
       </DialogContent>
     </Dialog>
-  );
-}
-
-function StudioDialogField({ children, label }: { children: ReactNode; label: string }) {
-  return (
-    <div className="grid gap-2.5 border-b border-border/50 px-4 py-3.5 last:border-b-0 sm:grid-cols-[1fr_240px] sm:items-center">
-      <span className="text-sm font-medium text-foreground/80">{label}</span>
-      {children}
-    </div>
   );
 }

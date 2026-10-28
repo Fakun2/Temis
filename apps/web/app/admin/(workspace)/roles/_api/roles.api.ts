@@ -9,7 +9,7 @@ import {
 } from "@temis/api-client";
 import { dashboardHttpClient } from "@/lib/http";
 import type { CreateRoleFormValues, UpdateRoleFormValues } from "@/lib/validation/roles";
-import type { TemisSession } from "@/lib/auth/session";
+import type { TenantSession } from "@/lib/auth/session";
 
 export type RolesAccessResponse = {
   permissions: PermissionDto[];
@@ -38,7 +38,7 @@ export async function createRole({
   input
 }: {
   input: CreateRoleFormValues;
-  session: TemisSession;
+  session: TenantSession;
   tenantId: string;
 }) {
   return dashboardHttpClient.request<RoleDto>({
@@ -54,7 +54,7 @@ export async function updateRole({
 }: {
   input: UpdateRoleFormValues;
   roleId: string;
-  session: TemisSession;
+  session: TenantSession;
   tenantId: string;
 }) {
   return dashboardHttpClient.request<RoleDto>({
@@ -68,7 +68,7 @@ export async function deleteRole({
   roleId
 }: {
   roleId: string;
-  session: TemisSession;
+  session: TenantSession;
   tenantId: string;
 }) {
   return dashboardHttpClient.request<{ deleted: boolean }>({

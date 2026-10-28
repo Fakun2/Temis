@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post, UseGuards } from "@nestjs/common";
+import { Body, Controller, Delete, Get, Param, Patch, Post } from "@nestjs/common";
 import {
   ApiBearerAuth,
   ApiCreatedResponse,
@@ -6,11 +6,9 @@ import {
   ApiSecurity,
   ApiTags
 } from "@nestjs/swagger";
-import { JwtAuthGuard } from "../auth/jwt-auth.guard";
 import { Permissions } from "../auth/permissions.decorator";
-import { PermissionsGuard } from "../auth/permissions.guard";
+import { TenantEndpoint } from "../auth/tenant-endpoint.decorator";
 import { ActiveTenant } from "../tenancy/active-tenant.decorator";
-import { TenantGuard } from "../tenancy/tenant.guard";
 import { CreateRoleDto, PermissionDto, RoleDto, UpdateRoleDto } from "./rbac.schemas";
 import { RbacService } from "./rbac.service";
 
@@ -18,7 +16,7 @@ import { RbacService } from "./rbac.service";
 @ApiBearerAuth()
 @ApiSecurity("tenant")
 @Controller("rbac")
-@UseGuards(JwtAuthGuard, TenantGuard, PermissionsGuard)
+@TenantEndpoint()
 export class RbacController {
   constructor(private readonly rbacService: RbacService) {}
 

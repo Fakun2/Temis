@@ -17,6 +17,7 @@
     "paths": {
       "@/*": ["./*"],
       "@temis/api-client": ["../../packages/api-client/src"],
+      "@temis/brand-ui": ["../../packages/brand-ui/src"],
       "@temis/database": ["../../packages/database/src"]
     }
   },

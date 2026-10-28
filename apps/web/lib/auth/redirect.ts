@@ -1,7 +1,7 @@
-import type { TemisSession } from "./session";
+import type { TenantSession } from "./session";
 import { hasTenantAccess } from "./session";
 
-export function getAuthenticatedRedirectPath(session: TemisSession, nextPath: string | null) {
+export function getAuthenticatedRedirectPath(session: TenantSession, nextPath: string | null) {
   if (!hasTenantAccess(session)) {
     return "/onboarding";
   }

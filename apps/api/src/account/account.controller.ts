@@ -8,7 +8,6 @@ import {
   Res,
   StreamableFile,
   UploadedFile,
-  UseGuards,
   UseInterceptors
 } from "@nestjs/common";
 import { FileInterceptor } from "@nestjs/platform-express";
@@ -20,12 +19,10 @@ import {
   ApiSecurity,
   ApiTags
 } from "@nestjs/swagger";
-import type { AuthenticatedRequest } from "../auth/auth.types";
-import { JwtAuthGuard } from "../auth/jwt-auth.guard";
+import type { TenantAuthenticatedRequest } from "../auth/auth.types";
 import { Permissions } from "../auth/permissions.decorator";
-import { PermissionsGuard } from "../auth/permissions.guard";
+import { TenantEndpoint } from "../auth/tenant-endpoint.decorator";
 import { ActiveTenant } from "../tenancy/active-tenant.decorator";
-import { TenantGuard } from "../tenancy/tenant.guard";
 import {
   AccountAiUsageResponseDto,
   AccountAvatarUploadResponseDto,
@@ -43,21 +40,21 @@ import { AccountService, maxAccountAvatarSizeBytes } from "./account.service";
 @ApiBearerAuth()
 @ApiSecurity("tenant")
 @Controller("account")
-@UseGuards(JwtAuthGuard, TenantGuard, PermissionsGuard)
+@TenantEndpoint()
 export class AccountController {
   constructor(private readonly accountService: AccountService) {}
 
   @Get()
   @Permissions("account:read")
   @ApiOkResponse({ type: AccountResponseDto })
-  getAccount(@ActiveTenant() tenantId: string, @Req() request: AuthenticatedRequest) {
+  getAccount(@ActiveTenant() tenantId: string, @Req() request: TenantAuthenticatedRequest) {
     return this.accountService.getAccount(tenantId, getAuthenticatedUser(request));
   }
 
   @Get("ai-usage")
   @Permissions("account:ai_usage_read")
   @ApiOkResponse({ type: AccountAiUsageResponseDto })
-  getAiUsage(@ActiveTenant() tenantId: string, @Req() request: AuthenticatedRequest) {
+  getAiUsage(@ActiveTenant() tenantId: string, @Req() request: TenantAuthenticatedRequest) {
     return this.accountService.getAiUsage(tenantId, getAuthenticatedUser(request));
   }
 
@@ -65,7 +62,7 @@ export class AccountController {
   @Permissions("account:read")
   async getAvatar(
     @ActiveTenant() tenantId: string,
-    @Req() request: AuthenticatedRequest,
+    @Req() request: TenantAuthenticatedRequest,
     @Res({ passthrough: true })
     response: { setHeader: (name: string, value: string | number) => void }
   ) {
@@ -99,7 +96,7 @@ export class AccountController {
   @ApiOkResponse({ type: AccountAvatarUploadResponseDto })
   uploadAvatar(
     @ActiveTenant() tenantId: string,
-    @Req() request: AuthenticatedRequest,
+    @Req() request: TenantAuthenticatedRequest,
     @UploadedFile()
     file: { buffer: Buffer; mimetype: string; originalname: string; size: number } | undefined
   ) {
@@ -111,7 +108,7 @@ export class AccountController {
   @ApiOkResponse({ type: AccountResponseDto })
   updateProfile(
     @ActiveTenant() tenantId: string,
-    @Req() request: AuthenticatedRequest,
+    @Req() request: TenantAuthenticatedRequest,
     @Body() input: UpdateAccountProfileDto
   ) {
     return this.accountService.updateProfile(tenantId, getAuthenticatedUser(request), input);
@@ -122,7 +119,7 @@ export class AccountController {
   @ApiOkResponse({ type: AccountResponseDto })
   updateStudio(
     @ActiveTenant() tenantId: string,
-    @Req() request: AuthenticatedRequest,
+    @Req() request: TenantAuthenticatedRequest,
     @Body() input: UpdateAccountStudioDto
   ) {
     return this.accountService.updateStudio(tenantId, getAuthenticatedUser(request), input);
@@ -133,7 +130,7 @@ export class AccountController {
   @ApiOkResponse({ type: AccountResponseDto })
   updateNotifications(
     @ActiveTenant() tenantId: string,
-    @Req() request: AuthenticatedRequest,
+    @Req() request: TenantAuthenticatedRequest,
     @Body() input: UpdateAccountNotificationsDto
   ) {
     return this.accountService.updateNotifications(tenantId, getAuthenticatedUser(request), input);
@@ -144,7 +141,7 @@ export class AccountController {
   @ApiOkResponse({ type: AccountResponseDto })
   updateMembership(
     @ActiveTenant() tenantId: string,
-    @Req() request: AuthenticatedRequest,
+    @Req() request: TenantAuthenticatedRequest,
     @Body() input: UpdateAccountMembershipDto
   ) {
     return this.accountService.updateMembership(tenantId, getAuthenticatedUser(request), input);
@@ -155,7 +152,7 @@ export class AccountController {
   @ApiOkResponse({ type: UpdateAccountPasswordResponseDto })
   validatePasswordChange(
     @ActiveTenant() tenantId: string,
-    @Req() request: AuthenticatedRequest,
+    @Req() request: TenantAuthenticatedRequest,
     @Body() input: UpdateAccountPasswordDto
   ) {
     return this.accountService.validatePasswordChange(
@@ -170,14 +167,14 @@ export class AccountController {
   @ApiOkResponse({ type: UpdateAccountPasswordResponseDto })
   updatePassword(
     @ActiveTenant() tenantId: string,
-    @Req() request: AuthenticatedRequest,
+    @Req() request: TenantAuthenticatedRequest,
     @Body() input: UpdateAccountPasswordDto
   ) {
     return this.accountService.updatePassword(tenantId, getAuthenticatedUser(request), input);
   }
 }
 
-function getAuthenticatedUser(request: AuthenticatedRequest) {
+function getAuthenticatedUser(request: TenantAuthenticatedRequest) {
   if (!request.user?.sub) {
     throw new Error("No se pudo identificar al usuario autenticado.");
   }

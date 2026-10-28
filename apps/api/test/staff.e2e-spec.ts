@@ -90,8 +90,17 @@ class InMemoryStaffPrismaService {
     },
     count: async ({ where }: { where: StaffWhere }) =>
       this.memberships.filter((membership) => this.matchesMembership(membership, where)).length,
-    findFirst: async ({ where }: { where: StaffWhere }) =>
-      this.memberships.find((membership) => this.matchesMembership(membership, where)) ?? null,
+    findFirst: async ({
+      where
+    }: {
+      where: StaffWhere & { tenant?: unknown; userId?: string };
+    }) => {
+      if (where.tenantId === "tenant-empty" && where.userId === "user-1" && where.tenant) {
+        return { id: "tenant-empty-membership" } as MembershipRecord;
+      }
+
+      return this.memberships.find((membership) => this.matchesMembership(membership, where)) ?? null;
+    },
     create: async ({ data }: { data: CreateMembershipData }) => {
       const user = this.users.find((current) => current.id === data.userId);
       const role = this.roles.find((current) => current.id === data.roleId);
@@ -538,10 +547,10 @@ describe("Staff endpoints (e2e)", () => {
       })
       .expect(201);
 
-    assert.deepEqual(
-      response.body.practiceAreas.map((area: { id: string }) => area.id).sort(),
-      [areaCivilId, areaCustomId]
-    );
+    assert.deepEqual(response.body.practiceAreas.map((area: { id: string }) => area.id).sort(), [
+      areaCivilId,
+      areaCustomId
+    ]);
   });
 
   it("rejects staff phone with more than 15 digits", async () => {
@@ -683,6 +692,7 @@ function makeToken(
     sub: userId,
     email: "mateo@estudio.com",
     sessionVersion: 0,
+    sessionKind: "tenant",
     tenantAccess: [
       {
         tenantId,

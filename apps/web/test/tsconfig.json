@@ -1,0 +1,9 @@
+{
+  "extends": "../tsconfig.json",
+  "compilerOptions": {
+    "jsx": "react-jsx",
+    "module": "CommonJS",
+    "moduleResolution": "Node"
+  },
+  "include": ["../lib/auth/platform-device-headers.ts", "../proxy.ts", "./**/*.ts"]
+}

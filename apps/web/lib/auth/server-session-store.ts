@@ -4,16 +4,29 @@ import { randomUUID } from "node:crypto";
 import type { AuthUserDto } from "@temis/api-client";
 import { decodeJwtPayload } from "./jwt";
 import type { SessionTenantAccess } from "./session";
+import type { SuperAdminAccess } from "./superadmin-session";
 import { decodeSessionCookie, encodeSessionCookie } from "./session-cookie";
 import type { TokenPair } from "./token-types";
-import { sessionMaxAgeSeconds } from "./cookies";
+import { platformSessionMaxAgeSeconds, sessionMaxAgeSeconds } from "./cookies";
 
-type StoredAuthSession = {
-  tenantAccess: SessionTenantAccess[];
+type StoredAuthSessionBase = {
+  sessionKind: "tenant" | "platform";
   tokens: TokenPair;
   updatedAt: string;
   user: AuthUserDto;
 };
+
+type StoredTenantSession = StoredAuthSessionBase & {
+  sessionKind: "tenant";
+  tenantAccess: SessionTenantAccess[];
+};
+
+type StoredPlatformSession = StoredAuthSessionBase & {
+  sessionKind: "platform";
+  platformAccess: SuperAdminAccess;
+};
+
+type StoredAuthSession = StoredTenantSession | StoredPlatformSession;
 
 declare global {
   var temisAuthSessions: Map<string, StoredAuthSession> | undefined;
@@ -31,12 +44,11 @@ const redisKeyPrefix = "bogaap:web:auth-session:";
 export async function createAuthSession(input: { tokens: TokenPair; user: AuthUserDto }) {
   const sessionId = randomUUID();
   const payload = decodeJwtPayload(input.tokens.accessToken);
-  const session: StoredAuthSession = {
-    tenantAccess: payload.tenantAccess,
-    tokens: input.tokens,
-    updatedAt: new Date().toISOString(),
-    user: input.user
-  };
+  if (!payload) throw new Error("Token de sesion invalido.");
+  const base = { tokens: input.tokens, updatedAt: new Date().toISOString(), user: input.user };
+  const session: StoredAuthSession = payload.sessionKind === "tenant"
+    ? { ...base, sessionKind: "tenant", tenantAccess: payload.tenantAccess }
+    : { ...base, sessionKind: "platform", platformAccess: payload.platformAccess };
 
   await writeStoredSession(sessionId, session);
 
@@ -46,7 +58,10 @@ export async function createAuthSession(input: { tokens: TokenPair; user: AuthUs
   };
 }
 
-export async function readAuthSessionFromCookie(cookieValue?: string | null) {
+export async function readAuthSessionFromCookie(
+  cookieValue: string | null | undefined,
+  expectedKind?: StoredAuthSession["sessionKind"]
+) {
   const parsed = decodeSessionCookie(cookieValue);
   if (!parsed) {
     return null;
@@ -56,6 +71,7 @@ export async function readAuthSessionFromCookie(cookieValue?: string | null) {
   if (!session) {
     return null;
   }
+  if (expectedKind && session.sessionKind !== expectedKind) return null;
 
   return {
     cookieValue: encodeSessionCookie({ sessionId: parsed.sessionId }),
@@ -64,19 +80,21 @@ export async function readAuthSessionFromCookie(cookieValue?: string | null) {
   };
 }
 
-export async function updateAuthSessionTokens(sessionId: string, tokens: TokenPair) {
+export async function updateAuthSessionTokens(
+  sessionId: string,
+  tokens: TokenPair,
+  expectedKind?: StoredAuthSession["sessionKind"]
+) {
   const currentSession = await readStoredSession(sessionId);
-  if (!currentSession) {
+  if (!currentSession || (expectedKind && currentSession.sessionKind !== expectedKind)) {
     return null;
   }
 
   const payload = decodeJwtPayload(tokens.accessToken);
-  const session: StoredAuthSession = {
-    ...currentSession,
-    tenantAccess: payload.tenantAccess,
-    tokens,
-    updatedAt: new Date().toISOString()
-  };
+  if (!payload || payload.sessionKind !== currentSession.sessionKind) return null;
+  const session: StoredAuthSession = payload.sessionKind === "tenant"
+    ? { ...currentSession, sessionKind: "tenant", tenantAccess: payload.tenantAccess, tokens, updatedAt: new Date().toISOString() } as StoredTenantSession
+    : { ...currentSession, sessionKind: "platform", platformAccess: payload.platformAccess, tokens, updatedAt: new Date().toISOString() } as StoredPlatformSession;
 
   await writeStoredSession(sessionId, session);
 
@@ -108,7 +126,12 @@ async function readStoredSession(sessionId: string) {
 async function writeStoredSession(sessionId: string, session: StoredAuthSession) {
   const redis = await getRedisClient();
   if (redis) {
-    await redis.set(toRedisKey(sessionId), JSON.stringify(session), "EX", sessionMaxAgeSeconds);
+    await redis.set(
+      toRedisKey(sessionId),
+      JSON.stringify(session),
+      "EX",
+      session.sessionKind === "platform" ? platformSessionMaxAgeSeconds : sessionMaxAgeSeconds
+    );
     return;
   }
 

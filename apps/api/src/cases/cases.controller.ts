@@ -26,12 +26,10 @@ import {
   ApiSecurity,
   ApiTags
 } from "@nestjs/swagger";
-import type { AuthenticatedRequest } from "../auth/auth.types";
-import { JwtAuthGuard } from "../auth/jwt-auth.guard";
+import type { TenantAuthenticatedRequest } from "../auth/auth.types";
 import { Permissions } from "../auth/permissions.decorator";
-import { PermissionsGuard } from "../auth/permissions.guard";
+import { TenantEndpoint } from "../auth/tenant-endpoint.decorator";
 import { ActiveTenant } from "../tenancy/active-tenant.decorator";
-import { TenantGuard } from "../tenancy/tenant.guard";
 import { CaseDocumentUploadRateLimitGuard } from "./guards/case-document-upload-rate-limit.guard";
 import { CaseExpenseAttachmentUploadRateLimitGuard } from "./guards/case-expense-attachment-upload-rate-limit.guard";
 import {
@@ -92,7 +90,7 @@ import { maxCaseExpenseAttachmentSizeBytes } from "./use-cases/case-expense-atta
 @ApiBearerAuth()
 @ApiSecurity("tenant")
 @Controller("cases")
-@UseGuards(JwtAuthGuard, TenantGuard, PermissionsGuard)
+@TenantEndpoint()
 export class CasesController {
   constructor(private readonly casesService: CasesService) {}
 
@@ -116,7 +114,7 @@ export class CasesController {
   getTenantCalendar(
     @ActiveTenant() tenantId: string,
     @Query() query: CaseCalendarQueryDto,
-    @Req() request: AuthenticatedRequest
+    @Req() request: TenantAuthenticatedRequest
   ) {
     const tenantPermissions = getTenantPermissions(request, tenantId);
 
@@ -157,7 +155,7 @@ export class CasesController {
   createTaskBoard(
     @ActiveTenant() tenantId: string,
     @Body() input: CreateTaskBoardViewDto,
-    @Req() request: AuthenticatedRequest
+    @Req() request: TenantAuthenticatedRequest
   ) {
     return this.casesService.createTaskBoard(
       tenantId,
@@ -187,10 +185,7 @@ export class CasesController {
   @Get("tasks")
   @Permissions("tasks:read")
   @ApiOkResponse({ type: TenantCaseTasksListResponseDto })
-  listTenantTasks(
-    @ActiveTenant() tenantId: string,
-    @Query() query: ListTenantCaseTasksQueryDto
-  ) {
+  listTenantTasks(@ActiveTenant() tenantId: string, @Query() query: ListTenantCaseTasksQueryDto) {
     return this.casesService.listTenantTasks(tenantId, query);
   }
 
@@ -248,7 +243,7 @@ export class CasesController {
     @ActiveTenant() tenantId: string,
     @Param("caseId") caseId: string,
     @Body() input: CreateCaseTaskDto,
-    @Req() request: AuthenticatedRequest
+    @Req() request: TenantAuthenticatedRequest
   ) {
     return this.casesService.createTask(
       tenantId,
@@ -266,7 +261,7 @@ export class CasesController {
     @Param("caseId") caseId: string,
     @Param("taskId") taskId: string,
     @Body() input: UpdateCaseTaskDto,
-    @Req() request: AuthenticatedRequest
+    @Req() request: TenantAuthenticatedRequest
   ) {
     return this.casesService.updateTask(
       tenantId,
@@ -306,7 +301,7 @@ export class CasesController {
     @ActiveTenant() tenantId: string,
     @Param("caseId") caseId: string,
     @Query() query: CaseCalendarQueryDto,
-    @Req() request: AuthenticatedRequest
+    @Req() request: TenantAuthenticatedRequest
   ) {
     const tenantPermissions = getTenantPermissions(request, tenantId);
 
@@ -342,7 +337,7 @@ export class CasesController {
   createDocument(
     @ActiveTenant() tenantId: string,
     @Param("caseId") caseId: string,
-    @Req() request: AuthenticatedRequest,
+    @Req() request: TenantAuthenticatedRequest,
     @Body() body: CreateCaseDocumentBodyDto,
     @UploadedFile() file: { buffer: Buffer; mimetype: string; originalname: string; size: number }
   ) {
@@ -442,7 +437,7 @@ export class CasesController {
     @ActiveTenant() tenantId: string,
     @Param("caseId") caseId: string,
     @Body() input: CreateCaseHearingDto,
-    @Req() request: AuthenticatedRequest
+    @Req() request: TenantAuthenticatedRequest
   ) {
     return this.casesService.createHearing(
       tenantId,
@@ -460,7 +455,7 @@ export class CasesController {
     @Param("caseId") caseId: string,
     @Param("hearingId") hearingId: string,
     @Body() input: UpdateCaseHearingDto,
-    @Req() request: AuthenticatedRequest
+    @Req() request: TenantAuthenticatedRequest
   ) {
     return this.casesService.updateHearing(
       tenantId,
@@ -526,7 +521,7 @@ export class CasesController {
     @ActiveTenant() tenantId: string,
     @Param("caseId") caseId: string,
     @Body() input: CreateCaseExpenseDto,
-    @Req() request: AuthenticatedRequest
+    @Req() request: TenantAuthenticatedRequest
   ) {
     return this.casesService.createExpense(
       tenantId,
@@ -544,7 +539,7 @@ export class CasesController {
     @Param("caseId") caseId: string,
     @Param("expenseId") expenseId: string,
     @Body() input: UpdateCaseExpenseDto,
-    @Req() request: AuthenticatedRequest
+    @Req() request: TenantAuthenticatedRequest
   ) {
     return this.casesService.updateExpense(
       tenantId,
@@ -604,7 +599,7 @@ export class CasesController {
     @ActiveTenant() tenantId: string,
     @Param("caseId") caseId: string,
     @Param("expenseId") expenseId: string,
-    @Req() request: AuthenticatedRequest,
+    @Req() request: TenantAuthenticatedRequest,
     @UploadedFile() file: { buffer: Buffer; mimetype: string; originalname: string; size: number }
   ) {
     return this.casesService.createExpenseAttachment(
@@ -686,7 +681,7 @@ function missingAuthenticatedUser(): never {
   throw new BadRequestException("No se pudo identificar al usuario autenticado.");
 }
 
-function getTenantPermissions(request: AuthenticatedRequest, tenantId: string) {
+function getTenantPermissions(request: TenantAuthenticatedRequest, tenantId: string) {
   return new Set(
     request.user?.tenantAccess.find((tenantAccess) => tenantAccess.tenantId === tenantId)
       ?.permissions ?? []

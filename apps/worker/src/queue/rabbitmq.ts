@@ -8,6 +8,8 @@ import {
   notificationEmailRoutingKey,
   notificationQueueName,
   notificationReminderRoutingKey,
+  platformSecurityAlertQueueName,
+  platformSecurityAlertRoutingKey,
   rabbitExchangeName
 } from "./constants";
 import type { QueuePayload } from "./types";
@@ -94,6 +96,7 @@ export class RabbitMq {
     await channel.assertQueue(notificationQueueName, { durable: true });
     await channel.assertQueue(notificationEmailQueueName, { durable: true });
     await channel.assertQueue(documentCleanupQueueName, { durable: true });
+    await channel.assertQueue(platformSecurityAlertQueueName, { durable: true });
     await channel.bindQueue(
       notificationQueueName,
       rabbitExchangeName,
@@ -108,6 +111,11 @@ export class RabbitMq {
       documentCleanupQueueName,
       rabbitExchangeName,
       documentCleanupRoutingKey
+    );
+    await channel.bindQueue(
+      platformSecurityAlertQueueName,
+      rabbitExchangeName,
+      platformSecurityAlertRoutingKey
     );
   }
 

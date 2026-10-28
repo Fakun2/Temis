@@ -1,5 +1,17 @@
 # Frontend app architecture
 
+## Frontera Admin y Super Admin
+
+- `/admin` usa sesión tenant y el BFF `/api/auth/*` + `/api/[...path]`.
+- `/superadmin` usa `SuperAdminShell`, sesión de plataforma y los BFF
+  `/api/superadmin-auth/*` + `/api/superadmin/*`.
+- Ambos paneles comparten origen; el prefijo de URL, no el subdominio, selecciona
+  el contexto de autenticación.
+- `components/dashboard` contiene sólo presentación reutilizable. Los hooks de
+  sesión, navegación, permisos y mutaciones pertenecen al árbol consumidor.
+- El prefijo de ruta determina el contexto; nunca se elige una sesión por
+  prioridad entre cookies y cada lector acepta únicamente su `sessionKind`.
+
 Este documento define la arquitectura activa de `apps/web` para vistas del
 dashboard. La meta es mantener UI, estado local, contratos de API y reglas de
 tenant separados, con componentes chicos y faciles de revisar.
@@ -122,3 +134,7 @@ Para vistas y acciones se usan guards reutilizables:
 - `Can`: oculta acciones puntuales como botones o menus.
 
 Estos guards mejoran UX, pero no reemplazan los guards del backend.
+
+## SSR de Super Admin
+
+Las pantallas operativas de `/superadmin` validan la sesión de plataforma en servidor, reenvían las cabeceras verificadas del dispositivo y cargan datos con `cache: no-store`. Filtros y cursores viven en `searchParams`; los diálogos y mutaciones permanecen como componentes cliente y refrescan el árbol server al completar.
