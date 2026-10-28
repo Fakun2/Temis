@@ -1,9 +1,7 @@
-import { Controller, Get, Query, UseGuards } from "@nestjs/common";
+import { Controller, Get, Query } from "@nestjs/common";
 import { ApiBearerAuth, ApiOkResponse, ApiSecurity, ApiTags } from "@nestjs/swagger";
-import { JwtAuthGuard } from "../auth/jwt-auth.guard";
 import { Permissions } from "../auth/permissions.decorator";
-import { PermissionsGuard } from "../auth/permissions.guard";
-import { TenantGuard } from "../tenancy/tenant.guard";
+import { TenantEndpoint } from "../auth/tenant-endpoint.decorator";
 import { ListProvincesQueryDto, ProvincesListResponseDto } from "./provinces.schemas";
 import { ProvincesService } from "./provinces.service";
 
@@ -11,7 +9,7 @@ import { ProvincesService } from "./provinces.service";
 @ApiBearerAuth()
 @ApiSecurity("tenant")
 @Controller("provinces")
-@UseGuards(JwtAuthGuard, TenantGuard, PermissionsGuard)
+@TenantEndpoint()
 export class ProvincesController {
   constructor(private readonly provincesService: ProvincesService) {}
 

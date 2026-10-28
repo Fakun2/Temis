@@ -3,7 +3,9 @@ import {
   accessTokenCookieName,
   refreshTokenCookieName,
   sessionCookieName,
-  sessionMaxAgeSeconds
+  sessionMaxAgeSeconds,
+  platformSessionCookieName,
+  platformSessionMaxAgeSeconds
 } from "./cookies";
 
 export function setAuthSessionCookie(response: NextResponse, sessionCookieValue: string) {
@@ -12,6 +14,16 @@ export function setAuthSessionCookie(response: NextResponse, sessionCookieValue:
     ...authCookieOptions()
   });
   clearLegacyAuthTokenCookies(response);
+}
+
+export function setPlatformSessionCookie(response: NextResponse, sessionCookieValue: string) {
+  response.cookies.set(platformSessionCookieName, sessionCookieValue, {
+    httpOnly: true,
+    maxAge: platformSessionMaxAgeSeconds,
+    path: "/",
+    sameSite: "strict",
+    secure: shouldUseSecureCookies()
+  });
 }
 
 export function clearAuthSessionCookies(response: NextResponse) {

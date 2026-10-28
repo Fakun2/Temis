@@ -1,11 +1,9 @@
-import { Controller, Get, Query, Req, UseGuards } from "@nestjs/common";
+import { Controller, Get, Query, Req } from "@nestjs/common";
 import { ApiBearerAuth, ApiOkResponse, ApiSecurity, ApiTags } from "@nestjs/swagger";
-import type { AuthenticatedRequest } from "../auth/auth.types";
-import { JwtAuthGuard } from "../auth/jwt-auth.guard";
+import type { TenantAuthenticatedRequest } from "../auth/auth.types";
 import { Permissions } from "../auth/permissions.decorator";
-import { PermissionsGuard } from "../auth/permissions.guard";
+import { TenantEndpoint } from "../auth/tenant-endpoint.decorator";
 import { ActiveTenant } from "../tenancy/active-tenant.decorator";
-import { TenantGuard } from "../tenancy/tenant.guard";
 import {
   DashboardMetricsDto,
   DashboardSearchQueryDto,
@@ -17,7 +15,7 @@ import { DashboardService } from "./dashboard.service";
 @ApiBearerAuth()
 @ApiSecurity("tenant")
 @Controller("dashboard")
-@UseGuards(JwtAuthGuard, TenantGuard, PermissionsGuard)
+@TenantEndpoint()
 export class DashboardController {
   constructor(private readonly dashboardService: DashboardService) {}
 
@@ -34,7 +32,7 @@ export class DashboardController {
   search(
     @ActiveTenant() tenantId: string,
     @Query() query: DashboardSearchQueryDto,
-    @Req() request: AuthenticatedRequest
+    @Req() request: TenantAuthenticatedRequest
   ) {
     const tenantPermissions = getTenantPermissions(request, tenantId);
 
@@ -49,7 +47,7 @@ export class DashboardController {
   }
 }
 
-function getTenantPermissions(request: AuthenticatedRequest, tenantId: string) {
+function getTenantPermissions(request: TenantAuthenticatedRequest, tenantId: string) {
   return new Set(
     request.user?.tenantAccess.find((tenantAccess) => tenantAccess.tenantId === tenantId)
       ?.permissions ?? []

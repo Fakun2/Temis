@@ -1,6 +1,6 @@
 "use client";
 
-import type { TemisSession } from "./session";
+import type { TenantSession } from "./session";
 import { saveSession } from "./session";
 
 export type GoogleCredentialResponse = {
@@ -13,13 +13,13 @@ export async function loginWithGoogleCredential(credential: string) {
     headers: { "Content-Type": "application/json" },
     method: "POST"
   });
-  const data = (await response.json().catch(() => null)) as TemisSession | unknown;
+  const data = (await response.json().catch(() => null)) as TenantSession | unknown;
 
   if (!response.ok) {
     throw new Error(getApiErrorMessage(data));
   }
 
-  const session = data as TemisSession;
+  const session = data as TenantSession;
   saveSession(session);
   return session;
 }

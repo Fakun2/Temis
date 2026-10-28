@@ -9,8 +9,7 @@ import {
   ParseUUIDPipe,
   Patch,
   Post,
-  Query,
-  UseGuards
+  Query
 } from "@nestjs/common";
 import {
   ApiBadRequestResponse,
@@ -25,11 +24,9 @@ import {
   ApiTags,
   getSchemaPath
 } from "@nestjs/swagger";
-import { JwtAuthGuard } from "../auth/jwt-auth.guard";
 import { Permissions } from "../auth/permissions.decorator";
-import { PermissionsGuard } from "../auth/permissions.guard";
+import { TenantEndpoint } from "../auth/tenant-endpoint.decorator";
 import { ActiveTenant } from "../tenancy/active-tenant.decorator";
-import { TenantGuard } from "../tenancy/tenant.guard";
 import {
   ClientArchiveResponseDto,
   ClientDeleteResponseDto,
@@ -56,7 +53,7 @@ import { ClientsService } from "./clients.service";
 )
 @ApiSecurity({ bearer: [], tenant: [] })
 @Controller("clients")
-@UseGuards(JwtAuthGuard, TenantGuard, PermissionsGuard)
+@TenantEndpoint()
 export class ClientsController {
   constructor(private readonly clientsService: ClientsService) {}
 

@@ -42,6 +42,7 @@ expira de inmediato.
 - `role_permissions`
 - `currencies`
 - `global_finance_categories`
+- `platform_role_assignments` (solo acceso operativo de Temis, nunca contenido tenant)
 
 ## Entidades tenant-scoped
 
@@ -75,3 +76,5 @@ Pendientes:
 - Guards aplicados en rutas operativas.
 - Servicios no aceptan `tenantId` arbitrario desde body.
 - Errores claros para tenant ausente, inactivo o no autorizado.
+- Una cuenta Super Admin activa no puede tener membresias tenant ni usar rutas
+  operativas tenant.

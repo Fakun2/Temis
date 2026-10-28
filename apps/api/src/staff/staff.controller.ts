@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post, Query, Req, UseGuards } from "@nestjs/common";
+import { Body, Controller, Delete, Get, Param, Patch, Post, Query, Req } from "@nestjs/common";
 import {
   ApiBearerAuth,
   ApiCreatedResponse,
@@ -6,12 +6,10 @@ import {
   ApiSecurity,
   ApiTags
 } from "@nestjs/swagger";
-import { JwtAuthGuard } from "../auth/jwt-auth.guard";
 import { Permissions } from "../auth/permissions.decorator";
-import { PermissionsGuard } from "../auth/permissions.guard";
+import { TenantEndpoint } from "../auth/tenant-endpoint.decorator";
 import type { AuthenticatedRequest } from "../auth/auth.types";
 import { ActiveTenant } from "../tenancy/active-tenant.decorator";
-import { TenantGuard } from "../tenancy/tenant.guard";
 import {
   CreateStaffDto,
   ListParticipantOptionsQueryDto,
@@ -29,7 +27,7 @@ import { StaffService } from "./staff.service";
 @ApiBearerAuth()
 @ApiSecurity("tenant")
 @Controller("staff")
-@UseGuards(JwtAuthGuard, TenantGuard, PermissionsGuard)
+@TenantEndpoint()
 export class StaffController {
   constructor(private readonly staffService: StaffService) {}
 

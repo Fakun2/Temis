@@ -1,11 +1,9 @@
-import { Body, Controller, Get, Post, Req, UseGuards } from "@nestjs/common";
+import { Body, Controller, Get, Post, Req } from "@nestjs/common";
 import { ApiBearerAuth, ApiOkResponse, ApiSecurity, ApiTags } from "@nestjs/swagger";
 import type { AuthenticatedRequest } from "../auth/auth.types";
-import { JwtAuthGuard } from "../auth/jwt-auth.guard";
 import { Permissions } from "../auth/permissions.decorator";
-import { PermissionsGuard } from "../auth/permissions.guard";
+import { TenantEndpoint } from "../auth/tenant-endpoint.decorator";
 import { ActiveTenant } from "../tenancy/active-tenant.decorator";
-import { TenantGuard } from "../tenancy/tenant.guard";
 import { AiChatDto, AiChatResponseDto, AiToolsResponseDto } from "./ai.schemas";
 import { AiService } from "./ai.service";
 
@@ -13,7 +11,7 @@ import { AiService } from "./ai.service";
 @ApiBearerAuth()
 @ApiSecurity("tenant")
 @Controller("ai")
-@UseGuards(JwtAuthGuard, TenantGuard, PermissionsGuard)
+@TenantEndpoint()
 export class AiController {
   constructor(private readonly aiService: AiService) {}
 
@@ -38,7 +36,7 @@ export class AiController {
 
 function getAuthenticatedUserId(request: AuthenticatedRequest) {
   if (!request.user?.sub) {
-    throw new Error("Authenticated user missing after JwtAuthGuard.");
+    throw new Error("Authenticated user missing after TenantAuthGuard.");
   }
 
   return request.user.sub;

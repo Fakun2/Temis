@@ -1,5 +1,31 @@
 import { createCipheriv, createDecipheriv, createHash, randomBytes } from "node:crypto";
 
+/** Redis pub/sub contract used to fan out in-app notification deliveries. */
+export const notificationDeliveredChannel = "temis:notifications:delivered";
+
+export type DeliveredNotificationEvent = {
+  notificationId: string;
+  recipientMembershipId: string;
+  tenantId: string;
+};
+
+export function parseDeliveredNotificationEvent(value: string): DeliveredNotificationEvent | null {
+  try {
+    const event = JSON.parse(value) as Partial<DeliveredNotificationEvent>;
+    if (
+      typeof event.notificationId !== "string" ||
+      typeof event.recipientMembershipId !== "string" ||
+      typeof event.tenantId !== "string"
+    ) {
+      return null;
+    }
+
+    return event as DeliveredNotificationEvent;
+  } catch {
+    return null;
+  }
+}
+
 export type GoogleCalendarResourceType = "case_task" | "case_hearing";
 
 export type GoogleCalendarSyncMode = "global" | "custom";

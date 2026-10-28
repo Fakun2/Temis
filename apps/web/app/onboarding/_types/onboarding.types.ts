@@ -1,4 +1,4 @@
-import type { TemisSession } from "@/lib/auth/session";
+import type { TenantSession } from "@/lib/auth/session";
 
 export type StepIndex = 0 | 1 | 2;
 
@@ -47,7 +47,7 @@ export type StartOnboardingResponse = {
   userId: string;
   tenantId: string;
   role: string;
-  tokens: TemisSession["tokens"];
+  tokens: TenantSession["tokens"];
 };
 
 export type OnboardingResult = {

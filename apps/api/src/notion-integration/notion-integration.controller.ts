@@ -1,11 +1,15 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post, Query, Req, UseGuards } from "@nestjs/common";
-import { ApiBearerAuth, ApiCreatedResponse, ApiOkResponse, ApiSecurity, ApiTags } from "@nestjs/swagger";
+import { Body, Controller, Delete, Get, Param, Patch, Post, Query, Req } from "@nestjs/common";
+import {
+  ApiBearerAuth,
+  ApiCreatedResponse,
+  ApiOkResponse,
+  ApiSecurity,
+  ApiTags
+} from "@nestjs/swagger";
 import type { AuthenticatedRequest } from "../auth/auth.types";
-import { JwtAuthGuard } from "../auth/jwt-auth.guard";
 import { Permissions } from "../auth/permissions.decorator";
-import { PermissionsGuard } from "../auth/permissions.guard";
+import { TenantEndpoint } from "../auth/tenant-endpoint.decorator";
 import { ActiveTenant } from "../tenancy/active-tenant.decorator";
-import { TenantGuard } from "../tenancy/tenant.guard";
 import { NotionIntegrationService } from "./notion-integration.service";
 import {
   CreateNotionMappingDto,
@@ -24,7 +28,7 @@ import {
 @ApiBearerAuth()
 @ApiSecurity("tenant")
 @Controller("account/integrations/notion")
-@UseGuards(JwtAuthGuard, TenantGuard, PermissionsGuard)
+@TenantEndpoint()
 export class NotionIntegrationController {
   constructor(private readonly notionIntegration: NotionIntegrationService) {}
 

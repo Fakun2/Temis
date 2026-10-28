@@ -33,13 +33,14 @@ export async function GET(request: NextRequest) {
 async function forwardStream(request: NextRequest, accessTokenOverride?: string) {
   const accessToken = accessTokenOverride ?? (await getAccessTokenCookie());
   const payload = accessToken ? decodeJwtPayload(accessToken) : null;
-  const tenantId = payload?.tenantAccess[0]?.tenantId;
+  const tenantId = payload?.sessionKind === "tenant" ? payload.tenantAccess[0]?.tenantId : null;
 
   if (!accessToken || !tenantId) {
     return NextResponse.json({ message: "No hay una sesion activa." }, { status: 401 });
   }
 
   const response = await fetch(toApiUrl("/api/notifications/stream"), {
+    cache: "no-store",
     headers: {
       Accept: "text/event-stream",
       Authorization: `Bearer ${accessToken}`,
@@ -84,8 +85,10 @@ async function refreshAccessToken() {
 
 function getStreamHeaders(response: Response) {
   return {
-    "Cache-Control": "no-cache, no-transform",
+    "Cache-Control": "no-cache, no-transform, no-store",
     Connection: "keep-alive",
-    "Content-Type": response.headers.get("Content-Type") ?? "text/event-stream"
+    "Content-Type": response.headers.get("Content-Type") ?? "text/event-stream",
+    "Content-Encoding": "none",
+    "X-Accel-Buffering": "no"
   };
 }

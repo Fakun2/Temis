@@ -14,3 +14,5 @@ coverage/
 *.tsbuildinfo
 apps/api/openapi.json
 
+# Device-trust CA material is provisioned directly on the deployment host.
+infra/nginx/client-ca/*.pem

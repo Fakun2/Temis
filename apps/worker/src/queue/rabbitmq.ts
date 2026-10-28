@@ -4,8 +4,12 @@ import { createLogger } from "../logger";
 import {
   documentCleanupQueueName,
   documentCleanupRoutingKey,
+  notificationEmailQueueName,
+  notificationEmailRoutingKey,
   notificationQueueName,
   notificationReminderRoutingKey,
+  platformSecurityAlertQueueName,
+  platformSecurityAlertRoutingKey,
   rabbitExchangeName
 } from "./constants";
 import type { QueuePayload } from "./types";
@@ -90,9 +94,29 @@ export class RabbitMq {
   async bindDefaultQueues() {
     const channel = await this.getChannel();
     await channel.assertQueue(notificationQueueName, { durable: true });
+    await channel.assertQueue(notificationEmailQueueName, { durable: true });
     await channel.assertQueue(documentCleanupQueueName, { durable: true });
-    await channel.bindQueue(notificationQueueName, rabbitExchangeName, notificationReminderRoutingKey);
-    await channel.bindQueue(documentCleanupQueueName, rabbitExchangeName, documentCleanupRoutingKey);
+    await channel.assertQueue(platformSecurityAlertQueueName, { durable: true });
+    await channel.bindQueue(
+      notificationQueueName,
+      rabbitExchangeName,
+      notificationReminderRoutingKey
+    );
+    await channel.bindQueue(
+      notificationEmailQueueName,
+      rabbitExchangeName,
+      notificationEmailRoutingKey
+    );
+    await channel.bindQueue(
+      documentCleanupQueueName,
+      rabbitExchangeName,
+      documentCleanupRoutingKey
+    );
+    await channel.bindQueue(
+      platformSecurityAlertQueueName,
+      rabbitExchangeName,
+      platformSecurityAlertRoutingKey
+    );
   }
 
   private async getChannel() {

@@ -20,6 +20,8 @@ type StoredUser = {
 
 type StoredTenant = {
   id: string;
+  createdByMembershipId: string | null;
+  createdByUserId: string;
   name: string;
   legalName: string | null;
   taxId: string;
@@ -57,6 +59,7 @@ class InMemoryPrismaService {
   private tenantSettingsRecords: unknown[] = [];
   private practiceAreas: unknown[] = [];
   private tenantMemberships: unknown[] = [];
+  private tenantCurrencies: unknown[] = [];
   private sequence = 1;
 
   readonly user = {
@@ -120,6 +123,11 @@ class InMemoryPrismaService {
       const permission = this.permissions.get(where.code);
       assert.ok(permission, `Expected permission ${where.code} to exist.`);
       return permission;
+    },
+    findMany: async ({ where }: { where: { code: { in: string[] } } }) => {
+      return [...this.permissions.values()]
+        .filter((permission) => where.code.in.includes(permission.code))
+        .map(({ code, id }) => ({ code, id }));
     }
   };
 
@@ -161,10 +169,23 @@ class InMemoryPrismaService {
   };
 
   readonly tenant = {
-    create: async ({ data }: { data: Omit<StoredTenant, "id"> }) => {
-      const tenant = { id: this.nextId(), ...data };
+    create: async ({ data }: { data: Omit<StoredTenant, "id" | "createdByMembershipId"> }) => {
+      const tenant = { id: this.nextId(), createdByMembershipId: null, ...data };
       this.tenants.set(tenant.id, tenant);
       return tenant;
+    },
+    update: async ({
+      where,
+      data
+    }: {
+      where: { id: string };
+      data: { createdByMembershipId: string };
+    }) => {
+      const tenant = this.tenants.get(where.id);
+      assert.ok(tenant, "Expected stored tenant to exist before update.");
+      const updated = { ...tenant, ...data };
+      this.tenants.set(updated.id, updated);
+      return updated;
     }
   };
 
@@ -178,6 +199,13 @@ class InMemoryPrismaService {
   readonly tenantSettings = {
     create: async ({ data }: { data: unknown }) => {
       this.tenantSettingsRecords.push(data);
+      return data;
+    }
+  };
+
+  readonly tenantCurrency = {
+    create: async ({ data }: { data: unknown }) => {
+      this.tenantCurrencies.push(data);
       return data;
     }
   };
@@ -199,8 +227,9 @@ class InMemoryPrismaService {
 
   readonly tenantMembership = {
     create: async ({ data }: { data: unknown }) => {
-      this.tenantMemberships.push(data);
-      return data;
+      const membership = { id: this.nextId(), ...(data as object) };
+      this.tenantMemberships.push(membership);
+      return membership;
     }
   };
 
@@ -238,6 +267,10 @@ class InMemoryPrismaService {
     return this.practiceAreas.length;
   }
 
+  getTenants() {
+    return [...this.tenants.values()];
+  }
+
   getPracticeAreas() {
     return this.practiceAreas;
   }
@@ -254,6 +287,7 @@ class InMemoryPrismaService {
     this.tenantSettingsRecords = [];
     this.practiceAreas = [];
     this.tenantMemberships = [];
+    this.tenantCurrencies = [];
     this.sequence = 1;
   }
 
@@ -326,6 +360,7 @@ describe("Onboarding endpoints (e2e)", () => {
       sub: user.id,
       email: user.email,
       sessionVersion: 0,
+      sessionKind: "tenant",
       tenantAccess: []
     });
 
@@ -350,6 +385,8 @@ describe("Onboarding endpoints (e2e)", () => {
     assert.ok(issuedPayload.tenantAccess[0]?.permissions.includes("staff:manage"));
     assert.equal(prisma.countUsers(), 1);
     assert.equal(prisma.countMemberships(), 1);
+    assert.equal(prisma.getTenants()[0]?.createdByUserId, user.id);
+    assert.ok(prisma.getTenants()[0]?.createdByMembershipId);
     assert.equal(prisma.countPracticeAreas(), 2);
     assert.deepEqual(prisma.getPracticeAreas(), [
       {
@@ -372,6 +409,7 @@ describe("Onboarding endpoints (e2e)", () => {
       sub: user.id,
       email: user.email,
       sessionVersion: 0,
+      sessionKind: "tenant",
       tenantAccess: []
     });
 
@@ -396,6 +434,7 @@ describe("Onboarding endpoints (e2e)", () => {
       sub: user.id,
       email: user.email,
       sessionVersion: 0,
+      sessionKind: "tenant",
       tenantAccess: []
     });
 
@@ -421,6 +460,7 @@ describe("Onboarding endpoints (e2e)", () => {
       sub: user.id,
       email: user.email,
       sessionVersion: 0,
+      sessionKind: "tenant",
       tenantAccess: []
     });
 

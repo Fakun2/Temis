@@ -5,7 +5,7 @@
  * API del monolito modular TEMIS.
  * OpenAPI spec version: 0.1.0
  */
-import { temisFetch } from "../fetch-client";
+import { temisFetch } from '../fetch-client';
 export interface AccountProfileDto {
   id: string;
   firstName: string;
@@ -37,14 +37,14 @@ export interface AccountStudioDto {
   logoUrl: string | null;
 }
 
-export type AccountMembershipDtoStatus =
-  (typeof AccountMembershipDtoStatus)[keyof typeof AccountMembershipDtoStatus];
+export type AccountMembershipDtoStatus = typeof AccountMembershipDtoStatus[keyof typeof AccountMembershipDtoStatus];
+
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const AccountMembershipDtoStatus = {
-  invited: "invited",
-  active: "active",
-  suspended: "suspended"
+  invited: 'invited',
+  active: 'active',
+  suspended: 'suspended',
 } as const;
 
 export interface AccountMembershipDto {
@@ -59,12 +59,30 @@ export interface AccountMembershipDto {
   monthlyTokenLimit: number;
 }
 
+export type NotificationChannelPreferenceDtoResourceType = typeof NotificationChannelPreferenceDtoResourceType[keyof typeof NotificationChannelPreferenceDtoResourceType];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const NotificationChannelPreferenceDtoResourceType = {
+  case_task: 'case_task',
+  case_expense: 'case_expense',
+  case_hearing: 'case_hearing',
+  meeting: 'meeting',
+} as const;
+
+export interface NotificationChannelPreferenceDto {
+  resourceType: NotificationChannelPreferenceDtoResourceType;
+  inAppEnabled: boolean;
+  emailEnabled: boolean;
+}
+
 export interface AccountNotificationsDto {
   browserNotifications: boolean;
   inAppReminders: boolean;
   emailReminders: boolean;
   dailyDigest: boolean;
   reminderLeadTime: number;
+  preferences: NotificationChannelPreferenceDto[];
 }
 
 export interface AccountTokenUsageDto {
@@ -148,6 +166,7 @@ export interface UpdateAccountNotificationsDto {
   emailReminders: boolean;
   dailyDigest: boolean;
   reminderLeadTime: number;
+  preferences: NotificationChannelPreferenceDto[];
 }
 
 export interface UpdateAccountMembershipDto {
@@ -228,6 +247,28 @@ export interface GoogleLoginDto {
   idToken: string;
 }
 
+export interface PasswordRecoveryRequestDto {
+  email: string;
+}
+
+export interface PasswordRecoveryResponseDto {
+  status: string;
+}
+
+export interface PasswordRecoveryConfirmDto {
+  email: string;
+  /**
+   * @minLength 6
+   * @maxLength 6
+   */
+  code: string;
+  /**
+   * @minLength 8
+   * @maxLength 72
+   */
+  newPassword: string;
+}
+
 export interface RefreshTokenDto {
   refreshToken: string;
 }
@@ -236,20 +277,95 @@ export interface LogoutDto {
   status: string;
 }
 
+export type PlatformAccessGrantedDtoSecurityMode = typeof PlatformAccessGrantedDtoSecurityMode[keyof typeof PlatformAccessGrantedDtoSecurityMode];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const PlatformAccessGrantedDtoSecurityMode = {
+  disabled: 'disabled',
+} as const;
+
+export type PlatformAccessGrantedDtoStatus = typeof PlatformAccessGrantedDtoStatus[keyof typeof PlatformAccessGrantedDtoStatus];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const PlatformAccessGrantedDtoStatus = {
+  access_granted: 'access_granted',
+} as const;
+
+export interface PlatformAccessGrantedDto {
+  user: AuthUserDto;
+  tokens: TokenPairDto;
+  securityMode: PlatformAccessGrantedDtoSecurityMode;
+  status: PlatformAccessGrantedDtoStatus;
+}
+
+export type PlatformFidoRequiredDtoOptions = { [key: string]: unknown };
+
+export type PlatformFidoRequiredDtoSecurityMode = typeof PlatformFidoRequiredDtoSecurityMode[keyof typeof PlatformFidoRequiredDtoSecurityMode];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const PlatformFidoRequiredDtoSecurityMode = {
+  required: 'required',
+} as const;
+
+export type PlatformFidoRequiredDtoStatus = typeof PlatformFidoRequiredDtoStatus[keyof typeof PlatformFidoRequiredDtoStatus];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const PlatformFidoRequiredDtoStatus = {
+  fido_required: 'fido_required',
+} as const;
+
+export interface PlatformFidoRequiredDto {
+  options: PlatformFidoRequiredDtoOptions;
+  securityMode: PlatformFidoRequiredDtoSecurityMode;
+  status: PlatformFidoRequiredDtoStatus;
+  transactionId: string;
+}
+
+export interface PlatformLoginStartDto {
+  email: string;
+  password: string;
+}
+
+export type PlatformLoginFinishDtoResponse = { [key: string]: unknown };
+
+export interface PlatformLoginFinishDto {
+  transactionId: string;
+  response: PlatformLoginFinishDtoResponse;
+}
+
+export interface PlatformEnrollmentStartDto {
+  bootstrapToken: string;
+  deviceName: string;
+  email: string;
+  password: string;
+}
+
+export type PlatformEnrollmentCredentialDtoResponse = { [key: string]: unknown };
+
+export interface PlatformEnrollmentCredentialDto {
+  authenticatorName: string;
+  response: PlatformEnrollmentCredentialDtoResponse;
+  transactionId: string;
+}
+
 export interface PermissionDto {
   code: string;
   resource: string;
   action: string;
 }
 
-export type RoleDtoHierarchyLevel =
-  (typeof RoleDtoHierarchyLevel)[keyof typeof RoleDtoHierarchyLevel];
+export type RoleDtoHierarchyLevel = typeof RoleDtoHierarchyLevel[keyof typeof RoleDtoHierarchyLevel];
+
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const RoleDtoHierarchyLevel = {
   NUMBER_1: 1,
   NUMBER_2: 2,
-  NUMBER_3: 3
+  NUMBER_3: 3,
 } as const;
 
 export interface RoleDto {
@@ -266,14 +382,14 @@ export interface RoleDto {
   permissions: string[];
 }
 
-export type CreateRoleDtoHierarchyLevel =
-  (typeof CreateRoleDtoHierarchyLevel)[keyof typeof CreateRoleDtoHierarchyLevel];
+export type CreateRoleDtoHierarchyLevel = typeof CreateRoleDtoHierarchyLevel[keyof typeof CreateRoleDtoHierarchyLevel];
+
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const CreateRoleDtoHierarchyLevel = {
   NUMBER_1: 1,
   NUMBER_2: 2,
-  NUMBER_3: 3
+  NUMBER_3: 3,
 } as const;
 
 export interface CreateRoleDto {
@@ -284,14 +400,14 @@ export interface CreateRoleDto {
   permissions: string[];
 }
 
-export type UpdateRoleDtoHierarchyLevel =
-  (typeof UpdateRoleDtoHierarchyLevel)[keyof typeof UpdateRoleDtoHierarchyLevel];
+export type UpdateRoleDtoHierarchyLevel = typeof UpdateRoleDtoHierarchyLevel[keyof typeof UpdateRoleDtoHierarchyLevel];
+
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const UpdateRoleDtoHierarchyLevel = {
   NUMBER_1: 1,
   NUMBER_2: 2,
-  NUMBER_3: 3
+  NUMBER_3: 3,
 } as const;
 
 export interface UpdateRoleDto {
@@ -302,17 +418,11 @@ export interface UpdateRoleDto {
   permissions?: string[];
 }
 
-export interface AiToolsResponseDto {
-  [key: string]: unknown;
-}
+export interface AiToolsResponseDto { [key: string]: unknown }
 
-export interface AiChatDto {
-  [key: string]: unknown;
-}
+export interface AiChatDto { [key: string]: unknown }
 
-export interface AiChatResponseDto {
-  [key: string]: unknown;
-}
+export interface AiChatResponseDto { [key: string]: unknown }
 
 /**
  * @nullable
@@ -329,13 +439,13 @@ export interface PracticeAreaTemplateDto {
   displayOrder: number;
 }
 
-export type ProvinceDtoCaseCatalogStrategy =
-  (typeof ProvinceDtoCaseCatalogStrategy)[keyof typeof ProvinceDtoCaseCatalogStrategy];
+export type ProvinceDtoCaseCatalogStrategy = typeof ProvinceDtoCaseCatalogStrategy[keyof typeof ProvinceDtoCaseCatalogStrategy];
+
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const ProvinceDtoCaseCatalogStrategy = {
-  manual: "manual",
-  center_forum: "center_forum"
+  manual: 'manual',
+  center_forum: 'center_forum',
 } as const;
 
 export interface ProvinceDto {
@@ -385,34 +495,34 @@ export interface StartOnboardingTenantDto {
   referralSource?: string;
 }
 
-export type StartOnboardingWorkspaceDtoDefaultRoleForInvites =
-  (typeof StartOnboardingWorkspaceDtoDefaultRoleForInvites)[keyof typeof StartOnboardingWorkspaceDtoDefaultRoleForInvites];
+export type StartOnboardingWorkspaceDtoDefaultRoleForInvites = typeof StartOnboardingWorkspaceDtoDefaultRoleForInvites[keyof typeof StartOnboardingWorkspaceDtoDefaultRoleForInvites];
+
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const StartOnboardingWorkspaceDtoDefaultRoleForInvites = {
-  admin: "admin",
-  lawyer: "lawyer",
-  paralegal: "paralegal",
-  accounting: "accounting",
-  viewer: "viewer"
+  admin: 'admin',
+  lawyer: 'lawyer',
+  paralegal: 'paralegal',
+  accounting: 'accounting',
+  viewer: 'viewer',
 } as const;
 
-export type StartOnboardingWorkspaceDtoCaseNumberingMode =
-  (typeof StartOnboardingWorkspaceDtoCaseNumberingMode)[keyof typeof StartOnboardingWorkspaceDtoCaseNumberingMode];
+export type StartOnboardingWorkspaceDtoCaseNumberingMode = typeof StartOnboardingWorkspaceDtoCaseNumberingMode[keyof typeof StartOnboardingWorkspaceDtoCaseNumberingMode];
+
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const StartOnboardingWorkspaceDtoCaseNumberingMode = {
-  manual: "manual",
-  automatic: "automatic"
+  manual: 'manual',
+  automatic: 'automatic',
 } as const;
 
-export type StartOnboardingWorkspaceDtoDocumentStorageMode =
-  (typeof StartOnboardingWorkspaceDtoDocumentStorageMode)[keyof typeof StartOnboardingWorkspaceDtoDocumentStorageMode];
+export type StartOnboardingWorkspaceDtoDocumentStorageMode = typeof StartOnboardingWorkspaceDtoDocumentStorageMode[keyof typeof StartOnboardingWorkspaceDtoDocumentStorageMode];
+
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const StartOnboardingWorkspaceDtoDocumentStorageMode = {
-  local: "local",
-  s3: "s3"
+  local: 'local',
+  s3: 's3',
 } as const;
 
 export interface StartOnboardingWorkspaceDto {
@@ -454,25 +564,25 @@ export interface OnboardingStatusDto {
   missingSteps: string[];
 }
 
-export type OnboardingChecklistStepDtoId =
-  (typeof OnboardingChecklistStepDtoId)[keyof typeof OnboardingChecklistStepDtoId];
+export type OnboardingChecklistStepDtoId = typeof OnboardingChecklistStepDtoId[keyof typeof OnboardingChecklistStepDtoId];
+
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const OnboardingChecklistStepDtoId = {
-  import_cases: "import_cases",
-  configure_finance: "configure_finance",
-  configure_notifications: "configure_notifications",
-  connect_calendar: "connect_calendar"
+  import_cases: 'import_cases',
+  configure_finance: 'configure_finance',
+  configure_notifications: 'configure_notifications',
+  connect_calendar: 'connect_calendar',
 } as const;
 
-export type OnboardingChecklistStepDtoStatus =
-  (typeof OnboardingChecklistStepDtoStatus)[keyof typeof OnboardingChecklistStepDtoStatus];
+export type OnboardingChecklistStepDtoStatus = typeof OnboardingChecklistStepDtoStatus[keyof typeof OnboardingChecklistStepDtoStatus];
+
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const OnboardingChecklistStepDtoStatus = {
-  pending: "pending",
-  completed: "completed",
-  skipped: "skipped"
+  pending: 'pending',
+  completed: 'completed',
+  skipped: 'skipped',
 } as const;
 
 export interface OnboardingChecklistStepDto {
@@ -494,13 +604,13 @@ export interface OnboardingChecklistResponseDto {
   steps: OnboardingChecklistStepDto[];
 }
 
-export type UpdateOnboardingChecklistStepDtoStatus =
-  (typeof UpdateOnboardingChecklistStepDtoStatus)[keyof typeof UpdateOnboardingChecklistStepDtoStatus];
+export type UpdateOnboardingChecklistStepDtoStatus = typeof UpdateOnboardingChecklistStepDtoStatus[keyof typeof UpdateOnboardingChecklistStepDtoStatus];
+
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const UpdateOnboardingChecklistStepDtoStatus = {
-  completed: "completed",
-  skipped: "skipped"
+  completed: 'completed',
+  skipped: 'skipped',
 } as const;
 
 export interface UpdateOnboardingChecklistStepDto {
@@ -512,23 +622,23 @@ export interface SaePreviewDto {
   password: string;
 }
 
-export type SaePreviewItemDtoSuggestedStatus =
-  (typeof SaePreviewItemDtoSuggestedStatus)[keyof typeof SaePreviewItemDtoSuggestedStatus];
+export type SaePreviewItemDtoSuggestedStatus = typeof SaePreviewItemDtoSuggestedStatus[keyof typeof SaePreviewItemDtoSuggestedStatus];
+
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const SaePreviewItemDtoSuggestedStatus = {
-  open: "open",
-  paused: "paused",
-  closed: "closed"
+  open: 'open',
+  paused: 'paused',
+  closed: 'closed',
 } as const;
 
-export type SaePreviewItemDtoAction =
-  (typeof SaePreviewItemDtoAction)[keyof typeof SaePreviewItemDtoAction];
+export type SaePreviewItemDtoAction = typeof SaePreviewItemDtoAction[keyof typeof SaePreviewItemDtoAction];
+
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const SaePreviewItemDtoAction = {
-  create: "create",
-  update: "update"
+  create: 'create',
+  update: 'update',
 } as const;
 
 export interface SaePreviewItemDto {
@@ -562,18 +672,16 @@ export interface SaePreviewResponseDto {
   summary: SaePreviewSummaryDto;
 }
 
-export interface SaeImportDto {
-  [key: string]: unknown;
-}
+export interface SaeImportDto { [key: string]: unknown }
 
-export type SaeImportItemDtoStatus =
-  (typeof SaeImportItemDtoStatus)[keyof typeof SaeImportItemDtoStatus];
+export type SaeImportItemDtoStatus = typeof SaeImportItemDtoStatus[keyof typeof SaeImportItemDtoStatus];
+
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const SaeImportItemDtoStatus = {
-  imported: "imported",
-  updated: "updated",
-  skipped: "skipped"
+  imported: 'imported',
+  updated: 'updated',
+  skipped: 'skipped',
 } as const;
 
 export interface SaeImportItemDto {
@@ -603,25 +711,25 @@ export type GoogleCalendarStatusDtoLastSyncAt = { [key: string]: unknown };
 
 export type GoogleCalendarStatusDtoLastError = { [key: string]: unknown };
 
-export type GoogleCalendarStatusDtoSyncMode =
-  (typeof GoogleCalendarStatusDtoSyncMode)[keyof typeof GoogleCalendarStatusDtoSyncMode];
+export type GoogleCalendarStatusDtoSyncMode = typeof GoogleCalendarStatusDtoSyncMode[keyof typeof GoogleCalendarStatusDtoSyncMode];
+
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const GoogleCalendarStatusDtoSyncMode = {
-  global: "global",
-  custom: "custom"
+  global: 'global',
+  custom: 'custom',
 } as const;
 
-export type GoogleCalendarStatusDtoSyncSourcesItem =
-  (typeof GoogleCalendarStatusDtoSyncSourcesItem)[keyof typeof GoogleCalendarStatusDtoSyncSourcesItem];
+export type GoogleCalendarStatusDtoSyncSourcesItem = typeof GoogleCalendarStatusDtoSyncSourcesItem[keyof typeof GoogleCalendarStatusDtoSyncSourcesItem];
+
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const GoogleCalendarStatusDtoSyncSourcesItem = {
-  all_hearings: "all_hearings",
-  my_tasks: "my_tasks",
-  my_area_tasks: "my_area_tasks",
-  participating_hearings: "participating_hearings",
-  all_tasks: "all_tasks"
+  all_hearings: 'all_hearings',
+  my_tasks: 'my_tasks',
+  my_area_tasks: 'my_area_tasks',
+  participating_hearings: 'participating_hearings',
+  all_tasks: 'all_tasks',
 } as const;
 
 export interface GoogleCalendarStatusDto {
@@ -637,9 +745,7 @@ export interface GoogleCalendarStatusDto {
   syncSources: GoogleCalendarStatusDtoSyncSourcesItem[];
 }
 
-export interface GoogleCalendarSyncPreferencesDto {
-  [key: string]: unknown;
-}
+export interface GoogleCalendarSyncPreferencesDto { [key: string]: unknown }
 
 export interface GoogleCalendarOAuthStartDto {
   authorizationUrl: string;
@@ -666,24 +772,24 @@ export interface CashboxSummaryDto {
   hourly: CashboxHourlySummaryDto[];
 }
 
-export type CashboxMovementDtoType =
-  (typeof CashboxMovementDtoType)[keyof typeof CashboxMovementDtoType];
+export type CashboxMovementDtoType = typeof CashboxMovementDtoType[keyof typeof CashboxMovementDtoType];
+
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const CashboxMovementDtoType = {
-  income: "income",
-  expense: "expense",
-  conversion_in: "conversion_in",
-  conversion_out: "conversion_out"
+  income: 'income',
+  expense: 'expense',
+  conversion_in: 'conversion_in',
+  conversion_out: 'conversion_out',
 } as const;
 
-export type CashboxMovementDtoCategoryOrigin =
-  (typeof CashboxMovementDtoCategoryOrigin)[keyof typeof CashboxMovementDtoCategoryOrigin];
+export type CashboxMovementDtoCategoryOrigin = typeof CashboxMovementDtoCategoryOrigin[keyof typeof CashboxMovementDtoCategoryOrigin];
+
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const CashboxMovementDtoCategoryOrigin = {
-  global: "global",
-  tenant: "tenant"
+  global: 'global',
+  tenant: 'tenant',
 } as const;
 
 export type CashboxMovementDtoSource = { [key: string]: unknown };
@@ -722,13 +828,13 @@ export interface CashboxMovementsListResponseDto {
   pageInfo: CashboxMovementsPageInfoDto;
 }
 
-export type CreateCashboxMovementDtoType =
-  (typeof CreateCashboxMovementDtoType)[keyof typeof CreateCashboxMovementDtoType];
+export type CreateCashboxMovementDtoType = typeof CreateCashboxMovementDtoType[keyof typeof CreateCashboxMovementDtoType];
+
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const CreateCashboxMovementDtoType = {
-  income: "income",
-  expense: "expense"
+  income: 'income',
+  expense: 'expense',
 } as const;
 
 export interface CreateCashboxMovementDto {
@@ -754,21 +860,23 @@ export interface CreateCashboxConversionResponseDto {
   items: CashboxMovementDto[];
 }
 
-export type CategoryDtoKind = (typeof CategoryDtoKind)[keyof typeof CategoryDtoKind];
+export type CategoryDtoKind = typeof CategoryDtoKind[keyof typeof CategoryDtoKind];
+
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const CategoryDtoKind = {
-  income: "income",
-  expense: "expense",
-  both: "both"
+  income: 'income',
+  expense: 'expense',
+  both: 'both',
 } as const;
 
-export type CategoryDtoOrigin = (typeof CategoryDtoOrigin)[keyof typeof CategoryDtoOrigin];
+export type CategoryDtoOrigin = typeof CategoryDtoOrigin[keyof typeof CategoryDtoOrigin];
+
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const CategoryDtoOrigin = {
-  global: "global",
-  tenant: "tenant"
+  global: 'global',
+  tenant: 'tenant',
 } as const;
 
 export interface CategoryDto {
@@ -806,14 +914,14 @@ export interface CategoryListResponseDto {
   pageInfo: CategoryPageInfoDto;
 }
 
-export type CreateCategoryDtoKind =
-  (typeof CreateCategoryDtoKind)[keyof typeof CreateCategoryDtoKind];
+export type CreateCategoryDtoKind = typeof CreateCategoryDtoKind[keyof typeof CreateCategoryDtoKind];
+
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const CreateCategoryDtoKind = {
-  income: "income",
-  expense: "expense",
-  both: "both"
+  income: 'income',
+  expense: 'expense',
+  both: 'both',
 } as const;
 
 export interface CreateCategoryDto {
@@ -826,14 +934,14 @@ export interface CreateCategoryDto {
   active?: boolean;
 }
 
-export type UpdateCategoryDtoKind =
-  (typeof UpdateCategoryDtoKind)[keyof typeof UpdateCategoryDtoKind];
+export type UpdateCategoryDtoKind = typeof UpdateCategoryDtoKind[keyof typeof UpdateCategoryDtoKind];
+
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const UpdateCategoryDtoKind = {
-  income: "income",
-  expense: "expense",
-  both: "both"
+  income: 'income',
+  expense: 'expense',
+  both: 'both',
 } as const;
 
 export interface UpdateCategoryDto {
@@ -928,21 +1036,15 @@ export interface DocumentsListResponseDto {
   metrics: DocumentLibraryMetricsDto;
 }
 
-export interface CreateDocumentFolderDto {
-  [key: string]: unknown;
-}
+export interface CreateDocumentFolderDto { [key: string]: unknown }
 
-export interface UpdateDocumentFolderDto {
-  [key: string]: unknown;
-}
+export interface UpdateDocumentFolderDto { [key: string]: unknown }
 
 export interface DeleteResponseDto {
   status: string;
 }
 
-export interface CreateDocumentImportJobDto {
-  [key: string]: unknown;
-}
+export interface CreateDocumentImportJobDto { [key: string]: unknown }
 
 export interface DocumentImportItemDto {
   id: string;
@@ -988,27 +1090,25 @@ export interface CreateDocumentBodyDto {
   file: Blob;
 }
 
-export interface UpdateDocumentDto {
-  [key: string]: unknown;
+export interface UpdateDocumentDto { [key: string]: unknown }
+
+export interface ReplaceDocumentBodyDto {
+  file: Blob;
 }
 
-export interface BulkDeleteDocumentsDto {
-  [key: string]: unknown;
-}
+export interface BulkDeleteDocumentsDto { [key: string]: unknown }
 
-export interface BulkMoveDocumentsDto {
-  [key: string]: unknown;
-}
+export interface BulkMoveDocumentsDto { [key: string]: unknown }
 
-export type NotificationDtoResourceType =
-  (typeof NotificationDtoResourceType)[keyof typeof NotificationDtoResourceType];
+export type NotificationDtoResourceType = typeof NotificationDtoResourceType[keyof typeof NotificationDtoResourceType];
+
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const NotificationDtoResourceType = {
-  case_task: "case_task",
-  case_expense: "case_expense",
-  case_hearing: "case_hearing",
-  meeting: "meeting"
+  case_task: 'case_task',
+  case_expense: 'case_expense',
+  case_hearing: 'case_hearing',
+  meeting: 'meeting',
 } as const;
 
 export interface NotificationDto {
@@ -1051,9 +1151,7 @@ export interface NotionConnectionDto {
 
 export type NotionMappingDtoPropertyMapping = { [key: string]: unknown };
 
-export type NotionMappingDtoStatusMapping = {
-  [key: string]: "pending" | "in_progress" | "completed" | "cancelled";
-};
+export type NotionMappingDtoStatusMapping = {[key: string]: 'pending' | 'in_progress' | 'completed' | 'cancelled'};
 
 export type NotionMappingDtoLastPullAt = { [key: string]: unknown };
 
@@ -1093,13 +1191,9 @@ export interface NotionDataSourcesResponseDto {
   nextCursor?: NotionDataSourcesResponseDtoNextCursor;
 }
 
-export interface CreateNotionMappingDto {
-  [key: string]: unknown;
-}
+export interface CreateNotionMappingDto { [key: string]: unknown }
 
-export interface UpdateNotionMappingDto {
-  [key: string]: unknown;
-}
+export interface UpdateNotionMappingDto { [key: string]: unknown }
 
 export interface NotionSyncResultDto {
   status: string;
@@ -1128,9 +1222,7 @@ export interface NotionConflictsResponseDto {
   items: NotionConflictDto[];
 }
 
-export interface ResolveNotionConflictDto {
-  [key: string]: unknown;
-}
+export interface ResolveNotionConflictDto { [key: string]: unknown }
 
 export interface CaseProvinceDto {
   id: string;
@@ -1150,30 +1242,30 @@ export interface CaseJudicialCenterDto {
   name: string;
 }
 
-export type CaseParticipantDtoParticipantKind =
-  (typeof CaseParticipantDtoParticipantKind)[keyof typeof CaseParticipantDtoParticipantKind];
+export type CaseParticipantDtoParticipantKind = typeof CaseParticipantDtoParticipantKind[keyof typeof CaseParticipantDtoParticipantKind];
+
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const CaseParticipantDtoParticipantKind = {
-  client: "client",
-  opposing_party: "opposing_party",
-  third_party: "third_party",
-  other: "other"
+  client: 'client',
+  opposing_party: 'opposing_party',
+  third_party: 'third_party',
+  other: 'other',
 } as const;
 
-export type CaseParticipantDtoRole =
-  (typeof CaseParticipantDtoRole)[keyof typeof CaseParticipantDtoRole];
+export type CaseParticipantDtoRole = typeof CaseParticipantDtoRole[keyof typeof CaseParticipantDtoRole];
+
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const CaseParticipantDtoRole = {
-  claimant: "claimant",
-  defendant: "defendant",
-  complainant: "complainant",
-  accused: "accused",
-  third_party: "third_party",
-  client: "client",
-  opposing_party: "opposing_party",
-  other: "other"
+  claimant: 'claimant',
+  defendant: 'defendant',
+  complainant: 'complainant',
+  accused: 'accused',
+  third_party: 'third_party',
+  client: 'client',
+  opposing_party: 'opposing_party',
+  other: 'other',
 } as const;
 
 export interface CaseParticipantDto {
@@ -1210,22 +1302,24 @@ export type CaseDtoForum = CaseForumDto | null;
  */
 export type CaseDtoJudicialCenter = CaseJudicialCenterDto | null;
 
-export type CaseDtoInstance = (typeof CaseDtoInstance)[keyof typeof CaseDtoInstance];
+export type CaseDtoInstance = typeof CaseDtoInstance[keyof typeof CaseDtoInstance];
+
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const CaseDtoInstance = {
-  first: "first",
-  second: "second",
-  third: "third"
+  first: 'first',
+  second: 'second',
+  third: 'third',
 } as const;
 
-export type CaseDtoStatus = (typeof CaseDtoStatus)[keyof typeof CaseDtoStatus];
+export type CaseDtoStatus = typeof CaseDtoStatus[keyof typeof CaseDtoStatus];
+
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const CaseDtoStatus = {
-  open: "open",
-  paused: "paused",
-  closed: "closed"
+  open: 'open',
+  paused: 'paused',
+  closed: 'closed',
 } as const;
 
 export interface CaseDto {
@@ -1292,30 +1386,30 @@ export interface CasesMetricsDto {
   pendingTasks: number;
 }
 
-export type CaseCalendarEventDtoType =
-  (typeof CaseCalendarEventDtoType)[keyof typeof CaseCalendarEventDtoType];
+export type CaseCalendarEventDtoType = typeof CaseCalendarEventDtoType[keyof typeof CaseCalendarEventDtoType];
+
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const CaseCalendarEventDtoType = {
-  payment_due: "payment_due",
-  hearing: "hearing",
-  task_due: "task_due"
+  payment_due: 'payment_due',
+  hearing: 'hearing',
+  task_due: 'task_due',
 } as const;
 
-export type CaseCalendarEventDtoHearingType =
-  (typeof CaseCalendarEventDtoHearingType)[keyof typeof CaseCalendarEventDtoHearingType];
+export type CaseCalendarEventDtoHearingType = typeof CaseCalendarEventDtoHearingType[keyof typeof CaseCalendarEventDtoHearingType];
+
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const CaseCalendarEventDtoHearingType = {
-  preliminary: "preliminary",
-  trial_view: "trial_view",
-  conciliation: "conciliation",
-  mediation: "mediation",
-  testimonial: "testimonial",
-  confessional: "confessional",
-  debate: "debate",
-  investigative_statement: "investigative_statement",
-  other: "other"
+  preliminary: 'preliminary',
+  trial_view: 'trial_view',
+  conciliation: 'conciliation',
+  mediation: 'mediation',
+  testimonial: 'testimonial',
+  confessional: 'confessional',
+  debate: 'debate',
+  investigative_statement: 'investigative_statement',
+  other: 'other',
 } as const;
 
 export interface CaseCalendarEventDto {
@@ -1367,24 +1461,24 @@ export interface TenantCaseTasksMetricsDto {
   overdue: number;
 }
 
-export type TaskBoardFiltersDtoDueStatus =
-  (typeof TaskBoardFiltersDtoDueStatus)[keyof typeof TaskBoardFiltersDtoDueStatus];
+export type TaskBoardFiltersDtoDueStatus = typeof TaskBoardFiltersDtoDueStatus[keyof typeof TaskBoardFiltersDtoDueStatus];
+
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const TaskBoardFiltersDtoDueStatus = {
-  due_soon: "due_soon",
-  overdue: "overdue"
+  due_soon: 'due_soon',
+  overdue: 'overdue',
 } as const;
 
-export type TaskBoardFiltersDtoStatus =
-  (typeof TaskBoardFiltersDtoStatus)[keyof typeof TaskBoardFiltersDtoStatus];
+export type TaskBoardFiltersDtoStatus = typeof TaskBoardFiltersDtoStatus[keyof typeof TaskBoardFiltersDtoStatus];
+
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const TaskBoardFiltersDtoStatus = {
-  pending: "pending",
-  in_progress: "in_progress",
-  completed: "completed",
-  cancelled: "cancelled"
+  pending: 'pending',
+  in_progress: 'in_progress',
+  completed: 'completed',
+  cancelled: 'cancelled',
 } as const;
 
 export interface TaskBoardFiltersDto {
@@ -1399,125 +1493,125 @@ export interface TaskBoardFiltersDto {
   status?: TaskBoardFiltersDtoStatus;
 }
 
-export type TaskBoardSettingsDtoChartGroupBy =
-  (typeof TaskBoardSettingsDtoChartGroupBy)[keyof typeof TaskBoardSettingsDtoChartGroupBy];
+export type TaskBoardSettingsDtoChartGroupBy = typeof TaskBoardSettingsDtoChartGroupBy[keyof typeof TaskBoardSettingsDtoChartGroupBy];
+
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const TaskBoardSettingsDtoChartGroupBy = {
-  status: "status",
-  client: "client",
-  case: "case",
-  assignedTo: "assignedTo"
+  status: 'status',
+  client: 'client',
+  case: 'case',
+  assignedTo: 'assignedTo',
 } as const;
 
 export type TaskBoardSettingsDtoChartShowHorizontalLines = { [key: string]: unknown };
 
-export type TaskBoardSettingsDtoChartSortBy =
-  (typeof TaskBoardSettingsDtoChartSortBy)[keyof typeof TaskBoardSettingsDtoChartSortBy];
+export type TaskBoardSettingsDtoChartSortBy = typeof TaskBoardSettingsDtoChartSortBy[keyof typeof TaskBoardSettingsDtoChartSortBy];
+
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const TaskBoardSettingsDtoChartSortBy = {
-  count: "count",
-  label: "label"
+  count: 'count',
+  label: 'label',
 } as const;
 
-export type TaskBoardSettingsDtoChartSortDirection =
-  (typeof TaskBoardSettingsDtoChartSortDirection)[keyof typeof TaskBoardSettingsDtoChartSortDirection];
+export type TaskBoardSettingsDtoChartSortDirection = typeof TaskBoardSettingsDtoChartSortDirection[keyof typeof TaskBoardSettingsDtoChartSortDirection];
+
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const TaskBoardSettingsDtoChartSortDirection = {
-  asc: "asc",
-  desc: "desc"
+  asc: 'asc',
+  desc: 'desc',
 } as const;
 
-export type TaskBoardSettingsDtoChartType =
-  (typeof TaskBoardSettingsDtoChartType)[keyof typeof TaskBoardSettingsDtoChartType];
+export type TaskBoardSettingsDtoChartType = typeof TaskBoardSettingsDtoChartType[keyof typeof TaskBoardSettingsDtoChartType];
+
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const TaskBoardSettingsDtoChartType = {
-  vertical_bar: "vertical_bar",
-  horizontal_bar: "horizontal_bar",
-  line: "line",
-  pie: "pie"
+  vertical_bar: 'vertical_bar',
+  horizontal_bar: 'horizontal_bar',
+  line: 'line',
+  pie: 'pie',
 } as const;
 
 export type TaskBoardSettingsDtoHideZeroValues = { [key: string]: unknown };
 
-export type TaskBoardSettingsDtoKanbanCardLayout =
-  (typeof TaskBoardSettingsDtoKanbanCardLayout)[keyof typeof TaskBoardSettingsDtoKanbanCardLayout];
+export type TaskBoardSettingsDtoKanbanCardLayout = typeof TaskBoardSettingsDtoKanbanCardLayout[keyof typeof TaskBoardSettingsDtoKanbanCardLayout];
+
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const TaskBoardSettingsDtoKanbanCardLayout = {
-  compact: "compact",
-  list: "list"
+  compact: 'compact',
+  list: 'list',
 } as const;
 
-export type TaskBoardSettingsDtoKanbanCardSize =
-  (typeof TaskBoardSettingsDtoKanbanCardSize)[keyof typeof TaskBoardSettingsDtoKanbanCardSize];
+export type TaskBoardSettingsDtoKanbanCardSize = typeof TaskBoardSettingsDtoKanbanCardSize[keyof typeof TaskBoardSettingsDtoKanbanCardSize];
+
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const TaskBoardSettingsDtoKanbanCardSize = {
-  small: "small",
-  medium: "medium",
-  large: "large"
+  small: 'small',
+  medium: 'medium',
+  large: 'large',
 } as const;
 
 export type TaskBoardSettingsDtoKanbanColorColumns = { [key: string]: unknown };
 
-export type TaskBoardSettingsDtoOpenTaskIn =
-  (typeof TaskBoardSettingsDtoOpenTaskIn)[keyof typeof TaskBoardSettingsDtoOpenTaskIn];
+export type TaskBoardSettingsDtoOpenTaskIn = typeof TaskBoardSettingsDtoOpenTaskIn[keyof typeof TaskBoardSettingsDtoOpenTaskIn];
+
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const TaskBoardSettingsDtoOpenTaskIn = {
-  side_sheet: "side_sheet",
-  center_modal: "center_modal"
+  side_sheet: 'side_sheet',
+  center_modal: 'center_modal',
 } as const;
 
-export type TaskBoardSettingsDtoViewMode =
-  (typeof TaskBoardSettingsDtoViewMode)[keyof typeof TaskBoardSettingsDtoViewMode];
+export type TaskBoardSettingsDtoViewMode = typeof TaskBoardSettingsDtoViewMode[keyof typeof TaskBoardSettingsDtoViewMode];
+
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const TaskBoardSettingsDtoViewMode = {
-  table: "table",
-  kanban: "kanban",
-  calendar: "calendar",
-  bar_chart: "bar_chart"
+  table: 'table',
+  kanban: 'kanban',
+  calendar: 'calendar',
+  bar_chart: 'bar_chart',
 } as const;
 
-export type TaskBoardSettingsDtoVisiblePropertiesItem =
-  (typeof TaskBoardSettingsDtoVisiblePropertiesItem)[keyof typeof TaskBoardSettingsDtoVisiblePropertiesItem];
+export type TaskBoardSettingsDtoVisiblePropertiesItem = typeof TaskBoardSettingsDtoVisiblePropertiesItem[keyof typeof TaskBoardSettingsDtoVisiblePropertiesItem];
+
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const TaskBoardSettingsDtoVisiblePropertiesItem = {
-  case: "case",
-  client: "client",
-  assignedTo: "assignedTo",
-  endDate: "endDate",
-  status: "status",
-  notes: "notes"
+  case: 'case',
+  client: 'client',
+  assignedTo: 'assignedTo',
+  endDate: 'endDate',
+  status: 'status',
+  notes: 'notes',
 } as const;
 
-export type TaskBoardSettingsDtoSortBy =
-  (typeof TaskBoardSettingsDtoSortBy)[keyof typeof TaskBoardSettingsDtoSortBy];
+export type TaskBoardSettingsDtoSortBy = typeof TaskBoardSettingsDtoSortBy[keyof typeof TaskBoardSettingsDtoSortBy];
+
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const TaskBoardSettingsDtoSortBy = {
-  name: "name",
-  status: "status",
-  endDate: "endDate",
-  client: "client",
-  case: "case",
-  assignedTo: "assignedTo",
-  createdAt: "createdAt"
+  name: 'name',
+  status: 'status',
+  endDate: 'endDate',
+  client: 'client',
+  case: 'case',
+  assignedTo: 'assignedTo',
+  createdAt: 'createdAt',
 } as const;
 
-export type TaskBoardSettingsDtoSortDirection =
-  (typeof TaskBoardSettingsDtoSortDirection)[keyof typeof TaskBoardSettingsDtoSortDirection];
+export type TaskBoardSettingsDtoSortDirection = typeof TaskBoardSettingsDtoSortDirection[keyof typeof TaskBoardSettingsDtoSortDirection];
+
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const TaskBoardSettingsDtoSortDirection = {
-  asc: "asc",
-  desc: "desc"
+  asc: 'asc',
+  desc: 'desc',
 } as const;
 
 export interface TaskBoardSettingsDto {
@@ -1551,13 +1645,9 @@ export interface TaskBoardViewsListResponseDto {
   items: TaskBoardViewDto[];
 }
 
-export interface CreateTaskBoardViewDto {
-  [key: string]: unknown;
-}
+export interface CreateTaskBoardViewDto { [key: string]: unknown }
 
-export interface UpdateTaskBoardViewDto {
-  [key: string]: unknown;
-}
+export interface UpdateTaskBoardViewDto { [key: string]: unknown }
 
 export interface CaseDeleteResponseDto {
   status: string;
@@ -1588,26 +1678,26 @@ export interface GlobalCaseTaskClientDto {
  */
 export type GlobalCaseTaskDtoAssignedTo = CaseTaskAssigneeDto | null;
 
-export type GlobalCaseTaskDtoStatus =
-  (typeof GlobalCaseTaskDtoStatus)[keyof typeof GlobalCaseTaskDtoStatus];
+export type GlobalCaseTaskDtoStatus = typeof GlobalCaseTaskDtoStatus[keyof typeof GlobalCaseTaskDtoStatus];
+
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const GlobalCaseTaskDtoStatus = {
-  pending: "pending",
-  in_progress: "in_progress",
-  completed: "completed",
-  cancelled: "cancelled"
+  pending: 'pending',
+  in_progress: 'in_progress',
+  completed: 'completed',
+  cancelled: 'cancelled',
 } as const;
 
-export type GlobalCaseTaskDtoNotificationRecipientMode =
-  (typeof GlobalCaseTaskDtoNotificationRecipientMode)[keyof typeof GlobalCaseTaskDtoNotificationRecipientMode];
+export type GlobalCaseTaskDtoNotificationRecipientMode = typeof GlobalCaseTaskDtoNotificationRecipientMode[keyof typeof GlobalCaseTaskDtoNotificationRecipientMode];
+
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const GlobalCaseTaskDtoNotificationRecipientMode = {
-  self: "self",
-  tenant: "tenant",
-  practice_area: "practice_area",
-  members: "members"
+  self: 'self',
+  tenant: 'tenant',
+  practice_area: 'practice_area',
+  members: 'members',
 } as const;
 
 /**
@@ -1660,17 +1750,11 @@ export interface TenantCaseTasksListResponseDto {
   pageInfo: CasesPageInfoDto;
 }
 
-export interface UpdateCaseTaskDto {
-  [key: string]: unknown;
-}
+export interface UpdateCaseTaskDto { [key: string]: unknown }
 
-export interface UpdateCaseTaskLocalContextDto {
-  [key: string]: unknown;
-}
+export interface UpdateCaseTaskLocalContextDto { [key: string]: unknown }
 
-export interface CreateCaseDto {
-  [key: string]: unknown;
-}
+export interface CreateCaseDto { [key: string]: unknown }
 
 export interface CaseMetricsDto {
   hearingsCount: number;
@@ -1695,23 +1779,24 @@ export type CaseDetailDtoForum = CaseForumDto | null;
  */
 export type CaseDetailDtoJudicialCenter = CaseJudicialCenterDto | null;
 
-export type CaseDetailDtoInstance =
-  (typeof CaseDetailDtoInstance)[keyof typeof CaseDetailDtoInstance];
+export type CaseDetailDtoInstance = typeof CaseDetailDtoInstance[keyof typeof CaseDetailDtoInstance];
+
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const CaseDetailDtoInstance = {
-  first: "first",
-  second: "second",
-  third: "third"
+  first: 'first',
+  second: 'second',
+  third: 'third',
 } as const;
 
-export type CaseDetailDtoStatus = (typeof CaseDetailDtoStatus)[keyof typeof CaseDetailDtoStatus];
+export type CaseDetailDtoStatus = typeof CaseDetailDtoStatus[keyof typeof CaseDetailDtoStatus];
+
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const CaseDetailDtoStatus = {
-  open: "open",
-  paused: "paused",
-  closed: "closed"
+  open: 'open',
+  paused: 'paused',
+  closed: 'closed',
 } as const;
 
 export interface CaseDetailDto {
@@ -1761,25 +1846,26 @@ export interface CaseDetailDto {
  */
 export type CaseTaskDtoAssignedTo = CaseTaskAssigneeDto | null;
 
-export type CaseTaskDtoStatus = (typeof CaseTaskDtoStatus)[keyof typeof CaseTaskDtoStatus];
+export type CaseTaskDtoStatus = typeof CaseTaskDtoStatus[keyof typeof CaseTaskDtoStatus];
+
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const CaseTaskDtoStatus = {
-  pending: "pending",
-  in_progress: "in_progress",
-  completed: "completed",
-  cancelled: "cancelled"
+  pending: 'pending',
+  in_progress: 'in_progress',
+  completed: 'completed',
+  cancelled: 'cancelled',
 } as const;
 
-export type CaseTaskDtoNotificationRecipientMode =
-  (typeof CaseTaskDtoNotificationRecipientMode)[keyof typeof CaseTaskDtoNotificationRecipientMode];
+export type CaseTaskDtoNotificationRecipientMode = typeof CaseTaskDtoNotificationRecipientMode[keyof typeof CaseTaskDtoNotificationRecipientMode];
+
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const CaseTaskDtoNotificationRecipientMode = {
-  self: "self",
-  tenant: "tenant",
-  practice_area: "practice_area",
-  members: "members"
+  self: 'self',
+  tenant: 'tenant',
+  practice_area: 'practice_area',
+  members: 'members',
 } as const;
 
 export interface CaseTaskDto {
@@ -1818,9 +1904,7 @@ export interface CaseTasksListResponseDto {
   pageInfo: CasesPageInfoDto;
 }
 
-export interface CreateCaseTaskDto {
-  [key: string]: unknown;
-}
+export interface CreateCaseTaskDto { [key: string]: unknown }
 
 export interface DocumentCategoryDto {
   id: string;
@@ -1856,30 +1940,31 @@ export interface CreateCaseDocumentBodyDto {
   file: Blob;
 }
 
-export type CaseHearingDtoType = (typeof CaseHearingDtoType)[keyof typeof CaseHearingDtoType];
+export type CaseHearingDtoType = typeof CaseHearingDtoType[keyof typeof CaseHearingDtoType];
+
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const CaseHearingDtoType = {
-  preliminary: "preliminary",
-  trial_view: "trial_view",
-  conciliation: "conciliation",
-  mediation: "mediation",
-  testimonial: "testimonial",
-  confessional: "confessional",
-  debate: "debate",
-  investigative_statement: "investigative_statement",
-  other: "other"
+  preliminary: 'preliminary',
+  trial_view: 'trial_view',
+  conciliation: 'conciliation',
+  mediation: 'mediation',
+  testimonial: 'testimonial',
+  confessional: 'confessional',
+  debate: 'debate',
+  investigative_statement: 'investigative_statement',
+  other: 'other',
 } as const;
 
-export type CaseHearingDtoNotificationRecipientMode =
-  (typeof CaseHearingDtoNotificationRecipientMode)[keyof typeof CaseHearingDtoNotificationRecipientMode];
+export type CaseHearingDtoNotificationRecipientMode = typeof CaseHearingDtoNotificationRecipientMode[keyof typeof CaseHearingDtoNotificationRecipientMode];
+
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const CaseHearingDtoNotificationRecipientMode = {
-  self: "self",
-  tenant: "tenant",
-  practice_area: "practice_area",
-  members: "members"
+  self: 'self',
+  tenant: 'tenant',
+  practice_area: 'practice_area',
+  members: 'members',
 } as const;
 
 export interface CaseHearingDto {
@@ -1909,13 +1994,9 @@ export interface CaseHearingsListResponseDto {
   pageInfo: CasesPageInfoDto;
 }
 
-export interface CreateCaseHearingDto {
-  [key: string]: unknown;
-}
+export interface CreateCaseHearingDto { [key: string]: unknown }
 
-export interface UpdateCaseHearingDto {
-  [key: string]: unknown;
-}
+export interface UpdateCaseHearingDto { [key: string]: unknown }
 
 export interface CaseExpenseSummaryItemDto {
   id: string;
@@ -1953,25 +2034,26 @@ export interface CaseExpenseAttachmentDto {
  */
 export type CaseExpenseDtoTask = CaseExpenseTaskDto | null;
 
-export type CaseExpenseDtoStatus = (typeof CaseExpenseDtoStatus)[keyof typeof CaseExpenseDtoStatus];
+export type CaseExpenseDtoStatus = typeof CaseExpenseDtoStatus[keyof typeof CaseExpenseDtoStatus];
+
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const CaseExpenseDtoStatus = {
-  pending: "pending",
-  paid: "paid",
-  cancelled: "cancelled",
-  overdue: "overdue"
+  pending: 'pending',
+  paid: 'paid',
+  cancelled: 'cancelled',
+  overdue: 'overdue',
 } as const;
 
-export type CaseExpenseDtoNotificationRecipientMode =
-  (typeof CaseExpenseDtoNotificationRecipientMode)[keyof typeof CaseExpenseDtoNotificationRecipientMode];
+export type CaseExpenseDtoNotificationRecipientMode = typeof CaseExpenseDtoNotificationRecipientMode[keyof typeof CaseExpenseDtoNotificationRecipientMode];
+
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const CaseExpenseDtoNotificationRecipientMode = {
-  self: "self",
-  tenant: "tenant",
-  practice_area: "practice_area",
-  members: "members"
+  self: 'self',
+  tenant: 'tenant',
+  practice_area: 'practice_area',
+  members: 'members',
 } as const;
 
 export interface CaseExpenseDto {
@@ -2011,42 +2093,37 @@ export interface CaseExpensesListResponseDto {
   pageInfo: CasesPageInfoDto;
 }
 
-export interface CreateCaseExpenseDto {
-  [key: string]: unknown;
-}
+export interface CreateCaseExpenseDto { [key: string]: unknown }
 
-export interface UpdateCaseExpenseDto {
-  [key: string]: unknown;
-}
+export interface UpdateCaseExpenseDto { [key: string]: unknown }
 
 export interface CaseExpenseAttachmentsListResponseDto {
   items: CaseExpenseAttachmentDto[];
   pageInfo: CasesPageInfoDto;
 }
 
-export interface UpdateCaseDto {
-  [key: string]: unknown;
-}
+export interface UpdateCaseDto { [key: string]: unknown }
 
 export interface DocumentCategoriesListResponseDto {
   items: DocumentCategoryDto[];
   pageInfo: CasesPageInfoDto;
 }
 
-export type MutableClientStatus = (typeof MutableClientStatus)[keyof typeof MutableClientStatus];
+export type MutableClientStatus = typeof MutableClientStatus[keyof typeof MutableClientStatus];
+
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const MutableClientStatus = {
-  active: "active",
-  inactive: "inactive"
+  active: 'active',
+  inactive: 'inactive',
 } as const;
 
-export type CreateHumanClientInputDtoType =
-  (typeof CreateHumanClientInputDtoType)[keyof typeof CreateHumanClientInputDtoType];
+export type CreateHumanClientInputDtoType = typeof CreateHumanClientInputDtoType[keyof typeof CreateHumanClientInputDtoType];
+
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const CreateHumanClientInputDtoType = {
-  human: "human"
+  human: 'human',
 } as const;
 
 export interface CreateHumanClientInputDto {
@@ -2110,12 +2187,12 @@ export interface CreateHumanClientInputDto {
   salaryReceiptRef?: string | null;
 }
 
-export type CreateLegalEntityClientInputDtoType =
-  (typeof CreateLegalEntityClientInputDtoType)[keyof typeof CreateLegalEntityClientInputDtoType];
+export type CreateLegalEntityClientInputDtoType = typeof CreateLegalEntityClientInputDtoType[keyof typeof CreateLegalEntityClientInputDtoType];
+
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const CreateLegalEntityClientInputDtoType = {
-  legal_entity: "legal_entity"
+  legal_entity: 'legal_entity',
 } as const;
 
 export interface CreateLegalEntityClientInputDto {
@@ -2296,21 +2373,23 @@ export interface UpdateLegalEntityClientInputDto {
   statute?: string | null;
 }
 
-export type ClientType = (typeof ClientType)[keyof typeof ClientType];
+export type ClientType = typeof ClientType[keyof typeof ClientType];
+
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const ClientType = {
-  human: "human",
-  legal_entity: "legal_entity"
+  human: 'human',
+  legal_entity: 'legal_entity',
 } as const;
 
-export type ClientStatus = (typeof ClientStatus)[keyof typeof ClientStatus];
+export type ClientStatus = typeof ClientStatus[keyof typeof ClientStatus];
+
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const ClientStatus = {
-  active: "active",
-  inactive: "inactive",
-  archived: "archived"
+  active: 'active',
+  inactive: 'inactive',
+  archived: 'archived',
 } as const;
 
 export interface ClientMetricsDto {
@@ -2319,14 +2398,14 @@ export interface ClientMetricsDto {
   totalCases: number;
 }
 
-export type ClientRelatedCaseDtoStatus =
-  (typeof ClientRelatedCaseDtoStatus)[keyof typeof ClientRelatedCaseDtoStatus];
+export type ClientRelatedCaseDtoStatus = typeof ClientRelatedCaseDtoStatus[keyof typeof ClientRelatedCaseDtoStatus];
+
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const ClientRelatedCaseDtoStatus = {
-  open: "open",
-  paused: "paused",
-  closed: "closed"
+  open: 'open',
+  paused: 'paused',
+  closed: 'closed',
 } as const;
 
 export interface ClientRelatedCaseDto {
@@ -2381,23 +2460,25 @@ export interface ClientDetailDto {
   relatedCases: ClientRelatedCasesDto;
 }
 
-export type ClientSort = (typeof ClientSort)[keyof typeof ClientSort];
+export type ClientSort = typeof ClientSort[keyof typeof ClientSort];
+
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const ClientSort = {
-  name: "name",
-  createdAt: "createdAt",
-  updatedAt: "updatedAt",
-  status: "status",
-  type: "type"
+  name: 'name',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt',
+  status: 'status',
+  type: 'type',
 } as const;
 
-export type ClientOrder = (typeof ClientOrder)[keyof typeof ClientOrder];
+export type ClientOrder = typeof ClientOrder[keyof typeof ClientOrder];
+
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const ClientOrder = {
-  asc: "asc",
-  desc: "desc"
+  asc: 'asc',
+  desc: 'desc',
 } as const;
 
 export interface ClientSummaryDto {
@@ -2440,20 +2521,20 @@ export interface ClientsListResponseDto {
   pageInfo: ClientsPageInfoDto;
 }
 
-export type ClientArchiveResponseDtoClientStatus =
-  (typeof ClientArchiveResponseDtoClientStatus)[keyof typeof ClientArchiveResponseDtoClientStatus];
+export type ClientArchiveResponseDtoClientStatus = typeof ClientArchiveResponseDtoClientStatus[keyof typeof ClientArchiveResponseDtoClientStatus];
+
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const ClientArchiveResponseDtoClientStatus = {
-  archived: "archived"
+  archived: 'archived',
 } as const;
 
-export type ClientArchiveResponseDtoStatus =
-  (typeof ClientArchiveResponseDtoStatus)[keyof typeof ClientArchiveResponseDtoStatus];
+export type ClientArchiveResponseDtoStatus = typeof ClientArchiveResponseDtoStatus[keyof typeof ClientArchiveResponseDtoStatus];
+
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const ClientArchiveResponseDtoStatus = {
-  ok: "ok"
+  ok: 'ok',
 } as const;
 
 export interface ClientArchiveResponseDto {
@@ -2462,20 +2543,20 @@ export interface ClientArchiveResponseDto {
   status: ClientArchiveResponseDtoStatus;
 }
 
-export type ClientDeleteResponseDtoClientStatus =
-  (typeof ClientDeleteResponseDtoClientStatus)[keyof typeof ClientDeleteResponseDtoClientStatus];
+export type ClientDeleteResponseDtoClientStatus = typeof ClientDeleteResponseDtoClientStatus[keyof typeof ClientDeleteResponseDtoClientStatus];
+
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const ClientDeleteResponseDtoClientStatus = {
-  deleted: "deleted"
+  deleted: 'deleted',
 } as const;
 
-export type ClientDeleteResponseDtoStatus =
-  (typeof ClientDeleteResponseDtoStatus)[keyof typeof ClientDeleteResponseDtoStatus];
+export type ClientDeleteResponseDtoStatus = typeof ClientDeleteResponseDtoStatus[keyof typeof ClientDeleteResponseDtoStatus];
+
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const ClientDeleteResponseDtoStatus = {
-  ok: "ok"
+  ok: 'ok',
 } as const;
 
 export interface ClientDeleteResponseDto {
@@ -2613,28 +2694,28 @@ export interface DashboardMetricsDto {
   dueToday: DashboardDueTodayMetricDto;
 }
 
-export type DashboardSearchItemDtoType =
-  (typeof DashboardSearchItemDtoType)[keyof typeof DashboardSearchItemDtoType];
+export type DashboardSearchItemDtoType = typeof DashboardSearchItemDtoType[keyof typeof DashboardSearchItemDtoType];
+
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const DashboardSearchItemDtoType = {
-  case: "case",
-  document: "document",
-  cashbox_movement: "cashbox_movement",
-  task_due: "task_due",
-  hearing: "hearing",
-  payment_due: "payment_due"
+  case: 'case',
+  document: 'document',
+  cashbox_movement: 'cashbox_movement',
+  task_due: 'task_due',
+  hearing: 'hearing',
+  payment_due: 'payment_due',
 } as const;
 
-export type DashboardSearchItemDtoMovementType =
-  (typeof DashboardSearchItemDtoMovementType)[keyof typeof DashboardSearchItemDtoMovementType];
+export type DashboardSearchItemDtoMovementType = typeof DashboardSearchItemDtoMovementType[keyof typeof DashboardSearchItemDtoMovementType];
+
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const DashboardSearchItemDtoMovementType = {
-  income: "income",
-  expense: "expense",
-  conversion_in: "conversion_in",
-  conversion_out: "conversion_out"
+  income: 'income',
+  expense: 'expense',
+  conversion_in: 'conversion_in',
+  conversion_out: 'conversion_out',
 } as const;
 
 export interface DashboardSearchItemDto {
@@ -2770,13 +2851,14 @@ export interface StaffPracticeAreaDto {
  */
 export type StaffWorkerDtoRole = StaffRoleOptionDto | null;
 
-export type StaffWorkerDtoStatus = (typeof StaffWorkerDtoStatus)[keyof typeof StaffWorkerDtoStatus];
+export type StaffWorkerDtoStatus = typeof StaffWorkerDtoStatus[keyof typeof StaffWorkerDtoStatus];
+
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const StaffWorkerDtoStatus = {
-  active: "active",
-  invited: "invited",
-  suspended: "suspended"
+  active: 'active',
+  invited: 'invited',
+  suspended: 'suspended',
 } as const;
 
 export interface StaffWorkerDto {
@@ -2802,14 +2884,14 @@ export interface StaffMetricsDto {
   practiceAreasCount: number;
 }
 
-export type StaffStatusOptionDtoValue =
-  (typeof StaffStatusOptionDtoValue)[keyof typeof StaffStatusOptionDtoValue];
+export type StaffStatusOptionDtoValue = typeof StaffStatusOptionDtoValue[keyof typeof StaffStatusOptionDtoValue];
+
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const StaffStatusOptionDtoValue = {
-  active: "active",
-  invited: "invited",
-  suspended: "suspended"
+  active: 'active',
+  invited: 'invited',
+  suspended: 'suspended',
 } as const;
 
 export interface StaffStatusOptionDto {
@@ -2862,12 +2944,13 @@ export interface ParticipantOptionsResponseDto {
   pageInfo: StaffPageInfoDto;
 }
 
-export type CreateStaffDtoStatus = (typeof CreateStaffDtoStatus)[keyof typeof CreateStaffDtoStatus];
+export type CreateStaffDtoStatus = typeof CreateStaffDtoStatus[keyof typeof CreateStaffDtoStatus];
+
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const CreateStaffDtoStatus = {
-  active: "active",
-  suspended: "suspended"
+  active: 'active',
+  suspended: 'suspended',
 } as const;
 
 export interface CreateStaffDto {
@@ -2908,14 +2991,14 @@ export interface CreateStaffDto {
  */
 export type StaffCreateResponseDtoRole = StaffRoleOptionDto | null;
 
-export type StaffCreateResponseDtoStatus =
-  (typeof StaffCreateResponseDtoStatus)[keyof typeof StaffCreateResponseDtoStatus];
+export type StaffCreateResponseDtoStatus = typeof StaffCreateResponseDtoStatus[keyof typeof StaffCreateResponseDtoStatus];
+
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const StaffCreateResponseDtoStatus = {
-  active: "active",
-  invited: "invited",
-  suspended: "suspended"
+  active: 'active',
+  invited: 'invited',
+  suspended: 'suspended',
 } as const;
 
 export interface StaffCreateResponseDto {
@@ -2935,12 +3018,13 @@ export interface StaffCreateResponseDto {
   practiceAreas: StaffPracticeAreaDto[];
 }
 
-export type UpdateStaffDtoStatus = (typeof UpdateStaffDtoStatus)[keyof typeof UpdateStaffDtoStatus];
+export type UpdateStaffDtoStatus = typeof UpdateStaffDtoStatus[keyof typeof UpdateStaffDtoStatus];
+
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const UpdateStaffDtoStatus = {
-  active: "active",
-  suspended: "suspended"
+  active: 'active',
+  suspended: 'suspended',
 } as const;
 
 export interface UpdateStaffDto {
@@ -2981,14 +3065,14 @@ export interface UpdateStaffDto {
  */
 export type StaffUpdateResponseDtoRole = StaffRoleOptionDto | null;
 
-export type StaffUpdateResponseDtoStatus =
-  (typeof StaffUpdateResponseDtoStatus)[keyof typeof StaffUpdateResponseDtoStatus];
+export type StaffUpdateResponseDtoStatus = typeof StaffUpdateResponseDtoStatus[keyof typeof StaffUpdateResponseDtoStatus];
+
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const StaffUpdateResponseDtoStatus = {
-  active: "active",
-  invited: "invited",
-  suspended: "suspended"
+  active: 'active',
+  invited: 'invited',
+  suspended: 'suspended',
 } as const;
 
 export interface StaffUpdateResponseDto {
@@ -3012,14 +3096,2553 @@ export interface StaffDeleteResponseDto {
   status: string;
 }
 
+export interface PlatformMeDto {
+  role: string;
+  permissions: string[];
+}
+
+export interface PlatformAccountDto {
+  id: string;
+  firstName: string;
+  lastName: string;
+  fullName: string;
+  email: string;
+  /** @nullable */
+  phone: string | null;
+  /** @nullable */
+  avatarUrl: string | null;
+  hasPassword: boolean;
+}
+
+export interface UpdatePlatformAccountProfileDto {
+  firstName: string;
+  lastName: string;
+  /** @nullable */
+  phone?: string | null;
+}
+
+export interface UpdatePlatformAccountPasswordDto {
+  /** @maxLength 72 */
+  currentPassword?: string;
+  /**
+   * @minLength 16
+   * @maxLength 72
+   */
+  newPassword: string;
+}
+
+export type PlatformStepUpFinishDtoResponse = { [key: string]: unknown };
+
+export interface PlatformStepUpFinishDto {
+  response: PlatformStepUpFinishDtoResponse;
+  transactionId: string;
+}
+
+export interface PlatformPasswordStepUpDto {
+  password: string;
+}
+
+export type PlatformObservabilitySummaryDtoStatus = typeof PlatformObservabilitySummaryDtoStatus[keyof typeof PlatformObservabilitySummaryDtoStatus];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const PlatformObservabilitySummaryDtoStatus = {
+  healthy: 'healthy',
+  degraded: 'degraded',
+  unavailable: 'unavailable',
+} as const;
+
+export type PlatformObservabilitySummaryDtoChecksItem = { [key: string]: unknown };
+
+export type PlatformObservabilitySummaryDtoOutbox = { [key: string]: unknown };
+
+/**
+ * @nullable
+ */
+export type PlatformObservabilitySummaryDtoRequests = { [key: string]: unknown } | null;
+
+export interface PlatformObservabilitySummaryDto {
+  status: PlatformObservabilitySummaryDtoStatus;
+  generatedAt: string;
+  checks: PlatformObservabilitySummaryDtoChecksItem[];
+  outbox: PlatformObservabilitySummaryDtoOutbox;
+  /** @nullable */
+  requests?: PlatformObservabilitySummaryDtoRequests;
+}
+
+export type PlatformObservabilityHistoryDayDtoStatus = typeof PlatformObservabilityHistoryDayDtoStatus[keyof typeof PlatformObservabilityHistoryDayDtoStatus];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const PlatformObservabilityHistoryDayDtoStatus = {
+  healthy: 'healthy',
+  degraded: 'degraded',
+  unavailable: 'unavailable',
+  no_data: 'no_data',
+} as const;
+
+export interface PlatformObservabilityHistoryDayDto {
+  date: string;
+  status: PlatformObservabilityHistoryDayDtoStatus;
+  samples: number;
+  /** @nullable */
+  uptimePercent: number | null;
+}
+
+export type PlatformObservabilityHistoryComponentDtoKey = typeof PlatformObservabilityHistoryComponentDtoKey[keyof typeof PlatformObservabilityHistoryComponentDtoKey];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const PlatformObservabilityHistoryComponentDtoKey = {
+  api: 'api',
+  postgresql: 'postgresql',
+  redis: 'redis',
+  rabbitmq: 'rabbitmq',
+  worker: 'worker',
+} as const;
+
+export type PlatformObservabilityHistoryComponentDtoCurrentStatus = typeof PlatformObservabilityHistoryComponentDtoCurrentStatus[keyof typeof PlatformObservabilityHistoryComponentDtoCurrentStatus];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const PlatformObservabilityHistoryComponentDtoCurrentStatus = {
+  healthy: 'healthy',
+  degraded: 'degraded',
+  unavailable: 'unavailable',
+  no_data: 'no_data',
+} as const;
+
+export interface PlatformObservabilityHistoryComponentDto {
+  key: PlatformObservabilityHistoryComponentDtoKey;
+  name: string;
+  currentStatus: PlatformObservabilityHistoryComponentDtoCurrentStatus;
+  /** @nullable */
+  currentLatencyMs: number | null;
+  /** @nullable */
+  uptimePercent: number | null;
+  days: PlatformObservabilityHistoryDayDto[];
+}
+
+export interface PlatformObservabilityHistoryDto {
+  days: number;
+  from: string;
+  to: string;
+  timeZone: string;
+  generatedAt: string;
+  components: PlatformObservabilityHistoryComponentDto[];
+}
+
+export interface PlatformDashboardUsersDto {
+  active: number;
+  inactive: number;
+  total: number;
+}
+
+export interface PlatformDashboardSummaryDto {
+  users: PlatformDashboardUsersDto;
+  generatedAt: string;
+}
+
+export type PlatformUserDtoStatus = typeof PlatformUserDtoStatus[keyof typeof PlatformUserDtoStatus];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const PlatformUserDtoStatus = {
+  active: 'active',
+  inactive: 'inactive',
+} as const;
+
+export type PlatformUserDtoFoundedTenantsItemStatus = typeof PlatformUserDtoFoundedTenantsItemStatus[keyof typeof PlatformUserDtoFoundedTenantsItemStatus];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const PlatformUserDtoFoundedTenantsItemStatus = {
+  active: 'active',
+  inactive: 'inactive',
+} as const;
+
+export type PlatformUserDtoFoundedTenantsItem = {
+  id: string;
+  name: string;
+  peopleCount: number;
+  status: PlatformUserDtoFoundedTenantsItemStatus;
+};
+
+export interface PlatformUserDto {
+  id: string;
+  fullName: string;
+  email: string;
+  status: PlatformUserDtoStatus;
+  foundedTenants: PlatformUserDtoFoundedTenantsItem[];
+  peopleCount: number;
+  /** @nullable */
+  lastLoginAt: string | null;
+  createdAt: string;
+}
+
+export interface PlatformUsersPageInfoDto {
+  limit: number;
+  hasNextPage: boolean;
+  /** @nullable */
+  nextCursor: string | null;
+}
+
+export interface PlatformUsersListDto {
+  items: PlatformUserDto[];
+  pageInfo: PlatformUsersPageInfoDto;
+}
+
+export type PlatformAnnouncementListItemDtoCategory = typeof PlatformAnnouncementListItemDtoCategory[keyof typeof PlatformAnnouncementListItemDtoCategory];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const PlatformAnnouncementListItemDtoCategory = {
+  general: 'general',
+  maintenance: 'maintenance',
+  deployment: 'deployment',
+  incident: 'incident',
+} as const;
+
+export type PlatformAnnouncementListItemDtoSeverity = typeof PlatformAnnouncementListItemDtoSeverity[keyof typeof PlatformAnnouncementListItemDtoSeverity];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const PlatformAnnouncementListItemDtoSeverity = {
+  info: 'info',
+  warning: 'warning',
+  critical: 'critical',
+} as const;
+
+export type PlatformAnnouncementListItemDtoAudience = typeof PlatformAnnouncementListItemDtoAudience[keyof typeof PlatformAnnouncementListItemDtoAudience];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const PlatformAnnouncementListItemDtoAudience = {
+  all_tenants: 'all_tenants',
+  selected_tenants: 'selected_tenants',
+} as const;
+
+export type PlatformAnnouncementListItemDtoStatus = typeof PlatformAnnouncementListItemDtoStatus[keyof typeof PlatformAnnouncementListItemDtoStatus];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const PlatformAnnouncementListItemDtoStatus = {
+  draft: 'draft',
+  published: 'published',
+  cancelled: 'cancelled',
+} as const;
+
+export type PlatformAnnouncementListItemDtoLifecycle = typeof PlatformAnnouncementListItemDtoLifecycle[keyof typeof PlatformAnnouncementListItemDtoLifecycle];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const PlatformAnnouncementListItemDtoLifecycle = {
+  draft: 'draft',
+  scheduled: 'scheduled',
+  active: 'active',
+  expired: 'expired',
+  cancelled: 'cancelled',
+} as const;
+
+export interface PlatformAnnouncementListItemDto {
+  id: string;
+  title: string;
+  body: string;
+  category: PlatformAnnouncementListItemDtoCategory;
+  severity: PlatformAnnouncementListItemDtoSeverity;
+  audience: PlatformAnnouncementListItemDtoAudience;
+  status: PlatformAnnouncementListItemDtoStatus;
+  lifecycle: PlatformAnnouncementListItemDtoLifecycle;
+  targetCount: number;
+  revision: number;
+  createdByName: string;
+  /** @nullable */
+  startsAt: string | null;
+  /** @nullable */
+  endsAt: string | null;
+  /** @nullable */
+  linkLabel: string | null;
+  /** @nullable */
+  linkUrl: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface PlatformAnnouncementsPageInfoDto {
+  limit: number;
+  hasNextPage: boolean;
+  /** @nullable */
+  nextCursor: string | null;
+}
+
+export interface PlatformAnnouncementsListDto {
+  items: PlatformAnnouncementListItemDto[];
+  pageInfo: PlatformAnnouncementsPageInfoDto;
+  evaluatedAt: string;
+}
+
+export interface PlatformAnnouncementsSummaryDto {
+  total: number;
+  active: number;
+  inactive: number;
+  general: number;
+  generatedAt: string;
+}
+
+export type PlatformAnnouncementTenantOptionDtoStatus = typeof PlatformAnnouncementTenantOptionDtoStatus[keyof typeof PlatformAnnouncementTenantOptionDtoStatus];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const PlatformAnnouncementTenantOptionDtoStatus = {
+  active: 'active',
+  inactive: 'inactive',
+} as const;
+
+export interface PlatformAnnouncementTenantOptionDto {
+  id: string;
+  name: string;
+  status: PlatformAnnouncementTenantOptionDtoStatus;
+}
+
+export interface PlatformAnnouncementTenantOptionsListDto {
+  items: PlatformAnnouncementTenantOptionDto[];
+  pageInfo: PlatformAnnouncementsPageInfoDto;
+}
+
+export type PlatformAnnouncementDetailDtoCategory = typeof PlatformAnnouncementDetailDtoCategory[keyof typeof PlatformAnnouncementDetailDtoCategory];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const PlatformAnnouncementDetailDtoCategory = {
+  general: 'general',
+  maintenance: 'maintenance',
+  deployment: 'deployment',
+  incident: 'incident',
+} as const;
+
+export type PlatformAnnouncementDetailDtoSeverity = typeof PlatformAnnouncementDetailDtoSeverity[keyof typeof PlatformAnnouncementDetailDtoSeverity];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const PlatformAnnouncementDetailDtoSeverity = {
+  info: 'info',
+  warning: 'warning',
+  critical: 'critical',
+} as const;
+
+export type PlatformAnnouncementDetailDtoAudience = typeof PlatformAnnouncementDetailDtoAudience[keyof typeof PlatformAnnouncementDetailDtoAudience];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const PlatformAnnouncementDetailDtoAudience = {
+  all_tenants: 'all_tenants',
+  selected_tenants: 'selected_tenants',
+} as const;
+
+export type PlatformAnnouncementDetailDtoStatus = typeof PlatformAnnouncementDetailDtoStatus[keyof typeof PlatformAnnouncementDetailDtoStatus];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const PlatformAnnouncementDetailDtoStatus = {
+  draft: 'draft',
+  published: 'published',
+  cancelled: 'cancelled',
+} as const;
+
+export type PlatformAnnouncementDetailDtoLifecycle = typeof PlatformAnnouncementDetailDtoLifecycle[keyof typeof PlatformAnnouncementDetailDtoLifecycle];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const PlatformAnnouncementDetailDtoLifecycle = {
+  draft: 'draft',
+  scheduled: 'scheduled',
+  active: 'active',
+  expired: 'expired',
+  cancelled: 'cancelled',
+} as const;
+
+export interface PlatformAnnouncementDetailDto {
+  id: string;
+  title: string;
+  body: string;
+  category: PlatformAnnouncementDetailDtoCategory;
+  severity: PlatformAnnouncementDetailDtoSeverity;
+  audience: PlatformAnnouncementDetailDtoAudience;
+  status: PlatformAnnouncementDetailDtoStatus;
+  lifecycle: PlatformAnnouncementDetailDtoLifecycle;
+  targetCount: number;
+  revision: number;
+  createdByName: string;
+  /** @nullable */
+  startsAt: string | null;
+  /** @nullable */
+  endsAt: string | null;
+  /** @nullable */
+  linkLabel: string | null;
+  /** @nullable */
+  linkUrl: string | null;
+  createdAt: string;
+  updatedAt: string;
+  targetTenants: PlatformAnnouncementTenantOptionDto[];
+}
+
+export interface CreatePlatformAnnouncementDto { [key: string]: unknown }
+
+export interface UpdatePlatformAnnouncementDto { [key: string]: unknown }
+
+export interface NewsletterTargetDto {
+  tenantId: string;
+}
+
+/**
+ * @nullable
+ */
+export type NewsletterDtoNewsletterCategory = typeof NewsletterDtoNewsletterCategory[keyof typeof NewsletterDtoNewsletterCategory] | null;
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const NewsletterDtoNewsletterCategory = {
+  release: 'release',
+  bugfix: 'bugfix',
+  policy: 'policy',
+  performance: 'performance',
+  general: 'general',
+} as const;
+
+export type NewsletterDtoAudience = typeof NewsletterDtoAudience[keyof typeof NewsletterDtoAudience];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const NewsletterDtoAudience = {
+  all_tenants: 'all_tenants',
+  selected_tenants: 'selected_tenants',
+} as const;
+
+export type NewsletterDtoStatus = typeof NewsletterDtoStatus[keyof typeof NewsletterDtoStatus];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const NewsletterDtoStatus = {
+  draft: 'draft',
+  published: 'published',
+  cancelled: 'cancelled',
+} as const;
+
+export type NewsletterDtoContentOneOfVersion = typeof NewsletterDtoContentOneOfVersion[keyof typeof NewsletterDtoContentOneOfVersion];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const NewsletterDtoContentOneOfVersion = {
+  NUMBER_1: 1,
+} as const;
+
+export type NewsletterDtoContentOneOfBlocksItemOneOfType = typeof NewsletterDtoContentOneOfBlocksItemOneOfType[keyof typeof NewsletterDtoContentOneOfBlocksItemOneOfType];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const NewsletterDtoContentOneOfBlocksItemOneOfType = {
+  heading: 'heading',
+} as const;
+
+export type NewsletterDtoContentOneOfBlocksItemOneOf = {
+  type: NewsletterDtoContentOneOfBlocksItemOneOfType;
+  text: string;
+};
+
+export type NewsletterDtoContentOneOfBlocksItemOneOfThreeType = typeof NewsletterDtoContentOneOfBlocksItemOneOfThreeType[keyof typeof NewsletterDtoContentOneOfBlocksItemOneOfThreeType];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const NewsletterDtoContentOneOfBlocksItemOneOfThreeType = {
+  paragraph: 'paragraph',
+} as const;
+
+export type NewsletterDtoContentOneOfBlocksItemOneOfThree = {
+  type: NewsletterDtoContentOneOfBlocksItemOneOfThreeType;
+  text: string;
+};
+
+export type NewsletterDtoContentOneOfBlocksItemOneOfFiveType = typeof NewsletterDtoContentOneOfBlocksItemOneOfFiveType[keyof typeof NewsletterDtoContentOneOfBlocksItemOneOfFiveType];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const NewsletterDtoContentOneOfBlocksItemOneOfFiveType = {
+  list: 'list',
+} as const;
+
+export type NewsletterDtoContentOneOfBlocksItemOneOfFive = {
+  type: NewsletterDtoContentOneOfBlocksItemOneOfFiveType;
+  /**
+   * @minItems 1
+   * @maxItems 30
+   */
+  items: string[];
+};
+
+export type NewsletterDtoContentOneOfBlocksItemOneOfSevenType = typeof NewsletterDtoContentOneOfBlocksItemOneOfSevenType[keyof typeof NewsletterDtoContentOneOfBlocksItemOneOfSevenType];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const NewsletterDtoContentOneOfBlocksItemOneOfSevenType = {
+  image: 'image',
+} as const;
+
+export type NewsletterDtoContentOneOfBlocksItemOneOfSeven = {
+  type: NewsletterDtoContentOneOfBlocksItemOneOfSevenType;
+  assetId: string;
+  alt: string;
+  caption: string;
+};
+
+export type NewsletterDtoContentOneOfBlocksItemOneOfNineType = typeof NewsletterDtoContentOneOfBlocksItemOneOfNineType[keyof typeof NewsletterDtoContentOneOfBlocksItemOneOfNineType];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const NewsletterDtoContentOneOfBlocksItemOneOfNineType = {
+  callout: 'callout',
+} as const;
+
+export type NewsletterDtoContentOneOfBlocksItemOneOfNine = {
+  type: NewsletterDtoContentOneOfBlocksItemOneOfNineType;
+  text: string;
+};
+
+export type NewsletterDtoContentOneOfBlocksItemOneOfOneoneType = typeof NewsletterDtoContentOneOfBlocksItemOneOfOneoneType[keyof typeof NewsletterDtoContentOneOfBlocksItemOneOfOneoneType];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const NewsletterDtoContentOneOfBlocksItemOneOfOneoneType = {
+  metrics: 'metrics',
+} as const;
+
+export type NewsletterDtoContentOneOfBlocksItemOneOfOneoneItemsItem = {
+  label: string;
+  value: string;
+};
+
+export type NewsletterDtoContentOneOfBlocksItemOneOfOneone = {
+  type: NewsletterDtoContentOneOfBlocksItemOneOfOneoneType;
+  /**
+   * @minItems 1
+   * @maxItems 4
+   */
+  items: NewsletterDtoContentOneOfBlocksItemOneOfOneoneItemsItem[];
+};
+
+export type NewsletterDtoContentOneOfBlocksItemOneOfOnefourType = typeof NewsletterDtoContentOneOfBlocksItemOneOfOnefourType[keyof typeof NewsletterDtoContentOneOfBlocksItemOneOfOnefourType];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const NewsletterDtoContentOneOfBlocksItemOneOfOnefourType = {
+  chart: 'chart',
+} as const;
+
+export type NewsletterDtoContentOneOfBlocksItemOneOfOnefourChartType = typeof NewsletterDtoContentOneOfBlocksItemOneOfOnefourChartType[keyof typeof NewsletterDtoContentOneOfBlocksItemOneOfOnefourChartType];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const NewsletterDtoContentOneOfBlocksItemOneOfOnefourChartType = {
+  bar: 'bar',
+  line: 'line',
+  donut: 'donut',
+} as const;
+
+export type NewsletterDtoContentOneOfBlocksItemOneOfOnefourDataItem = {
+  label: string;
+  value: number;
+};
+
+export type NewsletterDtoContentOneOfBlocksItemOneOfOnefour = {
+  type: NewsletterDtoContentOneOfBlocksItemOneOfOnefourType;
+  title: string;
+  chartType: NewsletterDtoContentOneOfBlocksItemOneOfOnefourChartType;
+  /**
+   * @minItems 1
+   * @maxItems 30
+   */
+  data: NewsletterDtoContentOneOfBlocksItemOneOfOnefourDataItem[];
+};
+
+export type NewsletterDtoContentOneOfBlocksItemOneOfOneeightType = typeof NewsletterDtoContentOneOfBlocksItemOneOfOneeightType[keyof typeof NewsletterDtoContentOneOfBlocksItemOneOfOneeightType];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const NewsletterDtoContentOneOfBlocksItemOneOfOneeightType = {
+  video: 'video',
+} as const;
+
+export type NewsletterDtoContentOneOfBlocksItemOneOfOneeightProvider = typeof NewsletterDtoContentOneOfBlocksItemOneOfOneeightProvider[keyof typeof NewsletterDtoContentOneOfBlocksItemOneOfOneeightProvider];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const NewsletterDtoContentOneOfBlocksItemOneOfOneeightProvider = {
+  youtube: 'youtube',
+  vimeo: 'vimeo',
+} as const;
+
+export type NewsletterDtoContentOneOfBlocksItemOneOfOneeight = {
+  type: NewsletterDtoContentOneOfBlocksItemOneOfOneeightType;
+  provider: NewsletterDtoContentOneOfBlocksItemOneOfOneeightProvider;
+  videoId: string;
+  title: string;
+};
+
+export type NewsletterDtoContentOneOfBlocksItemOneOfTwooneType = typeof NewsletterDtoContentOneOfBlocksItemOneOfTwooneType[keyof typeof NewsletterDtoContentOneOfBlocksItemOneOfTwooneType];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const NewsletterDtoContentOneOfBlocksItemOneOfTwooneType = {
+  cta: 'cta',
+} as const;
+
+export type NewsletterDtoContentOneOfBlocksItemOneOfTwoone = {
+  type: NewsletterDtoContentOneOfBlocksItemOneOfTwooneType;
+  label: string;
+  url: string;
+};
+
+export type NewsletterDtoContentOneOfBlocksItemOneOfTwothreeType = typeof NewsletterDtoContentOneOfBlocksItemOneOfTwothreeType[keyof typeof NewsletterDtoContentOneOfBlocksItemOneOfTwothreeType];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const NewsletterDtoContentOneOfBlocksItemOneOfTwothreeType = {
+  separator: 'separator',
+} as const;
+
+export type NewsletterDtoContentOneOfBlocksItemOneOfTwothree = {
+  type: NewsletterDtoContentOneOfBlocksItemOneOfTwothreeType;
+};
+
+export type NewsletterDtoContentOneOfBlocksItem = NewsletterDtoContentOneOfBlocksItemOneOf | NewsletterDtoContentOneOfBlocksItemOneOfThree | NewsletterDtoContentOneOfBlocksItemOneOfFive | NewsletterDtoContentOneOfBlocksItemOneOfSeven | NewsletterDtoContentOneOfBlocksItemOneOfNine | NewsletterDtoContentOneOfBlocksItemOneOfOneone | NewsletterDtoContentOneOfBlocksItemOneOfOnefour | NewsletterDtoContentOneOfBlocksItemOneOfOneeight | NewsletterDtoContentOneOfBlocksItemOneOfTwoone | NewsletterDtoContentOneOfBlocksItemOneOfTwothree;
+
+export type NewsletterDtoContentOneOf = {
+  version: NewsletterDtoContentOneOfVersion;
+  /** @maxItems 60 */
+  blocks: NewsletterDtoContentOneOfBlocksItem[];
+};
+
+export type NewsletterDtoContentOneOfTwoeightVersion = typeof NewsletterDtoContentOneOfTwoeightVersion[keyof typeof NewsletterDtoContentOneOfTwoeightVersion];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const NewsletterDtoContentOneOfTwoeightVersion = {
+  NUMBER_2: 2,
+} as const;
+
+export type NewsletterDtoContentOneOfTwoeightHeaderType = typeof NewsletterDtoContentOneOfTwoeightHeaderType[keyof typeof NewsletterDtoContentOneOfTwoeightHeaderType];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const NewsletterDtoContentOneOfTwoeightHeaderType = {
+  doc: 'doc',
+} as const;
+
+export type NewsletterDtoContentOneOfTwoeightHeaderContentItem = { [key: string]: unknown };
+
+/**
+ * Documento Tiptap JSON limitado a los nodos y marcas admitidos.
+ */
+export type NewsletterDtoContentOneOfTwoeightHeader = {
+  type: NewsletterDtoContentOneOfTwoeightHeaderType;
+  content: NewsletterDtoContentOneOfTwoeightHeaderContentItem[];
+};
+
+export type NewsletterDtoContentOneOfTwoeightDescriptionType = typeof NewsletterDtoContentOneOfTwoeightDescriptionType[keyof typeof NewsletterDtoContentOneOfTwoeightDescriptionType];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const NewsletterDtoContentOneOfTwoeightDescriptionType = {
+  doc: 'doc',
+} as const;
+
+export type NewsletterDtoContentOneOfTwoeightDescriptionContentItem = { [key: string]: unknown };
+
+/**
+ * Documento Tiptap JSON limitado a los nodos y marcas admitidos.
+ */
+export type NewsletterDtoContentOneOfTwoeightDescription = {
+  type: NewsletterDtoContentOneOfTwoeightDescriptionType;
+  content: NewsletterDtoContentOneOfTwoeightDescriptionContentItem[];
+};
+
+export type NewsletterDtoContentOneOfTwoeightFooterType = typeof NewsletterDtoContentOneOfTwoeightFooterType[keyof typeof NewsletterDtoContentOneOfTwoeightFooterType];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const NewsletterDtoContentOneOfTwoeightFooterType = {
+  doc: 'doc',
+} as const;
+
+export type NewsletterDtoContentOneOfTwoeightFooterContentItem = { [key: string]: unknown };
+
+/**
+ * Documento Tiptap JSON limitado a los nodos y marcas admitidos.
+ */
+export type NewsletterDtoContentOneOfTwoeightFooter = {
+  type: NewsletterDtoContentOneOfTwoeightFooterType;
+  content: NewsletterDtoContentOneOfTwoeightFooterContentItem[];
+};
+
+export type NewsletterDtoContentOneOfTwoeightThemeWidth = typeof NewsletterDtoContentOneOfTwoeightThemeWidth[keyof typeof NewsletterDtoContentOneOfTwoeightThemeWidth];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const NewsletterDtoContentOneOfTwoeightThemeWidth = {
+  compact: 'compact',
+  standard: 'standard',
+  wide: 'wide',
+} as const;
+
+export type NewsletterDtoContentOneOfTwoeightThemeFontFamily = typeof NewsletterDtoContentOneOfTwoeightThemeFontFamily[keyof typeof NewsletterDtoContentOneOfTwoeightThemeFontFamily];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const NewsletterDtoContentOneOfTwoeightThemeFontFamily = {
+  sans: 'sans',
+  serif: 'serif',
+  mono: 'mono',
+} as const;
+
+export type NewsletterDtoContentOneOfTwoeightTheme = {
+  width: NewsletterDtoContentOneOfTwoeightThemeWidth;
+  fontFamily: NewsletterDtoContentOneOfTwoeightThemeFontFamily;
+  backgroundColor: string;
+  textColor: string;
+  accentColor: string;
+};
+
+export type NewsletterDtoContentOneOfTwoeightBlocksItemOneOfType = typeof NewsletterDtoContentOneOfTwoeightBlocksItemOneOfType[keyof typeof NewsletterDtoContentOneOfTwoeightBlocksItemOneOfType];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const NewsletterDtoContentOneOfTwoeightBlocksItemOneOfType = {
+  richText: 'richText',
+} as const;
+
+export type NewsletterDtoContentOneOfTwoeightBlocksItemOneOfDocumentType = typeof NewsletterDtoContentOneOfTwoeightBlocksItemOneOfDocumentType[keyof typeof NewsletterDtoContentOneOfTwoeightBlocksItemOneOfDocumentType];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const NewsletterDtoContentOneOfTwoeightBlocksItemOneOfDocumentType = {
+  doc: 'doc',
+} as const;
+
+export type NewsletterDtoContentOneOfTwoeightBlocksItemOneOfDocumentContentItem = { [key: string]: unknown };
+
+/**
+ * Documento Tiptap JSON limitado a los nodos y marcas admitidos.
+ */
+export type NewsletterDtoContentOneOfTwoeightBlocksItemOneOfDocument = {
+  type: NewsletterDtoContentOneOfTwoeightBlocksItemOneOfDocumentType;
+  content: NewsletterDtoContentOneOfTwoeightBlocksItemOneOfDocumentContentItem[];
+};
+
+export type NewsletterDtoContentOneOfTwoeightBlocksItemOneOf = {
+  type: NewsletterDtoContentOneOfTwoeightBlocksItemOneOfType;
+  /** Documento Tiptap JSON limitado a los nodos y marcas admitidos. */
+  document: NewsletterDtoContentOneOfTwoeightBlocksItemOneOfDocument;
+};
+
+export type NewsletterDtoContentOneOfTwoeightBlocksItemOneOfSixType = typeof NewsletterDtoContentOneOfTwoeightBlocksItemOneOfSixType[keyof typeof NewsletterDtoContentOneOfTwoeightBlocksItemOneOfSixType];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const NewsletterDtoContentOneOfTwoeightBlocksItemOneOfSixType = {
+  image: 'image',
+} as const;
+
+export type NewsletterDtoContentOneOfTwoeightBlocksItemOneOfSixWidth = typeof NewsletterDtoContentOneOfTwoeightBlocksItemOneOfSixWidth[keyof typeof NewsletterDtoContentOneOfTwoeightBlocksItemOneOfSixWidth];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const NewsletterDtoContentOneOfTwoeightBlocksItemOneOfSixWidth = {
+  small: 'small',
+  medium: 'medium',
+  full: 'full',
+} as const;
+
+export type NewsletterDtoContentOneOfTwoeightBlocksItemOneOfSixAlign = typeof NewsletterDtoContentOneOfTwoeightBlocksItemOneOfSixAlign[keyof typeof NewsletterDtoContentOneOfTwoeightBlocksItemOneOfSixAlign];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const NewsletterDtoContentOneOfTwoeightBlocksItemOneOfSixAlign = {
+  left: 'left',
+  center: 'center',
+  right: 'right',
+} as const;
+
+export type NewsletterDtoContentOneOfTwoeightBlocksItemOneOfSixSection = typeof NewsletterDtoContentOneOfTwoeightBlocksItemOneOfSixSection[keyof typeof NewsletterDtoContentOneOfTwoeightBlocksItemOneOfSixSection];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const NewsletterDtoContentOneOfTwoeightBlocksItemOneOfSixSection = {
+  header: 'header',
+  body: 'body',
+  footer: 'footer',
+} as const;
+
+export type NewsletterDtoContentOneOfTwoeightBlocksItemOneOfSix = {
+  type: NewsletterDtoContentOneOfTwoeightBlocksItemOneOfSixType;
+  assetId: string;
+  alt: string;
+  caption: string;
+  width: NewsletterDtoContentOneOfTwoeightBlocksItemOneOfSixWidth;
+  align: NewsletterDtoContentOneOfTwoeightBlocksItemOneOfSixAlign;
+  section?: NewsletterDtoContentOneOfTwoeightBlocksItemOneOfSixSection;
+  background?: boolean;
+};
+
+export type NewsletterDtoContentOneOfTwoeightBlocksItemOneOfOneoneType = typeof NewsletterDtoContentOneOfTwoeightBlocksItemOneOfOneoneType[keyof typeof NewsletterDtoContentOneOfTwoeightBlocksItemOneOfOneoneType];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const NewsletterDtoContentOneOfTwoeightBlocksItemOneOfOneoneType = {
+  gif: 'gif',
+} as const;
+
+export type NewsletterDtoContentOneOfTwoeightBlocksItemOneOfOneoneWidth = typeof NewsletterDtoContentOneOfTwoeightBlocksItemOneOfOneoneWidth[keyof typeof NewsletterDtoContentOneOfTwoeightBlocksItemOneOfOneoneWidth];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const NewsletterDtoContentOneOfTwoeightBlocksItemOneOfOneoneWidth = {
+  small: 'small',
+  medium: 'medium',
+  full: 'full',
+} as const;
+
+export type NewsletterDtoContentOneOfTwoeightBlocksItemOneOfOneoneAlign = typeof NewsletterDtoContentOneOfTwoeightBlocksItemOneOfOneoneAlign[keyof typeof NewsletterDtoContentOneOfTwoeightBlocksItemOneOfOneoneAlign];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const NewsletterDtoContentOneOfTwoeightBlocksItemOneOfOneoneAlign = {
+  left: 'left',
+  center: 'center',
+  right: 'right',
+} as const;
+
+export type NewsletterDtoContentOneOfTwoeightBlocksItemOneOfOneoneSection = typeof NewsletterDtoContentOneOfTwoeightBlocksItemOneOfOneoneSection[keyof typeof NewsletterDtoContentOneOfTwoeightBlocksItemOneOfOneoneSection];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const NewsletterDtoContentOneOfTwoeightBlocksItemOneOfOneoneSection = {
+  header: 'header',
+  body: 'body',
+  footer: 'footer',
+} as const;
+
+export type NewsletterDtoContentOneOfTwoeightBlocksItemOneOfOneone = {
+  type: NewsletterDtoContentOneOfTwoeightBlocksItemOneOfOneoneType;
+  assetId: string;
+  alt: string;
+  caption: string;
+  width: NewsletterDtoContentOneOfTwoeightBlocksItemOneOfOneoneWidth;
+  align: NewsletterDtoContentOneOfTwoeightBlocksItemOneOfOneoneAlign;
+  section?: NewsletterDtoContentOneOfTwoeightBlocksItemOneOfOneoneSection;
+  background?: boolean;
+};
+
+export type NewsletterDtoContentOneOfTwoeightBlocksItemOneOfOnesixType = typeof NewsletterDtoContentOneOfTwoeightBlocksItemOneOfOnesixType[keyof typeof NewsletterDtoContentOneOfTwoeightBlocksItemOneOfOnesixType];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const NewsletterDtoContentOneOfTwoeightBlocksItemOneOfOnesixType = {
+  callout: 'callout',
+} as const;
+
+export type NewsletterDtoContentOneOfTwoeightBlocksItemOneOfOnesixDocumentType = typeof NewsletterDtoContentOneOfTwoeightBlocksItemOneOfOnesixDocumentType[keyof typeof NewsletterDtoContentOneOfTwoeightBlocksItemOneOfOnesixDocumentType];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const NewsletterDtoContentOneOfTwoeightBlocksItemOneOfOnesixDocumentType = {
+  doc: 'doc',
+} as const;
+
+export type NewsletterDtoContentOneOfTwoeightBlocksItemOneOfOnesixDocumentContentItem = { [key: string]: unknown };
+
+/**
+ * Documento Tiptap JSON limitado a los nodos y marcas admitidos.
+ */
+export type NewsletterDtoContentOneOfTwoeightBlocksItemOneOfOnesixDocument = {
+  type: NewsletterDtoContentOneOfTwoeightBlocksItemOneOfOnesixDocumentType;
+  content: NewsletterDtoContentOneOfTwoeightBlocksItemOneOfOnesixDocumentContentItem[];
+};
+
+export type NewsletterDtoContentOneOfTwoeightBlocksItemOneOfOnesixTone = typeof NewsletterDtoContentOneOfTwoeightBlocksItemOneOfOnesixTone[keyof typeof NewsletterDtoContentOneOfTwoeightBlocksItemOneOfOnesixTone];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const NewsletterDtoContentOneOfTwoeightBlocksItemOneOfOnesixTone = {
+  info: 'info',
+  success: 'success',
+  warning: 'warning',
+} as const;
+
+export type NewsletterDtoContentOneOfTwoeightBlocksItemOneOfOnesix = {
+  type: NewsletterDtoContentOneOfTwoeightBlocksItemOneOfOnesixType;
+  /** Documento Tiptap JSON limitado a los nodos y marcas admitidos. */
+  document: NewsletterDtoContentOneOfTwoeightBlocksItemOneOfOnesixDocument;
+  tone: NewsletterDtoContentOneOfTwoeightBlocksItemOneOfOnesixTone;
+};
+
+export type NewsletterDtoContentOneOfTwoeightBlocksItemOneOfTwotwoType = typeof NewsletterDtoContentOneOfTwoeightBlocksItemOneOfTwotwoType[keyof typeof NewsletterDtoContentOneOfTwoeightBlocksItemOneOfTwotwoType];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const NewsletterDtoContentOneOfTwoeightBlocksItemOneOfTwotwoType = {
+  metrics: 'metrics',
+} as const;
+
+export type NewsletterDtoContentOneOfTwoeightBlocksItemOneOfTwotwoItemsItem = {
+  label: string;
+  value: string;
+};
+
+export type NewsletterDtoContentOneOfTwoeightBlocksItemOneOfTwotwo = {
+  type: NewsletterDtoContentOneOfTwoeightBlocksItemOneOfTwotwoType;
+  /**
+   * @minItems 1
+   * @maxItems 4
+   */
+  items: NewsletterDtoContentOneOfTwoeightBlocksItemOneOfTwotwoItemsItem[];
+};
+
+export type NewsletterDtoContentOneOfTwoeightBlocksItemOneOfTwofiveType = typeof NewsletterDtoContentOneOfTwoeightBlocksItemOneOfTwofiveType[keyof typeof NewsletterDtoContentOneOfTwoeightBlocksItemOneOfTwofiveType];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const NewsletterDtoContentOneOfTwoeightBlocksItemOneOfTwofiveType = {
+  chart: 'chart',
+} as const;
+
+export type NewsletterDtoContentOneOfTwoeightBlocksItemOneOfTwofiveChartType = typeof NewsletterDtoContentOneOfTwoeightBlocksItemOneOfTwofiveChartType[keyof typeof NewsletterDtoContentOneOfTwoeightBlocksItemOneOfTwofiveChartType];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const NewsletterDtoContentOneOfTwoeightBlocksItemOneOfTwofiveChartType = {
+  bar: 'bar',
+  line: 'line',
+  donut: 'donut',
+} as const;
+
+export type NewsletterDtoContentOneOfTwoeightBlocksItemOneOfTwofiveDataItem = { [key: string]: unknown };
+
+export type NewsletterDtoContentOneOfTwoeightBlocksItemOneOfTwofiveAlign = typeof NewsletterDtoContentOneOfTwoeightBlocksItemOneOfTwofiveAlign[keyof typeof NewsletterDtoContentOneOfTwoeightBlocksItemOneOfTwofiveAlign];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const NewsletterDtoContentOneOfTwoeightBlocksItemOneOfTwofiveAlign = {
+  left: 'left',
+  center: 'center',
+  right: 'right',
+} as const;
+
+export type NewsletterDtoContentOneOfTwoeightBlocksItemOneOfTwofive = {
+  type: NewsletterDtoContentOneOfTwoeightBlocksItemOneOfTwofiveType;
+  title: string;
+  chartType: NewsletterDtoContentOneOfTwoeightBlocksItemOneOfTwofiveChartType;
+  /**
+   * @minItems 1
+   * @maxItems 30
+   */
+  data: NewsletterDtoContentOneOfTwoeightBlocksItemOneOfTwofiveDataItem[];
+  showLegend: boolean;
+  showLabels: boolean;
+  align: NewsletterDtoContentOneOfTwoeightBlocksItemOneOfTwofiveAlign;
+};
+
+export type NewsletterDtoContentOneOfTwoeightBlocksItemOneOfThreezeroType = typeof NewsletterDtoContentOneOfTwoeightBlocksItemOneOfThreezeroType[keyof typeof NewsletterDtoContentOneOfTwoeightBlocksItemOneOfThreezeroType];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const NewsletterDtoContentOneOfTwoeightBlocksItemOneOfThreezeroType = {
+  video: 'video',
+} as const;
+
+export type NewsletterDtoContentOneOfTwoeightBlocksItemOneOfThreezeroProvider = typeof NewsletterDtoContentOneOfTwoeightBlocksItemOneOfThreezeroProvider[keyof typeof NewsletterDtoContentOneOfTwoeightBlocksItemOneOfThreezeroProvider];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const NewsletterDtoContentOneOfTwoeightBlocksItemOneOfThreezeroProvider = {
+  youtube: 'youtube',
+  vimeo: 'vimeo',
+} as const;
+
+export type NewsletterDtoContentOneOfTwoeightBlocksItemOneOfThreezeroWidth = typeof NewsletterDtoContentOneOfTwoeightBlocksItemOneOfThreezeroWidth[keyof typeof NewsletterDtoContentOneOfTwoeightBlocksItemOneOfThreezeroWidth];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const NewsletterDtoContentOneOfTwoeightBlocksItemOneOfThreezeroWidth = {
+  small: 'small',
+  medium: 'medium',
+  full: 'full',
+} as const;
+
+export type NewsletterDtoContentOneOfTwoeightBlocksItemOneOfThreezeroAlign = typeof NewsletterDtoContentOneOfTwoeightBlocksItemOneOfThreezeroAlign[keyof typeof NewsletterDtoContentOneOfTwoeightBlocksItemOneOfThreezeroAlign];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const NewsletterDtoContentOneOfTwoeightBlocksItemOneOfThreezeroAlign = {
+  left: 'left',
+  center: 'center',
+  right: 'right',
+} as const;
+
+export type NewsletterDtoContentOneOfTwoeightBlocksItemOneOfThreezeroSection = typeof NewsletterDtoContentOneOfTwoeightBlocksItemOneOfThreezeroSection[keyof typeof NewsletterDtoContentOneOfTwoeightBlocksItemOneOfThreezeroSection];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const NewsletterDtoContentOneOfTwoeightBlocksItemOneOfThreezeroSection = {
+  header: 'header',
+  body: 'body',
+  footer: 'footer',
+} as const;
+
+export type NewsletterDtoContentOneOfTwoeightBlocksItemOneOfThreezero = {
+  type: NewsletterDtoContentOneOfTwoeightBlocksItemOneOfThreezeroType;
+  provider: NewsletterDtoContentOneOfTwoeightBlocksItemOneOfThreezeroProvider;
+  videoId: string;
+  title: string;
+  width: NewsletterDtoContentOneOfTwoeightBlocksItemOneOfThreezeroWidth;
+  align: NewsletterDtoContentOneOfTwoeightBlocksItemOneOfThreezeroAlign;
+  section?: NewsletterDtoContentOneOfTwoeightBlocksItemOneOfThreezeroSection;
+  background?: boolean;
+};
+
+export type NewsletterDtoContentOneOfTwoeightBlocksItemOneOfThreesixType = typeof NewsletterDtoContentOneOfTwoeightBlocksItemOneOfThreesixType[keyof typeof NewsletterDtoContentOneOfTwoeightBlocksItemOneOfThreesixType];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const NewsletterDtoContentOneOfTwoeightBlocksItemOneOfThreesixType = {
+  drawing: 'drawing',
+} as const;
+
+export type NewsletterDtoContentOneOfTwoeightBlocksItemOneOfThreesixStrokesItem = { [key: string]: unknown };
+
+export type NewsletterDtoContentOneOfTwoeightBlocksItemOneOfThreesix = {
+  type: NewsletterDtoContentOneOfTwoeightBlocksItemOneOfThreesixType;
+  width: number;
+  height: number;
+  backgroundColor: string;
+  alt: string;
+  /** @maxItems 200 */
+  strokes: NewsletterDtoContentOneOfTwoeightBlocksItemOneOfThreesixStrokesItem[];
+};
+
+export type NewsletterDtoContentOneOfTwoeightBlocksItemOneOfThreenineType = typeof NewsletterDtoContentOneOfTwoeightBlocksItemOneOfThreenineType[keyof typeof NewsletterDtoContentOneOfTwoeightBlocksItemOneOfThreenineType];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const NewsletterDtoContentOneOfTwoeightBlocksItemOneOfThreenineType = {
+  cta: 'cta',
+} as const;
+
+export type NewsletterDtoContentOneOfTwoeightBlocksItemOneOfThreenineAlign = typeof NewsletterDtoContentOneOfTwoeightBlocksItemOneOfThreenineAlign[keyof typeof NewsletterDtoContentOneOfTwoeightBlocksItemOneOfThreenineAlign];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const NewsletterDtoContentOneOfTwoeightBlocksItemOneOfThreenineAlign = {
+  left: 'left',
+  center: 'center',
+  right: 'right',
+} as const;
+
+export type NewsletterDtoContentOneOfTwoeightBlocksItemOneOfThreenine = {
+  type: NewsletterDtoContentOneOfTwoeightBlocksItemOneOfThreenineType;
+  label: string;
+  url: string;
+  align: NewsletterDtoContentOneOfTwoeightBlocksItemOneOfThreenineAlign;
+};
+
+export type NewsletterDtoContentOneOfTwoeightBlocksItemOneOfFourtwoType = typeof NewsletterDtoContentOneOfTwoeightBlocksItemOneOfFourtwoType[keyof typeof NewsletterDtoContentOneOfTwoeightBlocksItemOneOfFourtwoType];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const NewsletterDtoContentOneOfTwoeightBlocksItemOneOfFourtwoType = {
+  separator: 'separator',
+} as const;
+
+export type NewsletterDtoContentOneOfTwoeightBlocksItemOneOfFourtwo = {
+  type: NewsletterDtoContentOneOfTwoeightBlocksItemOneOfFourtwoType;
+};
+
+export type NewsletterDtoContentOneOfTwoeightBlocksItem = NewsletterDtoContentOneOfTwoeightBlocksItemOneOf | NewsletterDtoContentOneOfTwoeightBlocksItemOneOfSix | NewsletterDtoContentOneOfTwoeightBlocksItemOneOfOneone | NewsletterDtoContentOneOfTwoeightBlocksItemOneOfOnesix | NewsletterDtoContentOneOfTwoeightBlocksItemOneOfTwotwo | NewsletterDtoContentOneOfTwoeightBlocksItemOneOfTwofive | NewsletterDtoContentOneOfTwoeightBlocksItemOneOfThreezero | NewsletterDtoContentOneOfTwoeightBlocksItemOneOfThreesix | NewsletterDtoContentOneOfTwoeightBlocksItemOneOfThreenine | NewsletterDtoContentOneOfTwoeightBlocksItemOneOfFourtwo;
+
+export type NewsletterDtoContentOneOfTwoeight = {
+  version: NewsletterDtoContentOneOfTwoeightVersion;
+  /** Documento Tiptap JSON limitado a los nodos y marcas admitidos. */
+  header?: NewsletterDtoContentOneOfTwoeightHeader;
+  /** Documento Tiptap JSON limitado a los nodos y marcas admitidos. */
+  description?: NewsletterDtoContentOneOfTwoeightDescription;
+  /** Documento Tiptap JSON limitado a los nodos y marcas admitidos. */
+  footer?: NewsletterDtoContentOneOfTwoeightFooter;
+  theme: NewsletterDtoContentOneOfTwoeightTheme;
+  /** @maxItems 60 */
+  blocks: NewsletterDtoContentOneOfTwoeightBlocksItem[];
+};
+
+/**
+ * @nullable
+ */
+export type NewsletterDtoContent = NewsletterDtoContentOneOf | NewsletterDtoContentOneOfTwoeight | null;
+
+export interface NewsletterDto {
+  id: string;
+  title: string;
+  /** @nullable */
+  excerpt: string | null;
+  /** @nullable */
+  newsletterCategory: NewsletterDtoNewsletterCategory;
+  audience: NewsletterDtoAudience;
+  status: NewsletterDtoStatus;
+  /** @nullable */
+  startsAt: string | null;
+  /** @nullable */
+  endsAt: string | null;
+  revision: number;
+  /** @nullable */
+  content: NewsletterDtoContent;
+  targets?: NewsletterTargetDto[];
+}
+
+export interface NewsletterPageDto {
+  items: NewsletterDto[];
+  /** @nullable */
+  nextCursor: string | null;
+}
+
+export type UpdateNewsletterDtoNewsletterCategory = typeof UpdateNewsletterDtoNewsletterCategory[keyof typeof UpdateNewsletterDtoNewsletterCategory];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const UpdateNewsletterDtoNewsletterCategory = {
+  release: 'release',
+  bugfix: 'bugfix',
+  policy: 'policy',
+  performance: 'performance',
+  general: 'general',
+} as const;
+
+export type UpdateNewsletterDtoAudience = typeof UpdateNewsletterDtoAudience[keyof typeof UpdateNewsletterDtoAudience];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const UpdateNewsletterDtoAudience = {
+  all_tenants: 'all_tenants',
+  selected_tenants: 'selected_tenants',
+} as const;
+
+export type UpdateNewsletterDtoContentOneOfVersion = typeof UpdateNewsletterDtoContentOneOfVersion[keyof typeof UpdateNewsletterDtoContentOneOfVersion];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const UpdateNewsletterDtoContentOneOfVersion = {
+  NUMBER_1: 1,
+} as const;
+
+export type UpdateNewsletterDtoContentOneOfBlocksItemOneOfType = typeof UpdateNewsletterDtoContentOneOfBlocksItemOneOfType[keyof typeof UpdateNewsletterDtoContentOneOfBlocksItemOneOfType];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const UpdateNewsletterDtoContentOneOfBlocksItemOneOfType = {
+  heading: 'heading',
+} as const;
+
+export type UpdateNewsletterDtoContentOneOfBlocksItemOneOf = {
+  type: UpdateNewsletterDtoContentOneOfBlocksItemOneOfType;
+  text: string;
+};
+
+export type UpdateNewsletterDtoContentOneOfBlocksItemOneOfThreeType = typeof UpdateNewsletterDtoContentOneOfBlocksItemOneOfThreeType[keyof typeof UpdateNewsletterDtoContentOneOfBlocksItemOneOfThreeType];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const UpdateNewsletterDtoContentOneOfBlocksItemOneOfThreeType = {
+  paragraph: 'paragraph',
+} as const;
+
+export type UpdateNewsletterDtoContentOneOfBlocksItemOneOfThree = {
+  type: UpdateNewsletterDtoContentOneOfBlocksItemOneOfThreeType;
+  text: string;
+};
+
+export type UpdateNewsletterDtoContentOneOfBlocksItemOneOfFiveType = typeof UpdateNewsletterDtoContentOneOfBlocksItemOneOfFiveType[keyof typeof UpdateNewsletterDtoContentOneOfBlocksItemOneOfFiveType];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const UpdateNewsletterDtoContentOneOfBlocksItemOneOfFiveType = {
+  list: 'list',
+} as const;
+
+export type UpdateNewsletterDtoContentOneOfBlocksItemOneOfFive = {
+  type: UpdateNewsletterDtoContentOneOfBlocksItemOneOfFiveType;
+  /**
+   * @minItems 1
+   * @maxItems 30
+   */
+  items: string[];
+};
+
+export type UpdateNewsletterDtoContentOneOfBlocksItemOneOfSevenType = typeof UpdateNewsletterDtoContentOneOfBlocksItemOneOfSevenType[keyof typeof UpdateNewsletterDtoContentOneOfBlocksItemOneOfSevenType];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const UpdateNewsletterDtoContentOneOfBlocksItemOneOfSevenType = {
+  image: 'image',
+} as const;
+
+export type UpdateNewsletterDtoContentOneOfBlocksItemOneOfSeven = {
+  type: UpdateNewsletterDtoContentOneOfBlocksItemOneOfSevenType;
+  assetId: string;
+  alt: string;
+  caption: string;
+};
+
+export type UpdateNewsletterDtoContentOneOfBlocksItemOneOfNineType = typeof UpdateNewsletterDtoContentOneOfBlocksItemOneOfNineType[keyof typeof UpdateNewsletterDtoContentOneOfBlocksItemOneOfNineType];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const UpdateNewsletterDtoContentOneOfBlocksItemOneOfNineType = {
+  callout: 'callout',
+} as const;
+
+export type UpdateNewsletterDtoContentOneOfBlocksItemOneOfNine = {
+  type: UpdateNewsletterDtoContentOneOfBlocksItemOneOfNineType;
+  text: string;
+};
+
+export type UpdateNewsletterDtoContentOneOfBlocksItemOneOfOneoneType = typeof UpdateNewsletterDtoContentOneOfBlocksItemOneOfOneoneType[keyof typeof UpdateNewsletterDtoContentOneOfBlocksItemOneOfOneoneType];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const UpdateNewsletterDtoContentOneOfBlocksItemOneOfOneoneType = {
+  metrics: 'metrics',
+} as const;
+
+export type UpdateNewsletterDtoContentOneOfBlocksItemOneOfOneoneItemsItem = {
+  label: string;
+  value: string;
+};
+
+export type UpdateNewsletterDtoContentOneOfBlocksItemOneOfOneone = {
+  type: UpdateNewsletterDtoContentOneOfBlocksItemOneOfOneoneType;
+  /**
+   * @minItems 1
+   * @maxItems 4
+   */
+  items: UpdateNewsletterDtoContentOneOfBlocksItemOneOfOneoneItemsItem[];
+};
+
+export type UpdateNewsletterDtoContentOneOfBlocksItemOneOfOnefourType = typeof UpdateNewsletterDtoContentOneOfBlocksItemOneOfOnefourType[keyof typeof UpdateNewsletterDtoContentOneOfBlocksItemOneOfOnefourType];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const UpdateNewsletterDtoContentOneOfBlocksItemOneOfOnefourType = {
+  chart: 'chart',
+} as const;
+
+export type UpdateNewsletterDtoContentOneOfBlocksItemOneOfOnefourChartType = typeof UpdateNewsletterDtoContentOneOfBlocksItemOneOfOnefourChartType[keyof typeof UpdateNewsletterDtoContentOneOfBlocksItemOneOfOnefourChartType];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const UpdateNewsletterDtoContentOneOfBlocksItemOneOfOnefourChartType = {
+  bar: 'bar',
+  line: 'line',
+  donut: 'donut',
+} as const;
+
+export type UpdateNewsletterDtoContentOneOfBlocksItemOneOfOnefourDataItem = {
+  label: string;
+  value: number;
+};
+
+export type UpdateNewsletterDtoContentOneOfBlocksItemOneOfOnefour = {
+  type: UpdateNewsletterDtoContentOneOfBlocksItemOneOfOnefourType;
+  title: string;
+  chartType: UpdateNewsletterDtoContentOneOfBlocksItemOneOfOnefourChartType;
+  /**
+   * @minItems 1
+   * @maxItems 30
+   */
+  data: UpdateNewsletterDtoContentOneOfBlocksItemOneOfOnefourDataItem[];
+};
+
+export type UpdateNewsletterDtoContentOneOfBlocksItemOneOfOneeightType = typeof UpdateNewsletterDtoContentOneOfBlocksItemOneOfOneeightType[keyof typeof UpdateNewsletterDtoContentOneOfBlocksItemOneOfOneeightType];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const UpdateNewsletterDtoContentOneOfBlocksItemOneOfOneeightType = {
+  video: 'video',
+} as const;
+
+export type UpdateNewsletterDtoContentOneOfBlocksItemOneOfOneeightProvider = typeof UpdateNewsletterDtoContentOneOfBlocksItemOneOfOneeightProvider[keyof typeof UpdateNewsletterDtoContentOneOfBlocksItemOneOfOneeightProvider];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const UpdateNewsletterDtoContentOneOfBlocksItemOneOfOneeightProvider = {
+  youtube: 'youtube',
+  vimeo: 'vimeo',
+} as const;
+
+export type UpdateNewsletterDtoContentOneOfBlocksItemOneOfOneeight = {
+  type: UpdateNewsletterDtoContentOneOfBlocksItemOneOfOneeightType;
+  provider: UpdateNewsletterDtoContentOneOfBlocksItemOneOfOneeightProvider;
+  videoId: string;
+  title: string;
+};
+
+export type UpdateNewsletterDtoContentOneOfBlocksItemOneOfTwooneType = typeof UpdateNewsletterDtoContentOneOfBlocksItemOneOfTwooneType[keyof typeof UpdateNewsletterDtoContentOneOfBlocksItemOneOfTwooneType];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const UpdateNewsletterDtoContentOneOfBlocksItemOneOfTwooneType = {
+  cta: 'cta',
+} as const;
+
+export type UpdateNewsletterDtoContentOneOfBlocksItemOneOfTwoone = {
+  type: UpdateNewsletterDtoContentOneOfBlocksItemOneOfTwooneType;
+  label: string;
+  url: string;
+};
+
+export type UpdateNewsletterDtoContentOneOfBlocksItemOneOfTwothreeType = typeof UpdateNewsletterDtoContentOneOfBlocksItemOneOfTwothreeType[keyof typeof UpdateNewsletterDtoContentOneOfBlocksItemOneOfTwothreeType];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const UpdateNewsletterDtoContentOneOfBlocksItemOneOfTwothreeType = {
+  separator: 'separator',
+} as const;
+
+export type UpdateNewsletterDtoContentOneOfBlocksItemOneOfTwothree = {
+  type: UpdateNewsletterDtoContentOneOfBlocksItemOneOfTwothreeType;
+};
+
+export type UpdateNewsletterDtoContentOneOfBlocksItem = UpdateNewsletterDtoContentOneOfBlocksItemOneOf | UpdateNewsletterDtoContentOneOfBlocksItemOneOfThree | UpdateNewsletterDtoContentOneOfBlocksItemOneOfFive | UpdateNewsletterDtoContentOneOfBlocksItemOneOfSeven | UpdateNewsletterDtoContentOneOfBlocksItemOneOfNine | UpdateNewsletterDtoContentOneOfBlocksItemOneOfOneone | UpdateNewsletterDtoContentOneOfBlocksItemOneOfOnefour | UpdateNewsletterDtoContentOneOfBlocksItemOneOfOneeight | UpdateNewsletterDtoContentOneOfBlocksItemOneOfTwoone | UpdateNewsletterDtoContentOneOfBlocksItemOneOfTwothree;
+
+export type UpdateNewsletterDtoContentOneOf = {
+  version: UpdateNewsletterDtoContentOneOfVersion;
+  /** @maxItems 60 */
+  blocks: UpdateNewsletterDtoContentOneOfBlocksItem[];
+};
+
+export type UpdateNewsletterDtoContentOneOfTwoeightVersion = typeof UpdateNewsletterDtoContentOneOfTwoeightVersion[keyof typeof UpdateNewsletterDtoContentOneOfTwoeightVersion];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const UpdateNewsletterDtoContentOneOfTwoeightVersion = {
+  NUMBER_2: 2,
+} as const;
+
+export type UpdateNewsletterDtoContentOneOfTwoeightHeaderType = typeof UpdateNewsletterDtoContentOneOfTwoeightHeaderType[keyof typeof UpdateNewsletterDtoContentOneOfTwoeightHeaderType];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const UpdateNewsletterDtoContentOneOfTwoeightHeaderType = {
+  doc: 'doc',
+} as const;
+
+export type UpdateNewsletterDtoContentOneOfTwoeightHeaderContentItem = { [key: string]: unknown };
+
+/**
+ * Documento Tiptap JSON limitado a los nodos y marcas admitidos.
+ */
+export type UpdateNewsletterDtoContentOneOfTwoeightHeader = {
+  type: UpdateNewsletterDtoContentOneOfTwoeightHeaderType;
+  content: UpdateNewsletterDtoContentOneOfTwoeightHeaderContentItem[];
+};
+
+export type UpdateNewsletterDtoContentOneOfTwoeightDescriptionType = typeof UpdateNewsletterDtoContentOneOfTwoeightDescriptionType[keyof typeof UpdateNewsletterDtoContentOneOfTwoeightDescriptionType];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const UpdateNewsletterDtoContentOneOfTwoeightDescriptionType = {
+  doc: 'doc',
+} as const;
+
+export type UpdateNewsletterDtoContentOneOfTwoeightDescriptionContentItem = { [key: string]: unknown };
+
+/**
+ * Documento Tiptap JSON limitado a los nodos y marcas admitidos.
+ */
+export type UpdateNewsletterDtoContentOneOfTwoeightDescription = {
+  type: UpdateNewsletterDtoContentOneOfTwoeightDescriptionType;
+  content: UpdateNewsletterDtoContentOneOfTwoeightDescriptionContentItem[];
+};
+
+export type UpdateNewsletterDtoContentOneOfTwoeightFooterType = typeof UpdateNewsletterDtoContentOneOfTwoeightFooterType[keyof typeof UpdateNewsletterDtoContentOneOfTwoeightFooterType];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const UpdateNewsletterDtoContentOneOfTwoeightFooterType = {
+  doc: 'doc',
+} as const;
+
+export type UpdateNewsletterDtoContentOneOfTwoeightFooterContentItem = { [key: string]: unknown };
+
+/**
+ * Documento Tiptap JSON limitado a los nodos y marcas admitidos.
+ */
+export type UpdateNewsletterDtoContentOneOfTwoeightFooter = {
+  type: UpdateNewsletterDtoContentOneOfTwoeightFooterType;
+  content: UpdateNewsletterDtoContentOneOfTwoeightFooterContentItem[];
+};
+
+export type UpdateNewsletterDtoContentOneOfTwoeightThemeWidth = typeof UpdateNewsletterDtoContentOneOfTwoeightThemeWidth[keyof typeof UpdateNewsletterDtoContentOneOfTwoeightThemeWidth];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const UpdateNewsletterDtoContentOneOfTwoeightThemeWidth = {
+  compact: 'compact',
+  standard: 'standard',
+  wide: 'wide',
+} as const;
+
+export type UpdateNewsletterDtoContentOneOfTwoeightThemeFontFamily = typeof UpdateNewsletterDtoContentOneOfTwoeightThemeFontFamily[keyof typeof UpdateNewsletterDtoContentOneOfTwoeightThemeFontFamily];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const UpdateNewsletterDtoContentOneOfTwoeightThemeFontFamily = {
+  sans: 'sans',
+  serif: 'serif',
+  mono: 'mono',
+} as const;
+
+export type UpdateNewsletterDtoContentOneOfTwoeightTheme = {
+  width: UpdateNewsletterDtoContentOneOfTwoeightThemeWidth;
+  fontFamily: UpdateNewsletterDtoContentOneOfTwoeightThemeFontFamily;
+  backgroundColor: string;
+  textColor: string;
+  accentColor: string;
+};
+
+export type UpdateNewsletterDtoContentOneOfTwoeightBlocksItemOneOfType = typeof UpdateNewsletterDtoContentOneOfTwoeightBlocksItemOneOfType[keyof typeof UpdateNewsletterDtoContentOneOfTwoeightBlocksItemOneOfType];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const UpdateNewsletterDtoContentOneOfTwoeightBlocksItemOneOfType = {
+  richText: 'richText',
+} as const;
+
+export type UpdateNewsletterDtoContentOneOfTwoeightBlocksItemOneOfDocumentType = typeof UpdateNewsletterDtoContentOneOfTwoeightBlocksItemOneOfDocumentType[keyof typeof UpdateNewsletterDtoContentOneOfTwoeightBlocksItemOneOfDocumentType];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const UpdateNewsletterDtoContentOneOfTwoeightBlocksItemOneOfDocumentType = {
+  doc: 'doc',
+} as const;
+
+export type UpdateNewsletterDtoContentOneOfTwoeightBlocksItemOneOfDocumentContentItem = { [key: string]: unknown };
+
+/**
+ * Documento Tiptap JSON limitado a los nodos y marcas admitidos.
+ */
+export type UpdateNewsletterDtoContentOneOfTwoeightBlocksItemOneOfDocument = {
+  type: UpdateNewsletterDtoContentOneOfTwoeightBlocksItemOneOfDocumentType;
+  content: UpdateNewsletterDtoContentOneOfTwoeightBlocksItemOneOfDocumentContentItem[];
+};
+
+export type UpdateNewsletterDtoContentOneOfTwoeightBlocksItemOneOf = {
+  type: UpdateNewsletterDtoContentOneOfTwoeightBlocksItemOneOfType;
+  /** Documento Tiptap JSON limitado a los nodos y marcas admitidos. */
+  document: UpdateNewsletterDtoContentOneOfTwoeightBlocksItemOneOfDocument;
+};
+
+export type UpdateNewsletterDtoContentOneOfTwoeightBlocksItemOneOfSixType = typeof UpdateNewsletterDtoContentOneOfTwoeightBlocksItemOneOfSixType[keyof typeof UpdateNewsletterDtoContentOneOfTwoeightBlocksItemOneOfSixType];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const UpdateNewsletterDtoContentOneOfTwoeightBlocksItemOneOfSixType = {
+  image: 'image',
+} as const;
+
+export type UpdateNewsletterDtoContentOneOfTwoeightBlocksItemOneOfSixWidth = typeof UpdateNewsletterDtoContentOneOfTwoeightBlocksItemOneOfSixWidth[keyof typeof UpdateNewsletterDtoContentOneOfTwoeightBlocksItemOneOfSixWidth];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const UpdateNewsletterDtoContentOneOfTwoeightBlocksItemOneOfSixWidth = {
+  small: 'small',
+  medium: 'medium',
+  full: 'full',
+} as const;
+
+export type UpdateNewsletterDtoContentOneOfTwoeightBlocksItemOneOfSixAlign = typeof UpdateNewsletterDtoContentOneOfTwoeightBlocksItemOneOfSixAlign[keyof typeof UpdateNewsletterDtoContentOneOfTwoeightBlocksItemOneOfSixAlign];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const UpdateNewsletterDtoContentOneOfTwoeightBlocksItemOneOfSixAlign = {
+  left: 'left',
+  center: 'center',
+  right: 'right',
+} as const;
+
+export type UpdateNewsletterDtoContentOneOfTwoeightBlocksItemOneOfSixSection = typeof UpdateNewsletterDtoContentOneOfTwoeightBlocksItemOneOfSixSection[keyof typeof UpdateNewsletterDtoContentOneOfTwoeightBlocksItemOneOfSixSection];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const UpdateNewsletterDtoContentOneOfTwoeightBlocksItemOneOfSixSection = {
+  header: 'header',
+  body: 'body',
+  footer: 'footer',
+} as const;
+
+export type UpdateNewsletterDtoContentOneOfTwoeightBlocksItemOneOfSix = {
+  type: UpdateNewsletterDtoContentOneOfTwoeightBlocksItemOneOfSixType;
+  assetId: string;
+  alt: string;
+  caption: string;
+  width: UpdateNewsletterDtoContentOneOfTwoeightBlocksItemOneOfSixWidth;
+  align: UpdateNewsletterDtoContentOneOfTwoeightBlocksItemOneOfSixAlign;
+  section?: UpdateNewsletterDtoContentOneOfTwoeightBlocksItemOneOfSixSection;
+  background?: boolean;
+};
+
+export type UpdateNewsletterDtoContentOneOfTwoeightBlocksItemOneOfOneoneType = typeof UpdateNewsletterDtoContentOneOfTwoeightBlocksItemOneOfOneoneType[keyof typeof UpdateNewsletterDtoContentOneOfTwoeightBlocksItemOneOfOneoneType];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const UpdateNewsletterDtoContentOneOfTwoeightBlocksItemOneOfOneoneType = {
+  gif: 'gif',
+} as const;
+
+export type UpdateNewsletterDtoContentOneOfTwoeightBlocksItemOneOfOneoneWidth = typeof UpdateNewsletterDtoContentOneOfTwoeightBlocksItemOneOfOneoneWidth[keyof typeof UpdateNewsletterDtoContentOneOfTwoeightBlocksItemOneOfOneoneWidth];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const UpdateNewsletterDtoContentOneOfTwoeightBlocksItemOneOfOneoneWidth = {
+  small: 'small',
+  medium: 'medium',
+  full: 'full',
+} as const;
+
+export type UpdateNewsletterDtoContentOneOfTwoeightBlocksItemOneOfOneoneAlign = typeof UpdateNewsletterDtoContentOneOfTwoeightBlocksItemOneOfOneoneAlign[keyof typeof UpdateNewsletterDtoContentOneOfTwoeightBlocksItemOneOfOneoneAlign];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const UpdateNewsletterDtoContentOneOfTwoeightBlocksItemOneOfOneoneAlign = {
+  left: 'left',
+  center: 'center',
+  right: 'right',
+} as const;
+
+export type UpdateNewsletterDtoContentOneOfTwoeightBlocksItemOneOfOneoneSection = typeof UpdateNewsletterDtoContentOneOfTwoeightBlocksItemOneOfOneoneSection[keyof typeof UpdateNewsletterDtoContentOneOfTwoeightBlocksItemOneOfOneoneSection];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const UpdateNewsletterDtoContentOneOfTwoeightBlocksItemOneOfOneoneSection = {
+  header: 'header',
+  body: 'body',
+  footer: 'footer',
+} as const;
+
+export type UpdateNewsletterDtoContentOneOfTwoeightBlocksItemOneOfOneone = {
+  type: UpdateNewsletterDtoContentOneOfTwoeightBlocksItemOneOfOneoneType;
+  assetId: string;
+  alt: string;
+  caption: string;
+  width: UpdateNewsletterDtoContentOneOfTwoeightBlocksItemOneOfOneoneWidth;
+  align: UpdateNewsletterDtoContentOneOfTwoeightBlocksItemOneOfOneoneAlign;
+  section?: UpdateNewsletterDtoContentOneOfTwoeightBlocksItemOneOfOneoneSection;
+  background?: boolean;
+};
+
+export type UpdateNewsletterDtoContentOneOfTwoeightBlocksItemOneOfOnesixType = typeof UpdateNewsletterDtoContentOneOfTwoeightBlocksItemOneOfOnesixType[keyof typeof UpdateNewsletterDtoContentOneOfTwoeightBlocksItemOneOfOnesixType];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const UpdateNewsletterDtoContentOneOfTwoeightBlocksItemOneOfOnesixType = {
+  callout: 'callout',
+} as const;
+
+export type UpdateNewsletterDtoContentOneOfTwoeightBlocksItemOneOfOnesixDocumentType = typeof UpdateNewsletterDtoContentOneOfTwoeightBlocksItemOneOfOnesixDocumentType[keyof typeof UpdateNewsletterDtoContentOneOfTwoeightBlocksItemOneOfOnesixDocumentType];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const UpdateNewsletterDtoContentOneOfTwoeightBlocksItemOneOfOnesixDocumentType = {
+  doc: 'doc',
+} as const;
+
+export type UpdateNewsletterDtoContentOneOfTwoeightBlocksItemOneOfOnesixDocumentContentItem = { [key: string]: unknown };
+
+/**
+ * Documento Tiptap JSON limitado a los nodos y marcas admitidos.
+ */
+export type UpdateNewsletterDtoContentOneOfTwoeightBlocksItemOneOfOnesixDocument = {
+  type: UpdateNewsletterDtoContentOneOfTwoeightBlocksItemOneOfOnesixDocumentType;
+  content: UpdateNewsletterDtoContentOneOfTwoeightBlocksItemOneOfOnesixDocumentContentItem[];
+};
+
+export type UpdateNewsletterDtoContentOneOfTwoeightBlocksItemOneOfOnesixTone = typeof UpdateNewsletterDtoContentOneOfTwoeightBlocksItemOneOfOnesixTone[keyof typeof UpdateNewsletterDtoContentOneOfTwoeightBlocksItemOneOfOnesixTone];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const UpdateNewsletterDtoContentOneOfTwoeightBlocksItemOneOfOnesixTone = {
+  info: 'info',
+  success: 'success',
+  warning: 'warning',
+} as const;
+
+export type UpdateNewsletterDtoContentOneOfTwoeightBlocksItemOneOfOnesix = {
+  type: UpdateNewsletterDtoContentOneOfTwoeightBlocksItemOneOfOnesixType;
+  /** Documento Tiptap JSON limitado a los nodos y marcas admitidos. */
+  document: UpdateNewsletterDtoContentOneOfTwoeightBlocksItemOneOfOnesixDocument;
+  tone: UpdateNewsletterDtoContentOneOfTwoeightBlocksItemOneOfOnesixTone;
+};
+
+export type UpdateNewsletterDtoContentOneOfTwoeightBlocksItemOneOfTwotwoType = typeof UpdateNewsletterDtoContentOneOfTwoeightBlocksItemOneOfTwotwoType[keyof typeof UpdateNewsletterDtoContentOneOfTwoeightBlocksItemOneOfTwotwoType];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const UpdateNewsletterDtoContentOneOfTwoeightBlocksItemOneOfTwotwoType = {
+  metrics: 'metrics',
+} as const;
+
+export type UpdateNewsletterDtoContentOneOfTwoeightBlocksItemOneOfTwotwoItemsItem = {
+  label: string;
+  value: string;
+};
+
+export type UpdateNewsletterDtoContentOneOfTwoeightBlocksItemOneOfTwotwo = {
+  type: UpdateNewsletterDtoContentOneOfTwoeightBlocksItemOneOfTwotwoType;
+  /**
+   * @minItems 1
+   * @maxItems 4
+   */
+  items: UpdateNewsletterDtoContentOneOfTwoeightBlocksItemOneOfTwotwoItemsItem[];
+};
+
+export type UpdateNewsletterDtoContentOneOfTwoeightBlocksItemOneOfTwofiveType = typeof UpdateNewsletterDtoContentOneOfTwoeightBlocksItemOneOfTwofiveType[keyof typeof UpdateNewsletterDtoContentOneOfTwoeightBlocksItemOneOfTwofiveType];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const UpdateNewsletterDtoContentOneOfTwoeightBlocksItemOneOfTwofiveType = {
+  chart: 'chart',
+} as const;
+
+export type UpdateNewsletterDtoContentOneOfTwoeightBlocksItemOneOfTwofiveChartType = typeof UpdateNewsletterDtoContentOneOfTwoeightBlocksItemOneOfTwofiveChartType[keyof typeof UpdateNewsletterDtoContentOneOfTwoeightBlocksItemOneOfTwofiveChartType];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const UpdateNewsletterDtoContentOneOfTwoeightBlocksItemOneOfTwofiveChartType = {
+  bar: 'bar',
+  line: 'line',
+  donut: 'donut',
+} as const;
+
+export type UpdateNewsletterDtoContentOneOfTwoeightBlocksItemOneOfTwofiveDataItem = { [key: string]: unknown };
+
+export type UpdateNewsletterDtoContentOneOfTwoeightBlocksItemOneOfTwofiveAlign = typeof UpdateNewsletterDtoContentOneOfTwoeightBlocksItemOneOfTwofiveAlign[keyof typeof UpdateNewsletterDtoContentOneOfTwoeightBlocksItemOneOfTwofiveAlign];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const UpdateNewsletterDtoContentOneOfTwoeightBlocksItemOneOfTwofiveAlign = {
+  left: 'left',
+  center: 'center',
+  right: 'right',
+} as const;
+
+export type UpdateNewsletterDtoContentOneOfTwoeightBlocksItemOneOfTwofive = {
+  type: UpdateNewsletterDtoContentOneOfTwoeightBlocksItemOneOfTwofiveType;
+  title: string;
+  chartType: UpdateNewsletterDtoContentOneOfTwoeightBlocksItemOneOfTwofiveChartType;
+  /**
+   * @minItems 1
+   * @maxItems 30
+   */
+  data: UpdateNewsletterDtoContentOneOfTwoeightBlocksItemOneOfTwofiveDataItem[];
+  showLegend: boolean;
+  showLabels: boolean;
+  align: UpdateNewsletterDtoContentOneOfTwoeightBlocksItemOneOfTwofiveAlign;
+};
+
+export type UpdateNewsletterDtoContentOneOfTwoeightBlocksItemOneOfThreezeroType = typeof UpdateNewsletterDtoContentOneOfTwoeightBlocksItemOneOfThreezeroType[keyof typeof UpdateNewsletterDtoContentOneOfTwoeightBlocksItemOneOfThreezeroType];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const UpdateNewsletterDtoContentOneOfTwoeightBlocksItemOneOfThreezeroType = {
+  video: 'video',
+} as const;
+
+export type UpdateNewsletterDtoContentOneOfTwoeightBlocksItemOneOfThreezeroProvider = typeof UpdateNewsletterDtoContentOneOfTwoeightBlocksItemOneOfThreezeroProvider[keyof typeof UpdateNewsletterDtoContentOneOfTwoeightBlocksItemOneOfThreezeroProvider];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const UpdateNewsletterDtoContentOneOfTwoeightBlocksItemOneOfThreezeroProvider = {
+  youtube: 'youtube',
+  vimeo: 'vimeo',
+} as const;
+
+export type UpdateNewsletterDtoContentOneOfTwoeightBlocksItemOneOfThreezeroWidth = typeof UpdateNewsletterDtoContentOneOfTwoeightBlocksItemOneOfThreezeroWidth[keyof typeof UpdateNewsletterDtoContentOneOfTwoeightBlocksItemOneOfThreezeroWidth];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const UpdateNewsletterDtoContentOneOfTwoeightBlocksItemOneOfThreezeroWidth = {
+  small: 'small',
+  medium: 'medium',
+  full: 'full',
+} as const;
+
+export type UpdateNewsletterDtoContentOneOfTwoeightBlocksItemOneOfThreezeroAlign = typeof UpdateNewsletterDtoContentOneOfTwoeightBlocksItemOneOfThreezeroAlign[keyof typeof UpdateNewsletterDtoContentOneOfTwoeightBlocksItemOneOfThreezeroAlign];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const UpdateNewsletterDtoContentOneOfTwoeightBlocksItemOneOfThreezeroAlign = {
+  left: 'left',
+  center: 'center',
+  right: 'right',
+} as const;
+
+export type UpdateNewsletterDtoContentOneOfTwoeightBlocksItemOneOfThreezeroSection = typeof UpdateNewsletterDtoContentOneOfTwoeightBlocksItemOneOfThreezeroSection[keyof typeof UpdateNewsletterDtoContentOneOfTwoeightBlocksItemOneOfThreezeroSection];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const UpdateNewsletterDtoContentOneOfTwoeightBlocksItemOneOfThreezeroSection = {
+  header: 'header',
+  body: 'body',
+  footer: 'footer',
+} as const;
+
+export type UpdateNewsletterDtoContentOneOfTwoeightBlocksItemOneOfThreezero = {
+  type: UpdateNewsletterDtoContentOneOfTwoeightBlocksItemOneOfThreezeroType;
+  provider: UpdateNewsletterDtoContentOneOfTwoeightBlocksItemOneOfThreezeroProvider;
+  videoId: string;
+  title: string;
+  width: UpdateNewsletterDtoContentOneOfTwoeightBlocksItemOneOfThreezeroWidth;
+  align: UpdateNewsletterDtoContentOneOfTwoeightBlocksItemOneOfThreezeroAlign;
+  section?: UpdateNewsletterDtoContentOneOfTwoeightBlocksItemOneOfThreezeroSection;
+  background?: boolean;
+};
+
+export type UpdateNewsletterDtoContentOneOfTwoeightBlocksItemOneOfThreesixType = typeof UpdateNewsletterDtoContentOneOfTwoeightBlocksItemOneOfThreesixType[keyof typeof UpdateNewsletterDtoContentOneOfTwoeightBlocksItemOneOfThreesixType];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const UpdateNewsletterDtoContentOneOfTwoeightBlocksItemOneOfThreesixType = {
+  drawing: 'drawing',
+} as const;
+
+export type UpdateNewsletterDtoContentOneOfTwoeightBlocksItemOneOfThreesixStrokesItem = { [key: string]: unknown };
+
+export type UpdateNewsletterDtoContentOneOfTwoeightBlocksItemOneOfThreesix = {
+  type: UpdateNewsletterDtoContentOneOfTwoeightBlocksItemOneOfThreesixType;
+  width: number;
+  height: number;
+  backgroundColor: string;
+  alt: string;
+  /** @maxItems 200 */
+  strokes: UpdateNewsletterDtoContentOneOfTwoeightBlocksItemOneOfThreesixStrokesItem[];
+};
+
+export type UpdateNewsletterDtoContentOneOfTwoeightBlocksItemOneOfThreenineType = typeof UpdateNewsletterDtoContentOneOfTwoeightBlocksItemOneOfThreenineType[keyof typeof UpdateNewsletterDtoContentOneOfTwoeightBlocksItemOneOfThreenineType];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const UpdateNewsletterDtoContentOneOfTwoeightBlocksItemOneOfThreenineType = {
+  cta: 'cta',
+} as const;
+
+export type UpdateNewsletterDtoContentOneOfTwoeightBlocksItemOneOfThreenineAlign = typeof UpdateNewsletterDtoContentOneOfTwoeightBlocksItemOneOfThreenineAlign[keyof typeof UpdateNewsletterDtoContentOneOfTwoeightBlocksItemOneOfThreenineAlign];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const UpdateNewsletterDtoContentOneOfTwoeightBlocksItemOneOfThreenineAlign = {
+  left: 'left',
+  center: 'center',
+  right: 'right',
+} as const;
+
+export type UpdateNewsletterDtoContentOneOfTwoeightBlocksItemOneOfThreenine = {
+  type: UpdateNewsletterDtoContentOneOfTwoeightBlocksItemOneOfThreenineType;
+  label: string;
+  url: string;
+  align: UpdateNewsletterDtoContentOneOfTwoeightBlocksItemOneOfThreenineAlign;
+};
+
+export type UpdateNewsletterDtoContentOneOfTwoeightBlocksItemOneOfFourtwoType = typeof UpdateNewsletterDtoContentOneOfTwoeightBlocksItemOneOfFourtwoType[keyof typeof UpdateNewsletterDtoContentOneOfTwoeightBlocksItemOneOfFourtwoType];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const UpdateNewsletterDtoContentOneOfTwoeightBlocksItemOneOfFourtwoType = {
+  separator: 'separator',
+} as const;
+
+export type UpdateNewsletterDtoContentOneOfTwoeightBlocksItemOneOfFourtwo = {
+  type: UpdateNewsletterDtoContentOneOfTwoeightBlocksItemOneOfFourtwoType;
+};
+
+export type UpdateNewsletterDtoContentOneOfTwoeightBlocksItem = UpdateNewsletterDtoContentOneOfTwoeightBlocksItemOneOf | UpdateNewsletterDtoContentOneOfTwoeightBlocksItemOneOfSix | UpdateNewsletterDtoContentOneOfTwoeightBlocksItemOneOfOneone | UpdateNewsletterDtoContentOneOfTwoeightBlocksItemOneOfOnesix | UpdateNewsletterDtoContentOneOfTwoeightBlocksItemOneOfTwotwo | UpdateNewsletterDtoContentOneOfTwoeightBlocksItemOneOfTwofive | UpdateNewsletterDtoContentOneOfTwoeightBlocksItemOneOfThreezero | UpdateNewsletterDtoContentOneOfTwoeightBlocksItemOneOfThreesix | UpdateNewsletterDtoContentOneOfTwoeightBlocksItemOneOfThreenine | UpdateNewsletterDtoContentOneOfTwoeightBlocksItemOneOfFourtwo;
+
+export type UpdateNewsletterDtoContentOneOfTwoeight = {
+  version: UpdateNewsletterDtoContentOneOfTwoeightVersion;
+  /** Documento Tiptap JSON limitado a los nodos y marcas admitidos. */
+  header?: UpdateNewsletterDtoContentOneOfTwoeightHeader;
+  /** Documento Tiptap JSON limitado a los nodos y marcas admitidos. */
+  description?: UpdateNewsletterDtoContentOneOfTwoeightDescription;
+  /** Documento Tiptap JSON limitado a los nodos y marcas admitidos. */
+  footer?: UpdateNewsletterDtoContentOneOfTwoeightFooter;
+  theme: UpdateNewsletterDtoContentOneOfTwoeightTheme;
+  /** @maxItems 60 */
+  blocks: UpdateNewsletterDtoContentOneOfTwoeightBlocksItem[];
+};
+
+/**
+ * Documento versionado de bloques editoriales.
+ */
+export type UpdateNewsletterDtoContent = UpdateNewsletterDtoContentOneOf | UpdateNewsletterDtoContentOneOfTwoeight;
+
+export interface UpdateNewsletterDto {
+  title: string;
+  excerpt: string;
+  newsletterCategory: UpdateNewsletterDtoNewsletterCategory;
+  audience: UpdateNewsletterDtoAudience;
+  targetTenantIds: string[];
+  /** @nullable */
+  startsAt: string | null;
+  /** @nullable */
+  endsAt: string | null;
+  /** Documento versionado de bloques editoriales. */
+  content: UpdateNewsletterDtoContent;
+}
+
+export interface NewsletterActionDto {
+  status: string;
+}
+
+export interface NewsletterAssetDto {
+  id: string;
+}
+
+export interface NewsletterSummaryDto {
+  unreadCount: number;
+  /** @nullable */
+  oldestUnreadId: string | null;
+  /** @nullable */
+  latestId: string | null;
+}
+
+export interface NewsletterReaderItemDto {
+  id: string;
+  title: string;
+  /** @nullable */
+  excerpt: string | null;
+  /** @nullable */
+  newsletterCategory: string | null;
+  /** @nullable */
+  startsAt: string | null;
+  revision: number;
+  isRead: boolean;
+}
+
+export interface NewsletterReaderPageDto {
+  items: NewsletterReaderItemDto[];
+  /** @nullable */
+  nextCursor: string | null;
+}
+
+export type NewsletterReaderDetailDtoContentOneOfVersion = typeof NewsletterReaderDetailDtoContentOneOfVersion[keyof typeof NewsletterReaderDetailDtoContentOneOfVersion];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const NewsletterReaderDetailDtoContentOneOfVersion = {
+  NUMBER_1: 1,
+} as const;
+
+export type NewsletterReaderDetailDtoContentOneOfBlocksItemOneOfType = typeof NewsletterReaderDetailDtoContentOneOfBlocksItemOneOfType[keyof typeof NewsletterReaderDetailDtoContentOneOfBlocksItemOneOfType];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const NewsletterReaderDetailDtoContentOneOfBlocksItemOneOfType = {
+  heading: 'heading',
+} as const;
+
+export type NewsletterReaderDetailDtoContentOneOfBlocksItemOneOf = {
+  type: NewsletterReaderDetailDtoContentOneOfBlocksItemOneOfType;
+  text: string;
+};
+
+export type NewsletterReaderDetailDtoContentOneOfBlocksItemOneOfThreeType = typeof NewsletterReaderDetailDtoContentOneOfBlocksItemOneOfThreeType[keyof typeof NewsletterReaderDetailDtoContentOneOfBlocksItemOneOfThreeType];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const NewsletterReaderDetailDtoContentOneOfBlocksItemOneOfThreeType = {
+  paragraph: 'paragraph',
+} as const;
+
+export type NewsletterReaderDetailDtoContentOneOfBlocksItemOneOfThree = {
+  type: NewsletterReaderDetailDtoContentOneOfBlocksItemOneOfThreeType;
+  text: string;
+};
+
+export type NewsletterReaderDetailDtoContentOneOfBlocksItemOneOfFiveType = typeof NewsletterReaderDetailDtoContentOneOfBlocksItemOneOfFiveType[keyof typeof NewsletterReaderDetailDtoContentOneOfBlocksItemOneOfFiveType];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const NewsletterReaderDetailDtoContentOneOfBlocksItemOneOfFiveType = {
+  list: 'list',
+} as const;
+
+export type NewsletterReaderDetailDtoContentOneOfBlocksItemOneOfFive = {
+  type: NewsletterReaderDetailDtoContentOneOfBlocksItemOneOfFiveType;
+  /**
+   * @minItems 1
+   * @maxItems 30
+   */
+  items: string[];
+};
+
+export type NewsletterReaderDetailDtoContentOneOfBlocksItemOneOfSevenType = typeof NewsletterReaderDetailDtoContentOneOfBlocksItemOneOfSevenType[keyof typeof NewsletterReaderDetailDtoContentOneOfBlocksItemOneOfSevenType];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const NewsletterReaderDetailDtoContentOneOfBlocksItemOneOfSevenType = {
+  image: 'image',
+} as const;
+
+export type NewsletterReaderDetailDtoContentOneOfBlocksItemOneOfSeven = {
+  type: NewsletterReaderDetailDtoContentOneOfBlocksItemOneOfSevenType;
+  assetId: string;
+  alt: string;
+  caption: string;
+};
+
+export type NewsletterReaderDetailDtoContentOneOfBlocksItemOneOfNineType = typeof NewsletterReaderDetailDtoContentOneOfBlocksItemOneOfNineType[keyof typeof NewsletterReaderDetailDtoContentOneOfBlocksItemOneOfNineType];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const NewsletterReaderDetailDtoContentOneOfBlocksItemOneOfNineType = {
+  callout: 'callout',
+} as const;
+
+export type NewsletterReaderDetailDtoContentOneOfBlocksItemOneOfNine = {
+  type: NewsletterReaderDetailDtoContentOneOfBlocksItemOneOfNineType;
+  text: string;
+};
+
+export type NewsletterReaderDetailDtoContentOneOfBlocksItemOneOfOneoneType = typeof NewsletterReaderDetailDtoContentOneOfBlocksItemOneOfOneoneType[keyof typeof NewsletterReaderDetailDtoContentOneOfBlocksItemOneOfOneoneType];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const NewsletterReaderDetailDtoContentOneOfBlocksItemOneOfOneoneType = {
+  metrics: 'metrics',
+} as const;
+
+export type NewsletterReaderDetailDtoContentOneOfBlocksItemOneOfOneoneItemsItem = {
+  label: string;
+  value: string;
+};
+
+export type NewsletterReaderDetailDtoContentOneOfBlocksItemOneOfOneone = {
+  type: NewsletterReaderDetailDtoContentOneOfBlocksItemOneOfOneoneType;
+  /**
+   * @minItems 1
+   * @maxItems 4
+   */
+  items: NewsletterReaderDetailDtoContentOneOfBlocksItemOneOfOneoneItemsItem[];
+};
+
+export type NewsletterReaderDetailDtoContentOneOfBlocksItemOneOfOnefourType = typeof NewsletterReaderDetailDtoContentOneOfBlocksItemOneOfOnefourType[keyof typeof NewsletterReaderDetailDtoContentOneOfBlocksItemOneOfOnefourType];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const NewsletterReaderDetailDtoContentOneOfBlocksItemOneOfOnefourType = {
+  chart: 'chart',
+} as const;
+
+export type NewsletterReaderDetailDtoContentOneOfBlocksItemOneOfOnefourChartType = typeof NewsletterReaderDetailDtoContentOneOfBlocksItemOneOfOnefourChartType[keyof typeof NewsletterReaderDetailDtoContentOneOfBlocksItemOneOfOnefourChartType];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const NewsletterReaderDetailDtoContentOneOfBlocksItemOneOfOnefourChartType = {
+  bar: 'bar',
+  line: 'line',
+  donut: 'donut',
+} as const;
+
+export type NewsletterReaderDetailDtoContentOneOfBlocksItemOneOfOnefourDataItem = {
+  label: string;
+  value: number;
+};
+
+export type NewsletterReaderDetailDtoContentOneOfBlocksItemOneOfOnefour = {
+  type: NewsletterReaderDetailDtoContentOneOfBlocksItemOneOfOnefourType;
+  title: string;
+  chartType: NewsletterReaderDetailDtoContentOneOfBlocksItemOneOfOnefourChartType;
+  /**
+   * @minItems 1
+   * @maxItems 30
+   */
+  data: NewsletterReaderDetailDtoContentOneOfBlocksItemOneOfOnefourDataItem[];
+};
+
+export type NewsletterReaderDetailDtoContentOneOfBlocksItemOneOfOneeightType = typeof NewsletterReaderDetailDtoContentOneOfBlocksItemOneOfOneeightType[keyof typeof NewsletterReaderDetailDtoContentOneOfBlocksItemOneOfOneeightType];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const NewsletterReaderDetailDtoContentOneOfBlocksItemOneOfOneeightType = {
+  video: 'video',
+} as const;
+
+export type NewsletterReaderDetailDtoContentOneOfBlocksItemOneOfOneeightProvider = typeof NewsletterReaderDetailDtoContentOneOfBlocksItemOneOfOneeightProvider[keyof typeof NewsletterReaderDetailDtoContentOneOfBlocksItemOneOfOneeightProvider];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const NewsletterReaderDetailDtoContentOneOfBlocksItemOneOfOneeightProvider = {
+  youtube: 'youtube',
+  vimeo: 'vimeo',
+} as const;
+
+export type NewsletterReaderDetailDtoContentOneOfBlocksItemOneOfOneeight = {
+  type: NewsletterReaderDetailDtoContentOneOfBlocksItemOneOfOneeightType;
+  provider: NewsletterReaderDetailDtoContentOneOfBlocksItemOneOfOneeightProvider;
+  videoId: string;
+  title: string;
+};
+
+export type NewsletterReaderDetailDtoContentOneOfBlocksItemOneOfTwooneType = typeof NewsletterReaderDetailDtoContentOneOfBlocksItemOneOfTwooneType[keyof typeof NewsletterReaderDetailDtoContentOneOfBlocksItemOneOfTwooneType];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const NewsletterReaderDetailDtoContentOneOfBlocksItemOneOfTwooneType = {
+  cta: 'cta',
+} as const;
+
+export type NewsletterReaderDetailDtoContentOneOfBlocksItemOneOfTwoone = {
+  type: NewsletterReaderDetailDtoContentOneOfBlocksItemOneOfTwooneType;
+  label: string;
+  url: string;
+};
+
+export type NewsletterReaderDetailDtoContentOneOfBlocksItemOneOfTwothreeType = typeof NewsletterReaderDetailDtoContentOneOfBlocksItemOneOfTwothreeType[keyof typeof NewsletterReaderDetailDtoContentOneOfBlocksItemOneOfTwothreeType];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const NewsletterReaderDetailDtoContentOneOfBlocksItemOneOfTwothreeType = {
+  separator: 'separator',
+} as const;
+
+export type NewsletterReaderDetailDtoContentOneOfBlocksItemOneOfTwothree = {
+  type: NewsletterReaderDetailDtoContentOneOfBlocksItemOneOfTwothreeType;
+};
+
+export type NewsletterReaderDetailDtoContentOneOfBlocksItem = NewsletterReaderDetailDtoContentOneOfBlocksItemOneOf | NewsletterReaderDetailDtoContentOneOfBlocksItemOneOfThree | NewsletterReaderDetailDtoContentOneOfBlocksItemOneOfFive | NewsletterReaderDetailDtoContentOneOfBlocksItemOneOfSeven | NewsletterReaderDetailDtoContentOneOfBlocksItemOneOfNine | NewsletterReaderDetailDtoContentOneOfBlocksItemOneOfOneone | NewsletterReaderDetailDtoContentOneOfBlocksItemOneOfOnefour | NewsletterReaderDetailDtoContentOneOfBlocksItemOneOfOneeight | NewsletterReaderDetailDtoContentOneOfBlocksItemOneOfTwoone | NewsletterReaderDetailDtoContentOneOfBlocksItemOneOfTwothree;
+
+export type NewsletterReaderDetailDtoContentOneOf = {
+  version: NewsletterReaderDetailDtoContentOneOfVersion;
+  /** @maxItems 60 */
+  blocks: NewsletterReaderDetailDtoContentOneOfBlocksItem[];
+};
+
+export type NewsletterReaderDetailDtoContentOneOfTwoeightVersion = typeof NewsletterReaderDetailDtoContentOneOfTwoeightVersion[keyof typeof NewsletterReaderDetailDtoContentOneOfTwoeightVersion];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const NewsletterReaderDetailDtoContentOneOfTwoeightVersion = {
+  NUMBER_2: 2,
+} as const;
+
+export type NewsletterReaderDetailDtoContentOneOfTwoeightHeaderType = typeof NewsletterReaderDetailDtoContentOneOfTwoeightHeaderType[keyof typeof NewsletterReaderDetailDtoContentOneOfTwoeightHeaderType];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const NewsletterReaderDetailDtoContentOneOfTwoeightHeaderType = {
+  doc: 'doc',
+} as const;
+
+export type NewsletterReaderDetailDtoContentOneOfTwoeightHeaderContentItem = { [key: string]: unknown };
+
+/**
+ * Documento Tiptap JSON limitado a los nodos y marcas admitidos.
+ */
+export type NewsletterReaderDetailDtoContentOneOfTwoeightHeader = {
+  type: NewsletterReaderDetailDtoContentOneOfTwoeightHeaderType;
+  content: NewsletterReaderDetailDtoContentOneOfTwoeightHeaderContentItem[];
+};
+
+export type NewsletterReaderDetailDtoContentOneOfTwoeightDescriptionType = typeof NewsletterReaderDetailDtoContentOneOfTwoeightDescriptionType[keyof typeof NewsletterReaderDetailDtoContentOneOfTwoeightDescriptionType];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const NewsletterReaderDetailDtoContentOneOfTwoeightDescriptionType = {
+  doc: 'doc',
+} as const;
+
+export type NewsletterReaderDetailDtoContentOneOfTwoeightDescriptionContentItem = { [key: string]: unknown };
+
+/**
+ * Documento Tiptap JSON limitado a los nodos y marcas admitidos.
+ */
+export type NewsletterReaderDetailDtoContentOneOfTwoeightDescription = {
+  type: NewsletterReaderDetailDtoContentOneOfTwoeightDescriptionType;
+  content: NewsletterReaderDetailDtoContentOneOfTwoeightDescriptionContentItem[];
+};
+
+export type NewsletterReaderDetailDtoContentOneOfTwoeightFooterType = typeof NewsletterReaderDetailDtoContentOneOfTwoeightFooterType[keyof typeof NewsletterReaderDetailDtoContentOneOfTwoeightFooterType];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const NewsletterReaderDetailDtoContentOneOfTwoeightFooterType = {
+  doc: 'doc',
+} as const;
+
+export type NewsletterReaderDetailDtoContentOneOfTwoeightFooterContentItem = { [key: string]: unknown };
+
+/**
+ * Documento Tiptap JSON limitado a los nodos y marcas admitidos.
+ */
+export type NewsletterReaderDetailDtoContentOneOfTwoeightFooter = {
+  type: NewsletterReaderDetailDtoContentOneOfTwoeightFooterType;
+  content: NewsletterReaderDetailDtoContentOneOfTwoeightFooterContentItem[];
+};
+
+export type NewsletterReaderDetailDtoContentOneOfTwoeightThemeWidth = typeof NewsletterReaderDetailDtoContentOneOfTwoeightThemeWidth[keyof typeof NewsletterReaderDetailDtoContentOneOfTwoeightThemeWidth];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const NewsletterReaderDetailDtoContentOneOfTwoeightThemeWidth = {
+  compact: 'compact',
+  standard: 'standard',
+  wide: 'wide',
+} as const;
+
+export type NewsletterReaderDetailDtoContentOneOfTwoeightThemeFontFamily = typeof NewsletterReaderDetailDtoContentOneOfTwoeightThemeFontFamily[keyof typeof NewsletterReaderDetailDtoContentOneOfTwoeightThemeFontFamily];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const NewsletterReaderDetailDtoContentOneOfTwoeightThemeFontFamily = {
+  sans: 'sans',
+  serif: 'serif',
+  mono: 'mono',
+} as const;
+
+export type NewsletterReaderDetailDtoContentOneOfTwoeightTheme = {
+  width: NewsletterReaderDetailDtoContentOneOfTwoeightThemeWidth;
+  fontFamily: NewsletterReaderDetailDtoContentOneOfTwoeightThemeFontFamily;
+  backgroundColor: string;
+  textColor: string;
+  accentColor: string;
+};
+
+export type NewsletterReaderDetailDtoContentOneOfTwoeightBlocksItemOneOfType = typeof NewsletterReaderDetailDtoContentOneOfTwoeightBlocksItemOneOfType[keyof typeof NewsletterReaderDetailDtoContentOneOfTwoeightBlocksItemOneOfType];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const NewsletterReaderDetailDtoContentOneOfTwoeightBlocksItemOneOfType = {
+  richText: 'richText',
+} as const;
+
+export type NewsletterReaderDetailDtoContentOneOfTwoeightBlocksItemOneOfDocumentType = typeof NewsletterReaderDetailDtoContentOneOfTwoeightBlocksItemOneOfDocumentType[keyof typeof NewsletterReaderDetailDtoContentOneOfTwoeightBlocksItemOneOfDocumentType];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const NewsletterReaderDetailDtoContentOneOfTwoeightBlocksItemOneOfDocumentType = {
+  doc: 'doc',
+} as const;
+
+export type NewsletterReaderDetailDtoContentOneOfTwoeightBlocksItemOneOfDocumentContentItem = { [key: string]: unknown };
+
+/**
+ * Documento Tiptap JSON limitado a los nodos y marcas admitidos.
+ */
+export type NewsletterReaderDetailDtoContentOneOfTwoeightBlocksItemOneOfDocument = {
+  type: NewsletterReaderDetailDtoContentOneOfTwoeightBlocksItemOneOfDocumentType;
+  content: NewsletterReaderDetailDtoContentOneOfTwoeightBlocksItemOneOfDocumentContentItem[];
+};
+
+export type NewsletterReaderDetailDtoContentOneOfTwoeightBlocksItemOneOf = {
+  type: NewsletterReaderDetailDtoContentOneOfTwoeightBlocksItemOneOfType;
+  /** Documento Tiptap JSON limitado a los nodos y marcas admitidos. */
+  document: NewsletterReaderDetailDtoContentOneOfTwoeightBlocksItemOneOfDocument;
+};
+
+export type NewsletterReaderDetailDtoContentOneOfTwoeightBlocksItemOneOfSixType = typeof NewsletterReaderDetailDtoContentOneOfTwoeightBlocksItemOneOfSixType[keyof typeof NewsletterReaderDetailDtoContentOneOfTwoeightBlocksItemOneOfSixType];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const NewsletterReaderDetailDtoContentOneOfTwoeightBlocksItemOneOfSixType = {
+  image: 'image',
+} as const;
+
+export type NewsletterReaderDetailDtoContentOneOfTwoeightBlocksItemOneOfSixWidth = typeof NewsletterReaderDetailDtoContentOneOfTwoeightBlocksItemOneOfSixWidth[keyof typeof NewsletterReaderDetailDtoContentOneOfTwoeightBlocksItemOneOfSixWidth];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const NewsletterReaderDetailDtoContentOneOfTwoeightBlocksItemOneOfSixWidth = {
+  small: 'small',
+  medium: 'medium',
+  full: 'full',
+} as const;
+
+export type NewsletterReaderDetailDtoContentOneOfTwoeightBlocksItemOneOfSixAlign = typeof NewsletterReaderDetailDtoContentOneOfTwoeightBlocksItemOneOfSixAlign[keyof typeof NewsletterReaderDetailDtoContentOneOfTwoeightBlocksItemOneOfSixAlign];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const NewsletterReaderDetailDtoContentOneOfTwoeightBlocksItemOneOfSixAlign = {
+  left: 'left',
+  center: 'center',
+  right: 'right',
+} as const;
+
+export type NewsletterReaderDetailDtoContentOneOfTwoeightBlocksItemOneOfSixSection = typeof NewsletterReaderDetailDtoContentOneOfTwoeightBlocksItemOneOfSixSection[keyof typeof NewsletterReaderDetailDtoContentOneOfTwoeightBlocksItemOneOfSixSection];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const NewsletterReaderDetailDtoContentOneOfTwoeightBlocksItemOneOfSixSection = {
+  header: 'header',
+  body: 'body',
+  footer: 'footer',
+} as const;
+
+export type NewsletterReaderDetailDtoContentOneOfTwoeightBlocksItemOneOfSix = {
+  type: NewsletterReaderDetailDtoContentOneOfTwoeightBlocksItemOneOfSixType;
+  assetId: string;
+  alt: string;
+  caption: string;
+  width: NewsletterReaderDetailDtoContentOneOfTwoeightBlocksItemOneOfSixWidth;
+  align: NewsletterReaderDetailDtoContentOneOfTwoeightBlocksItemOneOfSixAlign;
+  section?: NewsletterReaderDetailDtoContentOneOfTwoeightBlocksItemOneOfSixSection;
+  background?: boolean;
+};
+
+export type NewsletterReaderDetailDtoContentOneOfTwoeightBlocksItemOneOfOneoneType = typeof NewsletterReaderDetailDtoContentOneOfTwoeightBlocksItemOneOfOneoneType[keyof typeof NewsletterReaderDetailDtoContentOneOfTwoeightBlocksItemOneOfOneoneType];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const NewsletterReaderDetailDtoContentOneOfTwoeightBlocksItemOneOfOneoneType = {
+  gif: 'gif',
+} as const;
+
+export type NewsletterReaderDetailDtoContentOneOfTwoeightBlocksItemOneOfOneoneWidth = typeof NewsletterReaderDetailDtoContentOneOfTwoeightBlocksItemOneOfOneoneWidth[keyof typeof NewsletterReaderDetailDtoContentOneOfTwoeightBlocksItemOneOfOneoneWidth];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const NewsletterReaderDetailDtoContentOneOfTwoeightBlocksItemOneOfOneoneWidth = {
+  small: 'small',
+  medium: 'medium',
+  full: 'full',
+} as const;
+
+export type NewsletterReaderDetailDtoContentOneOfTwoeightBlocksItemOneOfOneoneAlign = typeof NewsletterReaderDetailDtoContentOneOfTwoeightBlocksItemOneOfOneoneAlign[keyof typeof NewsletterReaderDetailDtoContentOneOfTwoeightBlocksItemOneOfOneoneAlign];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const NewsletterReaderDetailDtoContentOneOfTwoeightBlocksItemOneOfOneoneAlign = {
+  left: 'left',
+  center: 'center',
+  right: 'right',
+} as const;
+
+export type NewsletterReaderDetailDtoContentOneOfTwoeightBlocksItemOneOfOneoneSection = typeof NewsletterReaderDetailDtoContentOneOfTwoeightBlocksItemOneOfOneoneSection[keyof typeof NewsletterReaderDetailDtoContentOneOfTwoeightBlocksItemOneOfOneoneSection];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const NewsletterReaderDetailDtoContentOneOfTwoeightBlocksItemOneOfOneoneSection = {
+  header: 'header',
+  body: 'body',
+  footer: 'footer',
+} as const;
+
+export type NewsletterReaderDetailDtoContentOneOfTwoeightBlocksItemOneOfOneone = {
+  type: NewsletterReaderDetailDtoContentOneOfTwoeightBlocksItemOneOfOneoneType;
+  assetId: string;
+  alt: string;
+  caption: string;
+  width: NewsletterReaderDetailDtoContentOneOfTwoeightBlocksItemOneOfOneoneWidth;
+  align: NewsletterReaderDetailDtoContentOneOfTwoeightBlocksItemOneOfOneoneAlign;
+  section?: NewsletterReaderDetailDtoContentOneOfTwoeightBlocksItemOneOfOneoneSection;
+  background?: boolean;
+};
+
+export type NewsletterReaderDetailDtoContentOneOfTwoeightBlocksItemOneOfOnesixType = typeof NewsletterReaderDetailDtoContentOneOfTwoeightBlocksItemOneOfOnesixType[keyof typeof NewsletterReaderDetailDtoContentOneOfTwoeightBlocksItemOneOfOnesixType];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const NewsletterReaderDetailDtoContentOneOfTwoeightBlocksItemOneOfOnesixType = {
+  callout: 'callout',
+} as const;
+
+export type NewsletterReaderDetailDtoContentOneOfTwoeightBlocksItemOneOfOnesixDocumentType = typeof NewsletterReaderDetailDtoContentOneOfTwoeightBlocksItemOneOfOnesixDocumentType[keyof typeof NewsletterReaderDetailDtoContentOneOfTwoeightBlocksItemOneOfOnesixDocumentType];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const NewsletterReaderDetailDtoContentOneOfTwoeightBlocksItemOneOfOnesixDocumentType = {
+  doc: 'doc',
+} as const;
+
+export type NewsletterReaderDetailDtoContentOneOfTwoeightBlocksItemOneOfOnesixDocumentContentItem = { [key: string]: unknown };
+
+/**
+ * Documento Tiptap JSON limitado a los nodos y marcas admitidos.
+ */
+export type NewsletterReaderDetailDtoContentOneOfTwoeightBlocksItemOneOfOnesixDocument = {
+  type: NewsletterReaderDetailDtoContentOneOfTwoeightBlocksItemOneOfOnesixDocumentType;
+  content: NewsletterReaderDetailDtoContentOneOfTwoeightBlocksItemOneOfOnesixDocumentContentItem[];
+};
+
+export type NewsletterReaderDetailDtoContentOneOfTwoeightBlocksItemOneOfOnesixTone = typeof NewsletterReaderDetailDtoContentOneOfTwoeightBlocksItemOneOfOnesixTone[keyof typeof NewsletterReaderDetailDtoContentOneOfTwoeightBlocksItemOneOfOnesixTone];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const NewsletterReaderDetailDtoContentOneOfTwoeightBlocksItemOneOfOnesixTone = {
+  info: 'info',
+  success: 'success',
+  warning: 'warning',
+} as const;
+
+export type NewsletterReaderDetailDtoContentOneOfTwoeightBlocksItemOneOfOnesix = {
+  type: NewsletterReaderDetailDtoContentOneOfTwoeightBlocksItemOneOfOnesixType;
+  /** Documento Tiptap JSON limitado a los nodos y marcas admitidos. */
+  document: NewsletterReaderDetailDtoContentOneOfTwoeightBlocksItemOneOfOnesixDocument;
+  tone: NewsletterReaderDetailDtoContentOneOfTwoeightBlocksItemOneOfOnesixTone;
+};
+
+export type NewsletterReaderDetailDtoContentOneOfTwoeightBlocksItemOneOfTwotwoType = typeof NewsletterReaderDetailDtoContentOneOfTwoeightBlocksItemOneOfTwotwoType[keyof typeof NewsletterReaderDetailDtoContentOneOfTwoeightBlocksItemOneOfTwotwoType];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const NewsletterReaderDetailDtoContentOneOfTwoeightBlocksItemOneOfTwotwoType = {
+  metrics: 'metrics',
+} as const;
+
+export type NewsletterReaderDetailDtoContentOneOfTwoeightBlocksItemOneOfTwotwoItemsItem = {
+  label: string;
+  value: string;
+};
+
+export type NewsletterReaderDetailDtoContentOneOfTwoeightBlocksItemOneOfTwotwo = {
+  type: NewsletterReaderDetailDtoContentOneOfTwoeightBlocksItemOneOfTwotwoType;
+  /**
+   * @minItems 1
+   * @maxItems 4
+   */
+  items: NewsletterReaderDetailDtoContentOneOfTwoeightBlocksItemOneOfTwotwoItemsItem[];
+};
+
+export type NewsletterReaderDetailDtoContentOneOfTwoeightBlocksItemOneOfTwofiveType = typeof NewsletterReaderDetailDtoContentOneOfTwoeightBlocksItemOneOfTwofiveType[keyof typeof NewsletterReaderDetailDtoContentOneOfTwoeightBlocksItemOneOfTwofiveType];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const NewsletterReaderDetailDtoContentOneOfTwoeightBlocksItemOneOfTwofiveType = {
+  chart: 'chart',
+} as const;
+
+export type NewsletterReaderDetailDtoContentOneOfTwoeightBlocksItemOneOfTwofiveChartType = typeof NewsletterReaderDetailDtoContentOneOfTwoeightBlocksItemOneOfTwofiveChartType[keyof typeof NewsletterReaderDetailDtoContentOneOfTwoeightBlocksItemOneOfTwofiveChartType];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const NewsletterReaderDetailDtoContentOneOfTwoeightBlocksItemOneOfTwofiveChartType = {
+  bar: 'bar',
+  line: 'line',
+  donut: 'donut',
+} as const;
+
+export type NewsletterReaderDetailDtoContentOneOfTwoeightBlocksItemOneOfTwofiveDataItem = { [key: string]: unknown };
+
+export type NewsletterReaderDetailDtoContentOneOfTwoeightBlocksItemOneOfTwofiveAlign = typeof NewsletterReaderDetailDtoContentOneOfTwoeightBlocksItemOneOfTwofiveAlign[keyof typeof NewsletterReaderDetailDtoContentOneOfTwoeightBlocksItemOneOfTwofiveAlign];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const NewsletterReaderDetailDtoContentOneOfTwoeightBlocksItemOneOfTwofiveAlign = {
+  left: 'left',
+  center: 'center',
+  right: 'right',
+} as const;
+
+export type NewsletterReaderDetailDtoContentOneOfTwoeightBlocksItemOneOfTwofive = {
+  type: NewsletterReaderDetailDtoContentOneOfTwoeightBlocksItemOneOfTwofiveType;
+  title: string;
+  chartType: NewsletterReaderDetailDtoContentOneOfTwoeightBlocksItemOneOfTwofiveChartType;
+  /**
+   * @minItems 1
+   * @maxItems 30
+   */
+  data: NewsletterReaderDetailDtoContentOneOfTwoeightBlocksItemOneOfTwofiveDataItem[];
+  showLegend: boolean;
+  showLabels: boolean;
+  align: NewsletterReaderDetailDtoContentOneOfTwoeightBlocksItemOneOfTwofiveAlign;
+};
+
+export type NewsletterReaderDetailDtoContentOneOfTwoeightBlocksItemOneOfThreezeroType = typeof NewsletterReaderDetailDtoContentOneOfTwoeightBlocksItemOneOfThreezeroType[keyof typeof NewsletterReaderDetailDtoContentOneOfTwoeightBlocksItemOneOfThreezeroType];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const NewsletterReaderDetailDtoContentOneOfTwoeightBlocksItemOneOfThreezeroType = {
+  video: 'video',
+} as const;
+
+export type NewsletterReaderDetailDtoContentOneOfTwoeightBlocksItemOneOfThreezeroProvider = typeof NewsletterReaderDetailDtoContentOneOfTwoeightBlocksItemOneOfThreezeroProvider[keyof typeof NewsletterReaderDetailDtoContentOneOfTwoeightBlocksItemOneOfThreezeroProvider];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const NewsletterReaderDetailDtoContentOneOfTwoeightBlocksItemOneOfThreezeroProvider = {
+  youtube: 'youtube',
+  vimeo: 'vimeo',
+} as const;
+
+export type NewsletterReaderDetailDtoContentOneOfTwoeightBlocksItemOneOfThreezeroWidth = typeof NewsletterReaderDetailDtoContentOneOfTwoeightBlocksItemOneOfThreezeroWidth[keyof typeof NewsletterReaderDetailDtoContentOneOfTwoeightBlocksItemOneOfThreezeroWidth];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const NewsletterReaderDetailDtoContentOneOfTwoeightBlocksItemOneOfThreezeroWidth = {
+  small: 'small',
+  medium: 'medium',
+  full: 'full',
+} as const;
+
+export type NewsletterReaderDetailDtoContentOneOfTwoeightBlocksItemOneOfThreezeroAlign = typeof NewsletterReaderDetailDtoContentOneOfTwoeightBlocksItemOneOfThreezeroAlign[keyof typeof NewsletterReaderDetailDtoContentOneOfTwoeightBlocksItemOneOfThreezeroAlign];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const NewsletterReaderDetailDtoContentOneOfTwoeightBlocksItemOneOfThreezeroAlign = {
+  left: 'left',
+  center: 'center',
+  right: 'right',
+} as const;
+
+export type NewsletterReaderDetailDtoContentOneOfTwoeightBlocksItemOneOfThreezeroSection = typeof NewsletterReaderDetailDtoContentOneOfTwoeightBlocksItemOneOfThreezeroSection[keyof typeof NewsletterReaderDetailDtoContentOneOfTwoeightBlocksItemOneOfThreezeroSection];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const NewsletterReaderDetailDtoContentOneOfTwoeightBlocksItemOneOfThreezeroSection = {
+  header: 'header',
+  body: 'body',
+  footer: 'footer',
+} as const;
+
+export type NewsletterReaderDetailDtoContentOneOfTwoeightBlocksItemOneOfThreezero = {
+  type: NewsletterReaderDetailDtoContentOneOfTwoeightBlocksItemOneOfThreezeroType;
+  provider: NewsletterReaderDetailDtoContentOneOfTwoeightBlocksItemOneOfThreezeroProvider;
+  videoId: string;
+  title: string;
+  width: NewsletterReaderDetailDtoContentOneOfTwoeightBlocksItemOneOfThreezeroWidth;
+  align: NewsletterReaderDetailDtoContentOneOfTwoeightBlocksItemOneOfThreezeroAlign;
+  section?: NewsletterReaderDetailDtoContentOneOfTwoeightBlocksItemOneOfThreezeroSection;
+  background?: boolean;
+};
+
+export type NewsletterReaderDetailDtoContentOneOfTwoeightBlocksItemOneOfThreesixType = typeof NewsletterReaderDetailDtoContentOneOfTwoeightBlocksItemOneOfThreesixType[keyof typeof NewsletterReaderDetailDtoContentOneOfTwoeightBlocksItemOneOfThreesixType];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const NewsletterReaderDetailDtoContentOneOfTwoeightBlocksItemOneOfThreesixType = {
+  drawing: 'drawing',
+} as const;
+
+export type NewsletterReaderDetailDtoContentOneOfTwoeightBlocksItemOneOfThreesixStrokesItem = { [key: string]: unknown };
+
+export type NewsletterReaderDetailDtoContentOneOfTwoeightBlocksItemOneOfThreesix = {
+  type: NewsletterReaderDetailDtoContentOneOfTwoeightBlocksItemOneOfThreesixType;
+  width: number;
+  height: number;
+  backgroundColor: string;
+  alt: string;
+  /** @maxItems 200 */
+  strokes: NewsletterReaderDetailDtoContentOneOfTwoeightBlocksItemOneOfThreesixStrokesItem[];
+};
+
+export type NewsletterReaderDetailDtoContentOneOfTwoeightBlocksItemOneOfThreenineType = typeof NewsletterReaderDetailDtoContentOneOfTwoeightBlocksItemOneOfThreenineType[keyof typeof NewsletterReaderDetailDtoContentOneOfTwoeightBlocksItemOneOfThreenineType];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const NewsletterReaderDetailDtoContentOneOfTwoeightBlocksItemOneOfThreenineType = {
+  cta: 'cta',
+} as const;
+
+export type NewsletterReaderDetailDtoContentOneOfTwoeightBlocksItemOneOfThreenineAlign = typeof NewsletterReaderDetailDtoContentOneOfTwoeightBlocksItemOneOfThreenineAlign[keyof typeof NewsletterReaderDetailDtoContentOneOfTwoeightBlocksItemOneOfThreenineAlign];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const NewsletterReaderDetailDtoContentOneOfTwoeightBlocksItemOneOfThreenineAlign = {
+  left: 'left',
+  center: 'center',
+  right: 'right',
+} as const;
+
+export type NewsletterReaderDetailDtoContentOneOfTwoeightBlocksItemOneOfThreenine = {
+  type: NewsletterReaderDetailDtoContentOneOfTwoeightBlocksItemOneOfThreenineType;
+  label: string;
+  url: string;
+  align: NewsletterReaderDetailDtoContentOneOfTwoeightBlocksItemOneOfThreenineAlign;
+};
+
+export type NewsletterReaderDetailDtoContentOneOfTwoeightBlocksItemOneOfFourtwoType = typeof NewsletterReaderDetailDtoContentOneOfTwoeightBlocksItemOneOfFourtwoType[keyof typeof NewsletterReaderDetailDtoContentOneOfTwoeightBlocksItemOneOfFourtwoType];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const NewsletterReaderDetailDtoContentOneOfTwoeightBlocksItemOneOfFourtwoType = {
+  separator: 'separator',
+} as const;
+
+export type NewsletterReaderDetailDtoContentOneOfTwoeightBlocksItemOneOfFourtwo = {
+  type: NewsletterReaderDetailDtoContentOneOfTwoeightBlocksItemOneOfFourtwoType;
+};
+
+export type NewsletterReaderDetailDtoContentOneOfTwoeightBlocksItem = NewsletterReaderDetailDtoContentOneOfTwoeightBlocksItemOneOf | NewsletterReaderDetailDtoContentOneOfTwoeightBlocksItemOneOfSix | NewsletterReaderDetailDtoContentOneOfTwoeightBlocksItemOneOfOneone | NewsletterReaderDetailDtoContentOneOfTwoeightBlocksItemOneOfOnesix | NewsletterReaderDetailDtoContentOneOfTwoeightBlocksItemOneOfTwotwo | NewsletterReaderDetailDtoContentOneOfTwoeightBlocksItemOneOfTwofive | NewsletterReaderDetailDtoContentOneOfTwoeightBlocksItemOneOfThreezero | NewsletterReaderDetailDtoContentOneOfTwoeightBlocksItemOneOfThreesix | NewsletterReaderDetailDtoContentOneOfTwoeightBlocksItemOneOfThreenine | NewsletterReaderDetailDtoContentOneOfTwoeightBlocksItemOneOfFourtwo;
+
+export type NewsletterReaderDetailDtoContentOneOfTwoeight = {
+  version: NewsletterReaderDetailDtoContentOneOfTwoeightVersion;
+  /** Documento Tiptap JSON limitado a los nodos y marcas admitidos. */
+  header?: NewsletterReaderDetailDtoContentOneOfTwoeightHeader;
+  /** Documento Tiptap JSON limitado a los nodos y marcas admitidos. */
+  description?: NewsletterReaderDetailDtoContentOneOfTwoeightDescription;
+  /** Documento Tiptap JSON limitado a los nodos y marcas admitidos. */
+  footer?: NewsletterReaderDetailDtoContentOneOfTwoeightFooter;
+  theme: NewsletterReaderDetailDtoContentOneOfTwoeightTheme;
+  /** @maxItems 60 */
+  blocks: NewsletterReaderDetailDtoContentOneOfTwoeightBlocksItem[];
+};
+
+/**
+ * @nullable
+ */
+export type NewsletterReaderDetailDtoContent = NewsletterReaderDetailDtoContentOneOf | NewsletterReaderDetailDtoContentOneOfTwoeight | null;
+
+export interface NewsletterReaderDetailDto {
+  id: string;
+  title: string;
+  /** @nullable */
+  excerpt: string | null;
+  /** @nullable */
+  newsletterCategory: string | null;
+  /** @nullable */
+  startsAt: string | null;
+  revision: number;
+  /** @nullable */
+  content: NewsletterReaderDetailDtoContent;
+}
+
+export type PublicHealthResponseDtoComponent = typeof PublicHealthResponseDtoComponent[keyof typeof PublicHealthResponseDtoComponent];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const PublicHealthResponseDtoComponent = {
+  authentication: 'authentication',
+  documents: 'documents',
+  'async-processing': 'async-processing',
+} as const;
+
+export type PublicHealthResponseDtoStatus = typeof PublicHealthResponseDtoStatus[keyof typeof PublicHealthResponseDtoStatus];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const PublicHealthResponseDtoStatus = {
+  operational: 'operational',
+  unavailable: 'unavailable',
+} as const;
+
+export interface PublicHealthResponseDto {
+  component: PublicHealthResponseDtoComponent;
+  checkedAt: string;
+  status: PublicHealthResponseDtoStatus;
+}
+
 export type AccountControllerUploadAvatarBody = {
   file: Blob;
 };
 
+export type PlatformAuthControllerLoginStart200 = PlatformAccessGrantedDto | PlatformFidoRequiredDto;
+
 export type GoogleCalendarControllerCallbackParams = {
-  code: string;
-  state: string;
-  error: string;
+code: string;
+state: string;
+error: string;
 };
 
 export type GoogleCalendarControllerUpdatePreferences202 = { [key: string]: unknown };
@@ -3031,8 +5654,8 @@ export type GoogleCalendarControllerDisconnect200 = { [key: string]: unknown };
 export type NotionIntegrationControllerDisconnect200 = { [key: string]: unknown };
 
 export type NotionIntegrationControllerCompleteOAuthParams = {
-  code: string;
-  state: string;
+code: string;
+state: string;
 };
 
 export type NotionIntegrationControllerResolveConflict200 = { [key: string]: unknown };
@@ -3041,4137 +5664,6782 @@ export type CasesControllerCreateExpenseAttachmentBody = {
   file: Blob;
 };
 
-export type ClientsControllerCreateBody =
-  | CreateHumanClientInputDto
-  | CreateLegalEntityClientInputDto;
+export type ClientsControllerCreateBody = CreateHumanClientInputDto | CreateLegalEntityClientInputDto;
 
 export type ClientsControllerListParams = {
-  /**
-   * @maxLength 120
-   */
-  search?: string;
-  type?: ClientType;
-  status?: ClientStatus;
-  /**
-   * @minimum 1
-   * @maximum 100
-   */
-  limit?: number;
-  /**
-   * Cursor opaco devuelto por pageInfo.nextCursor.
-   */
-  cursor?: string;
-  sort?: ClientSort;
-  order?: ClientOrder;
+/**
+ * @maxLength 120
+ */
+search?: string;
+type?: ClientType;
+status?: ClientStatus;
+/**
+ * @minimum 1
+ * @maximum 100
+ */
+limit?: number;
+/**
+ * Cursor opaco devuelto por pageInfo.nextCursor.
+ */
+cursor?: string;
+sort?: ClientSort;
+order?: ClientOrder;
 };
 
-export type ClientsControllerUpdateBody =
-  | CreateHumanClientInputDto
-  | CreateLegalEntityClientInputDto
-  | UpdateCommonClientInputDto
-  | UpdateHumanClientInputDto
-  | UpdateLegalEntityClientInputDto;
+export type ClientsControllerUpdateBody = CreateHumanClientInputDto | CreateLegalEntityClientInputDto | UpdateCommonClientInputDto | UpdateHumanClientInputDto | UpdateLegalEntityClientInputDto;
+
+export type PlatformNewslettersControllerListParams = {
+cursor?: string;
+};
+
+export type PlatformNewslettersControllerUploadBody = {
+  file: Blob;
+};
+
+export type NewslettersControllerListParams = {
+cursor?: string;
+};
 
 export type accountControllerGetAccountResponse200 = {
-  data: AccountResponseDto;
-  status: 200;
-};
-
-export type accountControllerGetAccountResponseSuccess = accountControllerGetAccountResponse200 & {
+  data: AccountResponseDto
+  status: 200
+}
+    
+export type accountControllerGetAccountResponseSuccess = (accountControllerGetAccountResponse200) & {
   headers: Headers;
 };
-export type accountControllerGetAccountResponse = accountControllerGetAccountResponseSuccess;
+;
+
+export type accountControllerGetAccountResponse = (accountControllerGetAccountResponseSuccess)
 
 export const getAccountControllerGetAccountUrl = () => {
-  return `/api/account`;
-};
 
-export const accountControllerGetAccount = async (
-  options?: RequestInit
-): Promise<accountControllerGetAccountResponse> => {
-  return temisFetch<accountControllerGetAccountResponse>(getAccountControllerGetAccountUrl(), {
+
+  
+
+  return `/api/account`
+}
+
+export const accountControllerGetAccount = async ( options?: RequestInit): Promise<accountControllerGetAccountResponse> => {
+  
+  return temisFetch<accountControllerGetAccountResponse>(getAccountControllerGetAccountUrl(),
+  {      
     ...options,
-    method: "GET"
-  });
-};
+    method: 'GET'
+    
+    
+  }
+);}
+
+
 
 export type accountControllerGetAiUsageResponse200 = {
-  data: AccountAiUsageResponseDto;
-  status: 200;
-};
-
-export type accountControllerGetAiUsageResponseSuccess = accountControllerGetAiUsageResponse200 & {
+  data: AccountAiUsageResponseDto
+  status: 200
+}
+    
+export type accountControllerGetAiUsageResponseSuccess = (accountControllerGetAiUsageResponse200) & {
   headers: Headers;
 };
-export type accountControllerGetAiUsageResponse = accountControllerGetAiUsageResponseSuccess;
+;
+
+export type accountControllerGetAiUsageResponse = (accountControllerGetAiUsageResponseSuccess)
 
 export const getAccountControllerGetAiUsageUrl = () => {
-  return `/api/account/ai-usage`;
-};
 
-export const accountControllerGetAiUsage = async (
-  options?: RequestInit
-): Promise<accountControllerGetAiUsageResponse> => {
-  return temisFetch<accountControllerGetAiUsageResponse>(getAccountControllerGetAiUsageUrl(), {
+
+  
+
+  return `/api/account/ai-usage`
+}
+
+export const accountControllerGetAiUsage = async ( options?: RequestInit): Promise<accountControllerGetAiUsageResponse> => {
+  
+  return temisFetch<accountControllerGetAiUsageResponse>(getAccountControllerGetAiUsageUrl(),
+  {      
     ...options,
-    method: "GET"
-  });
-};
+    method: 'GET'
+    
+    
+  }
+);}
+
+
 
 export type accountControllerGetAvatarResponse200 = {
-  data: void;
-  status: 200;
-};
-
-export type accountControllerGetAvatarResponseSuccess = accountControllerGetAvatarResponse200 & {
+  data: void
+  status: 200
+}
+    
+export type accountControllerGetAvatarResponseSuccess = (accountControllerGetAvatarResponse200) & {
   headers: Headers;
 };
-export type accountControllerGetAvatarResponse = accountControllerGetAvatarResponseSuccess;
+;
+
+export type accountControllerGetAvatarResponse = (accountControllerGetAvatarResponseSuccess)
 
 export const getAccountControllerGetAvatarUrl = () => {
-  return `/api/account/avatar`;
-};
 
-export const accountControllerGetAvatar = async (
-  options?: RequestInit
-): Promise<accountControllerGetAvatarResponse> => {
-  return temisFetch<accountControllerGetAvatarResponse>(getAccountControllerGetAvatarUrl(), {
+
+  
+
+  return `/api/account/avatar`
+}
+
+export const accountControllerGetAvatar = async ( options?: RequestInit): Promise<accountControllerGetAvatarResponse> => {
+  
+  return temisFetch<accountControllerGetAvatarResponse>(getAccountControllerGetAvatarUrl(),
+  {      
     ...options,
-    method: "GET"
-  });
-};
+    method: 'GET'
+    
+    
+  }
+);}
+
+
 
 export type accountControllerUploadAvatarResponse200 = {
-  data: AccountAvatarUploadResponseDto;
-  status: 200;
+  data: AccountAvatarUploadResponseDto
+  status: 200
+}
+    
+export type accountControllerUploadAvatarResponseSuccess = (accountControllerUploadAvatarResponse200) & {
+  headers: Headers;
 };
+;
 
-export type accountControllerUploadAvatarResponseSuccess =
-  accountControllerUploadAvatarResponse200 & {
-    headers: Headers;
-  };
-export type accountControllerUploadAvatarResponse = accountControllerUploadAvatarResponseSuccess;
+export type accountControllerUploadAvatarResponse = (accountControllerUploadAvatarResponseSuccess)
 
 export const getAccountControllerUploadAvatarUrl = () => {
-  return `/api/account/avatar`;
-};
 
-export const accountControllerUploadAvatar = async (
-  accountControllerUploadAvatarBody: AccountControllerUploadAvatarBody,
-  options?: RequestInit
-): Promise<accountControllerUploadAvatarResponse> => {
-  const formData = new FormData();
-  formData.append(`file`, accountControllerUploadAvatarBody.file);
 
-  return temisFetch<accountControllerUploadAvatarResponse>(getAccountControllerUploadAvatarUrl(), {
+  
+
+  return `/api/account/avatar`
+}
+
+export const accountControllerUploadAvatar = async (accountControllerUploadAvatarBody: AccountControllerUploadAvatarBody, options?: RequestInit): Promise<accountControllerUploadAvatarResponse> => {
+    const formData = new FormData();
+formData.append(`file`, accountControllerUploadAvatarBody.file)
+
+  return temisFetch<accountControllerUploadAvatarResponse>(getAccountControllerUploadAvatarUrl(),
+  {      
     ...options,
-    method: "POST",
-    body: formData
-  });
-};
+    method: 'POST'
+    ,
+    body: 
+      formData,
+  }
+);}
+
+
 
 export type accountControllerUpdateProfileResponse200 = {
-  data: AccountResponseDto;
-  status: 200;
+  data: AccountResponseDto
+  status: 200
+}
+    
+export type accountControllerUpdateProfileResponseSuccess = (accountControllerUpdateProfileResponse200) & {
+  headers: Headers;
 };
+;
 
-export type accountControllerUpdateProfileResponseSuccess =
-  accountControllerUpdateProfileResponse200 & {
-    headers: Headers;
-  };
-export type accountControllerUpdateProfileResponse = accountControllerUpdateProfileResponseSuccess;
+export type accountControllerUpdateProfileResponse = (accountControllerUpdateProfileResponseSuccess)
 
 export const getAccountControllerUpdateProfileUrl = () => {
-  return `/api/account/profile`;
-};
 
-export const accountControllerUpdateProfile = async (
-  updateAccountProfileDto: UpdateAccountProfileDto,
-  options?: RequestInit
-): Promise<accountControllerUpdateProfileResponse> => {
-  return temisFetch<accountControllerUpdateProfileResponse>(
-    getAccountControllerUpdateProfileUrl(),
-    {
-      ...options,
-      method: "PATCH",
-      headers: { "Content-Type": "application/json", ...options?.headers },
-      body: JSON.stringify(updateAccountProfileDto)
-    }
-  );
-};
+
+  
+
+  return `/api/account/profile`
+}
+
+export const accountControllerUpdateProfile = async (updateAccountProfileDto: UpdateAccountProfileDto, options?: RequestInit): Promise<accountControllerUpdateProfileResponse> => {
+  
+  return temisFetch<accountControllerUpdateProfileResponse>(getAccountControllerUpdateProfileUrl(),
+  {      
+    ...options,
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      updateAccountProfileDto,)
+  }
+);}
+
+
 
 export type accountControllerUpdateStudioResponse200 = {
-  data: AccountResponseDto;
-  status: 200;
+  data: AccountResponseDto
+  status: 200
+}
+    
+export type accountControllerUpdateStudioResponseSuccess = (accountControllerUpdateStudioResponse200) & {
+  headers: Headers;
 };
+;
 
-export type accountControllerUpdateStudioResponseSuccess =
-  accountControllerUpdateStudioResponse200 & {
-    headers: Headers;
-  };
-export type accountControllerUpdateStudioResponse = accountControllerUpdateStudioResponseSuccess;
+export type accountControllerUpdateStudioResponse = (accountControllerUpdateStudioResponseSuccess)
 
 export const getAccountControllerUpdateStudioUrl = () => {
-  return `/api/account/studio`;
-};
 
-export const accountControllerUpdateStudio = async (
-  updateAccountStudioDto: UpdateAccountStudioDto,
-  options?: RequestInit
-): Promise<accountControllerUpdateStudioResponse> => {
-  return temisFetch<accountControllerUpdateStudioResponse>(getAccountControllerUpdateStudioUrl(), {
+
+  
+
+  return `/api/account/studio`
+}
+
+export const accountControllerUpdateStudio = async (updateAccountStudioDto: UpdateAccountStudioDto, options?: RequestInit): Promise<accountControllerUpdateStudioResponse> => {
+  
+  return temisFetch<accountControllerUpdateStudioResponse>(getAccountControllerUpdateStudioUrl(),
+  {      
     ...options,
-    method: "PATCH",
-    headers: { "Content-Type": "application/json", ...options?.headers },
-    body: JSON.stringify(updateAccountStudioDto)
-  });
-};
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      updateAccountStudioDto,)
+  }
+);}
+
+
 
 export type accountControllerUpdateNotificationsResponse200 = {
-  data: AccountResponseDto;
-  status: 200;
+  data: AccountResponseDto
+  status: 200
+}
+    
+export type accountControllerUpdateNotificationsResponseSuccess = (accountControllerUpdateNotificationsResponse200) & {
+  headers: Headers;
 };
+;
 
-export type accountControllerUpdateNotificationsResponseSuccess =
-  accountControllerUpdateNotificationsResponse200 & {
-    headers: Headers;
-  };
-export type accountControllerUpdateNotificationsResponse =
-  accountControllerUpdateNotificationsResponseSuccess;
+export type accountControllerUpdateNotificationsResponse = (accountControllerUpdateNotificationsResponseSuccess)
 
 export const getAccountControllerUpdateNotificationsUrl = () => {
-  return `/api/account/notifications`;
-};
 
-export const accountControllerUpdateNotifications = async (
-  updateAccountNotificationsDto: UpdateAccountNotificationsDto,
-  options?: RequestInit
-): Promise<accountControllerUpdateNotificationsResponse> => {
-  return temisFetch<accountControllerUpdateNotificationsResponse>(
-    getAccountControllerUpdateNotificationsUrl(),
-    {
-      ...options,
-      method: "PATCH",
-      headers: { "Content-Type": "application/json", ...options?.headers },
-      body: JSON.stringify(updateAccountNotificationsDto)
-    }
-  );
-};
+
+  
+
+  return `/api/account/notifications`
+}
+
+export const accountControllerUpdateNotifications = async (updateAccountNotificationsDto: UpdateAccountNotificationsDto, options?: RequestInit): Promise<accountControllerUpdateNotificationsResponse> => {
+  
+  return temisFetch<accountControllerUpdateNotificationsResponse>(getAccountControllerUpdateNotificationsUrl(),
+  {      
+    ...options,
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      updateAccountNotificationsDto,)
+  }
+);}
+
+
 
 export type accountControllerUpdateMembershipResponse200 = {
-  data: AccountResponseDto;
-  status: 200;
+  data: AccountResponseDto
+  status: 200
+}
+    
+export type accountControllerUpdateMembershipResponseSuccess = (accountControllerUpdateMembershipResponse200) & {
+  headers: Headers;
 };
+;
 
-export type accountControllerUpdateMembershipResponseSuccess =
-  accountControllerUpdateMembershipResponse200 & {
-    headers: Headers;
-  };
-export type accountControllerUpdateMembershipResponse =
-  accountControllerUpdateMembershipResponseSuccess;
+export type accountControllerUpdateMembershipResponse = (accountControllerUpdateMembershipResponseSuccess)
 
 export const getAccountControllerUpdateMembershipUrl = () => {
-  return `/api/account/membership`;
-};
 
-export const accountControllerUpdateMembership = async (
-  updateAccountMembershipDto: UpdateAccountMembershipDto,
-  options?: RequestInit
-): Promise<accountControllerUpdateMembershipResponse> => {
-  return temisFetch<accountControllerUpdateMembershipResponse>(
-    getAccountControllerUpdateMembershipUrl(),
-    {
-      ...options,
-      method: "PATCH",
-      headers: { "Content-Type": "application/json", ...options?.headers },
-      body: JSON.stringify(updateAccountMembershipDto)
-    }
-  );
-};
+
+  
+
+  return `/api/account/membership`
+}
+
+export const accountControllerUpdateMembership = async (updateAccountMembershipDto: UpdateAccountMembershipDto, options?: RequestInit): Promise<accountControllerUpdateMembershipResponse> => {
+  
+  return temisFetch<accountControllerUpdateMembershipResponse>(getAccountControllerUpdateMembershipUrl(),
+  {      
+    ...options,
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      updateAccountMembershipDto,)
+  }
+);}
+
+
 
 export type accountControllerValidatePasswordChangeResponse200 = {
-  data: UpdateAccountPasswordResponseDto;
-  status: 200;
+  data: UpdateAccountPasswordResponseDto
+  status: 200
+}
+    
+export type accountControllerValidatePasswordChangeResponseSuccess = (accountControllerValidatePasswordChangeResponse200) & {
+  headers: Headers;
 };
+;
 
-export type accountControllerValidatePasswordChangeResponseSuccess =
-  accountControllerValidatePasswordChangeResponse200 & {
-    headers: Headers;
-  };
-export type accountControllerValidatePasswordChangeResponse =
-  accountControllerValidatePasswordChangeResponseSuccess;
+export type accountControllerValidatePasswordChangeResponse = (accountControllerValidatePasswordChangeResponseSuccess)
 
 export const getAccountControllerValidatePasswordChangeUrl = () => {
-  return `/api/account/password/validate`;
-};
 
-export const accountControllerValidatePasswordChange = async (
-  updateAccountPasswordDto: UpdateAccountPasswordDto,
-  options?: RequestInit
-): Promise<accountControllerValidatePasswordChangeResponse> => {
-  return temisFetch<accountControllerValidatePasswordChangeResponse>(
-    getAccountControllerValidatePasswordChangeUrl(),
-    {
-      ...options,
-      method: "PATCH",
-      headers: { "Content-Type": "application/json", ...options?.headers },
-      body: JSON.stringify(updateAccountPasswordDto)
-    }
-  );
-};
+
+  
+
+  return `/api/account/password/validate`
+}
+
+export const accountControllerValidatePasswordChange = async (updateAccountPasswordDto: UpdateAccountPasswordDto, options?: RequestInit): Promise<accountControllerValidatePasswordChangeResponse> => {
+  
+  return temisFetch<accountControllerValidatePasswordChangeResponse>(getAccountControllerValidatePasswordChangeUrl(),
+  {      
+    ...options,
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      updateAccountPasswordDto,)
+  }
+);}
+
+
 
 export type accountControllerUpdatePasswordResponse200 = {
-  data: UpdateAccountPasswordResponseDto;
-  status: 200;
+  data: UpdateAccountPasswordResponseDto
+  status: 200
+}
+    
+export type accountControllerUpdatePasswordResponseSuccess = (accountControllerUpdatePasswordResponse200) & {
+  headers: Headers;
 };
+;
 
-export type accountControllerUpdatePasswordResponseSuccess =
-  accountControllerUpdatePasswordResponse200 & {
-    headers: Headers;
-  };
-export type accountControllerUpdatePasswordResponse =
-  accountControllerUpdatePasswordResponseSuccess;
+export type accountControllerUpdatePasswordResponse = (accountControllerUpdatePasswordResponseSuccess)
 
 export const getAccountControllerUpdatePasswordUrl = () => {
-  return `/api/account/password`;
-};
 
-export const accountControllerUpdatePassword = async (
-  updateAccountPasswordDto: UpdateAccountPasswordDto,
-  options?: RequestInit
-): Promise<accountControllerUpdatePasswordResponse> => {
-  return temisFetch<accountControllerUpdatePasswordResponse>(
-    getAccountControllerUpdatePasswordUrl(),
-    {
-      ...options,
-      method: "PATCH",
-      headers: { "Content-Type": "application/json", ...options?.headers },
-      body: JSON.stringify(updateAccountPasswordDto)
-    }
-  );
-};
+
+  
+
+  return `/api/account/password`
+}
+
+export const accountControllerUpdatePassword = async (updateAccountPasswordDto: UpdateAccountPasswordDto, options?: RequestInit): Promise<accountControllerUpdatePasswordResponse> => {
+  
+  return temisFetch<accountControllerUpdatePasswordResponse>(getAccountControllerUpdatePasswordUrl(),
+  {      
+    ...options,
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      updateAccountPasswordDto,)
+  }
+);}
+
+
 
 export type authControllerCreateAccountResponse201 = {
-  data: CreateAccountResponseDto;
-  status: 201;
-};
-
-export type authControllerCreateAccountResponseSuccess = authControllerCreateAccountResponse201 & {
+  data: CreateAccountResponseDto
+  status: 201
+}
+    
+export type authControllerCreateAccountResponseSuccess = (authControllerCreateAccountResponse201) & {
   headers: Headers;
 };
-export type authControllerCreateAccountResponse = authControllerCreateAccountResponseSuccess;
+;
+
+export type authControllerCreateAccountResponse = (authControllerCreateAccountResponseSuccess)
 
 export const getAuthControllerCreateAccountUrl = () => {
-  return `/api/auth/create-account`;
-};
 
-export const authControllerCreateAccount = async (
-  createAccountDto: CreateAccountDto,
-  options?: RequestInit
-): Promise<authControllerCreateAccountResponse> => {
-  return temisFetch<authControllerCreateAccountResponse>(getAuthControllerCreateAccountUrl(), {
+
+  
+
+  return `/api/auth/create-account`
+}
+
+export const authControllerCreateAccount = async (createAccountDto: CreateAccountDto, options?: RequestInit): Promise<authControllerCreateAccountResponse> => {
+  
+  return temisFetch<authControllerCreateAccountResponse>(getAuthControllerCreateAccountUrl(),
+  {      
     ...options,
-    method: "POST",
-    headers: { "Content-Type": "application/json", ...options?.headers },
-    body: JSON.stringify(createAccountDto)
-  });
-};
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      createAccountDto,)
+  }
+);}
+
+
 
 export type authControllerLoginResponse200 = {
-  data: LoginResponseDto;
-  status: 200;
-};
-
-export type authControllerLoginResponseSuccess = authControllerLoginResponse200 & {
+  data: LoginResponseDto
+  status: 200
+}
+    
+export type authControllerLoginResponseSuccess = (authControllerLoginResponse200) & {
   headers: Headers;
 };
-export type authControllerLoginResponse = authControllerLoginResponseSuccess;
+;
+
+export type authControllerLoginResponse = (authControllerLoginResponseSuccess)
 
 export const getAuthControllerLoginUrl = () => {
-  return `/api/auth/login`;
-};
 
-export const authControllerLogin = async (
-  loginDto: LoginDto,
-  options?: RequestInit
-): Promise<authControllerLoginResponse> => {
-  return temisFetch<authControllerLoginResponse>(getAuthControllerLoginUrl(), {
+
+  
+
+  return `/api/auth/login`
+}
+
+export const authControllerLogin = async (loginDto: LoginDto, options?: RequestInit): Promise<authControllerLoginResponse> => {
+  
+  return temisFetch<authControllerLoginResponse>(getAuthControllerLoginUrl(),
+  {      
     ...options,
-    method: "POST",
-    headers: { "Content-Type": "application/json", ...options?.headers },
-    body: JSON.stringify(loginDto)
-  });
-};
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      loginDto,)
+  }
+);}
+
+
 
 export type authControllerGoogleLoginResponse200 = {
-  data: LoginResponseDto;
-  status: 200;
-};
-
-export type authControllerGoogleLoginResponseSuccess = authControllerGoogleLoginResponse200 & {
+  data: LoginResponseDto
+  status: 200
+}
+    
+export type authControllerGoogleLoginResponseSuccess = (authControllerGoogleLoginResponse200) & {
   headers: Headers;
 };
-export type authControllerGoogleLoginResponse = authControllerGoogleLoginResponseSuccess;
+;
+
+export type authControllerGoogleLoginResponse = (authControllerGoogleLoginResponseSuccess)
 
 export const getAuthControllerGoogleLoginUrl = () => {
-  return `/api/auth/google`;
-};
 
-export const authControllerGoogleLogin = async (
-  googleLoginDto: GoogleLoginDto,
-  options?: RequestInit
-): Promise<authControllerGoogleLoginResponse> => {
-  return temisFetch<authControllerGoogleLoginResponse>(getAuthControllerGoogleLoginUrl(), {
+
+  
+
+  return `/api/auth/google`
+}
+
+export const authControllerGoogleLogin = async (googleLoginDto: GoogleLoginDto, options?: RequestInit): Promise<authControllerGoogleLoginResponse> => {
+  
+  return temisFetch<authControllerGoogleLoginResponse>(getAuthControllerGoogleLoginUrl(),
+  {      
     ...options,
-    method: "POST",
-    headers: { "Content-Type": "application/json", ...options?.headers },
-    body: JSON.stringify(googleLoginDto)
-  });
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      googleLoginDto,)
+  }
+);}
+
+
+
+export type authControllerRequestPasswordRecoveryResponse200 = {
+  data: PasswordRecoveryResponseDto
+  status: 200
+}
+    
+export type authControllerRequestPasswordRecoveryResponseSuccess = (authControllerRequestPasswordRecoveryResponse200) & {
+  headers: Headers;
 };
+;
+
+export type authControllerRequestPasswordRecoveryResponse = (authControllerRequestPasswordRecoveryResponseSuccess)
+
+export const getAuthControllerRequestPasswordRecoveryUrl = () => {
+
+
+  
+
+  return `/api/auth/password-recovery/request`
+}
+
+export const authControllerRequestPasswordRecovery = async (passwordRecoveryRequestDto: PasswordRecoveryRequestDto, options?: RequestInit): Promise<authControllerRequestPasswordRecoveryResponse> => {
+  
+  return temisFetch<authControllerRequestPasswordRecoveryResponse>(getAuthControllerRequestPasswordRecoveryUrl(),
+  {      
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      passwordRecoveryRequestDto,)
+  }
+);}
+
+
+
+export type authControllerConfirmPasswordRecoveryResponse200 = {
+  data: PasswordRecoveryResponseDto
+  status: 200
+}
+    
+export type authControllerConfirmPasswordRecoveryResponseSuccess = (authControllerConfirmPasswordRecoveryResponse200) & {
+  headers: Headers;
+};
+;
+
+export type authControllerConfirmPasswordRecoveryResponse = (authControllerConfirmPasswordRecoveryResponseSuccess)
+
+export const getAuthControllerConfirmPasswordRecoveryUrl = () => {
+
+
+  
+
+  return `/api/auth/password-recovery/confirm`
+}
+
+export const authControllerConfirmPasswordRecovery = async (passwordRecoveryConfirmDto: PasswordRecoveryConfirmDto, options?: RequestInit): Promise<authControllerConfirmPasswordRecoveryResponse> => {
+  
+  return temisFetch<authControllerConfirmPasswordRecoveryResponse>(getAuthControllerConfirmPasswordRecoveryUrl(),
+  {      
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      passwordRecoveryConfirmDto,)
+  }
+);}
+
+
 
 export type authControllerRefreshResponse201 = {
-  data: TokenPairDto;
-  status: 201;
-};
-
-export type authControllerRefreshResponseSuccess = authControllerRefreshResponse201 & {
+  data: TokenPairDto
+  status: 201
+}
+    
+export type authControllerRefreshResponseSuccess = (authControllerRefreshResponse201) & {
   headers: Headers;
 };
-export type authControllerRefreshResponse = authControllerRefreshResponseSuccess;
+;
+
+export type authControllerRefreshResponse = (authControllerRefreshResponseSuccess)
 
 export const getAuthControllerRefreshUrl = () => {
-  return `/api/auth/refresh`;
-};
 
-export const authControllerRefresh = async (
-  refreshTokenDto: RefreshTokenDto,
-  options?: RequestInit
-): Promise<authControllerRefreshResponse> => {
-  return temisFetch<authControllerRefreshResponse>(getAuthControllerRefreshUrl(), {
+
+  
+
+  return `/api/auth/refresh`
+}
+
+export const authControllerRefresh = async (refreshTokenDto: RefreshTokenDto, options?: RequestInit): Promise<authControllerRefreshResponse> => {
+  
+  return temisFetch<authControllerRefreshResponse>(getAuthControllerRefreshUrl(),
+  {      
     ...options,
-    method: "POST",
-    headers: { "Content-Type": "application/json", ...options?.headers },
-    body: JSON.stringify(refreshTokenDto)
-  });
-};
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      refreshTokenDto,)
+  }
+);}
+
+
 
 export type authControllerLogoutResponse200 = {
-  data: LogoutDto;
-  status: 200;
-};
-
-export type authControllerLogoutResponseSuccess = authControllerLogoutResponse200 & {
+  data: LogoutDto
+  status: 200
+}
+    
+export type authControllerLogoutResponseSuccess = (authControllerLogoutResponse200) & {
   headers: Headers;
 };
-export type authControllerLogoutResponse = authControllerLogoutResponseSuccess;
+;
+
+export type authControllerLogoutResponse = (authControllerLogoutResponseSuccess)
 
 export const getAuthControllerLogoutUrl = () => {
-  return `/api/auth/logout`;
-};
 
-export const authControllerLogout = async (
-  options?: RequestInit
-): Promise<authControllerLogoutResponse> => {
-  return temisFetch<authControllerLogoutResponse>(getAuthControllerLogoutUrl(), {
+
+  
+
+  return `/api/auth/logout`
+}
+
+export const authControllerLogout = async ( options?: RequestInit): Promise<authControllerLogoutResponse> => {
+  
+  return temisFetch<authControllerLogoutResponse>(getAuthControllerLogoutUrl(),
+  {      
     ...options,
-    method: "POST"
-  });
+    method: 'POST'
+    
+    
+  }
+);}
+
+
+
+export type platformAuthControllerLoginStartResponse200 = {
+  data: PlatformAuthControllerLoginStart200
+  status: 200
+}
+    
+export type platformAuthControllerLoginStartResponseSuccess = (platformAuthControllerLoginStartResponse200) & {
+  headers: Headers;
 };
+;
+
+export type platformAuthControllerLoginStartResponse = (platformAuthControllerLoginStartResponseSuccess)
+
+export const getPlatformAuthControllerLoginStartUrl = () => {
+
+
+  
+
+  return `/api/platform-auth/login/start`
+}
+
+export const platformAuthControllerLoginStart = async (platformLoginStartDto: PlatformLoginStartDto, options?: RequestInit): Promise<platformAuthControllerLoginStartResponse> => {
+  
+  return temisFetch<platformAuthControllerLoginStartResponse>(getPlatformAuthControllerLoginStartUrl(),
+  {      
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      platformLoginStartDto,)
+  }
+);}
+
+
+
+export type platformAuthControllerLoginFinishResponse200 = {
+  data: void
+  status: 200
+}
+    
+export type platformAuthControllerLoginFinishResponseSuccess = (platformAuthControllerLoginFinishResponse200) & {
+  headers: Headers;
+};
+;
+
+export type platformAuthControllerLoginFinishResponse = (platformAuthControllerLoginFinishResponseSuccess)
+
+export const getPlatformAuthControllerLoginFinishUrl = () => {
+
+
+  
+
+  return `/api/platform-auth/login/finish`
+}
+
+export const platformAuthControllerLoginFinish = async (platformLoginFinishDto: PlatformLoginFinishDto, options?: RequestInit): Promise<platformAuthControllerLoginFinishResponse> => {
+  
+  return temisFetch<platformAuthControllerLoginFinishResponse>(getPlatformAuthControllerLoginFinishUrl(),
+  {      
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      platformLoginFinishDto,)
+  }
+);}
+
+
+
+export type platformAuthControllerEnrollmentStartResponse200 = {
+  data: void
+  status: 200
+}
+    
+export type platformAuthControllerEnrollmentStartResponseSuccess = (platformAuthControllerEnrollmentStartResponse200) & {
+  headers: Headers;
+};
+;
+
+export type platformAuthControllerEnrollmentStartResponse = (platformAuthControllerEnrollmentStartResponseSuccess)
+
+export const getPlatformAuthControllerEnrollmentStartUrl = () => {
+
+
+  
+
+  return `/api/platform-auth/enrollment/start`
+}
+
+export const platformAuthControllerEnrollmentStart = async (platformEnrollmentStartDto: PlatformEnrollmentStartDto, options?: RequestInit): Promise<platformAuthControllerEnrollmentStartResponse> => {
+  
+  return temisFetch<platformAuthControllerEnrollmentStartResponse>(getPlatformAuthControllerEnrollmentStartUrl(),
+  {      
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      platformEnrollmentStartDto,)
+  }
+);}
+
+
+
+export type platformAuthControllerEnrollmentCredentialResponse200 = {
+  data: void
+  status: 200
+}
+    
+export type platformAuthControllerEnrollmentCredentialResponseSuccess = (platformAuthControllerEnrollmentCredentialResponse200) & {
+  headers: Headers;
+};
+;
+
+export type platformAuthControllerEnrollmentCredentialResponse = (platformAuthControllerEnrollmentCredentialResponseSuccess)
+
+export const getPlatformAuthControllerEnrollmentCredentialUrl = () => {
+
+
+  
+
+  return `/api/platform-auth/enrollment/credential`
+}
+
+export const platformAuthControllerEnrollmentCredential = async (platformEnrollmentCredentialDto: PlatformEnrollmentCredentialDto, options?: RequestInit): Promise<platformAuthControllerEnrollmentCredentialResponse> => {
+  
+  return temisFetch<platformAuthControllerEnrollmentCredentialResponse>(getPlatformAuthControllerEnrollmentCredentialUrl(),
+  {      
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      platformEnrollmentCredentialDto,)
+  }
+);}
+
+
+
+export type platformAuthControllerRefreshResponse200 = {
+  data: TokenPairDto
+  status: 200
+}
+    
+export type platformAuthControllerRefreshResponseSuccess = (platformAuthControllerRefreshResponse200) & {
+  headers: Headers;
+};
+;
+
+export type platformAuthControllerRefreshResponse = (platformAuthControllerRefreshResponseSuccess)
+
+export const getPlatformAuthControllerRefreshUrl = () => {
+
+
+  
+
+  return `/api/platform-auth/refresh`
+}
+
+export const platformAuthControllerRefresh = async (refreshTokenDto: RefreshTokenDto, options?: RequestInit): Promise<platformAuthControllerRefreshResponse> => {
+  
+  return temisFetch<platformAuthControllerRefreshResponse>(getPlatformAuthControllerRefreshUrl(),
+  {      
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      refreshTokenDto,)
+  }
+);}
+
+
+
+export type platformAuthControllerLogoutResponse200 = {
+  data: void
+  status: 200
+}
+    
+export type platformAuthControllerLogoutResponseSuccess = (platformAuthControllerLogoutResponse200) & {
+  headers: Headers;
+};
+;
+
+export type platformAuthControllerLogoutResponse = (platformAuthControllerLogoutResponseSuccess)
+
+export const getPlatformAuthControllerLogoutUrl = () => {
+
+
+  
+
+  return `/api/platform-auth/logout`
+}
+
+export const platformAuthControllerLogout = async (refreshTokenDto: RefreshTokenDto, options?: RequestInit): Promise<platformAuthControllerLogoutResponse> => {
+  
+  return temisFetch<platformAuthControllerLogoutResponse>(getPlatformAuthControllerLogoutUrl(),
+  {      
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      refreshTokenDto,)
+  }
+);}
+
+
 
 export type rbacControllerPermissionsResponse200 = {
-  data: PermissionDto[];
-  status: 200;
-};
-
-export type rbacControllerPermissionsResponseSuccess = rbacControllerPermissionsResponse200 & {
+  data: PermissionDto[]
+  status: 200
+}
+    
+export type rbacControllerPermissionsResponseSuccess = (rbacControllerPermissionsResponse200) & {
   headers: Headers;
 };
-export type rbacControllerPermissionsResponse = rbacControllerPermissionsResponseSuccess;
+;
+
+export type rbacControllerPermissionsResponse = (rbacControllerPermissionsResponseSuccess)
 
 export const getRbacControllerPermissionsUrl = () => {
-  return `/api/rbac/permissions`;
-};
 
-export const rbacControllerPermissions = async (
-  options?: RequestInit
-): Promise<rbacControllerPermissionsResponse> => {
-  return temisFetch<rbacControllerPermissionsResponse>(getRbacControllerPermissionsUrl(), {
+
+  
+
+  return `/api/rbac/permissions`
+}
+
+export const rbacControllerPermissions = async ( options?: RequestInit): Promise<rbacControllerPermissionsResponse> => {
+  
+  return temisFetch<rbacControllerPermissionsResponse>(getRbacControllerPermissionsUrl(),
+  {      
     ...options,
-    method: "GET"
-  });
-};
+    method: 'GET'
+    
+    
+  }
+);}
+
+
 
 export type rbacControllerRolesResponse200 = {
-  data: RoleDto[];
-  status: 200;
-};
-
-export type rbacControllerRolesResponseSuccess = rbacControllerRolesResponse200 & {
+  data: RoleDto[]
+  status: 200
+}
+    
+export type rbacControllerRolesResponseSuccess = (rbacControllerRolesResponse200) & {
   headers: Headers;
 };
-export type rbacControllerRolesResponse = rbacControllerRolesResponseSuccess;
+;
+
+export type rbacControllerRolesResponse = (rbacControllerRolesResponseSuccess)
 
 export const getRbacControllerRolesUrl = () => {
-  return `/api/rbac/roles`;
-};
 
-export const rbacControllerRoles = async (
-  options?: RequestInit
-): Promise<rbacControllerRolesResponse> => {
-  return temisFetch<rbacControllerRolesResponse>(getRbacControllerRolesUrl(), {
+
+  
+
+  return `/api/rbac/roles`
+}
+
+export const rbacControllerRoles = async ( options?: RequestInit): Promise<rbacControllerRolesResponse> => {
+  
+  return temisFetch<rbacControllerRolesResponse>(getRbacControllerRolesUrl(),
+  {      
     ...options,
-    method: "GET"
-  });
-};
+    method: 'GET'
+    
+    
+  }
+);}
+
+
 
 export type rbacControllerCreateRoleResponse201 = {
-  data: RoleDto;
-  status: 201;
-};
-
-export type rbacControllerCreateRoleResponseSuccess = rbacControllerCreateRoleResponse201 & {
+  data: RoleDto
+  status: 201
+}
+    
+export type rbacControllerCreateRoleResponseSuccess = (rbacControllerCreateRoleResponse201) & {
   headers: Headers;
 };
-export type rbacControllerCreateRoleResponse = rbacControllerCreateRoleResponseSuccess;
+;
+
+export type rbacControllerCreateRoleResponse = (rbacControllerCreateRoleResponseSuccess)
 
 export const getRbacControllerCreateRoleUrl = () => {
-  return `/api/rbac/roles`;
-};
 
-export const rbacControllerCreateRole = async (
-  createRoleDto: CreateRoleDto,
-  options?: RequestInit
-): Promise<rbacControllerCreateRoleResponse> => {
-  return temisFetch<rbacControllerCreateRoleResponse>(getRbacControllerCreateRoleUrl(), {
+
+  
+
+  return `/api/rbac/roles`
+}
+
+export const rbacControllerCreateRole = async (createRoleDto: CreateRoleDto, options?: RequestInit): Promise<rbacControllerCreateRoleResponse> => {
+  
+  return temisFetch<rbacControllerCreateRoleResponse>(getRbacControllerCreateRoleUrl(),
+  {      
     ...options,
-    method: "POST",
-    headers: { "Content-Type": "application/json", ...options?.headers },
-    body: JSON.stringify(createRoleDto)
-  });
-};
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      createRoleDto,)
+  }
+);}
+
+
 
 export type rbacControllerUpdateRoleResponse200 = {
-  data: RoleDto;
-  status: 200;
-};
-
-export type rbacControllerUpdateRoleResponseSuccess = rbacControllerUpdateRoleResponse200 & {
+  data: RoleDto
+  status: 200
+}
+    
+export type rbacControllerUpdateRoleResponseSuccess = (rbacControllerUpdateRoleResponse200) & {
   headers: Headers;
 };
-export type rbacControllerUpdateRoleResponse = rbacControllerUpdateRoleResponseSuccess;
+;
 
-export const getRbacControllerUpdateRoleUrl = (id: string) => {
-  return `/api/rbac/roles/${id}`;
-};
+export type rbacControllerUpdateRoleResponse = (rbacControllerUpdateRoleResponseSuccess)
 
-export const rbacControllerUpdateRole = async (
-  id: string,
-  updateRoleDto: UpdateRoleDto,
-  options?: RequestInit
-): Promise<rbacControllerUpdateRoleResponse> => {
-  return temisFetch<rbacControllerUpdateRoleResponse>(getRbacControllerUpdateRoleUrl(id), {
+export const getRbacControllerUpdateRoleUrl = (id: string,) => {
+
+
+  
+
+  return `/api/rbac/roles/${id}`
+}
+
+export const rbacControllerUpdateRole = async (id: string,
+    updateRoleDto: UpdateRoleDto, options?: RequestInit): Promise<rbacControllerUpdateRoleResponse> => {
+  
+  return temisFetch<rbacControllerUpdateRoleResponse>(getRbacControllerUpdateRoleUrl(id),
+  {      
     ...options,
-    method: "PATCH",
-    headers: { "Content-Type": "application/json", ...options?.headers },
-    body: JSON.stringify(updateRoleDto)
-  });
-};
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      updateRoleDto,)
+  }
+);}
+
+
 
 export type rbacControllerDeleteRoleResponse200 = {
-  data: void;
-  status: 200;
-};
-
-export type rbacControllerDeleteRoleResponseSuccess = rbacControllerDeleteRoleResponse200 & {
+  data: void
+  status: 200
+}
+    
+export type rbacControllerDeleteRoleResponseSuccess = (rbacControllerDeleteRoleResponse200) & {
   headers: Headers;
 };
-export type rbacControllerDeleteRoleResponse = rbacControllerDeleteRoleResponseSuccess;
+;
 
-export const getRbacControllerDeleteRoleUrl = (id: string) => {
-  return `/api/rbac/roles/${id}`;
-};
+export type rbacControllerDeleteRoleResponse = (rbacControllerDeleteRoleResponseSuccess)
 
-export const rbacControllerDeleteRole = async (
-  id: string,
-  options?: RequestInit
-): Promise<rbacControllerDeleteRoleResponse> => {
-  return temisFetch<rbacControllerDeleteRoleResponse>(getRbacControllerDeleteRoleUrl(id), {
+export const getRbacControllerDeleteRoleUrl = (id: string,) => {
+
+
+  
+
+  return `/api/rbac/roles/${id}`
+}
+
+export const rbacControllerDeleteRole = async (id: string, options?: RequestInit): Promise<rbacControllerDeleteRoleResponse> => {
+  
+  return temisFetch<rbacControllerDeleteRoleResponse>(getRbacControllerDeleteRoleUrl(id),
+  {      
     ...options,
-    method: "DELETE"
-  });
-};
+    method: 'DELETE'
+    
+    
+  }
+);}
+
+
 
 export type aiControllerListToolsResponse200 = {
-  data: AiToolsResponseDto;
-  status: 200;
-};
-
-export type aiControllerListToolsResponseSuccess = aiControllerListToolsResponse200 & {
+  data: AiToolsResponseDto
+  status: 200
+}
+    
+export type aiControllerListToolsResponseSuccess = (aiControllerListToolsResponse200) & {
   headers: Headers;
 };
-export type aiControllerListToolsResponse = aiControllerListToolsResponseSuccess;
+;
+
+export type aiControllerListToolsResponse = (aiControllerListToolsResponseSuccess)
 
 export const getAiControllerListToolsUrl = () => {
-  return `/api/ai/tools`;
-};
 
-export const aiControllerListTools = async (
-  options?: RequestInit
-): Promise<aiControllerListToolsResponse> => {
-  return temisFetch<aiControllerListToolsResponse>(getAiControllerListToolsUrl(), {
+
+  
+
+  return `/api/ai/tools`
+}
+
+export const aiControllerListTools = async ( options?: RequestInit): Promise<aiControllerListToolsResponse> => {
+  
+  return temisFetch<aiControllerListToolsResponse>(getAiControllerListToolsUrl(),
+  {      
     ...options,
-    method: "GET"
-  });
-};
+    method: 'GET'
+    
+    
+  }
+);}
+
+
 
 export type aiControllerStartChatResponse200 = {
-  data: AiChatResponseDto;
-  status: 200;
-};
-
-export type aiControllerStartChatResponseSuccess = aiControllerStartChatResponse200 & {
+  data: AiChatResponseDto
+  status: 200
+}
+    
+export type aiControllerStartChatResponseSuccess = (aiControllerStartChatResponse200) & {
   headers: Headers;
 };
-export type aiControllerStartChatResponse = aiControllerStartChatResponseSuccess;
+;
+
+export type aiControllerStartChatResponse = (aiControllerStartChatResponseSuccess)
 
 export const getAiControllerStartChatUrl = () => {
-  return `/api/ai/chat`;
-};
 
-export const aiControllerStartChat = async (
-  aiChatDto: AiChatDto,
-  options?: RequestInit
-): Promise<aiControllerStartChatResponse> => {
-  return temisFetch<aiControllerStartChatResponse>(getAiControllerStartChatUrl(), {
+
+  
+
+  return `/api/ai/chat`
+}
+
+export const aiControllerStartChat = async (aiChatDto: AiChatDto, options?: RequestInit): Promise<aiControllerStartChatResponse> => {
+  
+  return temisFetch<aiControllerStartChatResponse>(getAiControllerStartChatUrl(),
+  {      
     ...options,
-    method: "POST",
-    headers: { "Content-Type": "application/json", ...options?.headers },
-    body: JSON.stringify(aiChatDto)
-  });
-};
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      aiChatDto,)
+  }
+);}
+
+
 
 export type practiceAreaTemplatesControllerListResponse200 = {
-  data: PracticeAreaTemplateDto[];
-  status: 200;
+  data: PracticeAreaTemplateDto[]
+  status: 200
+}
+    
+export type practiceAreaTemplatesControllerListResponseSuccess = (practiceAreaTemplatesControllerListResponse200) & {
+  headers: Headers;
 };
+;
 
-export type practiceAreaTemplatesControllerListResponseSuccess =
-  practiceAreaTemplatesControllerListResponse200 & {
-    headers: Headers;
-  };
-export type practiceAreaTemplatesControllerListResponse =
-  practiceAreaTemplatesControllerListResponseSuccess;
+export type practiceAreaTemplatesControllerListResponse = (practiceAreaTemplatesControllerListResponseSuccess)
 
 export const getPracticeAreaTemplatesControllerListUrl = () => {
-  return `/api/practice-area-templates`;
-};
 
-export const practiceAreaTemplatesControllerList = async (
-  options?: RequestInit
-): Promise<practiceAreaTemplatesControllerListResponse> => {
-  return temisFetch<practiceAreaTemplatesControllerListResponse>(
-    getPracticeAreaTemplatesControllerListUrl(),
-    {
-      ...options,
-      method: "GET"
-    }
-  );
-};
+
+  
+
+  return `/api/practice-area-templates`
+}
+
+export const practiceAreaTemplatesControllerList = async ( options?: RequestInit): Promise<practiceAreaTemplatesControllerListResponse> => {
+  
+  return temisFetch<practiceAreaTemplatesControllerListResponse>(getPracticeAreaTemplatesControllerListUrl(),
+  {      
+    ...options,
+    method: 'GET'
+    
+    
+  }
+);}
+
+
 
 export type provincesControllerListResponse200 = {
-  data: ProvincesListResponseDto;
-  status: 200;
-};
-
-export type provincesControllerListResponseSuccess = provincesControllerListResponse200 & {
+  data: ProvincesListResponseDto
+  status: 200
+}
+    
+export type provincesControllerListResponseSuccess = (provincesControllerListResponse200) & {
   headers: Headers;
 };
-export type provincesControllerListResponse = provincesControllerListResponseSuccess;
+;
+
+export type provincesControllerListResponse = (provincesControllerListResponseSuccess)
 
 export const getProvincesControllerListUrl = () => {
-  return `/api/provinces`;
-};
 
-export const provincesControllerList = async (
-  options?: RequestInit
-): Promise<provincesControllerListResponse> => {
-  return temisFetch<provincesControllerListResponse>(getProvincesControllerListUrl(), {
+
+  
+
+  return `/api/provinces`
+}
+
+export const provincesControllerList = async ( options?: RequestInit): Promise<provincesControllerListResponse> => {
+  
+  return temisFetch<provincesControllerListResponse>(getProvincesControllerListUrl(),
+  {      
     ...options,
-    method: "GET"
-  });
-};
+    method: 'GET'
+    
+    
+  }
+);}
+
+
 
 export type onboardingControllerStartResponse201 = {
-  data: StartOnboardingResponseDto;
-  status: 201;
-};
-
-export type onboardingControllerStartResponseSuccess = onboardingControllerStartResponse201 & {
+  data: StartOnboardingResponseDto
+  status: 201
+}
+    
+export type onboardingControllerStartResponseSuccess = (onboardingControllerStartResponse201) & {
   headers: Headers;
 };
-export type onboardingControllerStartResponse = onboardingControllerStartResponseSuccess;
+;
+
+export type onboardingControllerStartResponse = (onboardingControllerStartResponseSuccess)
 
 export const getOnboardingControllerStartUrl = () => {
-  return `/api/onboarding/start`;
-};
 
-export const onboardingControllerStart = async (
-  startOnboardingDto: StartOnboardingDto,
-  options?: RequestInit
-): Promise<onboardingControllerStartResponse> => {
-  return temisFetch<onboardingControllerStartResponse>(getOnboardingControllerStartUrl(), {
+
+  
+
+  return `/api/onboarding/start`
+}
+
+export const onboardingControllerStart = async (startOnboardingDto: StartOnboardingDto, options?: RequestInit): Promise<onboardingControllerStartResponse> => {
+  
+  return temisFetch<onboardingControllerStartResponse>(getOnboardingControllerStartUrl(),
+  {      
     ...options,
-    method: "POST",
-    headers: { "Content-Type": "application/json", ...options?.headers },
-    body: JSON.stringify(startOnboardingDto)
-  });
-};
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      startOnboardingDto,)
+  }
+);}
+
+
 
 export type onboardingControllerStatusResponse200 = {
-  data: OnboardingStatusDto;
-  status: 200;
-};
-
-export type onboardingControllerStatusResponseSuccess = onboardingControllerStatusResponse200 & {
+  data: OnboardingStatusDto
+  status: 200
+}
+    
+export type onboardingControllerStatusResponseSuccess = (onboardingControllerStatusResponse200) & {
   headers: Headers;
 };
-export type onboardingControllerStatusResponse = onboardingControllerStatusResponseSuccess;
+;
+
+export type onboardingControllerStatusResponse = (onboardingControllerStatusResponseSuccess)
 
 export const getOnboardingControllerStatusUrl = () => {
-  return `/api/onboarding/status`;
-};
 
-export const onboardingControllerStatus = async (
-  options?: RequestInit
-): Promise<onboardingControllerStatusResponse> => {
-  return temisFetch<onboardingControllerStatusResponse>(getOnboardingControllerStatusUrl(), {
+
+  
+
+  return `/api/onboarding/status`
+}
+
+export const onboardingControllerStatus = async ( options?: RequestInit): Promise<onboardingControllerStatusResponse> => {
+  
+  return temisFetch<onboardingControllerStatusResponse>(getOnboardingControllerStatusUrl(),
+  {      
     ...options,
-    method: "GET"
-  });
-};
+    method: 'GET'
+    
+    
+  }
+);}
+
+
 
 export type onboardingControllerChecklistResponse200 = {
-  data: OnboardingChecklistResponseDto;
-  status: 200;
+  data: OnboardingChecklistResponseDto
+  status: 200
+}
+    
+export type onboardingControllerChecklistResponseSuccess = (onboardingControllerChecklistResponse200) & {
+  headers: Headers;
 };
+;
 
-export type onboardingControllerChecklistResponseSuccess =
-  onboardingControllerChecklistResponse200 & {
-    headers: Headers;
-  };
-export type onboardingControllerChecklistResponse = onboardingControllerChecklistResponseSuccess;
+export type onboardingControllerChecklistResponse = (onboardingControllerChecklistResponseSuccess)
 
 export const getOnboardingControllerChecklistUrl = () => {
-  return `/api/onboarding/checklist`;
-};
 
-export const onboardingControllerChecklist = async (
-  options?: RequestInit
-): Promise<onboardingControllerChecklistResponse> => {
-  return temisFetch<onboardingControllerChecklistResponse>(getOnboardingControllerChecklistUrl(), {
+
+  
+
+  return `/api/onboarding/checklist`
+}
+
+export const onboardingControllerChecklist = async ( options?: RequestInit): Promise<onboardingControllerChecklistResponse> => {
+  
+  return temisFetch<onboardingControllerChecklistResponse>(getOnboardingControllerChecklistUrl(),
+  {      
     ...options,
-    method: "GET"
-  });
-};
+    method: 'GET'
+    
+    
+  }
+);}
+
+
 
 export type onboardingControllerUpdateChecklistStepResponse200 = {
-  data: OnboardingChecklistResponseDto;
-  status: 200;
+  data: OnboardingChecklistResponseDto
+  status: 200
+}
+    
+export type onboardingControllerUpdateChecklistStepResponseSuccess = (onboardingControllerUpdateChecklistStepResponse200) & {
+  headers: Headers;
 };
+;
 
-export type onboardingControllerUpdateChecklistStepResponseSuccess =
-  onboardingControllerUpdateChecklistStepResponse200 & {
-    headers: Headers;
-  };
-export type onboardingControllerUpdateChecklistStepResponse =
-  onboardingControllerUpdateChecklistStepResponseSuccess;
+export type onboardingControllerUpdateChecklistStepResponse = (onboardingControllerUpdateChecklistStepResponseSuccess)
 
-export const getOnboardingControllerUpdateChecklistStepUrl = (step: string) => {
-  return `/api/onboarding/checklist/${step}`;
-};
+export const getOnboardingControllerUpdateChecklistStepUrl = (step: string,) => {
 
-export const onboardingControllerUpdateChecklistStep = async (
-  step: string,
-  updateOnboardingChecklistStepDto: UpdateOnboardingChecklistStepDto,
-  options?: RequestInit
-): Promise<onboardingControllerUpdateChecklistStepResponse> => {
-  return temisFetch<onboardingControllerUpdateChecklistStepResponse>(
-    getOnboardingControllerUpdateChecklistStepUrl(step),
-    {
-      ...options,
-      method: "PATCH",
-      headers: { "Content-Type": "application/json", ...options?.headers },
-      body: JSON.stringify(updateOnboardingChecklistStepDto)
-    }
-  );
-};
+
+  
+
+  return `/api/onboarding/checklist/${step}`
+}
+
+export const onboardingControllerUpdateChecklistStep = async (step: string,
+    updateOnboardingChecklistStepDto: UpdateOnboardingChecklistStepDto, options?: RequestInit): Promise<onboardingControllerUpdateChecklistStepResponse> => {
+  
+  return temisFetch<onboardingControllerUpdateChecklistStepResponse>(getOnboardingControllerUpdateChecklistStepUrl(step),
+  {      
+    ...options,
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      updateOnboardingChecklistStepDto,)
+  }
+);}
+
+
 
 export type identityControllerMeResponse200 = {
-  data: void;
-  status: 200;
-};
-
-export type identityControllerMeResponseSuccess = identityControllerMeResponse200 & {
+  data: void
+  status: 200
+}
+    
+export type identityControllerMeResponseSuccess = (identityControllerMeResponse200) & {
   headers: Headers;
 };
-export type identityControllerMeResponse = identityControllerMeResponseSuccess;
+;
+
+export type identityControllerMeResponse = (identityControllerMeResponseSuccess)
 
 export const getIdentityControllerMeUrl = () => {
-  return `/api/identity/me`;
-};
 
-export const identityControllerMe = async (
-  options?: RequestInit
-): Promise<identityControllerMeResponse> => {
-  return temisFetch<identityControllerMeResponse>(getIdentityControllerMeUrl(), {
+
+  
+
+  return `/api/identity/me`
+}
+
+export const identityControllerMe = async ( options?: RequestInit): Promise<identityControllerMeResponse> => {
+  
+  return temisFetch<identityControllerMeResponse>(getIdentityControllerMeUrl(),
+  {      
     ...options,
-    method: "GET"
-  });
-};
+    method: 'GET'
+    
+    
+  }
+);}
+
+
 
 export type identityControllerRolesResponse200 = {
-  data: void;
-  status: 200;
-};
-
-export type identityControllerRolesResponseSuccess = identityControllerRolesResponse200 & {
+  data: void
+  status: 200
+}
+    
+export type identityControllerRolesResponseSuccess = (identityControllerRolesResponse200) & {
   headers: Headers;
 };
-export type identityControllerRolesResponse = identityControllerRolesResponseSuccess;
+;
+
+export type identityControllerRolesResponse = (identityControllerRolesResponseSuccess)
 
 export const getIdentityControllerRolesUrl = () => {
-  return `/api/identity/roles`;
-};
 
-export const identityControllerRoles = async (
-  options?: RequestInit
-): Promise<identityControllerRolesResponse> => {
-  return temisFetch<identityControllerRolesResponse>(getIdentityControllerRolesUrl(), {
+
+  
+
+  return `/api/identity/roles`
+}
+
+export const identityControllerRoles = async ( options?: RequestInit): Promise<identityControllerRolesResponse> => {
+  
+  return temisFetch<identityControllerRolesResponse>(getIdentityControllerRolesUrl(),
+  {      
     ...options,
-    method: "GET"
-  });
-};
+    method: 'GET'
+    
+    
+  }
+);}
+
+
 
 export type integrationsControllerPreviewSaeImportResponse200 = {
-  data: SaePreviewResponseDto;
-  status: 200;
+  data: SaePreviewResponseDto
+  status: 200
+}
+    
+export type integrationsControllerPreviewSaeImportResponseSuccess = (integrationsControllerPreviewSaeImportResponse200) & {
+  headers: Headers;
 };
+;
 
-export type integrationsControllerPreviewSaeImportResponseSuccess =
-  integrationsControllerPreviewSaeImportResponse200 & {
-    headers: Headers;
-  };
-export type integrationsControllerPreviewSaeImportResponse =
-  integrationsControllerPreviewSaeImportResponseSuccess;
+export type integrationsControllerPreviewSaeImportResponse = (integrationsControllerPreviewSaeImportResponseSuccess)
 
 export const getIntegrationsControllerPreviewSaeImportUrl = () => {
-  return `/api/integrations/sae/preview`;
-};
 
-export const integrationsControllerPreviewSaeImport = async (
-  saePreviewDto: SaePreviewDto,
-  options?: RequestInit
-): Promise<integrationsControllerPreviewSaeImportResponse> => {
-  return temisFetch<integrationsControllerPreviewSaeImportResponse>(
-    getIntegrationsControllerPreviewSaeImportUrl(),
-    {
-      ...options,
-      method: "POST",
-      headers: { "Content-Type": "application/json", ...options?.headers },
-      body: JSON.stringify(saePreviewDto)
-    }
-  );
-};
+
+  
+
+  return `/api/integrations/sae/preview`
+}
+
+export const integrationsControllerPreviewSaeImport = async (saePreviewDto: SaePreviewDto, options?: RequestInit): Promise<integrationsControllerPreviewSaeImportResponse> => {
+  
+  return temisFetch<integrationsControllerPreviewSaeImportResponse>(getIntegrationsControllerPreviewSaeImportUrl(),
+  {      
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      saePreviewDto,)
+  }
+);}
+
+
 
 export type integrationsControllerImportSaeCasesResponse200 = {
-  data: SaeImportResponseDto;
-  status: 200;
+  data: SaeImportResponseDto
+  status: 200
+}
+    
+export type integrationsControllerImportSaeCasesResponseSuccess = (integrationsControllerImportSaeCasesResponse200) & {
+  headers: Headers;
 };
+;
 
-export type integrationsControllerImportSaeCasesResponseSuccess =
-  integrationsControllerImportSaeCasesResponse200 & {
-    headers: Headers;
-  };
-export type integrationsControllerImportSaeCasesResponse =
-  integrationsControllerImportSaeCasesResponseSuccess;
+export type integrationsControllerImportSaeCasesResponse = (integrationsControllerImportSaeCasesResponseSuccess)
 
 export const getIntegrationsControllerImportSaeCasesUrl = () => {
-  return `/api/integrations/sae/import`;
-};
 
-export const integrationsControllerImportSaeCases = async (
-  saeImportDto: SaeImportDto,
-  options?: RequestInit
-): Promise<integrationsControllerImportSaeCasesResponse> => {
-  return temisFetch<integrationsControllerImportSaeCasesResponse>(
-    getIntegrationsControllerImportSaeCasesUrl(),
-    {
-      ...options,
-      method: "POST",
-      headers: { "Content-Type": "application/json", ...options?.headers },
-      body: JSON.stringify(saeImportDto)
-    }
-  );
-};
+
+  
+
+  return `/api/integrations/sae/import`
+}
+
+export const integrationsControllerImportSaeCases = async (saeImportDto: SaeImportDto, options?: RequestInit): Promise<integrationsControllerImportSaeCasesResponse> => {
+  
+  return temisFetch<integrationsControllerImportSaeCasesResponse>(getIntegrationsControllerImportSaeCasesUrl(),
+  {      
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      saeImportDto,)
+  }
+);}
+
+
 
 export type googleCalendarControllerCallbackResponse200 = {
-  data: void;
-  status: 200;
+  data: void
+  status: 200
+}
+    
+export type googleCalendarControllerCallbackResponseSuccess = (googleCalendarControllerCallbackResponse200) & {
+  headers: Headers;
 };
+;
 
-export type googleCalendarControllerCallbackResponseSuccess =
-  googleCalendarControllerCallbackResponse200 & {
-    headers: Headers;
-  };
-export type googleCalendarControllerCallbackResponse =
-  googleCalendarControllerCallbackResponseSuccess;
+export type googleCalendarControllerCallbackResponse = (googleCalendarControllerCallbackResponseSuccess)
 
-export const getGoogleCalendarControllerCallbackUrl = (
-  params: GoogleCalendarControllerCallbackParams
-) => {
+export const getGoogleCalendarControllerCallbackUrl = (params: GoogleCalendarControllerCallbackParams,) => {
   const normalizedParams = new URLSearchParams();
 
   Object.entries(params || {}).forEach(([key, value]) => {
+    
     if (value !== undefined) {
-      normalizedParams.append(key, value === null ? "null" : value.toString());
+      normalizedParams.append(key, value === null ? 'null' : value.toString())
     }
   });
 
   const stringifiedParams = normalizedParams.toString();
 
-  return stringifiedParams.length > 0
-    ? `/api/integrations/google-calendar/callback?${stringifiedParams}`
-    : `/api/integrations/google-calendar/callback`;
-};
+  return stringifiedParams.length > 0 ? `/api/integrations/google-calendar/callback?${stringifiedParams}` : `/api/integrations/google-calendar/callback`
+}
 
-export const googleCalendarControllerCallback = async (
-  params: GoogleCalendarControllerCallbackParams,
-  options?: RequestInit
-): Promise<googleCalendarControllerCallbackResponse> => {
-  return temisFetch<googleCalendarControllerCallbackResponse>(
-    getGoogleCalendarControllerCallbackUrl(params),
-    {
-      ...options,
-      method: "GET"
-    }
-  );
-};
+export const googleCalendarControllerCallback = async (params: GoogleCalendarControllerCallbackParams, options?: RequestInit): Promise<googleCalendarControllerCallbackResponse> => {
+  
+  return temisFetch<googleCalendarControllerCallbackResponse>(getGoogleCalendarControllerCallbackUrl(params),
+  {      
+    ...options,
+    method: 'GET'
+    
+    
+  }
+);}
+
+
 
 export type googleCalendarControllerStatusResponse200 = {
-  data: GoogleCalendarStatusDto;
-  status: 200;
+  data: GoogleCalendarStatusDto
+  status: 200
+}
+    
+export type googleCalendarControllerStatusResponseSuccess = (googleCalendarControllerStatusResponse200) & {
+  headers: Headers;
 };
+;
 
-export type googleCalendarControllerStatusResponseSuccess =
-  googleCalendarControllerStatusResponse200 & {
-    headers: Headers;
-  };
-export type googleCalendarControllerStatusResponse = googleCalendarControllerStatusResponseSuccess;
+export type googleCalendarControllerStatusResponse = (googleCalendarControllerStatusResponseSuccess)
 
 export const getGoogleCalendarControllerStatusUrl = () => {
-  return `/api/integrations/google-calendar/status`;
-};
 
-export const googleCalendarControllerStatus = async (
-  options?: RequestInit
-): Promise<googleCalendarControllerStatusResponse> => {
-  return temisFetch<googleCalendarControllerStatusResponse>(
-    getGoogleCalendarControllerStatusUrl(),
-    {
-      ...options,
-      method: "GET"
-    }
-  );
-};
+
+  
+
+  return `/api/integrations/google-calendar/status`
+}
+
+export const googleCalendarControllerStatus = async ( options?: RequestInit): Promise<googleCalendarControllerStatusResponse> => {
+  
+  return temisFetch<googleCalendarControllerStatusResponse>(getGoogleCalendarControllerStatusUrl(),
+  {      
+    ...options,
+    method: 'GET'
+    
+    
+  }
+);}
+
+
 
 export type googleCalendarControllerConnectResponse200 = {
-  data: GoogleCalendarOAuthStartDto;
-  status: 200;
+  data: GoogleCalendarOAuthStartDto
+  status: 200
+}
+    
+export type googleCalendarControllerConnectResponseSuccess = (googleCalendarControllerConnectResponse200) & {
+  headers: Headers;
 };
+;
 
-export type googleCalendarControllerConnectResponseSuccess =
-  googleCalendarControllerConnectResponse200 & {
-    headers: Headers;
-  };
-export type googleCalendarControllerConnectResponse =
-  googleCalendarControllerConnectResponseSuccess;
+export type googleCalendarControllerConnectResponse = (googleCalendarControllerConnectResponseSuccess)
 
 export const getGoogleCalendarControllerConnectUrl = () => {
-  return `/api/integrations/google-calendar/connect`;
-};
 
-export const googleCalendarControllerConnect = async (
-  googleCalendarSyncPreferencesDto: GoogleCalendarSyncPreferencesDto,
-  options?: RequestInit
-): Promise<googleCalendarControllerConnectResponse> => {
-  return temisFetch<googleCalendarControllerConnectResponse>(
-    getGoogleCalendarControllerConnectUrl(),
-    {
-      ...options,
-      method: "POST",
-      headers: { "Content-Type": "application/json", ...options?.headers },
-      body: JSON.stringify(googleCalendarSyncPreferencesDto)
-    }
-  );
-};
+
+  
+
+  return `/api/integrations/google-calendar/connect`
+}
+
+export const googleCalendarControllerConnect = async (googleCalendarSyncPreferencesDto: GoogleCalendarSyncPreferencesDto, options?: RequestInit): Promise<googleCalendarControllerConnectResponse> => {
+  
+  return temisFetch<googleCalendarControllerConnectResponse>(getGoogleCalendarControllerConnectUrl(),
+  {      
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      googleCalendarSyncPreferencesDto,)
+  }
+);}
+
+
 
 export type googleCalendarControllerUpdatePreferencesResponse202 = {
-  data: GoogleCalendarControllerUpdatePreferences202;
-  status: 202;
+  data: GoogleCalendarControllerUpdatePreferences202
+  status: 202
+}
+    
+export type googleCalendarControllerUpdatePreferencesResponseSuccess = (googleCalendarControllerUpdatePreferencesResponse202) & {
+  headers: Headers;
 };
+;
 
-export type googleCalendarControllerUpdatePreferencesResponseSuccess =
-  googleCalendarControllerUpdatePreferencesResponse202 & {
-    headers: Headers;
-  };
-export type googleCalendarControllerUpdatePreferencesResponse =
-  googleCalendarControllerUpdatePreferencesResponseSuccess;
+export type googleCalendarControllerUpdatePreferencesResponse = (googleCalendarControllerUpdatePreferencesResponseSuccess)
 
 export const getGoogleCalendarControllerUpdatePreferencesUrl = () => {
-  return `/api/integrations/google-calendar/preferences`;
-};
 
-export const googleCalendarControllerUpdatePreferences = async (
-  googleCalendarSyncPreferencesDto: GoogleCalendarSyncPreferencesDto,
-  options?: RequestInit
-): Promise<googleCalendarControllerUpdatePreferencesResponse> => {
-  return temisFetch<googleCalendarControllerUpdatePreferencesResponse>(
-    getGoogleCalendarControllerUpdatePreferencesUrl(),
-    {
-      ...options,
-      method: "PATCH",
-      headers: { "Content-Type": "application/json", ...options?.headers },
-      body: JSON.stringify(googleCalendarSyncPreferencesDto)
-    }
-  );
-};
+
+  
+
+  return `/api/integrations/google-calendar/preferences`
+}
+
+export const googleCalendarControllerUpdatePreferences = async (googleCalendarSyncPreferencesDto: GoogleCalendarSyncPreferencesDto, options?: RequestInit): Promise<googleCalendarControllerUpdatePreferencesResponse> => {
+  
+  return temisFetch<googleCalendarControllerUpdatePreferencesResponse>(getGoogleCalendarControllerUpdatePreferencesUrl(),
+  {      
+    ...options,
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      googleCalendarSyncPreferencesDto,)
+  }
+);}
+
+
 
 export type googleCalendarControllerSyncResponse202 = {
-  data: GoogleCalendarControllerSync202;
-  status: 202;
+  data: GoogleCalendarControllerSync202
+  status: 202
+}
+    
+export type googleCalendarControllerSyncResponseSuccess = (googleCalendarControllerSyncResponse202) & {
+  headers: Headers;
 };
+;
 
-export type googleCalendarControllerSyncResponseSuccess =
-  googleCalendarControllerSyncResponse202 & {
-    headers: Headers;
-  };
-export type googleCalendarControllerSyncResponse = googleCalendarControllerSyncResponseSuccess;
+export type googleCalendarControllerSyncResponse = (googleCalendarControllerSyncResponseSuccess)
 
 export const getGoogleCalendarControllerSyncUrl = () => {
-  return `/api/integrations/google-calendar/sync`;
-};
 
-export const googleCalendarControllerSync = async (
-  options?: RequestInit
-): Promise<googleCalendarControllerSyncResponse> => {
-  return temisFetch<googleCalendarControllerSyncResponse>(getGoogleCalendarControllerSyncUrl(), {
+
+  
+
+  return `/api/integrations/google-calendar/sync`
+}
+
+export const googleCalendarControllerSync = async ( options?: RequestInit): Promise<googleCalendarControllerSyncResponse> => {
+  
+  return temisFetch<googleCalendarControllerSyncResponse>(getGoogleCalendarControllerSyncUrl(),
+  {      
     ...options,
-    method: "POST"
-  });
-};
+    method: 'POST'
+    
+    
+  }
+);}
+
+
 
 export type googleCalendarControllerDisconnectResponse200 = {
-  data: GoogleCalendarControllerDisconnect200;
-  status: 200;
+  data: GoogleCalendarControllerDisconnect200
+  status: 200
+}
+    
+export type googleCalendarControllerDisconnectResponseSuccess = (googleCalendarControllerDisconnectResponse200) & {
+  headers: Headers;
 };
+;
 
-export type googleCalendarControllerDisconnectResponseSuccess =
-  googleCalendarControllerDisconnectResponse200 & {
-    headers: Headers;
-  };
-export type googleCalendarControllerDisconnectResponse =
-  googleCalendarControllerDisconnectResponseSuccess;
+export type googleCalendarControllerDisconnectResponse = (googleCalendarControllerDisconnectResponseSuccess)
 
 export const getGoogleCalendarControllerDisconnectUrl = () => {
-  return `/api/integrations/google-calendar/disconnect`;
-};
 
-export const googleCalendarControllerDisconnect = async (
-  options?: RequestInit
-): Promise<googleCalendarControllerDisconnectResponse> => {
-  return temisFetch<googleCalendarControllerDisconnectResponse>(
-    getGoogleCalendarControllerDisconnectUrl(),
-    {
-      ...options,
-      method: "DELETE"
-    }
-  );
-};
+
+  
+
+  return `/api/integrations/google-calendar/disconnect`
+}
+
+export const googleCalendarControllerDisconnect = async ( options?: RequestInit): Promise<googleCalendarControllerDisconnectResponse> => {
+  
+  return temisFetch<googleCalendarControllerDisconnectResponse>(getGoogleCalendarControllerDisconnectUrl(),
+  {      
+    ...options,
+    method: 'DELETE'
+    
+    
+  }
+);}
+
+
 
 export type cashboxControllerSummaryResponse200 = {
-  data: CashboxSummaryDto;
-  status: 200;
-};
-
-export type cashboxControllerSummaryResponseSuccess = cashboxControllerSummaryResponse200 & {
+  data: CashboxSummaryDto
+  status: 200
+}
+    
+export type cashboxControllerSummaryResponseSuccess = (cashboxControllerSummaryResponse200) & {
   headers: Headers;
 };
-export type cashboxControllerSummaryResponse = cashboxControllerSummaryResponseSuccess;
+;
+
+export type cashboxControllerSummaryResponse = (cashboxControllerSummaryResponseSuccess)
 
 export const getCashboxControllerSummaryUrl = () => {
-  return `/api/cashbox/summary`;
-};
 
-export const cashboxControllerSummary = async (
-  options?: RequestInit
-): Promise<cashboxControllerSummaryResponse> => {
-  return temisFetch<cashboxControllerSummaryResponse>(getCashboxControllerSummaryUrl(), {
+
+  
+
+  return `/api/cashbox/summary`
+}
+
+export const cashboxControllerSummary = async ( options?: RequestInit): Promise<cashboxControllerSummaryResponse> => {
+  
+  return temisFetch<cashboxControllerSummaryResponse>(getCashboxControllerSummaryUrl(),
+  {      
     ...options,
-    method: "GET"
-  });
-};
+    method: 'GET'
+    
+    
+  }
+);}
+
+
 
 export type cashboxControllerListMovementsResponse200 = {
-  data: CashboxMovementsListResponseDto;
-  status: 200;
+  data: CashboxMovementsListResponseDto
+  status: 200
+}
+    
+export type cashboxControllerListMovementsResponseSuccess = (cashboxControllerListMovementsResponse200) & {
+  headers: Headers;
 };
+;
 
-export type cashboxControllerListMovementsResponseSuccess =
-  cashboxControllerListMovementsResponse200 & {
-    headers: Headers;
-  };
-export type cashboxControllerListMovementsResponse = cashboxControllerListMovementsResponseSuccess;
+export type cashboxControllerListMovementsResponse = (cashboxControllerListMovementsResponseSuccess)
 
 export const getCashboxControllerListMovementsUrl = () => {
-  return `/api/cashbox/movements`;
-};
 
-export const cashboxControllerListMovements = async (
-  options?: RequestInit
-): Promise<cashboxControllerListMovementsResponse> => {
-  return temisFetch<cashboxControllerListMovementsResponse>(
-    getCashboxControllerListMovementsUrl(),
-    {
-      ...options,
-      method: "GET"
-    }
-  );
-};
+
+  
+
+  return `/api/cashbox/movements`
+}
+
+export const cashboxControllerListMovements = async ( options?: RequestInit): Promise<cashboxControllerListMovementsResponse> => {
+  
+  return temisFetch<cashboxControllerListMovementsResponse>(getCashboxControllerListMovementsUrl(),
+  {      
+    ...options,
+    method: 'GET'
+    
+    
+  }
+);}
+
+
 
 export type cashboxControllerCreateMovementResponse201 = {
-  data: CashboxMovementDto;
-  status: 201;
+  data: CashboxMovementDto
+  status: 201
+}
+    
+export type cashboxControllerCreateMovementResponseSuccess = (cashboxControllerCreateMovementResponse201) & {
+  headers: Headers;
 };
+;
 
-export type cashboxControllerCreateMovementResponseSuccess =
-  cashboxControllerCreateMovementResponse201 & {
-    headers: Headers;
-  };
-export type cashboxControllerCreateMovementResponse =
-  cashboxControllerCreateMovementResponseSuccess;
+export type cashboxControllerCreateMovementResponse = (cashboxControllerCreateMovementResponseSuccess)
 
 export const getCashboxControllerCreateMovementUrl = () => {
-  return `/api/cashbox/movements`;
-};
 
-export const cashboxControllerCreateMovement = async (
-  createCashboxMovementDto: CreateCashboxMovementDto,
-  options?: RequestInit
-): Promise<cashboxControllerCreateMovementResponse> => {
-  return temisFetch<cashboxControllerCreateMovementResponse>(
-    getCashboxControllerCreateMovementUrl(),
-    {
-      ...options,
-      method: "POST",
-      headers: { "Content-Type": "application/json", ...options?.headers },
-      body: JSON.stringify(createCashboxMovementDto)
-    }
-  );
-};
+
+  
+
+  return `/api/cashbox/movements`
+}
+
+export const cashboxControllerCreateMovement = async (createCashboxMovementDto: CreateCashboxMovementDto, options?: RequestInit): Promise<cashboxControllerCreateMovementResponse> => {
+  
+  return temisFetch<cashboxControllerCreateMovementResponse>(getCashboxControllerCreateMovementUrl(),
+  {      
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      createCashboxMovementDto,)
+  }
+);}
+
+
 
 export type cashboxControllerUpdateMovementResponse200 = {
-  data: CashboxMovementDto;
-  status: 200;
+  data: CashboxMovementDto
+  status: 200
+}
+    
+export type cashboxControllerUpdateMovementResponseSuccess = (cashboxControllerUpdateMovementResponse200) & {
+  headers: Headers;
 };
+;
 
-export type cashboxControllerUpdateMovementResponseSuccess =
-  cashboxControllerUpdateMovementResponse200 & {
-    headers: Headers;
-  };
-export type cashboxControllerUpdateMovementResponse =
-  cashboxControllerUpdateMovementResponseSuccess;
+export type cashboxControllerUpdateMovementResponse = (cashboxControllerUpdateMovementResponseSuccess)
 
-export const getCashboxControllerUpdateMovementUrl = (id: string) => {
-  return `/api/cashbox/movements/${id}`;
-};
+export const getCashboxControllerUpdateMovementUrl = (id: string,) => {
 
-export const cashboxControllerUpdateMovement = async (
-  id: string,
-  updateCashboxMovementDto: UpdateCashboxMovementDto,
-  options?: RequestInit
-): Promise<cashboxControllerUpdateMovementResponse> => {
-  return temisFetch<cashboxControllerUpdateMovementResponse>(
-    getCashboxControllerUpdateMovementUrl(id),
-    {
-      ...options,
-      method: "PATCH",
-      headers: { "Content-Type": "application/json", ...options?.headers },
-      body: JSON.stringify(updateCashboxMovementDto)
-    }
-  );
-};
+
+  
+
+  return `/api/cashbox/movements/${id}`
+}
+
+export const cashboxControllerUpdateMovement = async (id: string,
+    updateCashboxMovementDto: UpdateCashboxMovementDto, options?: RequestInit): Promise<cashboxControllerUpdateMovementResponse> => {
+  
+  return temisFetch<cashboxControllerUpdateMovementResponse>(getCashboxControllerUpdateMovementUrl(id),
+  {      
+    ...options,
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      updateCashboxMovementDto,)
+  }
+);}
+
+
 
 export type cashboxControllerDeleteMovementResponse200 = {
-  data: void;
-  status: 200;
+  data: void
+  status: 200
+}
+    
+export type cashboxControllerDeleteMovementResponseSuccess = (cashboxControllerDeleteMovementResponse200) & {
+  headers: Headers;
 };
+;
 
-export type cashboxControllerDeleteMovementResponseSuccess =
-  cashboxControllerDeleteMovementResponse200 & {
-    headers: Headers;
-  };
-export type cashboxControllerDeleteMovementResponse =
-  cashboxControllerDeleteMovementResponseSuccess;
+export type cashboxControllerDeleteMovementResponse = (cashboxControllerDeleteMovementResponseSuccess)
 
-export const getCashboxControllerDeleteMovementUrl = (id: string) => {
-  return `/api/cashbox/movements/${id}`;
-};
+export const getCashboxControllerDeleteMovementUrl = (id: string,) => {
 
-export const cashboxControllerDeleteMovement = async (
-  id: string,
-  options?: RequestInit
-): Promise<cashboxControllerDeleteMovementResponse> => {
-  return temisFetch<cashboxControllerDeleteMovementResponse>(
-    getCashboxControllerDeleteMovementUrl(id),
-    {
-      ...options,
-      method: "DELETE"
-    }
-  );
-};
+
+  
+
+  return `/api/cashbox/movements/${id}`
+}
+
+export const cashboxControllerDeleteMovement = async (id: string, options?: RequestInit): Promise<cashboxControllerDeleteMovementResponse> => {
+  
+  return temisFetch<cashboxControllerDeleteMovementResponse>(getCashboxControllerDeleteMovementUrl(id),
+  {      
+    ...options,
+    method: 'DELETE'
+    
+    
+  }
+);}
+
+
 
 export type cashboxControllerCreateConversionResponse201 = {
-  data: CreateCashboxConversionResponseDto;
-  status: 201;
+  data: CreateCashboxConversionResponseDto
+  status: 201
+}
+    
+export type cashboxControllerCreateConversionResponseSuccess = (cashboxControllerCreateConversionResponse201) & {
+  headers: Headers;
 };
+;
 
-export type cashboxControllerCreateConversionResponseSuccess =
-  cashboxControllerCreateConversionResponse201 & {
-    headers: Headers;
-  };
-export type cashboxControllerCreateConversionResponse =
-  cashboxControllerCreateConversionResponseSuccess;
+export type cashboxControllerCreateConversionResponse = (cashboxControllerCreateConversionResponseSuccess)
 
 export const getCashboxControllerCreateConversionUrl = () => {
-  return `/api/cashbox/conversions`;
-};
 
-export const cashboxControllerCreateConversion = async (
-  createCashboxConversionDto: CreateCashboxConversionDto,
-  options?: RequestInit
-): Promise<cashboxControllerCreateConversionResponse> => {
-  return temisFetch<cashboxControllerCreateConversionResponse>(
-    getCashboxControllerCreateConversionUrl(),
-    {
-      ...options,
-      method: "POST",
-      headers: { "Content-Type": "application/json", ...options?.headers },
-      body: JSON.stringify(createCashboxConversionDto)
-    }
-  );
-};
+
+  
+
+  return `/api/cashbox/conversions`
+}
+
+export const cashboxControllerCreateConversion = async (createCashboxConversionDto: CreateCashboxConversionDto, options?: RequestInit): Promise<cashboxControllerCreateConversionResponse> => {
+  
+  return temisFetch<cashboxControllerCreateConversionResponse>(getCashboxControllerCreateConversionUrl(),
+  {      
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      createCashboxConversionDto,)
+  }
+);}
+
+
 
 export type categoriesControllerListResponse200 = {
-  data: CategoryListResponseDto;
-  status: 200;
-};
-
-export type categoriesControllerListResponseSuccess = categoriesControllerListResponse200 & {
+  data: CategoryListResponseDto
+  status: 200
+}
+    
+export type categoriesControllerListResponseSuccess = (categoriesControllerListResponse200) & {
   headers: Headers;
 };
-export type categoriesControllerListResponse = categoriesControllerListResponseSuccess;
+;
+
+export type categoriesControllerListResponse = (categoriesControllerListResponseSuccess)
 
 export const getCategoriesControllerListUrl = () => {
-  return `/api/categories`;
-};
 
-export const categoriesControllerList = async (
-  options?: RequestInit
-): Promise<categoriesControllerListResponse> => {
-  return temisFetch<categoriesControllerListResponse>(getCategoriesControllerListUrl(), {
+
+  
+
+  return `/api/categories`
+}
+
+export const categoriesControllerList = async ( options?: RequestInit): Promise<categoriesControllerListResponse> => {
+  
+  return temisFetch<categoriesControllerListResponse>(getCategoriesControllerListUrl(),
+  {      
     ...options,
-    method: "GET"
-  });
-};
+    method: 'GET'
+    
+    
+  }
+);}
+
+
 
 export type categoriesControllerCreateResponse201 = {
-  data: CategoryDto;
-  status: 201;
-};
-
-export type categoriesControllerCreateResponseSuccess = categoriesControllerCreateResponse201 & {
+  data: CategoryDto
+  status: 201
+}
+    
+export type categoriesControllerCreateResponseSuccess = (categoriesControllerCreateResponse201) & {
   headers: Headers;
 };
-export type categoriesControllerCreateResponse = categoriesControllerCreateResponseSuccess;
+;
+
+export type categoriesControllerCreateResponse = (categoriesControllerCreateResponseSuccess)
 
 export const getCategoriesControllerCreateUrl = () => {
-  return `/api/categories`;
-};
 
-export const categoriesControllerCreate = async (
-  createCategoryDto: CreateCategoryDto,
-  options?: RequestInit
-): Promise<categoriesControllerCreateResponse> => {
-  return temisFetch<categoriesControllerCreateResponse>(getCategoriesControllerCreateUrl(), {
+
+  
+
+  return `/api/categories`
+}
+
+export const categoriesControllerCreate = async (createCategoryDto: CreateCategoryDto, options?: RequestInit): Promise<categoriesControllerCreateResponse> => {
+  
+  return temisFetch<categoriesControllerCreateResponse>(getCategoriesControllerCreateUrl(),
+  {      
     ...options,
-    method: "POST",
-    headers: { "Content-Type": "application/json", ...options?.headers },
-    body: JSON.stringify(createCategoryDto)
-  });
-};
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      createCategoryDto,)
+  }
+);}
+
+
 
 export type categoriesControllerUpdateResponse200 = {
-  data: CategoryDto;
-  status: 200;
-};
-
-export type categoriesControllerUpdateResponseSuccess = categoriesControllerUpdateResponse200 & {
+  data: CategoryDto
+  status: 200
+}
+    
+export type categoriesControllerUpdateResponseSuccess = (categoriesControllerUpdateResponse200) & {
   headers: Headers;
 };
-export type categoriesControllerUpdateResponse = categoriesControllerUpdateResponseSuccess;
+;
 
-export const getCategoriesControllerUpdateUrl = (id: string) => {
-  return `/api/categories/${id}`;
-};
+export type categoriesControllerUpdateResponse = (categoriesControllerUpdateResponseSuccess)
 
-export const categoriesControllerUpdate = async (
-  id: string,
-  updateCategoryDto: UpdateCategoryDto,
-  options?: RequestInit
-): Promise<categoriesControllerUpdateResponse> => {
-  return temisFetch<categoriesControllerUpdateResponse>(getCategoriesControllerUpdateUrl(id), {
+export const getCategoriesControllerUpdateUrl = (id: string,) => {
+
+
+  
+
+  return `/api/categories/${id}`
+}
+
+export const categoriesControllerUpdate = async (id: string,
+    updateCategoryDto: UpdateCategoryDto, options?: RequestInit): Promise<categoriesControllerUpdateResponse> => {
+  
+  return temisFetch<categoriesControllerUpdateResponse>(getCategoriesControllerUpdateUrl(id),
+  {      
     ...options,
-    method: "PATCH",
-    headers: { "Content-Type": "application/json", ...options?.headers },
-    body: JSON.stringify(updateCategoryDto)
-  });
-};
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      updateCategoryDto,)
+  }
+);}
+
+
 
 export type categoriesControllerDeleteResponse200 = {
-  data: CategoryDeleteResponseDto;
-  status: 200;
-};
-
-export type categoriesControllerDeleteResponseSuccess = categoriesControllerDeleteResponse200 & {
+  data: CategoryDeleteResponseDto
+  status: 200
+}
+    
+export type categoriesControllerDeleteResponseSuccess = (categoriesControllerDeleteResponse200) & {
   headers: Headers;
 };
-export type categoriesControllerDeleteResponse = categoriesControllerDeleteResponseSuccess;
+;
 
-export const getCategoriesControllerDeleteUrl = (id: string) => {
-  return `/api/categories/${id}`;
-};
+export type categoriesControllerDeleteResponse = (categoriesControllerDeleteResponseSuccess)
 
-export const categoriesControllerDelete = async (
-  id: string,
-  options?: RequestInit
-): Promise<categoriesControllerDeleteResponse> => {
-  return temisFetch<categoriesControllerDeleteResponse>(getCategoriesControllerDeleteUrl(id), {
+export const getCategoriesControllerDeleteUrl = (id: string,) => {
+
+
+  
+
+  return `/api/categories/${id}`
+}
+
+export const categoriesControllerDelete = async (id: string, options?: RequestInit): Promise<categoriesControllerDeleteResponse> => {
+  
+  return temisFetch<categoriesControllerDeleteResponse>(getCategoriesControllerDeleteUrl(id),
+  {      
     ...options,
-    method: "DELETE"
-  });
-};
+    method: 'DELETE'
+    
+    
+  }
+);}
+
+
 
 export type documentsControllerListResponse200 = {
-  data: DocumentsListResponseDto;
-  status: 200;
-};
-
-export type documentsControllerListResponseSuccess = documentsControllerListResponse200 & {
+  data: DocumentsListResponseDto
+  status: 200
+}
+    
+export type documentsControllerListResponseSuccess = (documentsControllerListResponse200) & {
   headers: Headers;
 };
-export type documentsControllerListResponse = documentsControllerListResponseSuccess;
+;
+
+export type documentsControllerListResponse = (documentsControllerListResponseSuccess)
 
 export const getDocumentsControllerListUrl = () => {
-  return `/api/documents`;
-};
 
-export const documentsControllerList = async (
-  options?: RequestInit
-): Promise<documentsControllerListResponse> => {
-  return temisFetch<documentsControllerListResponse>(getDocumentsControllerListUrl(), {
+
+  
+
+  return `/api/documents`
+}
+
+export const documentsControllerList = async ( options?: RequestInit): Promise<documentsControllerListResponse> => {
+  
+  return temisFetch<documentsControllerListResponse>(getDocumentsControllerListUrl(),
+  {      
     ...options,
-    method: "GET"
-  });
-};
+    method: 'GET'
+    
+    
+  }
+);}
+
+
 
 export type documentsControllerCreateResponse201 = {
-  data: DocumentDto;
-  status: 201;
-};
-
-export type documentsControllerCreateResponseSuccess = documentsControllerCreateResponse201 & {
+  data: DocumentDto
+  status: 201
+}
+    
+export type documentsControllerCreateResponseSuccess = (documentsControllerCreateResponse201) & {
   headers: Headers;
 };
-export type documentsControllerCreateResponse = documentsControllerCreateResponseSuccess;
+;
+
+export type documentsControllerCreateResponse = (documentsControllerCreateResponseSuccess)
 
 export const getDocumentsControllerCreateUrl = () => {
-  return `/api/documents`;
-};
 
-export const documentsControllerCreate = async (
-  createDocumentBodyDto: CreateDocumentBodyDto,
-  options?: RequestInit
-): Promise<documentsControllerCreateResponse> => {
-  const formData = new FormData();
-  formData.append(`file`, createDocumentBodyDto.file);
 
-  return temisFetch<documentsControllerCreateResponse>(getDocumentsControllerCreateUrl(), {
+  
+
+  return `/api/documents`
+}
+
+export const documentsControllerCreate = async (createDocumentBodyDto: CreateDocumentBodyDto, options?: RequestInit): Promise<documentsControllerCreateResponse> => {
+    const formData = new FormData();
+formData.append(`file`, createDocumentBodyDto.file)
+
+  return temisFetch<documentsControllerCreateResponse>(getDocumentsControllerCreateUrl(),
+  {      
     ...options,
-    method: "POST",
-    body: formData
-  });
-};
+    method: 'POST'
+    ,
+    body: 
+      formData,
+  }
+);}
+
+
 
 export type documentsControllerListFoldersResponse200 = {
-  data: DocumentFolderDto[];
-  status: 200;
+  data: DocumentFolderDto[]
+  status: 200
+}
+    
+export type documentsControllerListFoldersResponseSuccess = (documentsControllerListFoldersResponse200) & {
+  headers: Headers;
 };
+;
 
-export type documentsControllerListFoldersResponseSuccess =
-  documentsControllerListFoldersResponse200 & {
-    headers: Headers;
-  };
-export type documentsControllerListFoldersResponse = documentsControllerListFoldersResponseSuccess;
+export type documentsControllerListFoldersResponse = (documentsControllerListFoldersResponseSuccess)
 
 export const getDocumentsControllerListFoldersUrl = () => {
-  return `/api/documents/folders`;
-};
 
-export const documentsControllerListFolders = async (
-  options?: RequestInit
-): Promise<documentsControllerListFoldersResponse> => {
-  return temisFetch<documentsControllerListFoldersResponse>(
-    getDocumentsControllerListFoldersUrl(),
-    {
-      ...options,
-      method: "GET"
-    }
-  );
-};
+
+  
+
+  return `/api/documents/folders`
+}
+
+export const documentsControllerListFolders = async ( options?: RequestInit): Promise<documentsControllerListFoldersResponse> => {
+  
+  return temisFetch<documentsControllerListFoldersResponse>(getDocumentsControllerListFoldersUrl(),
+  {      
+    ...options,
+    method: 'GET'
+    
+    
+  }
+);}
+
+
 
 export type documentsControllerCreateFolderResponse201 = {
-  data: DocumentFolderDto;
-  status: 201;
+  data: DocumentFolderDto
+  status: 201
+}
+    
+export type documentsControllerCreateFolderResponseSuccess = (documentsControllerCreateFolderResponse201) & {
+  headers: Headers;
 };
+;
 
-export type documentsControllerCreateFolderResponseSuccess =
-  documentsControllerCreateFolderResponse201 & {
-    headers: Headers;
-  };
-export type documentsControllerCreateFolderResponse =
-  documentsControllerCreateFolderResponseSuccess;
+export type documentsControllerCreateFolderResponse = (documentsControllerCreateFolderResponseSuccess)
 
 export const getDocumentsControllerCreateFolderUrl = () => {
-  return `/api/documents/folders`;
-};
 
-export const documentsControllerCreateFolder = async (
-  createDocumentFolderDto: CreateDocumentFolderDto,
-  options?: RequestInit
-): Promise<documentsControllerCreateFolderResponse> => {
-  return temisFetch<documentsControllerCreateFolderResponse>(
-    getDocumentsControllerCreateFolderUrl(),
-    {
-      ...options,
-      method: "POST",
-      headers: { "Content-Type": "application/json", ...options?.headers },
-      body: JSON.stringify(createDocumentFolderDto)
-    }
-  );
-};
+
+  
+
+  return `/api/documents/folders`
+}
+
+export const documentsControllerCreateFolder = async (createDocumentFolderDto: CreateDocumentFolderDto, options?: RequestInit): Promise<documentsControllerCreateFolderResponse> => {
+  
+  return temisFetch<documentsControllerCreateFolderResponse>(getDocumentsControllerCreateFolderUrl(),
+  {      
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      createDocumentFolderDto,)
+  }
+);}
+
+
 
 export type documentsControllerUpdateFolderResponse200 = {
-  data: DocumentFolderDto;
-  status: 200;
+  data: DocumentFolderDto
+  status: 200
+}
+    
+export type documentsControllerUpdateFolderResponseSuccess = (documentsControllerUpdateFolderResponse200) & {
+  headers: Headers;
 };
+;
 
-export type documentsControllerUpdateFolderResponseSuccess =
-  documentsControllerUpdateFolderResponse200 & {
-    headers: Headers;
-  };
-export type documentsControllerUpdateFolderResponse =
-  documentsControllerUpdateFolderResponseSuccess;
+export type documentsControllerUpdateFolderResponse = (documentsControllerUpdateFolderResponseSuccess)
 
-export const getDocumentsControllerUpdateFolderUrl = (folderId: string) => {
-  return `/api/documents/folders/${folderId}`;
-};
+export const getDocumentsControllerUpdateFolderUrl = (folderId: string,) => {
 
-export const documentsControllerUpdateFolder = async (
-  folderId: string,
-  updateDocumentFolderDto: UpdateDocumentFolderDto,
-  options?: RequestInit
-): Promise<documentsControllerUpdateFolderResponse> => {
-  return temisFetch<documentsControllerUpdateFolderResponse>(
-    getDocumentsControllerUpdateFolderUrl(folderId),
-    {
-      ...options,
-      method: "PATCH",
-      headers: { "Content-Type": "application/json", ...options?.headers },
-      body: JSON.stringify(updateDocumentFolderDto)
-    }
-  );
-};
+
+  
+
+  return `/api/documents/folders/${folderId}`
+}
+
+export const documentsControllerUpdateFolder = async (folderId: string,
+    updateDocumentFolderDto: UpdateDocumentFolderDto, options?: RequestInit): Promise<documentsControllerUpdateFolderResponse> => {
+  
+  return temisFetch<documentsControllerUpdateFolderResponse>(getDocumentsControllerUpdateFolderUrl(folderId),
+  {      
+    ...options,
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      updateDocumentFolderDto,)
+  }
+);}
+
+
 
 export type documentsControllerDeleteFolderResponse200 = {
-  data: DeleteResponseDto;
-  status: 200;
+  data: DeleteResponseDto
+  status: 200
+}
+    
+export type documentsControllerDeleteFolderResponseSuccess = (documentsControllerDeleteFolderResponse200) & {
+  headers: Headers;
 };
+;
 
-export type documentsControllerDeleteFolderResponseSuccess =
-  documentsControllerDeleteFolderResponse200 & {
-    headers: Headers;
-  };
-export type documentsControllerDeleteFolderResponse =
-  documentsControllerDeleteFolderResponseSuccess;
+export type documentsControllerDeleteFolderResponse = (documentsControllerDeleteFolderResponseSuccess)
 
-export const getDocumentsControllerDeleteFolderUrl = (folderId: string) => {
-  return `/api/documents/folders/${folderId}`;
-};
+export const getDocumentsControllerDeleteFolderUrl = (folderId: string,) => {
 
-export const documentsControllerDeleteFolder = async (
-  folderId: string,
-  options?: RequestInit
-): Promise<documentsControllerDeleteFolderResponse> => {
-  return temisFetch<documentsControllerDeleteFolderResponse>(
-    getDocumentsControllerDeleteFolderUrl(folderId),
-    {
-      ...options,
-      method: "DELETE"
-    }
-  );
-};
+
+  
+
+  return `/api/documents/folders/${folderId}`
+}
+
+export const documentsControllerDeleteFolder = async (folderId: string, options?: RequestInit): Promise<documentsControllerDeleteFolderResponse> => {
+  
+  return temisFetch<documentsControllerDeleteFolderResponse>(getDocumentsControllerDeleteFolderUrl(folderId),
+  {      
+    ...options,
+    method: 'DELETE'
+    
+    
+  }
+);}
+
+
 
 export type documentsControllerCreateImportJobResponse201 = {
-  data: DocumentImportJobDto;
-  status: 201;
+  data: DocumentImportJobDto
+  status: 201
+}
+    
+export type documentsControllerCreateImportJobResponseSuccess = (documentsControllerCreateImportJobResponse201) & {
+  headers: Headers;
 };
+;
 
-export type documentsControllerCreateImportJobResponseSuccess =
-  documentsControllerCreateImportJobResponse201 & {
-    headers: Headers;
-  };
-export type documentsControllerCreateImportJobResponse =
-  documentsControllerCreateImportJobResponseSuccess;
+export type documentsControllerCreateImportJobResponse = (documentsControllerCreateImportJobResponseSuccess)
 
 export const getDocumentsControllerCreateImportJobUrl = () => {
-  return `/api/documents/imports`;
-};
 
-export const documentsControllerCreateImportJob = async (
-  createDocumentImportJobDto: CreateDocumentImportJobDto,
-  options?: RequestInit
-): Promise<documentsControllerCreateImportJobResponse> => {
-  return temisFetch<documentsControllerCreateImportJobResponse>(
-    getDocumentsControllerCreateImportJobUrl(),
-    {
-      ...options,
-      method: "POST",
-      headers: { "Content-Type": "application/json", ...options?.headers },
-      body: JSON.stringify(createDocumentImportJobDto)
-    }
-  );
-};
+
+  
+
+  return `/api/documents/imports`
+}
+
+export const documentsControllerCreateImportJob = async (createDocumentImportJobDto: CreateDocumentImportJobDto, options?: RequestInit): Promise<documentsControllerCreateImportJobResponse> => {
+  
+  return temisFetch<documentsControllerCreateImportJobResponse>(getDocumentsControllerCreateImportJobUrl(),
+  {      
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      createDocumentImportJobDto,)
+  }
+);}
+
+
 
 export type documentsControllerUploadImportItemsResponse200 = {
-  data: DocumentImportJobDto;
-  status: 200;
+  data: DocumentImportJobDto
+  status: 200
+}
+    
+export type documentsControllerUploadImportItemsResponseSuccess = (documentsControllerUploadImportItemsResponse200) & {
+  headers: Headers;
 };
+;
 
-export type documentsControllerUploadImportItemsResponseSuccess =
-  documentsControllerUploadImportItemsResponse200 & {
-    headers: Headers;
-  };
-export type documentsControllerUploadImportItemsResponse =
-  documentsControllerUploadImportItemsResponseSuccess;
+export type documentsControllerUploadImportItemsResponse = (documentsControllerUploadImportItemsResponseSuccess)
 
-export const getDocumentsControllerUploadImportItemsUrl = (importJobId: string) => {
-  return `/api/documents/imports/${importJobId}/items`;
-};
+export const getDocumentsControllerUploadImportItemsUrl = (importJobId: string,) => {
 
-export const documentsControllerUploadImportItems = async (
-  importJobId: string,
-  uploadDocumentImportItemsDto: UploadDocumentImportItemsDto,
-  options?: RequestInit
-): Promise<documentsControllerUploadImportItemsResponse> => {
-  const formData = new FormData();
-  uploadDocumentImportItemsDto.files.forEach((value) => formData.append(`files`, value));
 
-  return temisFetch<documentsControllerUploadImportItemsResponse>(
-    getDocumentsControllerUploadImportItemsUrl(importJobId),
-    {
-      ...options,
-      method: "POST",
-      body: formData
-    }
-  );
-};
+  
+
+  return `/api/documents/imports/${importJobId}/items`
+}
+
+export const documentsControllerUploadImportItems = async (importJobId: string,
+    uploadDocumentImportItemsDto: UploadDocumentImportItemsDto, options?: RequestInit): Promise<documentsControllerUploadImportItemsResponse> => {
+    const formData = new FormData();
+uploadDocumentImportItemsDto.files.forEach(value => formData.append(`files`, value));
+
+  return temisFetch<documentsControllerUploadImportItemsResponse>(getDocumentsControllerUploadImportItemsUrl(importJobId),
+  {      
+    ...options,
+    method: 'POST'
+    ,
+    body: 
+      formData,
+  }
+);}
+
+
 
 export type documentsControllerGetImportJobResponse200 = {
-  data: DocumentImportJobDto;
-  status: 200;
+  data: DocumentImportJobDto
+  status: 200
+}
+    
+export type documentsControllerGetImportJobResponseSuccess = (documentsControllerGetImportJobResponse200) & {
+  headers: Headers;
 };
+;
 
-export type documentsControllerGetImportJobResponseSuccess =
-  documentsControllerGetImportJobResponse200 & {
-    headers: Headers;
-  };
-export type documentsControllerGetImportJobResponse =
-  documentsControllerGetImportJobResponseSuccess;
+export type documentsControllerGetImportJobResponse = (documentsControllerGetImportJobResponseSuccess)
 
-export const getDocumentsControllerGetImportJobUrl = (importJobId: string) => {
-  return `/api/documents/imports/${importJobId}`;
-};
+export const getDocumentsControllerGetImportJobUrl = (importJobId: string,) => {
 
-export const documentsControllerGetImportJob = async (
-  importJobId: string,
-  options?: RequestInit
-): Promise<documentsControllerGetImportJobResponse> => {
-  return temisFetch<documentsControllerGetImportJobResponse>(
-    getDocumentsControllerGetImportJobUrl(importJobId),
-    {
-      ...options,
-      method: "GET"
-    }
-  );
-};
+
+  
+
+  return `/api/documents/imports/${importJobId}`
+}
+
+export const documentsControllerGetImportJob = async (importJobId: string, options?: RequestInit): Promise<documentsControllerGetImportJobResponse> => {
+  
+  return temisFetch<documentsControllerGetImportJobResponse>(getDocumentsControllerGetImportJobUrl(importJobId),
+  {      
+    ...options,
+    method: 'GET'
+    
+    
+  }
+);}
+
+
 
 export type documentsControllerCancelImportJobResponse200 = {
-  data: DocumentImportJobDto;
-  status: 200;
+  data: DocumentImportJobDto
+  status: 200
+}
+    
+export type documentsControllerCancelImportJobResponseSuccess = (documentsControllerCancelImportJobResponse200) & {
+  headers: Headers;
 };
+;
 
-export type documentsControllerCancelImportJobResponseSuccess =
-  documentsControllerCancelImportJobResponse200 & {
-    headers: Headers;
-  };
-export type documentsControllerCancelImportJobResponse =
-  documentsControllerCancelImportJobResponseSuccess;
+export type documentsControllerCancelImportJobResponse = (documentsControllerCancelImportJobResponseSuccess)
 
-export const getDocumentsControllerCancelImportJobUrl = (importJobId: string) => {
-  return `/api/documents/imports/${importJobId}/cancel`;
-};
+export const getDocumentsControllerCancelImportJobUrl = (importJobId: string,) => {
 
-export const documentsControllerCancelImportJob = async (
-  importJobId: string,
-  options?: RequestInit
-): Promise<documentsControllerCancelImportJobResponse> => {
-  return temisFetch<documentsControllerCancelImportJobResponse>(
-    getDocumentsControllerCancelImportJobUrl(importJobId),
-    {
-      ...options,
-      method: "POST"
-    }
-  );
-};
+
+  
+
+  return `/api/documents/imports/${importJobId}/cancel`
+}
+
+export const documentsControllerCancelImportJob = async (importJobId: string, options?: RequestInit): Promise<documentsControllerCancelImportJobResponse> => {
+  
+  return temisFetch<documentsControllerCancelImportJobResponse>(getDocumentsControllerCancelImportJobUrl(importJobId),
+  {      
+    ...options,
+    method: 'POST'
+    
+    
+  }
+);}
+
+
 
 export type documentsControllerUpdateResponse200 = {
-  data: DocumentDto;
-  status: 200;
-};
-
-export type documentsControllerUpdateResponseSuccess = documentsControllerUpdateResponse200 & {
+  data: DocumentDto
+  status: 200
+}
+    
+export type documentsControllerUpdateResponseSuccess = (documentsControllerUpdateResponse200) & {
   headers: Headers;
 };
-export type documentsControllerUpdateResponse = documentsControllerUpdateResponseSuccess;
+;
 
-export const getDocumentsControllerUpdateUrl = (documentId: string) => {
-  return `/api/documents/${documentId}`;
-};
+export type documentsControllerUpdateResponse = (documentsControllerUpdateResponseSuccess)
 
-export const documentsControllerUpdate = async (
-  documentId: string,
-  updateDocumentDto: UpdateDocumentDto,
-  options?: RequestInit
-): Promise<documentsControllerUpdateResponse> => {
-  return temisFetch<documentsControllerUpdateResponse>(
-    getDocumentsControllerUpdateUrl(documentId),
-    {
-      ...options,
-      method: "PATCH",
-      headers: { "Content-Type": "application/json", ...options?.headers },
-      body: JSON.stringify(updateDocumentDto)
-    }
-  );
-};
+export const getDocumentsControllerUpdateUrl = (documentId: string,) => {
+
+
+  
+
+  return `/api/documents/${documentId}`
+}
+
+export const documentsControllerUpdate = async (documentId: string,
+    updateDocumentDto: UpdateDocumentDto, options?: RequestInit): Promise<documentsControllerUpdateResponse> => {
+  
+  return temisFetch<documentsControllerUpdateResponse>(getDocumentsControllerUpdateUrl(documentId),
+  {      
+    ...options,
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      updateDocumentDto,)
+  }
+);}
+
+
 
 export type documentsControllerDeleteResponse200 = {
-  data: DeleteResponseDto;
-  status: 200;
-};
-
-export type documentsControllerDeleteResponseSuccess = documentsControllerDeleteResponse200 & {
+  data: DeleteResponseDto
+  status: 200
+}
+    
+export type documentsControllerDeleteResponseSuccess = (documentsControllerDeleteResponse200) & {
   headers: Headers;
 };
-export type documentsControllerDeleteResponse = documentsControllerDeleteResponseSuccess;
+;
 
-export const getDocumentsControllerDeleteUrl = (documentId: string) => {
-  return `/api/documents/${documentId}`;
-};
+export type documentsControllerDeleteResponse = (documentsControllerDeleteResponseSuccess)
 
-export const documentsControllerDelete = async (
-  documentId: string,
-  options?: RequestInit
-): Promise<documentsControllerDeleteResponse> => {
-  return temisFetch<documentsControllerDeleteResponse>(
-    getDocumentsControllerDeleteUrl(documentId),
-    {
-      ...options,
-      method: "DELETE"
-    }
-  );
+export const getDocumentsControllerDeleteUrl = (documentId: string,) => {
+
+
+  
+
+  return `/api/documents/${documentId}`
+}
+
+export const documentsControllerDelete = async (documentId: string, options?: RequestInit): Promise<documentsControllerDeleteResponse> => {
+  
+  return temisFetch<documentsControllerDeleteResponse>(getDocumentsControllerDeleteUrl(documentId),
+  {      
+    ...options,
+    method: 'DELETE'
+    
+    
+  }
+);}
+
+
+
+export type documentsControllerReplaceResponse200 = {
+  data: DocumentDto
+  status: 200
+}
+    
+export type documentsControllerReplaceResponseSuccess = (documentsControllerReplaceResponse200) & {
+  headers: Headers;
 };
+;
+
+export type documentsControllerReplaceResponse = (documentsControllerReplaceResponseSuccess)
+
+export const getDocumentsControllerReplaceUrl = (documentId: string,) => {
+
+
+  
+
+  return `/api/documents/${documentId}/replace`
+}
+
+export const documentsControllerReplace = async (documentId: string,
+    replaceDocumentBodyDto: ReplaceDocumentBodyDto, options?: RequestInit): Promise<documentsControllerReplaceResponse> => {
+    const formData = new FormData();
+formData.append(`file`, replaceDocumentBodyDto.file)
+
+  return temisFetch<documentsControllerReplaceResponse>(getDocumentsControllerReplaceUrl(documentId),
+  {      
+    ...options,
+    method: 'POST'
+    ,
+    body: 
+      formData,
+  }
+);}
+
+
 
 export type documentsControllerPreviewResponse200 = {
-  data: void;
-  status: 200;
-};
-
-export type documentsControllerPreviewResponseSuccess = documentsControllerPreviewResponse200 & {
+  data: void
+  status: 200
+}
+    
+export type documentsControllerPreviewResponseSuccess = (documentsControllerPreviewResponse200) & {
   headers: Headers;
 };
-export type documentsControllerPreviewResponse = documentsControllerPreviewResponseSuccess;
+;
 
-export const getDocumentsControllerPreviewUrl = (documentId: string) => {
-  return `/api/documents/${documentId}/preview`;
-};
+export type documentsControllerPreviewResponse = (documentsControllerPreviewResponseSuccess)
 
-export const documentsControllerPreview = async (
-  documentId: string,
-  options?: RequestInit
-): Promise<documentsControllerPreviewResponse> => {
-  return temisFetch<documentsControllerPreviewResponse>(
-    getDocumentsControllerPreviewUrl(documentId),
-    {
-      ...options,
-      method: "GET"
-    }
-  );
-};
+export const getDocumentsControllerPreviewUrl = (documentId: string,) => {
+
+
+  
+
+  return `/api/documents/${documentId}/preview`
+}
+
+export const documentsControllerPreview = async (documentId: string, options?: RequestInit): Promise<documentsControllerPreviewResponse> => {
+  
+  return temisFetch<documentsControllerPreviewResponse>(getDocumentsControllerPreviewUrl(documentId),
+  {      
+    ...options,
+    method: 'GET'
+    
+    
+  }
+);}
+
+
 
 export type documentsControllerDownloadResponse200 = {
-  data: void;
-  status: 200;
-};
-
-export type documentsControllerDownloadResponseSuccess = documentsControllerDownloadResponse200 & {
+  data: void
+  status: 200
+}
+    
+export type documentsControllerDownloadResponseSuccess = (documentsControllerDownloadResponse200) & {
   headers: Headers;
 };
-export type documentsControllerDownloadResponse = documentsControllerDownloadResponseSuccess;
+;
 
-export const getDocumentsControllerDownloadUrl = (documentId: string) => {
-  return `/api/documents/${documentId}/download`;
-};
+export type documentsControllerDownloadResponse = (documentsControllerDownloadResponseSuccess)
 
-export const documentsControllerDownload = async (
-  documentId: string,
-  options?: RequestInit
-): Promise<documentsControllerDownloadResponse> => {
-  return temisFetch<documentsControllerDownloadResponse>(
-    getDocumentsControllerDownloadUrl(documentId),
-    {
-      ...options,
-      method: "GET"
-    }
-  );
-};
+export const getDocumentsControllerDownloadUrl = (documentId: string,) => {
+
+
+  
+
+  return `/api/documents/${documentId}/download`
+}
+
+export const documentsControllerDownload = async (documentId: string, options?: RequestInit): Promise<documentsControllerDownloadResponse> => {
+  
+  return temisFetch<documentsControllerDownloadResponse>(getDocumentsControllerDownloadUrl(documentId),
+  {      
+    ...options,
+    method: 'GET'
+    
+    
+  }
+);}
+
+
 
 export type documentsControllerBulkDeleteResponse200 = {
-  data: DeleteResponseDto;
-  status: 200;
+  data: DeleteResponseDto
+  status: 200
+}
+    
+export type documentsControllerBulkDeleteResponseSuccess = (documentsControllerBulkDeleteResponse200) & {
+  headers: Headers;
 };
+;
 
-export type documentsControllerBulkDeleteResponseSuccess =
-  documentsControllerBulkDeleteResponse200 & {
-    headers: Headers;
-  };
-export type documentsControllerBulkDeleteResponse = documentsControllerBulkDeleteResponseSuccess;
+export type documentsControllerBulkDeleteResponse = (documentsControllerBulkDeleteResponseSuccess)
 
 export const getDocumentsControllerBulkDeleteUrl = () => {
-  return `/api/documents/bulk-delete`;
-};
 
-export const documentsControllerBulkDelete = async (
-  bulkDeleteDocumentsDto: BulkDeleteDocumentsDto,
-  options?: RequestInit
-): Promise<documentsControllerBulkDeleteResponse> => {
-  return temisFetch<documentsControllerBulkDeleteResponse>(getDocumentsControllerBulkDeleteUrl(), {
+
+  
+
+  return `/api/documents/bulk-delete`
+}
+
+export const documentsControllerBulkDelete = async (bulkDeleteDocumentsDto: BulkDeleteDocumentsDto, options?: RequestInit): Promise<documentsControllerBulkDeleteResponse> => {
+  
+  return temisFetch<documentsControllerBulkDeleteResponse>(getDocumentsControllerBulkDeleteUrl(),
+  {      
     ...options,
-    method: "POST",
-    headers: { "Content-Type": "application/json", ...options?.headers },
-    body: JSON.stringify(bulkDeleteDocumentsDto)
-  });
-};
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      bulkDeleteDocumentsDto,)
+  }
+);}
+
+
 
 export type documentsControllerBulkMoveResponse200 = {
-  data: DeleteResponseDto;
-  status: 200;
-};
-
-export type documentsControllerBulkMoveResponseSuccess = documentsControllerBulkMoveResponse200 & {
+  data: DeleteResponseDto
+  status: 200
+}
+    
+export type documentsControllerBulkMoveResponseSuccess = (documentsControllerBulkMoveResponse200) & {
   headers: Headers;
 };
-export type documentsControllerBulkMoveResponse = documentsControllerBulkMoveResponseSuccess;
+;
+
+export type documentsControllerBulkMoveResponse = (documentsControllerBulkMoveResponseSuccess)
 
 export const getDocumentsControllerBulkMoveUrl = () => {
-  return `/api/documents/bulk-move`;
-};
 
-export const documentsControllerBulkMove = async (
-  bulkMoveDocumentsDto: BulkMoveDocumentsDto,
-  options?: RequestInit
-): Promise<documentsControllerBulkMoveResponse> => {
-  return temisFetch<documentsControllerBulkMoveResponse>(getDocumentsControllerBulkMoveUrl(), {
+
+  
+
+  return `/api/documents/bulk-move`
+}
+
+export const documentsControllerBulkMove = async (bulkMoveDocumentsDto: BulkMoveDocumentsDto, options?: RequestInit): Promise<documentsControllerBulkMoveResponse> => {
+  
+  return temisFetch<documentsControllerBulkMoveResponse>(getDocumentsControllerBulkMoveUrl(),
+  {      
     ...options,
-    method: "POST",
-    headers: { "Content-Type": "application/json", ...options?.headers },
-    body: JSON.stringify(bulkMoveDocumentsDto)
-  });
-};
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      bulkMoveDocumentsDto,)
+  }
+);}
+
+
 
 export type notificationsControllerListResponse200 = {
-  data: NotificationsListResponseDto;
-  status: 200;
-};
-
-export type notificationsControllerListResponseSuccess = notificationsControllerListResponse200 & {
+  data: NotificationsListResponseDto
+  status: 200
+}
+    
+export type notificationsControllerListResponseSuccess = (notificationsControllerListResponse200) & {
   headers: Headers;
 };
-export type notificationsControllerListResponse = notificationsControllerListResponseSuccess;
+;
+
+export type notificationsControllerListResponse = (notificationsControllerListResponseSuccess)
 
 export const getNotificationsControllerListUrl = () => {
-  return `/api/notifications`;
-};
 
-export const notificationsControllerList = async (
-  options?: RequestInit
-): Promise<notificationsControllerListResponse> => {
-  return temisFetch<notificationsControllerListResponse>(getNotificationsControllerListUrl(), {
+
+  
+
+  return `/api/notifications`
+}
+
+export const notificationsControllerList = async ( options?: RequestInit): Promise<notificationsControllerListResponse> => {
+  
+  return temisFetch<notificationsControllerListResponse>(getNotificationsControllerListUrl(),
+  {      
     ...options,
-    method: "GET"
-  });
-};
+    method: 'GET'
+    
+    
+  }
+);}
+
+
 
 export type notificationsControllerStreamResponse200 = {
-  data: void;
-  status: 200;
+  data: void
+  status: 200
+}
+    
+export type notificationsControllerStreamResponseSuccess = (notificationsControllerStreamResponse200) & {
+  headers: Headers;
 };
+;
 
-export type notificationsControllerStreamResponseSuccess =
-  notificationsControllerStreamResponse200 & {
-    headers: Headers;
-  };
-export type notificationsControllerStreamResponse = notificationsControllerStreamResponseSuccess;
+export type notificationsControllerStreamResponse = (notificationsControllerStreamResponseSuccess)
 
 export const getNotificationsControllerStreamUrl = () => {
-  return `/api/notifications/stream`;
-};
 
-export const notificationsControllerStream = async (
-  options?: RequestInit
-): Promise<notificationsControllerStreamResponse> => {
-  return temisFetch<notificationsControllerStreamResponse>(getNotificationsControllerStreamUrl(), {
+
+  
+
+  return `/api/notifications/stream`
+}
+
+export const notificationsControllerStream = async ( options?: RequestInit): Promise<notificationsControllerStreamResponse> => {
+  
+  return temisFetch<notificationsControllerStreamResponse>(getNotificationsControllerStreamUrl(),
+  {      
     ...options,
-    method: "GET"
-  });
-};
+    method: 'GET'
+    
+    
+  }
+);}
+
+
 
 export type notificationsControllerMarkReadResponse200 = {
-  data: NotificationReadResponseDto;
-  status: 200;
+  data: NotificationReadResponseDto
+  status: 200
+}
+    
+export type notificationsControllerMarkReadResponseSuccess = (notificationsControllerMarkReadResponse200) & {
+  headers: Headers;
 };
+;
 
-export type notificationsControllerMarkReadResponseSuccess =
-  notificationsControllerMarkReadResponse200 & {
-    headers: Headers;
-  };
-export type notificationsControllerMarkReadResponse =
-  notificationsControllerMarkReadResponseSuccess;
+export type notificationsControllerMarkReadResponse = (notificationsControllerMarkReadResponseSuccess)
 
-export const getNotificationsControllerMarkReadUrl = (id: string) => {
-  return `/api/notifications/${id}/read`;
-};
+export const getNotificationsControllerMarkReadUrl = (id: string,) => {
 
-export const notificationsControllerMarkRead = async (
-  id: string,
-  options?: RequestInit
-): Promise<notificationsControllerMarkReadResponse> => {
-  return temisFetch<notificationsControllerMarkReadResponse>(
-    getNotificationsControllerMarkReadUrl(id),
-    {
-      ...options,
-      method: "PATCH"
-    }
-  );
-};
+
+  
+
+  return `/api/notifications/${id}/read`
+}
+
+export const notificationsControllerMarkRead = async (id: string, options?: RequestInit): Promise<notificationsControllerMarkReadResponse> => {
+  
+  return temisFetch<notificationsControllerMarkReadResponse>(getNotificationsControllerMarkReadUrl(id),
+  {      
+    ...options,
+    method: 'PATCH'
+    
+    
+  }
+);}
+
+
 
 export type notionIntegrationControllerGetStatusResponse200 = {
-  data: NotionIntegrationStatusDto;
-  status: 200;
+  data: NotionIntegrationStatusDto
+  status: 200
+}
+    
+export type notionIntegrationControllerGetStatusResponseSuccess = (notionIntegrationControllerGetStatusResponse200) & {
+  headers: Headers;
 };
+;
 
-export type notionIntegrationControllerGetStatusResponseSuccess =
-  notionIntegrationControllerGetStatusResponse200 & {
-    headers: Headers;
-  };
-export type notionIntegrationControllerGetStatusResponse =
-  notionIntegrationControllerGetStatusResponseSuccess;
+export type notionIntegrationControllerGetStatusResponse = (notionIntegrationControllerGetStatusResponseSuccess)
 
 export const getNotionIntegrationControllerGetStatusUrl = () => {
-  return `/api/account/integrations/notion`;
-};
 
-export const notionIntegrationControllerGetStatus = async (
-  options?: RequestInit
-): Promise<notionIntegrationControllerGetStatusResponse> => {
-  return temisFetch<notionIntegrationControllerGetStatusResponse>(
-    getNotionIntegrationControllerGetStatusUrl(),
-    {
-      ...options,
-      method: "GET"
-    }
-  );
-};
+
+  
+
+  return `/api/account/integrations/notion`
+}
+
+export const notionIntegrationControllerGetStatus = async ( options?: RequestInit): Promise<notionIntegrationControllerGetStatusResponse> => {
+  
+  return temisFetch<notionIntegrationControllerGetStatusResponse>(getNotionIntegrationControllerGetStatusUrl(),
+  {      
+    ...options,
+    method: 'GET'
+    
+    
+  }
+);}
+
+
 
 export type notionIntegrationControllerDisconnectResponse200 = {
-  data: NotionIntegrationControllerDisconnect200;
-  status: 200;
+  data: NotionIntegrationControllerDisconnect200
+  status: 200
+}
+    
+export type notionIntegrationControllerDisconnectResponseSuccess = (notionIntegrationControllerDisconnectResponse200) & {
+  headers: Headers;
 };
+;
 
-export type notionIntegrationControllerDisconnectResponseSuccess =
-  notionIntegrationControllerDisconnectResponse200 & {
-    headers: Headers;
-  };
-export type notionIntegrationControllerDisconnectResponse =
-  notionIntegrationControllerDisconnectResponseSuccess;
+export type notionIntegrationControllerDisconnectResponse = (notionIntegrationControllerDisconnectResponseSuccess)
 
 export const getNotionIntegrationControllerDisconnectUrl = () => {
-  return `/api/account/integrations/notion`;
-};
 
-export const notionIntegrationControllerDisconnect = async (
-  options?: RequestInit
-): Promise<notionIntegrationControllerDisconnectResponse> => {
-  return temisFetch<notionIntegrationControllerDisconnectResponse>(
-    getNotionIntegrationControllerDisconnectUrl(),
-    {
-      ...options,
-      method: "DELETE"
-    }
-  );
-};
+
+  
+
+  return `/api/account/integrations/notion`
+}
+
+export const notionIntegrationControllerDisconnect = async ( options?: RequestInit): Promise<notionIntegrationControllerDisconnectResponse> => {
+  
+  return temisFetch<notionIntegrationControllerDisconnectResponse>(getNotionIntegrationControllerDisconnectUrl(),
+  {      
+    ...options,
+    method: 'DELETE'
+    
+    
+  }
+);}
+
+
 
 export type notionIntegrationControllerStartOAuthResponse200 = {
-  data: NotionOAuthStartDto;
-  status: 200;
+  data: NotionOAuthStartDto
+  status: 200
+}
+    
+export type notionIntegrationControllerStartOAuthResponseSuccess = (notionIntegrationControllerStartOAuthResponse200) & {
+  headers: Headers;
 };
+;
 
-export type notionIntegrationControllerStartOAuthResponseSuccess =
-  notionIntegrationControllerStartOAuthResponse200 & {
-    headers: Headers;
-  };
-export type notionIntegrationControllerStartOAuthResponse =
-  notionIntegrationControllerStartOAuthResponseSuccess;
+export type notionIntegrationControllerStartOAuthResponse = (notionIntegrationControllerStartOAuthResponseSuccess)
 
 export const getNotionIntegrationControllerStartOAuthUrl = () => {
-  return `/api/account/integrations/notion/oauth/start`;
-};
 
-export const notionIntegrationControllerStartOAuth = async (
-  options?: RequestInit
-): Promise<notionIntegrationControllerStartOAuthResponse> => {
-  return temisFetch<notionIntegrationControllerStartOAuthResponse>(
-    getNotionIntegrationControllerStartOAuthUrl(),
-    {
-      ...options,
-      method: "GET"
-    }
-  );
-};
+
+  
+
+  return `/api/account/integrations/notion/oauth/start`
+}
+
+export const notionIntegrationControllerStartOAuth = async ( options?: RequestInit): Promise<notionIntegrationControllerStartOAuthResponse> => {
+  
+  return temisFetch<notionIntegrationControllerStartOAuthResponse>(getNotionIntegrationControllerStartOAuthUrl(),
+  {      
+    ...options,
+    method: 'GET'
+    
+    
+  }
+);}
+
+
 
 export type notionIntegrationControllerCompleteOAuthResponse200 = {
-  data: NotionIntegrationStatusDto;
-  status: 200;
+  data: NotionIntegrationStatusDto
+  status: 200
+}
+    
+export type notionIntegrationControllerCompleteOAuthResponseSuccess = (notionIntegrationControllerCompleteOAuthResponse200) & {
+  headers: Headers;
 };
+;
 
-export type notionIntegrationControllerCompleteOAuthResponseSuccess =
-  notionIntegrationControllerCompleteOAuthResponse200 & {
-    headers: Headers;
-  };
-export type notionIntegrationControllerCompleteOAuthResponse =
-  notionIntegrationControllerCompleteOAuthResponseSuccess;
+export type notionIntegrationControllerCompleteOAuthResponse = (notionIntegrationControllerCompleteOAuthResponseSuccess)
 
-export const getNotionIntegrationControllerCompleteOAuthUrl = (
-  params: NotionIntegrationControllerCompleteOAuthParams
-) => {
+export const getNotionIntegrationControllerCompleteOAuthUrl = (params: NotionIntegrationControllerCompleteOAuthParams,) => {
   const normalizedParams = new URLSearchParams();
 
   Object.entries(params || {}).forEach(([key, value]) => {
+    
     if (value !== undefined) {
-      normalizedParams.append(key, value === null ? "null" : value.toString());
+      normalizedParams.append(key, value === null ? 'null' : value.toString())
     }
   });
 
   const stringifiedParams = normalizedParams.toString();
 
-  return stringifiedParams.length > 0
-    ? `/api/account/integrations/notion/oauth/callback?${stringifiedParams}`
-    : `/api/account/integrations/notion/oauth/callback`;
-};
+  return stringifiedParams.length > 0 ? `/api/account/integrations/notion/oauth/callback?${stringifiedParams}` : `/api/account/integrations/notion/oauth/callback`
+}
 
-export const notionIntegrationControllerCompleteOAuth = async (
-  params: NotionIntegrationControllerCompleteOAuthParams,
-  options?: RequestInit
-): Promise<notionIntegrationControllerCompleteOAuthResponse> => {
-  return temisFetch<notionIntegrationControllerCompleteOAuthResponse>(
-    getNotionIntegrationControllerCompleteOAuthUrl(params),
-    {
-      ...options,
-      method: "GET"
-    }
-  );
-};
+export const notionIntegrationControllerCompleteOAuth = async (params: NotionIntegrationControllerCompleteOAuthParams, options?: RequestInit): Promise<notionIntegrationControllerCompleteOAuthResponse> => {
+  
+  return temisFetch<notionIntegrationControllerCompleteOAuthResponse>(getNotionIntegrationControllerCompleteOAuthUrl(params),
+  {      
+    ...options,
+    method: 'GET'
+    
+    
+  }
+);}
+
+
 
 export type notionIntegrationControllerListDataSourcesResponse200 = {
-  data: NotionDataSourcesResponseDto;
-  status: 200;
+  data: NotionDataSourcesResponseDto
+  status: 200
+}
+    
+export type notionIntegrationControllerListDataSourcesResponseSuccess = (notionIntegrationControllerListDataSourcesResponse200) & {
+  headers: Headers;
 };
+;
 
-export type notionIntegrationControllerListDataSourcesResponseSuccess =
-  notionIntegrationControllerListDataSourcesResponse200 & {
-    headers: Headers;
-  };
-export type notionIntegrationControllerListDataSourcesResponse =
-  notionIntegrationControllerListDataSourcesResponseSuccess;
+export type notionIntegrationControllerListDataSourcesResponse = (notionIntegrationControllerListDataSourcesResponseSuccess)
 
 export const getNotionIntegrationControllerListDataSourcesUrl = () => {
-  return `/api/account/integrations/notion/data-sources`;
-};
 
-export const notionIntegrationControllerListDataSources = async (
-  options?: RequestInit
-): Promise<notionIntegrationControllerListDataSourcesResponse> => {
-  return temisFetch<notionIntegrationControllerListDataSourcesResponse>(
-    getNotionIntegrationControllerListDataSourcesUrl(),
-    {
-      ...options,
-      method: "GET"
-    }
-  );
-};
+
+  
+
+  return `/api/account/integrations/notion/data-sources`
+}
+
+export const notionIntegrationControllerListDataSources = async ( options?: RequestInit): Promise<notionIntegrationControllerListDataSourcesResponse> => {
+  
+  return temisFetch<notionIntegrationControllerListDataSourcesResponse>(getNotionIntegrationControllerListDataSourcesUrl(),
+  {      
+    ...options,
+    method: 'GET'
+    
+    
+  }
+);}
+
+
 
 export type notionIntegrationControllerCreateMappingResponse201 = {
-  data: NotionMappingDto;
-  status: 201;
+  data: NotionMappingDto
+  status: 201
+}
+    
+export type notionIntegrationControllerCreateMappingResponseSuccess = (notionIntegrationControllerCreateMappingResponse201) & {
+  headers: Headers;
 };
+;
 
-export type notionIntegrationControllerCreateMappingResponseSuccess =
-  notionIntegrationControllerCreateMappingResponse201 & {
-    headers: Headers;
-  };
-export type notionIntegrationControllerCreateMappingResponse =
-  notionIntegrationControllerCreateMappingResponseSuccess;
+export type notionIntegrationControllerCreateMappingResponse = (notionIntegrationControllerCreateMappingResponseSuccess)
 
 export const getNotionIntegrationControllerCreateMappingUrl = () => {
-  return `/api/account/integrations/notion/mappings`;
-};
 
-export const notionIntegrationControllerCreateMapping = async (
-  createNotionMappingDto: CreateNotionMappingDto,
-  options?: RequestInit
-): Promise<notionIntegrationControllerCreateMappingResponse> => {
-  return temisFetch<notionIntegrationControllerCreateMappingResponse>(
-    getNotionIntegrationControllerCreateMappingUrl(),
-    {
-      ...options,
-      method: "POST",
-      headers: { "Content-Type": "application/json", ...options?.headers },
-      body: JSON.stringify(createNotionMappingDto)
-    }
-  );
-};
+
+  
+
+  return `/api/account/integrations/notion/mappings`
+}
+
+export const notionIntegrationControllerCreateMapping = async (createNotionMappingDto: CreateNotionMappingDto, options?: RequestInit): Promise<notionIntegrationControllerCreateMappingResponse> => {
+  
+  return temisFetch<notionIntegrationControllerCreateMappingResponse>(getNotionIntegrationControllerCreateMappingUrl(),
+  {      
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      createNotionMappingDto,)
+  }
+);}
+
+
 
 export type notionIntegrationControllerUpdateMappingResponse200 = {
-  data: NotionMappingDto;
-  status: 200;
+  data: NotionMappingDto
+  status: 200
+}
+    
+export type notionIntegrationControllerUpdateMappingResponseSuccess = (notionIntegrationControllerUpdateMappingResponse200) & {
+  headers: Headers;
 };
+;
 
-export type notionIntegrationControllerUpdateMappingResponseSuccess =
-  notionIntegrationControllerUpdateMappingResponse200 & {
-    headers: Headers;
-  };
-export type notionIntegrationControllerUpdateMappingResponse =
-  notionIntegrationControllerUpdateMappingResponseSuccess;
+export type notionIntegrationControllerUpdateMappingResponse = (notionIntegrationControllerUpdateMappingResponseSuccess)
 
-export const getNotionIntegrationControllerUpdateMappingUrl = (mappingId: string) => {
-  return `/api/account/integrations/notion/mappings/${mappingId}`;
-};
+export const getNotionIntegrationControllerUpdateMappingUrl = (mappingId: string,) => {
 
-export const notionIntegrationControllerUpdateMapping = async (
-  mappingId: string,
-  updateNotionMappingDto: UpdateNotionMappingDto,
-  options?: RequestInit
-): Promise<notionIntegrationControllerUpdateMappingResponse> => {
-  return temisFetch<notionIntegrationControllerUpdateMappingResponse>(
-    getNotionIntegrationControllerUpdateMappingUrl(mappingId),
-    {
-      ...options,
-      method: "PATCH",
-      headers: { "Content-Type": "application/json", ...options?.headers },
-      body: JSON.stringify(updateNotionMappingDto)
-    }
-  );
-};
+
+  
+
+  return `/api/account/integrations/notion/mappings/${mappingId}`
+}
+
+export const notionIntegrationControllerUpdateMapping = async (mappingId: string,
+    updateNotionMappingDto: UpdateNotionMappingDto, options?: RequestInit): Promise<notionIntegrationControllerUpdateMappingResponse> => {
+  
+  return temisFetch<notionIntegrationControllerUpdateMappingResponse>(getNotionIntegrationControllerUpdateMappingUrl(mappingId),
+  {      
+    ...options,
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      updateNotionMappingDto,)
+  }
+);}
+
+
 
 export type notionIntegrationControllerSyncMappingResponse200 = {
-  data: NotionSyncResultDto;
-  status: 200;
+  data: NotionSyncResultDto
+  status: 200
+}
+    
+export type notionIntegrationControllerSyncMappingResponseSuccess = (notionIntegrationControllerSyncMappingResponse200) & {
+  headers: Headers;
 };
+;
 
-export type notionIntegrationControllerSyncMappingResponseSuccess =
-  notionIntegrationControllerSyncMappingResponse200 & {
-    headers: Headers;
-  };
-export type notionIntegrationControllerSyncMappingResponse =
-  notionIntegrationControllerSyncMappingResponseSuccess;
+export type notionIntegrationControllerSyncMappingResponse = (notionIntegrationControllerSyncMappingResponseSuccess)
 
-export const getNotionIntegrationControllerSyncMappingUrl = (mappingId: string) => {
-  return `/api/account/integrations/notion/mappings/${mappingId}/sync`;
-};
+export const getNotionIntegrationControllerSyncMappingUrl = (mappingId: string,) => {
 
-export const notionIntegrationControllerSyncMapping = async (
-  mappingId: string,
-  options?: RequestInit
-): Promise<notionIntegrationControllerSyncMappingResponse> => {
-  return temisFetch<notionIntegrationControllerSyncMappingResponse>(
-    getNotionIntegrationControllerSyncMappingUrl(mappingId),
-    {
-      ...options,
-      method: "POST"
-    }
-  );
-};
+
+  
+
+  return `/api/account/integrations/notion/mappings/${mappingId}/sync`
+}
+
+export const notionIntegrationControllerSyncMapping = async (mappingId: string, options?: RequestInit): Promise<notionIntegrationControllerSyncMappingResponse> => {
+  
+  return temisFetch<notionIntegrationControllerSyncMappingResponse>(getNotionIntegrationControllerSyncMappingUrl(mappingId),
+  {      
+    ...options,
+    method: 'POST'
+    
+    
+  }
+);}
+
+
 
 export type notionIntegrationControllerListConflictsResponse200 = {
-  data: NotionConflictsResponseDto;
-  status: 200;
+  data: NotionConflictsResponseDto
+  status: 200
+}
+    
+export type notionIntegrationControllerListConflictsResponseSuccess = (notionIntegrationControllerListConflictsResponse200) & {
+  headers: Headers;
 };
+;
 
-export type notionIntegrationControllerListConflictsResponseSuccess =
-  notionIntegrationControllerListConflictsResponse200 & {
-    headers: Headers;
-  };
-export type notionIntegrationControllerListConflictsResponse =
-  notionIntegrationControllerListConflictsResponseSuccess;
+export type notionIntegrationControllerListConflictsResponse = (notionIntegrationControllerListConflictsResponseSuccess)
 
 export const getNotionIntegrationControllerListConflictsUrl = () => {
-  return `/api/account/integrations/notion/conflicts`;
-};
 
-export const notionIntegrationControllerListConflicts = async (
-  options?: RequestInit
-): Promise<notionIntegrationControllerListConflictsResponse> => {
-  return temisFetch<notionIntegrationControllerListConflictsResponse>(
-    getNotionIntegrationControllerListConflictsUrl(),
-    {
-      ...options,
-      method: "GET"
-    }
-  );
-};
+
+  
+
+  return `/api/account/integrations/notion/conflicts`
+}
+
+export const notionIntegrationControllerListConflicts = async ( options?: RequestInit): Promise<notionIntegrationControllerListConflictsResponse> => {
+  
+  return temisFetch<notionIntegrationControllerListConflictsResponse>(getNotionIntegrationControllerListConflictsUrl(),
+  {      
+    ...options,
+    method: 'GET'
+    
+    
+  }
+);}
+
+
 
 export type notionIntegrationControllerResolveConflictResponse200 = {
-  data: NotionIntegrationControllerResolveConflict200;
-  status: 200;
+  data: NotionIntegrationControllerResolveConflict200
+  status: 200
+}
+    
+export type notionIntegrationControllerResolveConflictResponseSuccess = (notionIntegrationControllerResolveConflictResponse200) & {
+  headers: Headers;
 };
+;
 
-export type notionIntegrationControllerResolveConflictResponseSuccess =
-  notionIntegrationControllerResolveConflictResponse200 & {
-    headers: Headers;
-  };
-export type notionIntegrationControllerResolveConflictResponse =
-  notionIntegrationControllerResolveConflictResponseSuccess;
+export type notionIntegrationControllerResolveConflictResponse = (notionIntegrationControllerResolveConflictResponseSuccess)
 
-export const getNotionIntegrationControllerResolveConflictUrl = (conflictId: string) => {
-  return `/api/account/integrations/notion/conflicts/${conflictId}/resolve`;
-};
+export const getNotionIntegrationControllerResolveConflictUrl = (conflictId: string,) => {
 
-export const notionIntegrationControllerResolveConflict = async (
-  conflictId: string,
-  resolveNotionConflictDto: ResolveNotionConflictDto,
-  options?: RequestInit
-): Promise<notionIntegrationControllerResolveConflictResponse> => {
-  return temisFetch<notionIntegrationControllerResolveConflictResponse>(
-    getNotionIntegrationControllerResolveConflictUrl(conflictId),
-    {
-      ...options,
-      method: "POST",
-      headers: { "Content-Type": "application/json", ...options?.headers },
-      body: JSON.stringify(resolveNotionConflictDto)
-    }
-  );
-};
+
+  
+
+  return `/api/account/integrations/notion/conflicts/${conflictId}/resolve`
+}
+
+export const notionIntegrationControllerResolveConflict = async (conflictId: string,
+    resolveNotionConflictDto: ResolveNotionConflictDto, options?: RequestInit): Promise<notionIntegrationControllerResolveConflictResponse> => {
+  
+  return temisFetch<notionIntegrationControllerResolveConflictResponse>(getNotionIntegrationControllerResolveConflictUrl(conflictId),
+  {      
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      resolveNotionConflictDto,)
+  }
+);}
+
+
 
 export type casesControllerListResponse200 = {
-  data: CasesListResponseDto;
-  status: 200;
-};
-
-export type casesControllerListResponseSuccess = casesControllerListResponse200 & {
+  data: CasesListResponseDto
+  status: 200
+}
+    
+export type casesControllerListResponseSuccess = (casesControllerListResponse200) & {
   headers: Headers;
 };
-export type casesControllerListResponse = casesControllerListResponseSuccess;
+;
+
+export type casesControllerListResponse = (casesControllerListResponseSuccess)
 
 export const getCasesControllerListUrl = () => {
-  return `/api/cases`;
-};
 
-export const casesControllerList = async (
-  options?: RequestInit
-): Promise<casesControllerListResponse> => {
-  return temisFetch<casesControllerListResponse>(getCasesControllerListUrl(), {
+
+  
+
+  return `/api/cases`
+}
+
+export const casesControllerList = async ( options?: RequestInit): Promise<casesControllerListResponse> => {
+  
+  return temisFetch<casesControllerListResponse>(getCasesControllerListUrl(),
+  {      
     ...options,
-    method: "GET"
-  });
-};
+    method: 'GET'
+    
+    
+  }
+);}
+
+
 
 export type casesControllerCreateResponse201 = {
-  data: CaseDto;
-  status: 201;
-};
-
-export type casesControllerCreateResponseSuccess = casesControllerCreateResponse201 & {
+  data: CaseDto
+  status: 201
+}
+    
+export type casesControllerCreateResponseSuccess = (casesControllerCreateResponse201) & {
   headers: Headers;
 };
-export type casesControllerCreateResponse = casesControllerCreateResponseSuccess;
+;
+
+export type casesControllerCreateResponse = (casesControllerCreateResponseSuccess)
 
 export const getCasesControllerCreateUrl = () => {
-  return `/api/cases`;
-};
 
-export const casesControllerCreate = async (
-  createCaseDto: CreateCaseDto,
-  options?: RequestInit
-): Promise<casesControllerCreateResponse> => {
-  return temisFetch<casesControllerCreateResponse>(getCasesControllerCreateUrl(), {
+
+  
+
+  return `/api/cases`
+}
+
+export const casesControllerCreate = async (createCaseDto: CreateCaseDto, options?: RequestInit): Promise<casesControllerCreateResponse> => {
+  
+  return temisFetch<casesControllerCreateResponse>(getCasesControllerCreateUrl(),
+  {      
     ...options,
-    method: "POST",
-    headers: { "Content-Type": "application/json", ...options?.headers },
-    body: JSON.stringify(createCaseDto)
-  });
-};
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      createCaseDto,)
+  }
+);}
+
+
 
 export type casesControllerGetMetricsResponse200 = {
-  data: CasesMetricsDto;
-  status: 200;
-};
-
-export type casesControllerGetMetricsResponseSuccess = casesControllerGetMetricsResponse200 & {
+  data: CasesMetricsDto
+  status: 200
+}
+    
+export type casesControllerGetMetricsResponseSuccess = (casesControllerGetMetricsResponse200) & {
   headers: Headers;
 };
-export type casesControllerGetMetricsResponse = casesControllerGetMetricsResponseSuccess;
+;
+
+export type casesControllerGetMetricsResponse = (casesControllerGetMetricsResponseSuccess)
 
 export const getCasesControllerGetMetricsUrl = () => {
-  return `/api/cases/metrics`;
-};
 
-export const casesControllerGetMetrics = async (
-  options?: RequestInit
-): Promise<casesControllerGetMetricsResponse> => {
-  return temisFetch<casesControllerGetMetricsResponse>(getCasesControllerGetMetricsUrl(), {
+
+  
+
+  return `/api/cases/metrics`
+}
+
+export const casesControllerGetMetrics = async ( options?: RequestInit): Promise<casesControllerGetMetricsResponse> => {
+  
+  return temisFetch<casesControllerGetMetricsResponse>(getCasesControllerGetMetricsUrl(),
+  {      
     ...options,
-    method: "GET"
-  });
-};
+    method: 'GET'
+    
+    
+  }
+);}
+
+
 
 export type casesControllerGetTenantCalendarResponse200 = {
-  data: CaseCalendarResponseDto;
-  status: 200;
+  data: CaseCalendarResponseDto
+  status: 200
+}
+    
+export type casesControllerGetTenantCalendarResponseSuccess = (casesControllerGetTenantCalendarResponse200) & {
+  headers: Headers;
 };
+;
 
-export type casesControllerGetTenantCalendarResponseSuccess =
-  casesControllerGetTenantCalendarResponse200 & {
-    headers: Headers;
-  };
-export type casesControllerGetTenantCalendarResponse =
-  casesControllerGetTenantCalendarResponseSuccess;
+export type casesControllerGetTenantCalendarResponse = (casesControllerGetTenantCalendarResponseSuccess)
 
 export const getCasesControllerGetTenantCalendarUrl = () => {
-  return `/api/cases/calendar`;
-};
 
-export const casesControllerGetTenantCalendar = async (
-  options?: RequestInit
-): Promise<casesControllerGetTenantCalendarResponse> => {
-  return temisFetch<casesControllerGetTenantCalendarResponse>(
-    getCasesControllerGetTenantCalendarUrl(),
-    {
-      ...options,
-      method: "GET"
-    }
-  );
-};
+
+  
+
+  return `/api/cases/calendar`
+}
+
+export const casesControllerGetTenantCalendar = async ( options?: RequestInit): Promise<casesControllerGetTenantCalendarResponse> => {
+  
+  return temisFetch<casesControllerGetTenantCalendarResponse>(getCasesControllerGetTenantCalendarUrl(),
+  {      
+    ...options,
+    method: 'GET'
+    
+    
+  }
+);}
+
+
 
 export type casesControllerListPickerOptionsResponse200 = {
-  data: CasePickerOptionsResponseDto;
-  status: 200;
+  data: CasePickerOptionsResponseDto
+  status: 200
+}
+    
+export type casesControllerListPickerOptionsResponseSuccess = (casesControllerListPickerOptionsResponse200) & {
+  headers: Headers;
 };
+;
 
-export type casesControllerListPickerOptionsResponseSuccess =
-  casesControllerListPickerOptionsResponse200 & {
-    headers: Headers;
-  };
-export type casesControllerListPickerOptionsResponse =
-  casesControllerListPickerOptionsResponseSuccess;
+export type casesControllerListPickerOptionsResponse = (casesControllerListPickerOptionsResponseSuccess)
 
 export const getCasesControllerListPickerOptionsUrl = () => {
-  return `/api/cases/picker-options`;
-};
 
-export const casesControllerListPickerOptions = async (
-  options?: RequestInit
-): Promise<casesControllerListPickerOptionsResponse> => {
-  return temisFetch<casesControllerListPickerOptionsResponse>(
-    getCasesControllerListPickerOptionsUrl(),
-    {
-      ...options,
-      method: "GET"
-    }
-  );
-};
+
+  
+
+  return `/api/cases/picker-options`
+}
+
+export const casesControllerListPickerOptions = async ( options?: RequestInit): Promise<casesControllerListPickerOptionsResponse> => {
+  
+  return temisFetch<casesControllerListPickerOptionsResponse>(getCasesControllerListPickerOptionsUrl(),
+  {      
+    ...options,
+    method: 'GET'
+    
+    
+  }
+);}
+
+
 
 export type casesControllerGetTenantTasksMetricsResponse200 = {
-  data: TenantCaseTasksMetricsDto;
-  status: 200;
+  data: TenantCaseTasksMetricsDto
+  status: 200
+}
+    
+export type casesControllerGetTenantTasksMetricsResponseSuccess = (casesControllerGetTenantTasksMetricsResponse200) & {
+  headers: Headers;
 };
+;
 
-export type casesControllerGetTenantTasksMetricsResponseSuccess =
-  casesControllerGetTenantTasksMetricsResponse200 & {
-    headers: Headers;
-  };
-export type casesControllerGetTenantTasksMetricsResponse =
-  casesControllerGetTenantTasksMetricsResponseSuccess;
+export type casesControllerGetTenantTasksMetricsResponse = (casesControllerGetTenantTasksMetricsResponseSuccess)
 
 export const getCasesControllerGetTenantTasksMetricsUrl = () => {
-  return `/api/cases/tasks/metrics`;
-};
 
-export const casesControllerGetTenantTasksMetrics = async (
-  options?: RequestInit
-): Promise<casesControllerGetTenantTasksMetricsResponse> => {
-  return temisFetch<casesControllerGetTenantTasksMetricsResponse>(
-    getCasesControllerGetTenantTasksMetricsUrl(),
-    {
-      ...options,
-      method: "GET"
-    }
-  );
-};
+
+  
+
+  return `/api/cases/tasks/metrics`
+}
+
+export const casesControllerGetTenantTasksMetrics = async ( options?: RequestInit): Promise<casesControllerGetTenantTasksMetricsResponse> => {
+  
+  return temisFetch<casesControllerGetTenantTasksMetricsResponse>(getCasesControllerGetTenantTasksMetricsUrl(),
+  {      
+    ...options,
+    method: 'GET'
+    
+    
+  }
+);}
+
+
 
 export type casesControllerListTaskBoardsResponse200 = {
-  data: TaskBoardViewsListResponseDto;
-  status: 200;
+  data: TaskBoardViewsListResponseDto
+  status: 200
+}
+    
+export type casesControllerListTaskBoardsResponseSuccess = (casesControllerListTaskBoardsResponse200) & {
+  headers: Headers;
 };
+;
 
-export type casesControllerListTaskBoardsResponseSuccess =
-  casesControllerListTaskBoardsResponse200 & {
-    headers: Headers;
-  };
-export type casesControllerListTaskBoardsResponse = casesControllerListTaskBoardsResponseSuccess;
+export type casesControllerListTaskBoardsResponse = (casesControllerListTaskBoardsResponseSuccess)
 
 export const getCasesControllerListTaskBoardsUrl = () => {
-  return `/api/cases/tasks/boards`;
-};
 
-export const casesControllerListTaskBoards = async (
-  options?: RequestInit
-): Promise<casesControllerListTaskBoardsResponse> => {
-  return temisFetch<casesControllerListTaskBoardsResponse>(getCasesControllerListTaskBoardsUrl(), {
+
+  
+
+  return `/api/cases/tasks/boards`
+}
+
+export const casesControllerListTaskBoards = async ( options?: RequestInit): Promise<casesControllerListTaskBoardsResponse> => {
+  
+  return temisFetch<casesControllerListTaskBoardsResponse>(getCasesControllerListTaskBoardsUrl(),
+  {      
     ...options,
-    method: "GET"
-  });
-};
+    method: 'GET'
+    
+    
+  }
+);}
+
+
 
 export type casesControllerCreateTaskBoardResponse201 = {
-  data: TaskBoardViewDto;
-  status: 201;
+  data: TaskBoardViewDto
+  status: 201
+}
+    
+export type casesControllerCreateTaskBoardResponseSuccess = (casesControllerCreateTaskBoardResponse201) & {
+  headers: Headers;
 };
+;
 
-export type casesControllerCreateTaskBoardResponseSuccess =
-  casesControllerCreateTaskBoardResponse201 & {
-    headers: Headers;
-  };
-export type casesControllerCreateTaskBoardResponse = casesControllerCreateTaskBoardResponseSuccess;
+export type casesControllerCreateTaskBoardResponse = (casesControllerCreateTaskBoardResponseSuccess)
 
 export const getCasesControllerCreateTaskBoardUrl = () => {
-  return `/api/cases/tasks/boards`;
-};
 
-export const casesControllerCreateTaskBoard = async (
-  createTaskBoardViewDto: CreateTaskBoardViewDto,
-  options?: RequestInit
-): Promise<casesControllerCreateTaskBoardResponse> => {
-  return temisFetch<casesControllerCreateTaskBoardResponse>(
-    getCasesControllerCreateTaskBoardUrl(),
-    {
-      ...options,
-      method: "POST",
-      headers: { "Content-Type": "application/json", ...options?.headers },
-      body: JSON.stringify(createTaskBoardViewDto)
-    }
-  );
-};
+
+  
+
+  return `/api/cases/tasks/boards`
+}
+
+export const casesControllerCreateTaskBoard = async (createTaskBoardViewDto: CreateTaskBoardViewDto, options?: RequestInit): Promise<casesControllerCreateTaskBoardResponse> => {
+  
+  return temisFetch<casesControllerCreateTaskBoardResponse>(getCasesControllerCreateTaskBoardUrl(),
+  {      
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      createTaskBoardViewDto,)
+  }
+);}
+
+
 
 export type casesControllerUpdateTaskBoardResponse200 = {
-  data: TaskBoardViewDto;
-  status: 200;
+  data: TaskBoardViewDto
+  status: 200
+}
+    
+export type casesControllerUpdateTaskBoardResponseSuccess = (casesControllerUpdateTaskBoardResponse200) & {
+  headers: Headers;
 };
+;
 
-export type casesControllerUpdateTaskBoardResponseSuccess =
-  casesControllerUpdateTaskBoardResponse200 & {
-    headers: Headers;
-  };
-export type casesControllerUpdateTaskBoardResponse = casesControllerUpdateTaskBoardResponseSuccess;
+export type casesControllerUpdateTaskBoardResponse = (casesControllerUpdateTaskBoardResponseSuccess)
 
-export const getCasesControllerUpdateTaskBoardUrl = (boardId: string) => {
-  return `/api/cases/tasks/boards/${boardId}`;
-};
+export const getCasesControllerUpdateTaskBoardUrl = (boardId: string,) => {
 
-export const casesControllerUpdateTaskBoard = async (
-  boardId: string,
-  updateTaskBoardViewDto: UpdateTaskBoardViewDto,
-  options?: RequestInit
-): Promise<casesControllerUpdateTaskBoardResponse> => {
-  return temisFetch<casesControllerUpdateTaskBoardResponse>(
-    getCasesControllerUpdateTaskBoardUrl(boardId),
-    {
-      ...options,
-      method: "PATCH",
-      headers: { "Content-Type": "application/json", ...options?.headers },
-      body: JSON.stringify(updateTaskBoardViewDto)
-    }
-  );
-};
+
+  
+
+  return `/api/cases/tasks/boards/${boardId}`
+}
+
+export const casesControllerUpdateTaskBoard = async (boardId: string,
+    updateTaskBoardViewDto: UpdateTaskBoardViewDto, options?: RequestInit): Promise<casesControllerUpdateTaskBoardResponse> => {
+  
+  return temisFetch<casesControllerUpdateTaskBoardResponse>(getCasesControllerUpdateTaskBoardUrl(boardId),
+  {      
+    ...options,
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      updateTaskBoardViewDto,)
+  }
+);}
+
+
 
 export type casesControllerDeleteTaskBoardResponse200 = {
-  data: CaseDeleteResponseDto;
-  status: 200;
+  data: CaseDeleteResponseDto
+  status: 200
+}
+    
+export type casesControllerDeleteTaskBoardResponseSuccess = (casesControllerDeleteTaskBoardResponse200) & {
+  headers: Headers;
 };
+;
 
-export type casesControllerDeleteTaskBoardResponseSuccess =
-  casesControllerDeleteTaskBoardResponse200 & {
-    headers: Headers;
-  };
-export type casesControllerDeleteTaskBoardResponse = casesControllerDeleteTaskBoardResponseSuccess;
+export type casesControllerDeleteTaskBoardResponse = (casesControllerDeleteTaskBoardResponseSuccess)
 
-export const getCasesControllerDeleteTaskBoardUrl = (boardId: string) => {
-  return `/api/cases/tasks/boards/${boardId}`;
-};
+export const getCasesControllerDeleteTaskBoardUrl = (boardId: string,) => {
 
-export const casesControllerDeleteTaskBoard = async (
-  boardId: string,
-  options?: RequestInit
-): Promise<casesControllerDeleteTaskBoardResponse> => {
-  return temisFetch<casesControllerDeleteTaskBoardResponse>(
-    getCasesControllerDeleteTaskBoardUrl(boardId),
-    {
-      ...options,
-      method: "DELETE"
-    }
-  );
-};
+
+  
+
+  return `/api/cases/tasks/boards/${boardId}`
+}
+
+export const casesControllerDeleteTaskBoard = async (boardId: string, options?: RequestInit): Promise<casesControllerDeleteTaskBoardResponse> => {
+  
+  return temisFetch<casesControllerDeleteTaskBoardResponse>(getCasesControllerDeleteTaskBoardUrl(boardId),
+  {      
+    ...options,
+    method: 'DELETE'
+    
+    
+  }
+);}
+
+
 
 export type casesControllerListTenantTasksResponse200 = {
-  data: TenantCaseTasksListResponseDto;
-  status: 200;
+  data: TenantCaseTasksListResponseDto
+  status: 200
+}
+    
+export type casesControllerListTenantTasksResponseSuccess = (casesControllerListTenantTasksResponse200) & {
+  headers: Headers;
 };
+;
 
-export type casesControllerListTenantTasksResponseSuccess =
-  casesControllerListTenantTasksResponse200 & {
-    headers: Headers;
-  };
-export type casesControllerListTenantTasksResponse = casesControllerListTenantTasksResponseSuccess;
+export type casesControllerListTenantTasksResponse = (casesControllerListTenantTasksResponseSuccess)
 
 export const getCasesControllerListTenantTasksUrl = () => {
-  return `/api/cases/tasks`;
-};
 
-export const casesControllerListTenantTasks = async (
-  options?: RequestInit
-): Promise<casesControllerListTenantTasksResponse> => {
-  return temisFetch<casesControllerListTenantTasksResponse>(
-    getCasesControllerListTenantTasksUrl(),
-    {
-      ...options,
-      method: "GET"
-    }
-  );
-};
+
+  
+
+  return `/api/cases/tasks`
+}
+
+export const casesControllerListTenantTasks = async ( options?: RequestInit): Promise<casesControllerListTenantTasksResponse> => {
+  
+  return temisFetch<casesControllerListTenantTasksResponse>(getCasesControllerListTenantTasksUrl(),
+  {      
+    ...options,
+    method: 'GET'
+    
+    
+  }
+);}
+
+
 
 export type casesControllerUpdateTenantTaskResponse200 = {
-  data: GlobalCaseTaskDto;
-  status: 200;
+  data: GlobalCaseTaskDto
+  status: 200
+}
+    
+export type casesControllerUpdateTenantTaskResponseSuccess = (casesControllerUpdateTenantTaskResponse200) & {
+  headers: Headers;
 };
+;
 
-export type casesControllerUpdateTenantTaskResponseSuccess =
-  casesControllerUpdateTenantTaskResponse200 & {
-    headers: Headers;
-  };
-export type casesControllerUpdateTenantTaskResponse =
-  casesControllerUpdateTenantTaskResponseSuccess;
+export type casesControllerUpdateTenantTaskResponse = (casesControllerUpdateTenantTaskResponseSuccess)
 
-export const getCasesControllerUpdateTenantTaskUrl = (taskId: string) => {
-  return `/api/cases/tasks/${taskId}`;
-};
+export const getCasesControllerUpdateTenantTaskUrl = (taskId: string,) => {
 
-export const casesControllerUpdateTenantTask = async (
-  taskId: string,
-  updateCaseTaskDto: UpdateCaseTaskDto,
-  options?: RequestInit
-): Promise<casesControllerUpdateTenantTaskResponse> => {
-  return temisFetch<casesControllerUpdateTenantTaskResponse>(
-    getCasesControllerUpdateTenantTaskUrl(taskId),
-    {
-      ...options,
-      method: "PATCH",
-      headers: { "Content-Type": "application/json", ...options?.headers },
-      body: JSON.stringify(updateCaseTaskDto)
-    }
-  );
-};
+
+  
+
+  return `/api/cases/tasks/${taskId}`
+}
+
+export const casesControllerUpdateTenantTask = async (taskId: string,
+    updateCaseTaskDto: UpdateCaseTaskDto, options?: RequestInit): Promise<casesControllerUpdateTenantTaskResponse> => {
+  
+  return temisFetch<casesControllerUpdateTenantTaskResponse>(getCasesControllerUpdateTenantTaskUrl(taskId),
+  {      
+    ...options,
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      updateCaseTaskDto,)
+  }
+);}
+
+
 
 export type casesControllerUpdateTenantTaskLocalContextResponse200 = {
-  data: GlobalCaseTaskDto;
-  status: 200;
+  data: GlobalCaseTaskDto
+  status: 200
+}
+    
+export type casesControllerUpdateTenantTaskLocalContextResponseSuccess = (casesControllerUpdateTenantTaskLocalContextResponse200) & {
+  headers: Headers;
 };
+;
 
-export type casesControllerUpdateTenantTaskLocalContextResponseSuccess =
-  casesControllerUpdateTenantTaskLocalContextResponse200 & {
-    headers: Headers;
-  };
-export type casesControllerUpdateTenantTaskLocalContextResponse =
-  casesControllerUpdateTenantTaskLocalContextResponseSuccess;
+export type casesControllerUpdateTenantTaskLocalContextResponse = (casesControllerUpdateTenantTaskLocalContextResponseSuccess)
 
-export const getCasesControllerUpdateTenantTaskLocalContextUrl = (taskId: string) => {
-  return `/api/cases/tasks/${taskId}/local-context`;
-};
+export const getCasesControllerUpdateTenantTaskLocalContextUrl = (taskId: string,) => {
 
-export const casesControllerUpdateTenantTaskLocalContext = async (
-  taskId: string,
-  updateCaseTaskLocalContextDto: UpdateCaseTaskLocalContextDto,
-  options?: RequestInit
-): Promise<casesControllerUpdateTenantTaskLocalContextResponse> => {
-  return temisFetch<casesControllerUpdateTenantTaskLocalContextResponse>(
-    getCasesControllerUpdateTenantTaskLocalContextUrl(taskId),
-    {
-      ...options,
-      method: "PATCH",
-      headers: { "Content-Type": "application/json", ...options?.headers },
-      body: JSON.stringify(updateCaseTaskLocalContextDto)
-    }
-  );
-};
+
+  
+
+  return `/api/cases/tasks/${taskId}/local-context`
+}
+
+export const casesControllerUpdateTenantTaskLocalContext = async (taskId: string,
+    updateCaseTaskLocalContextDto: UpdateCaseTaskLocalContextDto, options?: RequestInit): Promise<casesControllerUpdateTenantTaskLocalContextResponse> => {
+  
+  return temisFetch<casesControllerUpdateTenantTaskLocalContextResponse>(getCasesControllerUpdateTenantTaskLocalContextUrl(taskId),
+  {      
+    ...options,
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      updateCaseTaskLocalContextDto,)
+  }
+);}
+
+
 
 export type casesControllerGetDetailResponse200 = {
-  data: CaseDetailDto;
-  status: 200;
-};
-
-export type casesControllerGetDetailResponseSuccess = casesControllerGetDetailResponse200 & {
+  data: CaseDetailDto
+  status: 200
+}
+    
+export type casesControllerGetDetailResponseSuccess = (casesControllerGetDetailResponse200) & {
   headers: Headers;
 };
-export type casesControllerGetDetailResponse = casesControllerGetDetailResponseSuccess;
+;
 
-export const getCasesControllerGetDetailUrl = (id: string) => {
-  return `/api/cases/${id}`;
-};
+export type casesControllerGetDetailResponse = (casesControllerGetDetailResponseSuccess)
 
-export const casesControllerGetDetail = async (
-  id: string,
-  options?: RequestInit
-): Promise<casesControllerGetDetailResponse> => {
-  return temisFetch<casesControllerGetDetailResponse>(getCasesControllerGetDetailUrl(id), {
+export const getCasesControllerGetDetailUrl = (id: string,) => {
+
+
+  
+
+  return `/api/cases/${id}`
+}
+
+export const casesControllerGetDetail = async (id: string, options?: RequestInit): Promise<casesControllerGetDetailResponse> => {
+  
+  return temisFetch<casesControllerGetDetailResponse>(getCasesControllerGetDetailUrl(id),
+  {      
     ...options,
-    method: "GET"
-  });
-};
+    method: 'GET'
+    
+    
+  }
+);}
+
+
 
 export type casesControllerUpdateResponse200 = {
-  data: CaseDto;
-  status: 200;
-};
-
-export type casesControllerUpdateResponseSuccess = casesControllerUpdateResponse200 & {
+  data: CaseDto
+  status: 200
+}
+    
+export type casesControllerUpdateResponseSuccess = (casesControllerUpdateResponse200) & {
   headers: Headers;
 };
-export type casesControllerUpdateResponse = casesControllerUpdateResponseSuccess;
+;
 
-export const getCasesControllerUpdateUrl = (id: string) => {
-  return `/api/cases/${id}`;
-};
+export type casesControllerUpdateResponse = (casesControllerUpdateResponseSuccess)
 
-export const casesControllerUpdate = async (
-  id: string,
-  updateCaseDto: UpdateCaseDto,
-  options?: RequestInit
-): Promise<casesControllerUpdateResponse> => {
-  return temisFetch<casesControllerUpdateResponse>(getCasesControllerUpdateUrl(id), {
+export const getCasesControllerUpdateUrl = (id: string,) => {
+
+
+  
+
+  return `/api/cases/${id}`
+}
+
+export const casesControllerUpdate = async (id: string,
+    updateCaseDto: UpdateCaseDto, options?: RequestInit): Promise<casesControllerUpdateResponse> => {
+  
+  return temisFetch<casesControllerUpdateResponse>(getCasesControllerUpdateUrl(id),
+  {      
     ...options,
-    method: "PATCH",
-    headers: { "Content-Type": "application/json", ...options?.headers },
-    body: JSON.stringify(updateCaseDto)
-  });
-};
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      updateCaseDto,)
+  }
+);}
+
+
 
 export type casesControllerDeleteResponse200 = {
-  data: CaseDeleteResponseDto;
-  status: 200;
-};
-
-export type casesControllerDeleteResponseSuccess = casesControllerDeleteResponse200 & {
+  data: CaseDeleteResponseDto
+  status: 200
+}
+    
+export type casesControllerDeleteResponseSuccess = (casesControllerDeleteResponse200) & {
   headers: Headers;
 };
-export type casesControllerDeleteResponse = casesControllerDeleteResponseSuccess;
+;
 
-export const getCasesControllerDeleteUrl = (id: string) => {
-  return `/api/cases/${id}`;
-};
+export type casesControllerDeleteResponse = (casesControllerDeleteResponseSuccess)
 
-export const casesControllerDelete = async (
-  id: string,
-  options?: RequestInit
-): Promise<casesControllerDeleteResponse> => {
-  return temisFetch<casesControllerDeleteResponse>(getCasesControllerDeleteUrl(id), {
+export const getCasesControllerDeleteUrl = (id: string,) => {
+
+
+  
+
+  return `/api/cases/${id}`
+}
+
+export const casesControllerDelete = async (id: string, options?: RequestInit): Promise<casesControllerDeleteResponse> => {
+  
+  return temisFetch<casesControllerDeleteResponse>(getCasesControllerDeleteUrl(id),
+  {      
     ...options,
-    method: "DELETE"
-  });
-};
+    method: 'DELETE'
+    
+    
+  }
+);}
+
+
 
 export type casesControllerListTasksResponse200 = {
-  data: CaseTasksListResponseDto;
-  status: 200;
-};
-
-export type casesControllerListTasksResponseSuccess = casesControllerListTasksResponse200 & {
+  data: CaseTasksListResponseDto
+  status: 200
+}
+    
+export type casesControllerListTasksResponseSuccess = (casesControllerListTasksResponse200) & {
   headers: Headers;
 };
-export type casesControllerListTasksResponse = casesControllerListTasksResponseSuccess;
+;
 
-export const getCasesControllerListTasksUrl = (caseId: string) => {
-  return `/api/cases/${caseId}/tasks`;
-};
+export type casesControllerListTasksResponse = (casesControllerListTasksResponseSuccess)
 
-export const casesControllerListTasks = async (
-  caseId: string,
-  options?: RequestInit
-): Promise<casesControllerListTasksResponse> => {
-  return temisFetch<casesControllerListTasksResponse>(getCasesControllerListTasksUrl(caseId), {
+export const getCasesControllerListTasksUrl = (caseId: string,) => {
+
+
+  
+
+  return `/api/cases/${caseId}/tasks`
+}
+
+export const casesControllerListTasks = async (caseId: string, options?: RequestInit): Promise<casesControllerListTasksResponse> => {
+  
+  return temisFetch<casesControllerListTasksResponse>(getCasesControllerListTasksUrl(caseId),
+  {      
     ...options,
-    method: "GET"
-  });
-};
+    method: 'GET'
+    
+    
+  }
+);}
+
+
 
 export type casesControllerCreateTaskResponse201 = {
-  data: CaseTaskDto;
-  status: 201;
-};
-
-export type casesControllerCreateTaskResponseSuccess = casesControllerCreateTaskResponse201 & {
+  data: CaseTaskDto
+  status: 201
+}
+    
+export type casesControllerCreateTaskResponseSuccess = (casesControllerCreateTaskResponse201) & {
   headers: Headers;
 };
-export type casesControllerCreateTaskResponse = casesControllerCreateTaskResponseSuccess;
+;
 
-export const getCasesControllerCreateTaskUrl = (caseId: string) => {
-  return `/api/cases/${caseId}/tasks`;
-};
+export type casesControllerCreateTaskResponse = (casesControllerCreateTaskResponseSuccess)
 
-export const casesControllerCreateTask = async (
-  caseId: string,
-  createCaseTaskDto: CreateCaseTaskDto,
-  options?: RequestInit
-): Promise<casesControllerCreateTaskResponse> => {
-  return temisFetch<casesControllerCreateTaskResponse>(getCasesControllerCreateTaskUrl(caseId), {
+export const getCasesControllerCreateTaskUrl = (caseId: string,) => {
+
+
+  
+
+  return `/api/cases/${caseId}/tasks`
+}
+
+export const casesControllerCreateTask = async (caseId: string,
+    createCaseTaskDto: CreateCaseTaskDto, options?: RequestInit): Promise<casesControllerCreateTaskResponse> => {
+  
+  return temisFetch<casesControllerCreateTaskResponse>(getCasesControllerCreateTaskUrl(caseId),
+  {      
     ...options,
-    method: "POST",
-    headers: { "Content-Type": "application/json", ...options?.headers },
-    body: JSON.stringify(createCaseTaskDto)
-  });
-};
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      createCaseTaskDto,)
+  }
+);}
+
+
 
 export type casesControllerUpdateTaskResponse200 = {
-  data: CaseTaskDto;
-  status: 200;
-};
-
-export type casesControllerUpdateTaskResponseSuccess = casesControllerUpdateTaskResponse200 & {
+  data: CaseTaskDto
+  status: 200
+}
+    
+export type casesControllerUpdateTaskResponseSuccess = (casesControllerUpdateTaskResponse200) & {
   headers: Headers;
 };
-export type casesControllerUpdateTaskResponse = casesControllerUpdateTaskResponseSuccess;
+;
 
-export const getCasesControllerUpdateTaskUrl = (caseId: string, taskId: string) => {
-  return `/api/cases/${caseId}/tasks/${taskId}`;
-};
+export type casesControllerUpdateTaskResponse = (casesControllerUpdateTaskResponseSuccess)
 
-export const casesControllerUpdateTask = async (
-  caseId: string,
-  taskId: string,
-  updateCaseTaskDto: UpdateCaseTaskDto,
-  options?: RequestInit
-): Promise<casesControllerUpdateTaskResponse> => {
-  return temisFetch<casesControllerUpdateTaskResponse>(
-    getCasesControllerUpdateTaskUrl(caseId, taskId),
-    {
-      ...options,
-      method: "PATCH",
-      headers: { "Content-Type": "application/json", ...options?.headers },
-      body: JSON.stringify(updateCaseTaskDto)
-    }
-  );
-};
+export const getCasesControllerUpdateTaskUrl = (caseId: string,
+    taskId: string,) => {
+
+
+  
+
+  return `/api/cases/${caseId}/tasks/${taskId}`
+}
+
+export const casesControllerUpdateTask = async (caseId: string,
+    taskId: string,
+    updateCaseTaskDto: UpdateCaseTaskDto, options?: RequestInit): Promise<casesControllerUpdateTaskResponse> => {
+  
+  return temisFetch<casesControllerUpdateTaskResponse>(getCasesControllerUpdateTaskUrl(caseId,taskId),
+  {      
+    ...options,
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      updateCaseTaskDto,)
+  }
+);}
+
+
 
 export type casesControllerDeleteTaskResponse200 = {
-  data: CaseDeleteResponseDto;
-  status: 200;
-};
-
-export type casesControllerDeleteTaskResponseSuccess = casesControllerDeleteTaskResponse200 & {
+  data: CaseDeleteResponseDto
+  status: 200
+}
+    
+export type casesControllerDeleteTaskResponseSuccess = (casesControllerDeleteTaskResponse200) & {
   headers: Headers;
 };
-export type casesControllerDeleteTaskResponse = casesControllerDeleteTaskResponseSuccess;
+;
 
-export const getCasesControllerDeleteTaskUrl = (caseId: string, taskId: string) => {
-  return `/api/cases/${caseId}/tasks/${taskId}`;
-};
+export type casesControllerDeleteTaskResponse = (casesControllerDeleteTaskResponseSuccess)
 
-export const casesControllerDeleteTask = async (
-  caseId: string,
-  taskId: string,
-  options?: RequestInit
-): Promise<casesControllerDeleteTaskResponse> => {
-  return temisFetch<casesControllerDeleteTaskResponse>(
-    getCasesControllerDeleteTaskUrl(caseId, taskId),
-    {
-      ...options,
-      method: "DELETE"
-    }
-  );
-};
+export const getCasesControllerDeleteTaskUrl = (caseId: string,
+    taskId: string,) => {
+
+
+  
+
+  return `/api/cases/${caseId}/tasks/${taskId}`
+}
+
+export const casesControllerDeleteTask = async (caseId: string,
+    taskId: string, options?: RequestInit): Promise<casesControllerDeleteTaskResponse> => {
+  
+  return temisFetch<casesControllerDeleteTaskResponse>(getCasesControllerDeleteTaskUrl(caseId,taskId),
+  {      
+    ...options,
+    method: 'DELETE'
+    
+    
+  }
+);}
+
+
 
 export type casesControllerMarkTaskSeenResponse200 = {
-  data: CaseTaskDto;
-  status: 200;
-};
-
-export type casesControllerMarkTaskSeenResponseSuccess = casesControllerMarkTaskSeenResponse200 & {
+  data: CaseTaskDto
+  status: 200
+}
+    
+export type casesControllerMarkTaskSeenResponseSuccess = (casesControllerMarkTaskSeenResponse200) & {
   headers: Headers;
 };
-export type casesControllerMarkTaskSeenResponse = casesControllerMarkTaskSeenResponseSuccess;
+;
 
-export const getCasesControllerMarkTaskSeenUrl = (caseId: string, taskId: string) => {
-  return `/api/cases/${caseId}/tasks/${taskId}/seen`;
-};
+export type casesControllerMarkTaskSeenResponse = (casesControllerMarkTaskSeenResponseSuccess)
 
-export const casesControllerMarkTaskSeen = async (
-  caseId: string,
-  taskId: string,
-  options?: RequestInit
-): Promise<casesControllerMarkTaskSeenResponse> => {
-  return temisFetch<casesControllerMarkTaskSeenResponse>(
-    getCasesControllerMarkTaskSeenUrl(caseId, taskId),
-    {
-      ...options,
-      method: "PATCH"
-    }
-  );
-};
+export const getCasesControllerMarkTaskSeenUrl = (caseId: string,
+    taskId: string,) => {
+
+
+  
+
+  return `/api/cases/${caseId}/tasks/${taskId}/seen`
+}
+
+export const casesControllerMarkTaskSeen = async (caseId: string,
+    taskId: string, options?: RequestInit): Promise<casesControllerMarkTaskSeenResponse> => {
+  
+  return temisFetch<casesControllerMarkTaskSeenResponse>(getCasesControllerMarkTaskSeenUrl(caseId,taskId),
+  {      
+    ...options,
+    method: 'PATCH'
+    
+    
+  }
+);}
+
+
 
 export type casesControllerGetCalendarResponse200 = {
-  data: CaseCalendarResponseDto;
-  status: 200;
-};
-
-export type casesControllerGetCalendarResponseSuccess = casesControllerGetCalendarResponse200 & {
+  data: CaseCalendarResponseDto
+  status: 200
+}
+    
+export type casesControllerGetCalendarResponseSuccess = (casesControllerGetCalendarResponse200) & {
   headers: Headers;
 };
-export type casesControllerGetCalendarResponse = casesControllerGetCalendarResponseSuccess;
+;
 
-export const getCasesControllerGetCalendarUrl = (caseId: string) => {
-  return `/api/cases/${caseId}/calendar`;
-};
+export type casesControllerGetCalendarResponse = (casesControllerGetCalendarResponseSuccess)
 
-export const casesControllerGetCalendar = async (
-  caseId: string,
-  options?: RequestInit
-): Promise<casesControllerGetCalendarResponse> => {
-  return temisFetch<casesControllerGetCalendarResponse>(getCasesControllerGetCalendarUrl(caseId), {
+export const getCasesControllerGetCalendarUrl = (caseId: string,) => {
+
+
+  
+
+  return `/api/cases/${caseId}/calendar`
+}
+
+export const casesControllerGetCalendar = async (caseId: string, options?: RequestInit): Promise<casesControllerGetCalendarResponse> => {
+  
+  return temisFetch<casesControllerGetCalendarResponse>(getCasesControllerGetCalendarUrl(caseId),
+  {      
     ...options,
-    method: "GET"
-  });
-};
+    method: 'GET'
+    
+    
+  }
+);}
+
+
 
 export type casesControllerListDocumentsResponse200 = {
-  data: CaseDocumentsListResponseDto;
-  status: 200;
+  data: CaseDocumentsListResponseDto
+  status: 200
+}
+    
+export type casesControllerListDocumentsResponseSuccess = (casesControllerListDocumentsResponse200) & {
+  headers: Headers;
 };
+;
 
-export type casesControllerListDocumentsResponseSuccess =
-  casesControllerListDocumentsResponse200 & {
-    headers: Headers;
-  };
-export type casesControllerListDocumentsResponse = casesControllerListDocumentsResponseSuccess;
+export type casesControllerListDocumentsResponse = (casesControllerListDocumentsResponseSuccess)
 
-export const getCasesControllerListDocumentsUrl = (caseId: string) => {
-  return `/api/cases/${caseId}/documents`;
-};
+export const getCasesControllerListDocumentsUrl = (caseId: string,) => {
 
-export const casesControllerListDocuments = async (
-  caseId: string,
-  options?: RequestInit
-): Promise<casesControllerListDocumentsResponse> => {
-  return temisFetch<casesControllerListDocumentsResponse>(
-    getCasesControllerListDocumentsUrl(caseId),
-    {
-      ...options,
-      method: "GET"
-    }
-  );
-};
+
+  
+
+  return `/api/cases/${caseId}/documents`
+}
+
+export const casesControllerListDocuments = async (caseId: string, options?: RequestInit): Promise<casesControllerListDocumentsResponse> => {
+  
+  return temisFetch<casesControllerListDocumentsResponse>(getCasesControllerListDocumentsUrl(caseId),
+  {      
+    ...options,
+    method: 'GET'
+    
+    
+  }
+);}
+
+
 
 export type casesControllerCreateDocumentResponse201 = {
-  data: CaseDocumentDto;
-  status: 201;
+  data: CaseDocumentDto
+  status: 201
+}
+    
+export type casesControllerCreateDocumentResponseSuccess = (casesControllerCreateDocumentResponse201) & {
+  headers: Headers;
 };
+;
 
-export type casesControllerCreateDocumentResponseSuccess =
-  casesControllerCreateDocumentResponse201 & {
-    headers: Headers;
-  };
-export type casesControllerCreateDocumentResponse = casesControllerCreateDocumentResponseSuccess;
+export type casesControllerCreateDocumentResponse = (casesControllerCreateDocumentResponseSuccess)
 
-export const getCasesControllerCreateDocumentUrl = (caseId: string) => {
-  return `/api/cases/${caseId}/documents`;
-};
+export const getCasesControllerCreateDocumentUrl = (caseId: string,) => {
 
-export const casesControllerCreateDocument = async (
-  caseId: string,
-  createCaseDocumentBodyDto: CreateCaseDocumentBodyDto,
-  options?: RequestInit
-): Promise<casesControllerCreateDocumentResponse> => {
-  const formData = new FormData();
-  formData.append(`file`, createCaseDocumentBodyDto.file);
 
-  return temisFetch<casesControllerCreateDocumentResponse>(
-    getCasesControllerCreateDocumentUrl(caseId),
-    {
-      ...options,
-      method: "POST",
-      body: formData
-    }
-  );
-};
+  
+
+  return `/api/cases/${caseId}/documents`
+}
+
+export const casesControllerCreateDocument = async (caseId: string,
+    createCaseDocumentBodyDto: CreateCaseDocumentBodyDto, options?: RequestInit): Promise<casesControllerCreateDocumentResponse> => {
+    const formData = new FormData();
+formData.append(`file`, createCaseDocumentBodyDto.file)
+
+  return temisFetch<casesControllerCreateDocumentResponse>(getCasesControllerCreateDocumentUrl(caseId),
+  {      
+    ...options,
+    method: 'POST'
+    ,
+    body: 
+      formData,
+  }
+);}
+
+
 
 export type casesControllerPreviewDocumentResponse200 = {
-  data: void;
-  status: 200;
+  data: void
+  status: 200
+}
+    
+export type casesControllerPreviewDocumentResponseSuccess = (casesControllerPreviewDocumentResponse200) & {
+  headers: Headers;
 };
+;
 
-export type casesControllerPreviewDocumentResponseSuccess =
-  casesControllerPreviewDocumentResponse200 & {
-    headers: Headers;
-  };
-export type casesControllerPreviewDocumentResponse = casesControllerPreviewDocumentResponseSuccess;
+export type casesControllerPreviewDocumentResponse = (casesControllerPreviewDocumentResponseSuccess)
 
-export const getCasesControllerPreviewDocumentUrl = (caseId: string, documentId: string) => {
-  return `/api/cases/${caseId}/documents/${documentId}/preview`;
-};
+export const getCasesControllerPreviewDocumentUrl = (caseId: string,
+    documentId: string,) => {
 
-export const casesControllerPreviewDocument = async (
-  caseId: string,
-  documentId: string,
-  options?: RequestInit
-): Promise<casesControllerPreviewDocumentResponse> => {
-  return temisFetch<casesControllerPreviewDocumentResponse>(
-    getCasesControllerPreviewDocumentUrl(caseId, documentId),
-    {
-      ...options,
-      method: "GET"
-    }
-  );
-};
+
+  
+
+  return `/api/cases/${caseId}/documents/${documentId}/preview`
+}
+
+export const casesControllerPreviewDocument = async (caseId: string,
+    documentId: string, options?: RequestInit): Promise<casesControllerPreviewDocumentResponse> => {
+  
+  return temisFetch<casesControllerPreviewDocumentResponse>(getCasesControllerPreviewDocumentUrl(caseId,documentId),
+  {      
+    ...options,
+    method: 'GET'
+    
+    
+  }
+);}
+
+
 
 export type casesControllerDownloadDocumentResponse200 = {
-  data: void;
-  status: 200;
+  data: void
+  status: 200
+}
+    
+export type casesControllerDownloadDocumentResponseSuccess = (casesControllerDownloadDocumentResponse200) & {
+  headers: Headers;
 };
+;
 
-export type casesControllerDownloadDocumentResponseSuccess =
-  casesControllerDownloadDocumentResponse200 & {
-    headers: Headers;
-  };
-export type casesControllerDownloadDocumentResponse =
-  casesControllerDownloadDocumentResponseSuccess;
+export type casesControllerDownloadDocumentResponse = (casesControllerDownloadDocumentResponseSuccess)
 
-export const getCasesControllerDownloadDocumentUrl = (caseId: string, documentId: string) => {
-  return `/api/cases/${caseId}/documents/${documentId}/download`;
-};
+export const getCasesControllerDownloadDocumentUrl = (caseId: string,
+    documentId: string,) => {
 
-export const casesControllerDownloadDocument = async (
-  caseId: string,
-  documentId: string,
-  options?: RequestInit
-): Promise<casesControllerDownloadDocumentResponse> => {
-  return temisFetch<casesControllerDownloadDocumentResponse>(
-    getCasesControllerDownloadDocumentUrl(caseId, documentId),
-    {
-      ...options,
-      method: "GET"
-    }
-  );
-};
+
+  
+
+  return `/api/cases/${caseId}/documents/${documentId}/download`
+}
+
+export const casesControllerDownloadDocument = async (caseId: string,
+    documentId: string, options?: RequestInit): Promise<casesControllerDownloadDocumentResponse> => {
+  
+  return temisFetch<casesControllerDownloadDocumentResponse>(getCasesControllerDownloadDocumentUrl(caseId,documentId),
+  {      
+    ...options,
+    method: 'GET'
+    
+    
+  }
+);}
+
+
 
 export type casesControllerDeleteDocumentResponse200 = {
-  data: CaseDeleteResponseDto;
-  status: 200;
+  data: CaseDeleteResponseDto
+  status: 200
+}
+    
+export type casesControllerDeleteDocumentResponseSuccess = (casesControllerDeleteDocumentResponse200) & {
+  headers: Headers;
 };
+;
 
-export type casesControllerDeleteDocumentResponseSuccess =
-  casesControllerDeleteDocumentResponse200 & {
-    headers: Headers;
-  };
-export type casesControllerDeleteDocumentResponse = casesControllerDeleteDocumentResponseSuccess;
+export type casesControllerDeleteDocumentResponse = (casesControllerDeleteDocumentResponseSuccess)
 
-export const getCasesControllerDeleteDocumentUrl = (caseId: string, documentId: string) => {
-  return `/api/cases/${caseId}/documents/${documentId}`;
-};
+export const getCasesControllerDeleteDocumentUrl = (caseId: string,
+    documentId: string,) => {
 
-export const casesControllerDeleteDocument = async (
-  caseId: string,
-  documentId: string,
-  options?: RequestInit
-): Promise<casesControllerDeleteDocumentResponse> => {
-  return temisFetch<casesControllerDeleteDocumentResponse>(
-    getCasesControllerDeleteDocumentUrl(caseId, documentId),
-    {
-      ...options,
-      method: "DELETE"
-    }
-  );
-};
+
+  
+
+  return `/api/cases/${caseId}/documents/${documentId}`
+}
+
+export const casesControllerDeleteDocument = async (caseId: string,
+    documentId: string, options?: RequestInit): Promise<casesControllerDeleteDocumentResponse> => {
+  
+  return temisFetch<casesControllerDeleteDocumentResponse>(getCasesControllerDeleteDocumentUrl(caseId,documentId),
+  {      
+    ...options,
+    method: 'DELETE'
+    
+    
+  }
+);}
+
+
 
 export type casesControllerListHearingsResponse200 = {
-  data: CaseHearingsListResponseDto;
-  status: 200;
-};
-
-export type casesControllerListHearingsResponseSuccess = casesControllerListHearingsResponse200 & {
+  data: CaseHearingsListResponseDto
+  status: 200
+}
+    
+export type casesControllerListHearingsResponseSuccess = (casesControllerListHearingsResponse200) & {
   headers: Headers;
 };
-export type casesControllerListHearingsResponse = casesControllerListHearingsResponseSuccess;
+;
 
-export const getCasesControllerListHearingsUrl = (caseId: string) => {
-  return `/api/cases/${caseId}/hearings`;
-};
+export type casesControllerListHearingsResponse = (casesControllerListHearingsResponseSuccess)
 
-export const casesControllerListHearings = async (
-  caseId: string,
-  options?: RequestInit
-): Promise<casesControllerListHearingsResponse> => {
-  return temisFetch<casesControllerListHearingsResponse>(
-    getCasesControllerListHearingsUrl(caseId),
-    {
-      ...options,
-      method: "GET"
-    }
-  );
-};
+export const getCasesControllerListHearingsUrl = (caseId: string,) => {
+
+
+  
+
+  return `/api/cases/${caseId}/hearings`
+}
+
+export const casesControllerListHearings = async (caseId: string, options?: RequestInit): Promise<casesControllerListHearingsResponse> => {
+  
+  return temisFetch<casesControllerListHearingsResponse>(getCasesControllerListHearingsUrl(caseId),
+  {      
+    ...options,
+    method: 'GET'
+    
+    
+  }
+);}
+
+
 
 export type casesControllerCreateHearingResponse201 = {
-  data: CaseHearingDto;
-  status: 201;
+  data: CaseHearingDto
+  status: 201
+}
+    
+export type casesControllerCreateHearingResponseSuccess = (casesControllerCreateHearingResponse201) & {
+  headers: Headers;
 };
+;
 
-export type casesControllerCreateHearingResponseSuccess =
-  casesControllerCreateHearingResponse201 & {
-    headers: Headers;
-  };
-export type casesControllerCreateHearingResponse = casesControllerCreateHearingResponseSuccess;
+export type casesControllerCreateHearingResponse = (casesControllerCreateHearingResponseSuccess)
 
-export const getCasesControllerCreateHearingUrl = (caseId: string) => {
-  return `/api/cases/${caseId}/hearings`;
-};
+export const getCasesControllerCreateHearingUrl = (caseId: string,) => {
 
-export const casesControllerCreateHearing = async (
-  caseId: string,
-  createCaseHearingDto: CreateCaseHearingDto,
-  options?: RequestInit
-): Promise<casesControllerCreateHearingResponse> => {
-  return temisFetch<casesControllerCreateHearingResponse>(
-    getCasesControllerCreateHearingUrl(caseId),
-    {
-      ...options,
-      method: "POST",
-      headers: { "Content-Type": "application/json", ...options?.headers },
-      body: JSON.stringify(createCaseHearingDto)
-    }
-  );
-};
+
+  
+
+  return `/api/cases/${caseId}/hearings`
+}
+
+export const casesControllerCreateHearing = async (caseId: string,
+    createCaseHearingDto: CreateCaseHearingDto, options?: RequestInit): Promise<casesControllerCreateHearingResponse> => {
+  
+  return temisFetch<casesControllerCreateHearingResponse>(getCasesControllerCreateHearingUrl(caseId),
+  {      
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      createCaseHearingDto,)
+  }
+);}
+
+
 
 export type casesControllerUpdateHearingResponse200 = {
-  data: CaseHearingDto;
-  status: 200;
+  data: CaseHearingDto
+  status: 200
+}
+    
+export type casesControllerUpdateHearingResponseSuccess = (casesControllerUpdateHearingResponse200) & {
+  headers: Headers;
 };
+;
 
-export type casesControllerUpdateHearingResponseSuccess =
-  casesControllerUpdateHearingResponse200 & {
-    headers: Headers;
-  };
-export type casesControllerUpdateHearingResponse = casesControllerUpdateHearingResponseSuccess;
+export type casesControllerUpdateHearingResponse = (casesControllerUpdateHearingResponseSuccess)
 
-export const getCasesControllerUpdateHearingUrl = (caseId: string, hearingId: string) => {
-  return `/api/cases/${caseId}/hearings/${hearingId}`;
-};
+export const getCasesControllerUpdateHearingUrl = (caseId: string,
+    hearingId: string,) => {
 
-export const casesControllerUpdateHearing = async (
-  caseId: string,
-  hearingId: string,
-  updateCaseHearingDto: UpdateCaseHearingDto,
-  options?: RequestInit
-): Promise<casesControllerUpdateHearingResponse> => {
-  return temisFetch<casesControllerUpdateHearingResponse>(
-    getCasesControllerUpdateHearingUrl(caseId, hearingId),
-    {
-      ...options,
-      method: "PATCH",
-      headers: { "Content-Type": "application/json", ...options?.headers },
-      body: JSON.stringify(updateCaseHearingDto)
-    }
-  );
-};
+
+  
+
+  return `/api/cases/${caseId}/hearings/${hearingId}`
+}
+
+export const casesControllerUpdateHearing = async (caseId: string,
+    hearingId: string,
+    updateCaseHearingDto: UpdateCaseHearingDto, options?: RequestInit): Promise<casesControllerUpdateHearingResponse> => {
+  
+  return temisFetch<casesControllerUpdateHearingResponse>(getCasesControllerUpdateHearingUrl(caseId,hearingId),
+  {      
+    ...options,
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      updateCaseHearingDto,)
+  }
+);}
+
+
 
 export type casesControllerDeleteHearingResponse200 = {
-  data: CaseDeleteResponseDto;
-  status: 200;
+  data: CaseDeleteResponseDto
+  status: 200
+}
+    
+export type casesControllerDeleteHearingResponseSuccess = (casesControllerDeleteHearingResponse200) & {
+  headers: Headers;
 };
+;
 
-export type casesControllerDeleteHearingResponseSuccess =
-  casesControllerDeleteHearingResponse200 & {
-    headers: Headers;
-  };
-export type casesControllerDeleteHearingResponse = casesControllerDeleteHearingResponseSuccess;
+export type casesControllerDeleteHearingResponse = (casesControllerDeleteHearingResponseSuccess)
 
-export const getCasesControllerDeleteHearingUrl = (caseId: string, hearingId: string) => {
-  return `/api/cases/${caseId}/hearings/${hearingId}`;
-};
+export const getCasesControllerDeleteHearingUrl = (caseId: string,
+    hearingId: string,) => {
 
-export const casesControllerDeleteHearing = async (
-  caseId: string,
-  hearingId: string,
-  options?: RequestInit
-): Promise<casesControllerDeleteHearingResponse> => {
-  return temisFetch<casesControllerDeleteHearingResponse>(
-    getCasesControllerDeleteHearingUrl(caseId, hearingId),
-    {
-      ...options,
-      method: "DELETE"
-    }
-  );
-};
+
+  
+
+  return `/api/cases/${caseId}/hearings/${hearingId}`
+}
+
+export const casesControllerDeleteHearing = async (caseId: string,
+    hearingId: string, options?: RequestInit): Promise<casesControllerDeleteHearingResponse> => {
+  
+  return temisFetch<casesControllerDeleteHearingResponse>(getCasesControllerDeleteHearingUrl(caseId,hearingId),
+  {      
+    ...options,
+    method: 'DELETE'
+    
+    
+  }
+);}
+
+
 
 export type casesControllerGetExpensesSummaryResponse200 = {
-  data: CaseExpensesSummaryDto;
-  status: 200;
+  data: CaseExpensesSummaryDto
+  status: 200
+}
+    
+export type casesControllerGetExpensesSummaryResponseSuccess = (casesControllerGetExpensesSummaryResponse200) & {
+  headers: Headers;
 };
+;
 
-export type casesControllerGetExpensesSummaryResponseSuccess =
-  casesControllerGetExpensesSummaryResponse200 & {
-    headers: Headers;
-  };
-export type casesControllerGetExpensesSummaryResponse =
-  casesControllerGetExpensesSummaryResponseSuccess;
+export type casesControllerGetExpensesSummaryResponse = (casesControllerGetExpensesSummaryResponseSuccess)
 
-export const getCasesControllerGetExpensesSummaryUrl = (caseId: string) => {
-  return `/api/cases/${caseId}/expenses/summary`;
-};
+export const getCasesControllerGetExpensesSummaryUrl = (caseId: string,) => {
 
-export const casesControllerGetExpensesSummary = async (
-  caseId: string,
-  options?: RequestInit
-): Promise<casesControllerGetExpensesSummaryResponse> => {
-  return temisFetch<casesControllerGetExpensesSummaryResponse>(
-    getCasesControllerGetExpensesSummaryUrl(caseId),
-    {
-      ...options,
-      method: "GET"
-    }
-  );
-};
+
+  
+
+  return `/api/cases/${caseId}/expenses/summary`
+}
+
+export const casesControllerGetExpensesSummary = async (caseId: string, options?: RequestInit): Promise<casesControllerGetExpensesSummaryResponse> => {
+  
+  return temisFetch<casesControllerGetExpensesSummaryResponse>(getCasesControllerGetExpensesSummaryUrl(caseId),
+  {      
+    ...options,
+    method: 'GET'
+    
+    
+  }
+);}
+
+
 
 export type casesControllerRecalculateOverdueExpensesResponse200 = {
-  data: CaseExpensesOverdueRecalculationDto;
-  status: 200;
+  data: CaseExpensesOverdueRecalculationDto
+  status: 200
+}
+    
+export type casesControllerRecalculateOverdueExpensesResponseSuccess = (casesControllerRecalculateOverdueExpensesResponse200) & {
+  headers: Headers;
 };
+;
 
-export type casesControllerRecalculateOverdueExpensesResponseSuccess =
-  casesControllerRecalculateOverdueExpensesResponse200 & {
-    headers: Headers;
-  };
-export type casesControllerRecalculateOverdueExpensesResponse =
-  casesControllerRecalculateOverdueExpensesResponseSuccess;
+export type casesControllerRecalculateOverdueExpensesResponse = (casesControllerRecalculateOverdueExpensesResponseSuccess)
 
-export const getCasesControllerRecalculateOverdueExpensesUrl = (caseId: string) => {
-  return `/api/cases/${caseId}/expenses/recalculate-overdue`;
-};
+export const getCasesControllerRecalculateOverdueExpensesUrl = (caseId: string,) => {
 
-export const casesControllerRecalculateOverdueExpenses = async (
-  caseId: string,
-  options?: RequestInit
-): Promise<casesControllerRecalculateOverdueExpensesResponse> => {
-  return temisFetch<casesControllerRecalculateOverdueExpensesResponse>(
-    getCasesControllerRecalculateOverdueExpensesUrl(caseId),
-    {
-      ...options,
-      method: "POST"
-    }
-  );
-};
+
+  
+
+  return `/api/cases/${caseId}/expenses/recalculate-overdue`
+}
+
+export const casesControllerRecalculateOverdueExpenses = async (caseId: string, options?: RequestInit): Promise<casesControllerRecalculateOverdueExpensesResponse> => {
+  
+  return temisFetch<casesControllerRecalculateOverdueExpensesResponse>(getCasesControllerRecalculateOverdueExpensesUrl(caseId),
+  {      
+    ...options,
+    method: 'POST'
+    
+    
+  }
+);}
+
+
 
 export type casesControllerListExpensesResponse200 = {
-  data: CaseExpensesListResponseDto;
-  status: 200;
-};
-
-export type casesControllerListExpensesResponseSuccess = casesControllerListExpensesResponse200 & {
+  data: CaseExpensesListResponseDto
+  status: 200
+}
+    
+export type casesControllerListExpensesResponseSuccess = (casesControllerListExpensesResponse200) & {
   headers: Headers;
 };
-export type casesControllerListExpensesResponse = casesControllerListExpensesResponseSuccess;
+;
 
-export const getCasesControllerListExpensesUrl = (caseId: string) => {
-  return `/api/cases/${caseId}/expenses`;
-};
+export type casesControllerListExpensesResponse = (casesControllerListExpensesResponseSuccess)
 
-export const casesControllerListExpenses = async (
-  caseId: string,
-  options?: RequestInit
-): Promise<casesControllerListExpensesResponse> => {
-  return temisFetch<casesControllerListExpensesResponse>(
-    getCasesControllerListExpensesUrl(caseId),
-    {
-      ...options,
-      method: "GET"
-    }
-  );
-};
+export const getCasesControllerListExpensesUrl = (caseId: string,) => {
+
+
+  
+
+  return `/api/cases/${caseId}/expenses`
+}
+
+export const casesControllerListExpenses = async (caseId: string, options?: RequestInit): Promise<casesControllerListExpensesResponse> => {
+  
+  return temisFetch<casesControllerListExpensesResponse>(getCasesControllerListExpensesUrl(caseId),
+  {      
+    ...options,
+    method: 'GET'
+    
+    
+  }
+);}
+
+
 
 export type casesControllerCreateExpenseResponse201 = {
-  data: CaseExpenseDto;
-  status: 201;
+  data: CaseExpenseDto
+  status: 201
+}
+    
+export type casesControllerCreateExpenseResponseSuccess = (casesControllerCreateExpenseResponse201) & {
+  headers: Headers;
 };
+;
 
-export type casesControllerCreateExpenseResponseSuccess =
-  casesControllerCreateExpenseResponse201 & {
-    headers: Headers;
-  };
-export type casesControllerCreateExpenseResponse = casesControllerCreateExpenseResponseSuccess;
+export type casesControllerCreateExpenseResponse = (casesControllerCreateExpenseResponseSuccess)
 
-export const getCasesControllerCreateExpenseUrl = (caseId: string) => {
-  return `/api/cases/${caseId}/expenses`;
-};
+export const getCasesControllerCreateExpenseUrl = (caseId: string,) => {
 
-export const casesControllerCreateExpense = async (
-  caseId: string,
-  createCaseExpenseDto: CreateCaseExpenseDto,
-  options?: RequestInit
-): Promise<casesControllerCreateExpenseResponse> => {
-  return temisFetch<casesControllerCreateExpenseResponse>(
-    getCasesControllerCreateExpenseUrl(caseId),
-    {
-      ...options,
-      method: "POST",
-      headers: { "Content-Type": "application/json", ...options?.headers },
-      body: JSON.stringify(createCaseExpenseDto)
-    }
-  );
-};
+
+  
+
+  return `/api/cases/${caseId}/expenses`
+}
+
+export const casesControllerCreateExpense = async (caseId: string,
+    createCaseExpenseDto: CreateCaseExpenseDto, options?: RequestInit): Promise<casesControllerCreateExpenseResponse> => {
+  
+  return temisFetch<casesControllerCreateExpenseResponse>(getCasesControllerCreateExpenseUrl(caseId),
+  {      
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      createCaseExpenseDto,)
+  }
+);}
+
+
 
 export type casesControllerGetExpenseResponse200 = {
-  data: CaseExpenseDto;
-  status: 200;
-};
-
-export type casesControllerGetExpenseResponseSuccess = casesControllerGetExpenseResponse200 & {
+  data: CaseExpenseDto
+  status: 200
+}
+    
+export type casesControllerGetExpenseResponseSuccess = (casesControllerGetExpenseResponse200) & {
   headers: Headers;
 };
-export type casesControllerGetExpenseResponse = casesControllerGetExpenseResponseSuccess;
+;
 
-export const getCasesControllerGetExpenseUrl = (caseId: string, expenseId: string) => {
-  return `/api/cases/${caseId}/expenses/${expenseId}`;
-};
+export type casesControllerGetExpenseResponse = (casesControllerGetExpenseResponseSuccess)
 
-export const casesControllerGetExpense = async (
-  caseId: string,
-  expenseId: string,
-  options?: RequestInit
-): Promise<casesControllerGetExpenseResponse> => {
-  return temisFetch<casesControllerGetExpenseResponse>(
-    getCasesControllerGetExpenseUrl(caseId, expenseId),
-    {
-      ...options,
-      method: "GET"
-    }
-  );
-};
+export const getCasesControllerGetExpenseUrl = (caseId: string,
+    expenseId: string,) => {
+
+
+  
+
+  return `/api/cases/${caseId}/expenses/${expenseId}`
+}
+
+export const casesControllerGetExpense = async (caseId: string,
+    expenseId: string, options?: RequestInit): Promise<casesControllerGetExpenseResponse> => {
+  
+  return temisFetch<casesControllerGetExpenseResponse>(getCasesControllerGetExpenseUrl(caseId,expenseId),
+  {      
+    ...options,
+    method: 'GET'
+    
+    
+  }
+);}
+
+
 
 export type casesControllerUpdateExpenseResponse200 = {
-  data: CaseExpenseDto;
-  status: 200;
+  data: CaseExpenseDto
+  status: 200
+}
+    
+export type casesControllerUpdateExpenseResponseSuccess = (casesControllerUpdateExpenseResponse200) & {
+  headers: Headers;
 };
+;
 
-export type casesControllerUpdateExpenseResponseSuccess =
-  casesControllerUpdateExpenseResponse200 & {
-    headers: Headers;
-  };
-export type casesControllerUpdateExpenseResponse = casesControllerUpdateExpenseResponseSuccess;
+export type casesControllerUpdateExpenseResponse = (casesControllerUpdateExpenseResponseSuccess)
 
-export const getCasesControllerUpdateExpenseUrl = (caseId: string, expenseId: string) => {
-  return `/api/cases/${caseId}/expenses/${expenseId}`;
-};
+export const getCasesControllerUpdateExpenseUrl = (caseId: string,
+    expenseId: string,) => {
 
-export const casesControllerUpdateExpense = async (
-  caseId: string,
-  expenseId: string,
-  updateCaseExpenseDto: UpdateCaseExpenseDto,
-  options?: RequestInit
-): Promise<casesControllerUpdateExpenseResponse> => {
-  return temisFetch<casesControllerUpdateExpenseResponse>(
-    getCasesControllerUpdateExpenseUrl(caseId, expenseId),
-    {
-      ...options,
-      method: "PATCH",
-      headers: { "Content-Type": "application/json", ...options?.headers },
-      body: JSON.stringify(updateCaseExpenseDto)
-    }
-  );
-};
+
+  
+
+  return `/api/cases/${caseId}/expenses/${expenseId}`
+}
+
+export const casesControllerUpdateExpense = async (caseId: string,
+    expenseId: string,
+    updateCaseExpenseDto: UpdateCaseExpenseDto, options?: RequestInit): Promise<casesControllerUpdateExpenseResponse> => {
+  
+  return temisFetch<casesControllerUpdateExpenseResponse>(getCasesControllerUpdateExpenseUrl(caseId,expenseId),
+  {      
+    ...options,
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      updateCaseExpenseDto,)
+  }
+);}
+
+
 
 export type casesControllerDeleteExpenseResponse200 = {
-  data: CaseDeleteResponseDto;
-  status: 200;
+  data: CaseDeleteResponseDto
+  status: 200
+}
+    
+export type casesControllerDeleteExpenseResponseSuccess = (casesControllerDeleteExpenseResponse200) & {
+  headers: Headers;
 };
+;
 
-export type casesControllerDeleteExpenseResponseSuccess =
-  casesControllerDeleteExpenseResponse200 & {
-    headers: Headers;
-  };
-export type casesControllerDeleteExpenseResponse = casesControllerDeleteExpenseResponseSuccess;
+export type casesControllerDeleteExpenseResponse = (casesControllerDeleteExpenseResponseSuccess)
 
-export const getCasesControllerDeleteExpenseUrl = (caseId: string, expenseId: string) => {
-  return `/api/cases/${caseId}/expenses/${expenseId}`;
-};
+export const getCasesControllerDeleteExpenseUrl = (caseId: string,
+    expenseId: string,) => {
 
-export const casesControllerDeleteExpense = async (
-  caseId: string,
-  expenseId: string,
-  options?: RequestInit
-): Promise<casesControllerDeleteExpenseResponse> => {
-  return temisFetch<casesControllerDeleteExpenseResponse>(
-    getCasesControllerDeleteExpenseUrl(caseId, expenseId),
-    {
-      ...options,
-      method: "DELETE"
-    }
-  );
-};
+
+  
+
+  return `/api/cases/${caseId}/expenses/${expenseId}`
+}
+
+export const casesControllerDeleteExpense = async (caseId: string,
+    expenseId: string, options?: RequestInit): Promise<casesControllerDeleteExpenseResponse> => {
+  
+  return temisFetch<casesControllerDeleteExpenseResponse>(getCasesControllerDeleteExpenseUrl(caseId,expenseId),
+  {      
+    ...options,
+    method: 'DELETE'
+    
+    
+  }
+);}
+
+
 
 export type casesControllerListExpenseAttachmentsResponse200 = {
-  data: CaseExpenseAttachmentsListResponseDto;
-  status: 200;
+  data: CaseExpenseAttachmentsListResponseDto
+  status: 200
+}
+    
+export type casesControllerListExpenseAttachmentsResponseSuccess = (casesControllerListExpenseAttachmentsResponse200) & {
+  headers: Headers;
 };
+;
 
-export type casesControllerListExpenseAttachmentsResponseSuccess =
-  casesControllerListExpenseAttachmentsResponse200 & {
-    headers: Headers;
-  };
-export type casesControllerListExpenseAttachmentsResponse =
-  casesControllerListExpenseAttachmentsResponseSuccess;
+export type casesControllerListExpenseAttachmentsResponse = (casesControllerListExpenseAttachmentsResponseSuccess)
 
-export const getCasesControllerListExpenseAttachmentsUrl = (caseId: string, expenseId: string) => {
-  return `/api/cases/${caseId}/expenses/${expenseId}/attachments`;
-};
+export const getCasesControllerListExpenseAttachmentsUrl = (caseId: string,
+    expenseId: string,) => {
 
-export const casesControllerListExpenseAttachments = async (
-  caseId: string,
-  expenseId: string,
-  options?: RequestInit
-): Promise<casesControllerListExpenseAttachmentsResponse> => {
-  return temisFetch<casesControllerListExpenseAttachmentsResponse>(
-    getCasesControllerListExpenseAttachmentsUrl(caseId, expenseId),
-    {
-      ...options,
-      method: "GET"
-    }
-  );
-};
+
+  
+
+  return `/api/cases/${caseId}/expenses/${expenseId}/attachments`
+}
+
+export const casesControllerListExpenseAttachments = async (caseId: string,
+    expenseId: string, options?: RequestInit): Promise<casesControllerListExpenseAttachmentsResponse> => {
+  
+  return temisFetch<casesControllerListExpenseAttachmentsResponse>(getCasesControllerListExpenseAttachmentsUrl(caseId,expenseId),
+  {      
+    ...options,
+    method: 'GET'
+    
+    
+  }
+);}
+
+
 
 export type casesControllerCreateExpenseAttachmentResponse201 = {
-  data: CaseExpenseAttachmentDto;
-  status: 201;
+  data: CaseExpenseAttachmentDto
+  status: 201
+}
+    
+export type casesControllerCreateExpenseAttachmentResponseSuccess = (casesControllerCreateExpenseAttachmentResponse201) & {
+  headers: Headers;
 };
+;
 
-export type casesControllerCreateExpenseAttachmentResponseSuccess =
-  casesControllerCreateExpenseAttachmentResponse201 & {
-    headers: Headers;
-  };
-export type casesControllerCreateExpenseAttachmentResponse =
-  casesControllerCreateExpenseAttachmentResponseSuccess;
+export type casesControllerCreateExpenseAttachmentResponse = (casesControllerCreateExpenseAttachmentResponseSuccess)
 
-export const getCasesControllerCreateExpenseAttachmentUrl = (caseId: string, expenseId: string) => {
-  return `/api/cases/${caseId}/expenses/${expenseId}/attachments`;
-};
+export const getCasesControllerCreateExpenseAttachmentUrl = (caseId: string,
+    expenseId: string,) => {
 
-export const casesControllerCreateExpenseAttachment = async (
-  caseId: string,
-  expenseId: string,
-  casesControllerCreateExpenseAttachmentBody: CasesControllerCreateExpenseAttachmentBody,
-  options?: RequestInit
-): Promise<casesControllerCreateExpenseAttachmentResponse> => {
-  const formData = new FormData();
-  formData.append(`file`, casesControllerCreateExpenseAttachmentBody.file);
 
-  return temisFetch<casesControllerCreateExpenseAttachmentResponse>(
-    getCasesControllerCreateExpenseAttachmentUrl(caseId, expenseId),
-    {
-      ...options,
-      method: "POST",
-      body: formData
-    }
-  );
-};
+  
+
+  return `/api/cases/${caseId}/expenses/${expenseId}/attachments`
+}
+
+export const casesControllerCreateExpenseAttachment = async (caseId: string,
+    expenseId: string,
+    casesControllerCreateExpenseAttachmentBody: CasesControllerCreateExpenseAttachmentBody, options?: RequestInit): Promise<casesControllerCreateExpenseAttachmentResponse> => {
+    const formData = new FormData();
+formData.append(`file`, casesControllerCreateExpenseAttachmentBody.file)
+
+  return temisFetch<casesControllerCreateExpenseAttachmentResponse>(getCasesControllerCreateExpenseAttachmentUrl(caseId,expenseId),
+  {      
+    ...options,
+    method: 'POST'
+    ,
+    body: 
+      formData,
+  }
+);}
+
+
 
 export type casesControllerDownloadExpenseAttachmentResponse200 = {
-  data: void;
-  status: 200;
+  data: void
+  status: 200
+}
+    
+export type casesControllerDownloadExpenseAttachmentResponseSuccess = (casesControllerDownloadExpenseAttachmentResponse200) & {
+  headers: Headers;
 };
+;
 
-export type casesControllerDownloadExpenseAttachmentResponseSuccess =
-  casesControllerDownloadExpenseAttachmentResponse200 & {
-    headers: Headers;
-  };
-export type casesControllerDownloadExpenseAttachmentResponse =
-  casesControllerDownloadExpenseAttachmentResponseSuccess;
+export type casesControllerDownloadExpenseAttachmentResponse = (casesControllerDownloadExpenseAttachmentResponseSuccess)
 
-export const getCasesControllerDownloadExpenseAttachmentUrl = (
-  caseId: string,
-  expenseId: string,
-  attachmentId: string
-) => {
-  return `/api/cases/${caseId}/expenses/${expenseId}/attachments/${attachmentId}/download`;
-};
+export const getCasesControllerDownloadExpenseAttachmentUrl = (caseId: string,
+    expenseId: string,
+    attachmentId: string,) => {
 
-export const casesControllerDownloadExpenseAttachment = async (
-  caseId: string,
-  expenseId: string,
-  attachmentId: string,
-  options?: RequestInit
-): Promise<casesControllerDownloadExpenseAttachmentResponse> => {
-  return temisFetch<casesControllerDownloadExpenseAttachmentResponse>(
-    getCasesControllerDownloadExpenseAttachmentUrl(caseId, expenseId, attachmentId),
-    {
-      ...options,
-      method: "GET"
-    }
-  );
-};
+
+  
+
+  return `/api/cases/${caseId}/expenses/${expenseId}/attachments/${attachmentId}/download`
+}
+
+export const casesControllerDownloadExpenseAttachment = async (caseId: string,
+    expenseId: string,
+    attachmentId: string, options?: RequestInit): Promise<casesControllerDownloadExpenseAttachmentResponse> => {
+  
+  return temisFetch<casesControllerDownloadExpenseAttachmentResponse>(getCasesControllerDownloadExpenseAttachmentUrl(caseId,expenseId,attachmentId),
+  {      
+    ...options,
+    method: 'GET'
+    
+    
+  }
+);}
+
+
 
 export type casesControllerDeleteExpenseAttachmentResponse200 = {
-  data: CaseDeleteResponseDto;
-  status: 200;
+  data: CaseDeleteResponseDto
+  status: 200
+}
+    
+export type casesControllerDeleteExpenseAttachmentResponseSuccess = (casesControllerDeleteExpenseAttachmentResponse200) & {
+  headers: Headers;
 };
+;
 
-export type casesControllerDeleteExpenseAttachmentResponseSuccess =
-  casesControllerDeleteExpenseAttachmentResponse200 & {
-    headers: Headers;
-  };
-export type casesControllerDeleteExpenseAttachmentResponse =
-  casesControllerDeleteExpenseAttachmentResponseSuccess;
+export type casesControllerDeleteExpenseAttachmentResponse = (casesControllerDeleteExpenseAttachmentResponseSuccess)
 
-export const getCasesControllerDeleteExpenseAttachmentUrl = (
-  caseId: string,
-  expenseId: string,
-  attachmentId: string
-) => {
-  return `/api/cases/${caseId}/expenses/${expenseId}/attachments/${attachmentId}`;
-};
+export const getCasesControllerDeleteExpenseAttachmentUrl = (caseId: string,
+    expenseId: string,
+    attachmentId: string,) => {
 
-export const casesControllerDeleteExpenseAttachment = async (
-  caseId: string,
-  expenseId: string,
-  attachmentId: string,
-  options?: RequestInit
-): Promise<casesControllerDeleteExpenseAttachmentResponse> => {
-  return temisFetch<casesControllerDeleteExpenseAttachmentResponse>(
-    getCasesControllerDeleteExpenseAttachmentUrl(caseId, expenseId, attachmentId),
-    {
-      ...options,
-      method: "DELETE"
-    }
-  );
-};
+
+  
+
+  return `/api/cases/${caseId}/expenses/${expenseId}/attachments/${attachmentId}`
+}
+
+export const casesControllerDeleteExpenseAttachment = async (caseId: string,
+    expenseId: string,
+    attachmentId: string, options?: RequestInit): Promise<casesControllerDeleteExpenseAttachmentResponse> => {
+  
+  return temisFetch<casesControllerDeleteExpenseAttachmentResponse>(getCasesControllerDeleteExpenseAttachmentUrl(caseId,expenseId,attachmentId),
+  {      
+    ...options,
+    method: 'DELETE'
+    
+    
+  }
+);}
+
+
 
 export type documentCategoriesControllerListResponse200 = {
-  data: DocumentCategoriesListResponseDto;
-  status: 200;
+  data: DocumentCategoriesListResponseDto
+  status: 200
+}
+    
+export type documentCategoriesControllerListResponseSuccess = (documentCategoriesControllerListResponse200) & {
+  headers: Headers;
 };
+;
 
-export type documentCategoriesControllerListResponseSuccess =
-  documentCategoriesControllerListResponse200 & {
-    headers: Headers;
-  };
-export type documentCategoriesControllerListResponse =
-  documentCategoriesControllerListResponseSuccess;
+export type documentCategoriesControllerListResponse = (documentCategoriesControllerListResponseSuccess)
 
 export const getDocumentCategoriesControllerListUrl = () => {
-  return `/api/document-categories`;
-};
 
-export const documentCategoriesControllerList = async (
-  options?: RequestInit
-): Promise<documentCategoriesControllerListResponse> => {
-  return temisFetch<documentCategoriesControllerListResponse>(
-    getDocumentCategoriesControllerListUrl(),
-    {
-      ...options,
-      method: "GET"
-    }
-  );
-};
+
+  
+
+  return `/api/document-categories`
+}
+
+export const documentCategoriesControllerList = async ( options?: RequestInit): Promise<documentCategoriesControllerListResponse> => {
+  
+  return temisFetch<documentCategoriesControllerListResponse>(getDocumentCategoriesControllerListUrl(),
+  {      
+    ...options,
+    method: 'GET'
+    
+    
+  }
+);}
+
+
 
 export type clientsControllerCreateResponse201 = {
-  data: ClientDetailDto;
-  status: 201;
-};
+  data: ClientDetailDto
+  status: 201
+}
 
 export type clientsControllerCreateResponse400 = {
-  data: void;
-  status: 400;
-};
+  data: void
+  status: 400
+}
 
 export type clientsControllerCreateResponse409 = {
-  data: void;
-  status: 409;
-};
-
-export type clientsControllerCreateResponseSuccess = clientsControllerCreateResponse201 & {
+  data: void
+  status: 409
+}
+    
+export type clientsControllerCreateResponseSuccess = (clientsControllerCreateResponse201) & {
   headers: Headers;
 };
-export type clientsControllerCreateResponseError = (
-  | clientsControllerCreateResponse400
-  | clientsControllerCreateResponse409
-) & {
+export type clientsControllerCreateResponseError = (clientsControllerCreateResponse400 | clientsControllerCreateResponse409) & {
   headers: Headers;
 };
 
-export type clientsControllerCreateResponse =
-  | clientsControllerCreateResponseSuccess
-  | clientsControllerCreateResponseError;
+export type clientsControllerCreateResponse = (clientsControllerCreateResponseSuccess | clientsControllerCreateResponseError)
 
 export const getClientsControllerCreateUrl = () => {
-  return `/api/clients`;
-};
 
-export const clientsControllerCreate = async (
-  clientsControllerCreateBody: ClientsControllerCreateBody,
-  options?: RequestInit
-): Promise<clientsControllerCreateResponse> => {
-  return temisFetch<clientsControllerCreateResponse>(getClientsControllerCreateUrl(), {
+
+  
+
+  return `/api/clients`
+}
+
+export const clientsControllerCreate = async (clientsControllerCreateBody: ClientsControllerCreateBody, options?: RequestInit): Promise<clientsControllerCreateResponse> => {
+  
+  return temisFetch<clientsControllerCreateResponse>(getClientsControllerCreateUrl(),
+  {      
     ...options,
-    method: "POST",
-    headers: { "Content-Type": "application/json", ...options?.headers },
-    body: JSON.stringify(clientsControllerCreateBody)
-  });
-};
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      clientsControllerCreateBody,)
+  }
+);}
+
+
 
 export type clientsControllerListResponse200 = {
-  data: ClientsListResponseDto;
-  status: 200;
-};
+  data: ClientsListResponseDto
+  status: 200
+}
 
 export type clientsControllerListResponse400 = {
-  data: void;
-  status: 400;
-};
-
-export type clientsControllerListResponseSuccess = clientsControllerListResponse200 & {
+  data: void
+  status: 400
+}
+    
+export type clientsControllerListResponseSuccess = (clientsControllerListResponse200) & {
   headers: Headers;
 };
-export type clientsControllerListResponseError = clientsControllerListResponse400 & {
+export type clientsControllerListResponseError = (clientsControllerListResponse400) & {
   headers: Headers;
 };
 
-export type clientsControllerListResponse =
-  | clientsControllerListResponseSuccess
-  | clientsControllerListResponseError;
+export type clientsControllerListResponse = (clientsControllerListResponseSuccess | clientsControllerListResponseError)
 
-export const getClientsControllerListUrl = (params?: ClientsControllerListParams) => {
+export const getClientsControllerListUrl = (params?: ClientsControllerListParams,) => {
   const normalizedParams = new URLSearchParams();
 
   Object.entries(params || {}).forEach(([key, value]) => {
+    
     if (value !== undefined) {
-      normalizedParams.append(key, value === null ? "null" : value.toString());
+      normalizedParams.append(key, value === null ? 'null' : value.toString())
     }
   });
 
   const stringifiedParams = normalizedParams.toString();
 
-  return stringifiedParams.length > 0 ? `/api/clients?${stringifiedParams}` : `/api/clients`;
-};
+  return stringifiedParams.length > 0 ? `/api/clients?${stringifiedParams}` : `/api/clients`
+}
 
-export const clientsControllerList = async (
-  params?: ClientsControllerListParams,
-  options?: RequestInit
-): Promise<clientsControllerListResponse> => {
-  return temisFetch<clientsControllerListResponse>(getClientsControllerListUrl(params), {
+export const clientsControllerList = async (params?: ClientsControllerListParams, options?: RequestInit): Promise<clientsControllerListResponse> => {
+  
+  return temisFetch<clientsControllerListResponse>(getClientsControllerListUrl(params),
+  {      
     ...options,
-    method: "GET"
-  });
-};
+    method: 'GET'
+    
+    
+  }
+);}
+
+
 
 export type clientsControllerGetDetailResponse200 = {
-  data: ClientDetailDto;
-  status: 200;
-};
+  data: ClientDetailDto
+  status: 200
+}
 
 export type clientsControllerGetDetailResponse400 = {
-  data: void;
-  status: 400;
-};
+  data: void
+  status: 400
+}
 
 export type clientsControllerGetDetailResponse404 = {
-  data: void;
-  status: 404;
-};
-
-export type clientsControllerGetDetailResponseSuccess = clientsControllerGetDetailResponse200 & {
+  data: void
+  status: 404
+}
+    
+export type clientsControllerGetDetailResponseSuccess = (clientsControllerGetDetailResponse200) & {
   headers: Headers;
 };
-export type clientsControllerGetDetailResponseError = (
-  | clientsControllerGetDetailResponse400
-  | clientsControllerGetDetailResponse404
-) & {
+export type clientsControllerGetDetailResponseError = (clientsControllerGetDetailResponse400 | clientsControllerGetDetailResponse404) & {
   headers: Headers;
 };
 
-export type clientsControllerGetDetailResponse =
-  | clientsControllerGetDetailResponseSuccess
-  | clientsControllerGetDetailResponseError;
+export type clientsControllerGetDetailResponse = (clientsControllerGetDetailResponseSuccess | clientsControllerGetDetailResponseError)
 
-export const getClientsControllerGetDetailUrl = (id: string) => {
-  return `/api/clients/${id}`;
-};
+export const getClientsControllerGetDetailUrl = (id: string,) => {
 
-export const clientsControllerGetDetail = async (
-  id: string,
-  options?: RequestInit
-): Promise<clientsControllerGetDetailResponse> => {
-  return temisFetch<clientsControllerGetDetailResponse>(getClientsControllerGetDetailUrl(id), {
+
+  
+
+  return `/api/clients/${id}`
+}
+
+export const clientsControllerGetDetail = async (id: string, options?: RequestInit): Promise<clientsControllerGetDetailResponse> => {
+  
+  return temisFetch<clientsControllerGetDetailResponse>(getClientsControllerGetDetailUrl(id),
+  {      
     ...options,
-    method: "GET"
-  });
-};
+    method: 'GET'
+    
+    
+  }
+);}
+
+
 
 export type clientsControllerUpdateResponse200 = {
-  data: ClientDetailDto;
-  status: 200;
-};
+  data: ClientDetailDto
+  status: 200
+}
 
 export type clientsControllerUpdateResponse400 = {
-  data: void;
-  status: 400;
-};
+  data: void
+  status: 400
+}
 
 export type clientsControllerUpdateResponse404 = {
-  data: void;
-  status: 404;
-};
+  data: void
+  status: 404
+}
 
 export type clientsControllerUpdateResponse409 = {
-  data: void;
-  status: 409;
-};
-
-export type clientsControllerUpdateResponseSuccess = clientsControllerUpdateResponse200 & {
+  data: void
+  status: 409
+}
+    
+export type clientsControllerUpdateResponseSuccess = (clientsControllerUpdateResponse200) & {
   headers: Headers;
 };
-export type clientsControllerUpdateResponseError = (
-  | clientsControllerUpdateResponse400
-  | clientsControllerUpdateResponse404
-  | clientsControllerUpdateResponse409
-) & {
+export type clientsControllerUpdateResponseError = (clientsControllerUpdateResponse400 | clientsControllerUpdateResponse404 | clientsControllerUpdateResponse409) & {
   headers: Headers;
 };
 
-export type clientsControllerUpdateResponse =
-  | clientsControllerUpdateResponseSuccess
-  | clientsControllerUpdateResponseError;
+export type clientsControllerUpdateResponse = (clientsControllerUpdateResponseSuccess | clientsControllerUpdateResponseError)
 
-export const getClientsControllerUpdateUrl = (id: string) => {
-  return `/api/clients/${id}`;
-};
+export const getClientsControllerUpdateUrl = (id: string,) => {
 
-export const clientsControllerUpdate = async (
-  id: string,
-  clientsControllerUpdateBody: ClientsControllerUpdateBody,
-  options?: RequestInit
-): Promise<clientsControllerUpdateResponse> => {
-  return temisFetch<clientsControllerUpdateResponse>(getClientsControllerUpdateUrl(id), {
+
+  
+
+  return `/api/clients/${id}`
+}
+
+export const clientsControllerUpdate = async (id: string,
+    clientsControllerUpdateBody: ClientsControllerUpdateBody, options?: RequestInit): Promise<clientsControllerUpdateResponse> => {
+  
+  return temisFetch<clientsControllerUpdateResponse>(getClientsControllerUpdateUrl(id),
+  {      
     ...options,
-    method: "PATCH",
-    headers: { "Content-Type": "application/json", ...options?.headers },
-    body: JSON.stringify(clientsControllerUpdateBody)
-  });
-};
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      clientsControllerUpdateBody,)
+  }
+);}
+
+
 
 export type clientsControllerDeleteResponse200 = {
-  data: ClientDeleteResponseDto;
-  status: 200;
-};
+  data: ClientDeleteResponseDto
+  status: 200
+}
 
 export type clientsControllerDeleteResponse400 = {
-  data: void;
-  status: 400;
-};
+  data: void
+  status: 400
+}
 
 export type clientsControllerDeleteResponse404 = {
-  data: void;
-  status: 404;
-};
-
-export type clientsControllerDeleteResponseSuccess = clientsControllerDeleteResponse200 & {
+  data: void
+  status: 404
+}
+    
+export type clientsControllerDeleteResponseSuccess = (clientsControllerDeleteResponse200) & {
   headers: Headers;
 };
-export type clientsControllerDeleteResponseError = (
-  | clientsControllerDeleteResponse400
-  | clientsControllerDeleteResponse404
-) & {
+export type clientsControllerDeleteResponseError = (clientsControllerDeleteResponse400 | clientsControllerDeleteResponse404) & {
   headers: Headers;
 };
 
-export type clientsControllerDeleteResponse =
-  | clientsControllerDeleteResponseSuccess
-  | clientsControllerDeleteResponseError;
+export type clientsControllerDeleteResponse = (clientsControllerDeleteResponseSuccess | clientsControllerDeleteResponseError)
 
-export const getClientsControllerDeleteUrl = (id: string) => {
-  return `/api/clients/${id}`;
-};
+export const getClientsControllerDeleteUrl = (id: string,) => {
 
-export const clientsControllerDelete = async (
-  id: string,
-  options?: RequestInit
-): Promise<clientsControllerDeleteResponse> => {
-  return temisFetch<clientsControllerDeleteResponse>(getClientsControllerDeleteUrl(id), {
+
+  
+
+  return `/api/clients/${id}`
+}
+
+export const clientsControllerDelete = async (id: string, options?: RequestInit): Promise<clientsControllerDeleteResponse> => {
+  
+  return temisFetch<clientsControllerDeleteResponse>(getClientsControllerDeleteUrl(id),
+  {      
     ...options,
-    method: "DELETE"
-  });
-};
+    method: 'DELETE'
+    
+    
+  }
+);}
+
+
 
 export type clientsControllerArchiveResponse200 = {
-  data: ClientArchiveResponseDto;
-  status: 200;
-};
+  data: ClientArchiveResponseDto
+  status: 200
+}
 
 export type clientsControllerArchiveResponse400 = {
-  data: void;
-  status: 400;
-};
+  data: void
+  status: 400
+}
 
 export type clientsControllerArchiveResponse404 = {
-  data: void;
-  status: 404;
-};
-
-export type clientsControllerArchiveResponseSuccess = clientsControllerArchiveResponse200 & {
+  data: void
+  status: 404
+}
+    
+export type clientsControllerArchiveResponseSuccess = (clientsControllerArchiveResponse200) & {
   headers: Headers;
 };
-export type clientsControllerArchiveResponseError = (
-  | clientsControllerArchiveResponse400
-  | clientsControllerArchiveResponse404
-) & {
+export type clientsControllerArchiveResponseError = (clientsControllerArchiveResponse400 | clientsControllerArchiveResponse404) & {
   headers: Headers;
 };
 
-export type clientsControllerArchiveResponse =
-  | clientsControllerArchiveResponseSuccess
-  | clientsControllerArchiveResponseError;
+export type clientsControllerArchiveResponse = (clientsControllerArchiveResponseSuccess | clientsControllerArchiveResponseError)
 
-export const getClientsControllerArchiveUrl = (id: string) => {
-  return `/api/clients/${id}/archive`;
-};
+export const getClientsControllerArchiveUrl = (id: string,) => {
 
-export const clientsControllerArchive = async (
-  id: string,
-  options?: RequestInit
-): Promise<clientsControllerArchiveResponse> => {
-  return temisFetch<clientsControllerArchiveResponse>(getClientsControllerArchiveUrl(id), {
+
+  
+
+  return `/api/clients/${id}/archive`
+}
+
+export const clientsControllerArchive = async (id: string, options?: RequestInit): Promise<clientsControllerArchiveResponse> => {
+  
+  return temisFetch<clientsControllerArchiveResponse>(getClientsControllerArchiveUrl(id),
+  {      
     ...options,
-    method: "POST"
-  });
-};
+    method: 'POST'
+    
+    
+  }
+);}
+
+
 
 export type currenciesControllerListResponse200 = {
-  data: CurrencyListResponseDto;
-  status: 200;
-};
-
-export type currenciesControllerListResponseSuccess = currenciesControllerListResponse200 & {
+  data: CurrencyListResponseDto
+  status: 200
+}
+    
+export type currenciesControllerListResponseSuccess = (currenciesControllerListResponse200) & {
   headers: Headers;
 };
-export type currenciesControllerListResponse = currenciesControllerListResponseSuccess;
+;
+
+export type currenciesControllerListResponse = (currenciesControllerListResponseSuccess)
 
 export const getCurrenciesControllerListUrl = () => {
-  return `/api/currencies`;
-};
 
-export const currenciesControllerList = async (
-  options?: RequestInit
-): Promise<currenciesControllerListResponse> => {
-  return temisFetch<currenciesControllerListResponse>(getCurrenciesControllerListUrl(), {
+
+  
+
+  return `/api/currencies`
+}
+
+export const currenciesControllerList = async ( options?: RequestInit): Promise<currenciesControllerListResponse> => {
+  
+  return temisFetch<currenciesControllerListResponse>(getCurrenciesControllerListUrl(),
+  {      
     ...options,
-    method: "GET"
-  });
-};
+    method: 'GET'
+    
+    
+  }
+);}
+
+
 
 export type currenciesControllerCreateResponse201 = {
-  data: CurrencyDto;
-  status: 201;
-};
-
-export type currenciesControllerCreateResponseSuccess = currenciesControllerCreateResponse201 & {
+  data: CurrencyDto
+  status: 201
+}
+    
+export type currenciesControllerCreateResponseSuccess = (currenciesControllerCreateResponse201) & {
   headers: Headers;
 };
-export type currenciesControllerCreateResponse = currenciesControllerCreateResponseSuccess;
+;
+
+export type currenciesControllerCreateResponse = (currenciesControllerCreateResponseSuccess)
 
 export const getCurrenciesControllerCreateUrl = () => {
-  return `/api/currencies`;
-};
 
-export const currenciesControllerCreate = async (
-  createCurrencyDto: CreateCurrencyDto,
-  options?: RequestInit
-): Promise<currenciesControllerCreateResponse> => {
-  return temisFetch<currenciesControllerCreateResponse>(getCurrenciesControllerCreateUrl(), {
+
+  
+
+  return `/api/currencies`
+}
+
+export const currenciesControllerCreate = async (createCurrencyDto: CreateCurrencyDto, options?: RequestInit): Promise<currenciesControllerCreateResponse> => {
+  
+  return temisFetch<currenciesControllerCreateResponse>(getCurrenciesControllerCreateUrl(),
+  {      
     ...options,
-    method: "POST",
-    headers: { "Content-Type": "application/json", ...options?.headers },
-    body: JSON.stringify(createCurrencyDto)
-  });
-};
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      createCurrencyDto,)
+  }
+);}
+
+
 
 export type currenciesControllerListTenantCurrenciesResponse200 = {
-  data: TenantCurrencyListResponseDto;
-  status: 200;
+  data: TenantCurrencyListResponseDto
+  status: 200
+}
+    
+export type currenciesControllerListTenantCurrenciesResponseSuccess = (currenciesControllerListTenantCurrenciesResponse200) & {
+  headers: Headers;
 };
+;
 
-export type currenciesControllerListTenantCurrenciesResponseSuccess =
-  currenciesControllerListTenantCurrenciesResponse200 & {
-    headers: Headers;
-  };
-export type currenciesControllerListTenantCurrenciesResponse =
-  currenciesControllerListTenantCurrenciesResponseSuccess;
+export type currenciesControllerListTenantCurrenciesResponse = (currenciesControllerListTenantCurrenciesResponseSuccess)
 
 export const getCurrenciesControllerListTenantCurrenciesUrl = () => {
-  return `/api/currencies/tenant`;
-};
 
-export const currenciesControllerListTenantCurrencies = async (
-  options?: RequestInit
-): Promise<currenciesControllerListTenantCurrenciesResponse> => {
-  return temisFetch<currenciesControllerListTenantCurrenciesResponse>(
-    getCurrenciesControllerListTenantCurrenciesUrl(),
-    {
-      ...options,
-      method: "GET"
-    }
-  );
-};
+
+  
+
+  return `/api/currencies/tenant`
+}
+
+export const currenciesControllerListTenantCurrencies = async ( options?: RequestInit): Promise<currenciesControllerListTenantCurrenciesResponse> => {
+  
+  return temisFetch<currenciesControllerListTenantCurrenciesResponse>(getCurrenciesControllerListTenantCurrenciesUrl(),
+  {      
+    ...options,
+    method: 'GET'
+    
+    
+  }
+);}
+
+
 
 export type currenciesControllerAddTenantCurrenciesResponse200 = {
-  data: AddTenantCurrenciesResponseDto;
-  status: 200;
+  data: AddTenantCurrenciesResponseDto
+  status: 200
+}
+    
+export type currenciesControllerAddTenantCurrenciesResponseSuccess = (currenciesControllerAddTenantCurrenciesResponse200) & {
+  headers: Headers;
 };
+;
 
-export type currenciesControllerAddTenantCurrenciesResponseSuccess =
-  currenciesControllerAddTenantCurrenciesResponse200 & {
-    headers: Headers;
-  };
-export type currenciesControllerAddTenantCurrenciesResponse =
-  currenciesControllerAddTenantCurrenciesResponseSuccess;
+export type currenciesControllerAddTenantCurrenciesResponse = (currenciesControllerAddTenantCurrenciesResponseSuccess)
 
 export const getCurrenciesControllerAddTenantCurrenciesUrl = () => {
-  return `/api/currencies/tenant`;
-};
 
-export const currenciesControllerAddTenantCurrencies = async (
-  addTenantCurrenciesDto: AddTenantCurrenciesDto,
-  options?: RequestInit
-): Promise<currenciesControllerAddTenantCurrenciesResponse> => {
-  return temisFetch<currenciesControllerAddTenantCurrenciesResponse>(
-    getCurrenciesControllerAddTenantCurrenciesUrl(),
-    {
-      ...options,
-      method: "POST",
-      headers: { "Content-Type": "application/json", ...options?.headers },
-      body: JSON.stringify(addTenantCurrenciesDto)
-    }
-  );
-};
+
+  
+
+  return `/api/currencies/tenant`
+}
+
+export const currenciesControllerAddTenantCurrencies = async (addTenantCurrenciesDto: AddTenantCurrenciesDto, options?: RequestInit): Promise<currenciesControllerAddTenantCurrenciesResponse> => {
+  
+  return temisFetch<currenciesControllerAddTenantCurrenciesResponse>(getCurrenciesControllerAddTenantCurrenciesUrl(),
+  {      
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      addTenantCurrenciesDto,)
+  }
+);}
+
+
 
 export type currenciesControllerListAvailableTenantCurrenciesResponse200 = {
-  data: AvailableTenantCurrenciesResponseDto;
-  status: 200;
+  data: AvailableTenantCurrenciesResponseDto
+  status: 200
+}
+    
+export type currenciesControllerListAvailableTenantCurrenciesResponseSuccess = (currenciesControllerListAvailableTenantCurrenciesResponse200) & {
+  headers: Headers;
 };
+;
 
-export type currenciesControllerListAvailableTenantCurrenciesResponseSuccess =
-  currenciesControllerListAvailableTenantCurrenciesResponse200 & {
-    headers: Headers;
-  };
-export type currenciesControllerListAvailableTenantCurrenciesResponse =
-  currenciesControllerListAvailableTenantCurrenciesResponseSuccess;
+export type currenciesControllerListAvailableTenantCurrenciesResponse = (currenciesControllerListAvailableTenantCurrenciesResponseSuccess)
 
 export const getCurrenciesControllerListAvailableTenantCurrenciesUrl = () => {
-  return `/api/currencies/tenant/available`;
-};
 
-export const currenciesControllerListAvailableTenantCurrencies = async (
-  options?: RequestInit
-): Promise<currenciesControllerListAvailableTenantCurrenciesResponse> => {
-  return temisFetch<currenciesControllerListAvailableTenantCurrenciesResponse>(
-    getCurrenciesControllerListAvailableTenantCurrenciesUrl(),
-    {
-      ...options,
-      method: "GET"
-    }
-  );
-};
+
+  
+
+  return `/api/currencies/tenant/available`
+}
+
+export const currenciesControllerListAvailableTenantCurrencies = async ( options?: RequestInit): Promise<currenciesControllerListAvailableTenantCurrenciesResponse> => {
+  
+  return temisFetch<currenciesControllerListAvailableTenantCurrenciesResponse>(getCurrenciesControllerListAvailableTenantCurrenciesUrl(),
+  {      
+    ...options,
+    method: 'GET'
+    
+    
+  }
+);}
+
+
 
 export type currenciesControllerDisableTenantCurrencyResponse200 = {
-  data: CurrencyDto;
-  status: 200;
+  data: CurrencyDto
+  status: 200
+}
+    
+export type currenciesControllerDisableTenantCurrencyResponseSuccess = (currenciesControllerDisableTenantCurrencyResponse200) & {
+  headers: Headers;
 };
+;
 
-export type currenciesControllerDisableTenantCurrencyResponseSuccess =
-  currenciesControllerDisableTenantCurrencyResponse200 & {
-    headers: Headers;
-  };
-export type currenciesControllerDisableTenantCurrencyResponse =
-  currenciesControllerDisableTenantCurrencyResponseSuccess;
+export type currenciesControllerDisableTenantCurrencyResponse = (currenciesControllerDisableTenantCurrencyResponseSuccess)
 
-export const getCurrenciesControllerDisableTenantCurrencyUrl = (code: string) => {
-  return `/api/currencies/tenant/${code}`;
-};
+export const getCurrenciesControllerDisableTenantCurrencyUrl = (code: string,) => {
 
-export const currenciesControllerDisableTenantCurrency = async (
-  code: string,
-  options?: RequestInit
-): Promise<currenciesControllerDisableTenantCurrencyResponse> => {
-  return temisFetch<currenciesControllerDisableTenantCurrencyResponse>(
-    getCurrenciesControllerDisableTenantCurrencyUrl(code),
-    {
-      ...options,
-      method: "DELETE"
-    }
-  );
-};
+
+  
+
+  return `/api/currencies/tenant/${code}`
+}
+
+export const currenciesControllerDisableTenantCurrency = async (code: string, options?: RequestInit): Promise<currenciesControllerDisableTenantCurrencyResponse> => {
+  
+  return temisFetch<currenciesControllerDisableTenantCurrencyResponse>(getCurrenciesControllerDisableTenantCurrencyUrl(code),
+  {      
+    ...options,
+    method: 'DELETE'
+    
+    
+  }
+);}
+
+
 
 export type currenciesControllerUpdateResponse200 = {
-  data: CurrencyDto;
-  status: 200;
-};
-
-export type currenciesControllerUpdateResponseSuccess = currenciesControllerUpdateResponse200 & {
+  data: CurrencyDto
+  status: 200
+}
+    
+export type currenciesControllerUpdateResponseSuccess = (currenciesControllerUpdateResponse200) & {
   headers: Headers;
 };
-export type currenciesControllerUpdateResponse = currenciesControllerUpdateResponseSuccess;
+;
 
-export const getCurrenciesControllerUpdateUrl = (id: string) => {
-  return `/api/currencies/${id}`;
-};
+export type currenciesControllerUpdateResponse = (currenciesControllerUpdateResponseSuccess)
 
-export const currenciesControllerUpdate = async (
-  id: string,
-  updateCurrencyDto: UpdateCurrencyDto,
-  options?: RequestInit
-): Promise<currenciesControllerUpdateResponse> => {
-  return temisFetch<currenciesControllerUpdateResponse>(getCurrenciesControllerUpdateUrl(id), {
+export const getCurrenciesControllerUpdateUrl = (id: string,) => {
+
+
+  
+
+  return `/api/currencies/${id}`
+}
+
+export const currenciesControllerUpdate = async (id: string,
+    updateCurrencyDto: UpdateCurrencyDto, options?: RequestInit): Promise<currenciesControllerUpdateResponse> => {
+  
+  return temisFetch<currenciesControllerUpdateResponse>(getCurrenciesControllerUpdateUrl(id),
+  {      
     ...options,
-    method: "PATCH",
-    headers: { "Content-Type": "application/json", ...options?.headers },
-    body: JSON.stringify(updateCurrencyDto)
-  });
-};
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      updateCurrencyDto,)
+  }
+);}
+
+
 
 export type currenciesControllerDeleteResponse200 = {
-  data: CurrencyDeleteResponseDto;
-  status: 200;
-};
-
-export type currenciesControllerDeleteResponseSuccess = currenciesControllerDeleteResponse200 & {
+  data: CurrencyDeleteResponseDto
+  status: 200
+}
+    
+export type currenciesControllerDeleteResponseSuccess = (currenciesControllerDeleteResponse200) & {
   headers: Headers;
 };
-export type currenciesControllerDeleteResponse = currenciesControllerDeleteResponseSuccess;
+;
 
-export const getCurrenciesControllerDeleteUrl = (id: string) => {
-  return `/api/currencies/${id}`;
-};
+export type currenciesControllerDeleteResponse = (currenciesControllerDeleteResponseSuccess)
 
-export const currenciesControllerDelete = async (
-  id: string,
-  options?: RequestInit
-): Promise<currenciesControllerDeleteResponse> => {
-  return temisFetch<currenciesControllerDeleteResponse>(getCurrenciesControllerDeleteUrl(id), {
+export const getCurrenciesControllerDeleteUrl = (id: string,) => {
+
+
+  
+
+  return `/api/currencies/${id}`
+}
+
+export const currenciesControllerDelete = async (id: string, options?: RequestInit): Promise<currenciesControllerDeleteResponse> => {
+  
+  return temisFetch<currenciesControllerDeleteResponse>(getCurrenciesControllerDeleteUrl(id),
+  {      
     ...options,
-    method: "DELETE"
-  });
-};
+    method: 'DELETE'
+    
+    
+  }
+);}
+
+
 
 export type dashboardControllerGetMetricsResponse200 = {
-  data: DashboardMetricsDto;
-  status: 200;
+  data: DashboardMetricsDto
+  status: 200
+}
+    
+export type dashboardControllerGetMetricsResponseSuccess = (dashboardControllerGetMetricsResponse200) & {
+  headers: Headers;
 };
+;
 
-export type dashboardControllerGetMetricsResponseSuccess =
-  dashboardControllerGetMetricsResponse200 & {
-    headers: Headers;
-  };
-export type dashboardControllerGetMetricsResponse = dashboardControllerGetMetricsResponseSuccess;
+export type dashboardControllerGetMetricsResponse = (dashboardControllerGetMetricsResponseSuccess)
 
 export const getDashboardControllerGetMetricsUrl = () => {
-  return `/api/dashboard/metrics`;
-};
 
-export const dashboardControllerGetMetrics = async (
-  options?: RequestInit
-): Promise<dashboardControllerGetMetricsResponse> => {
-  return temisFetch<dashboardControllerGetMetricsResponse>(getDashboardControllerGetMetricsUrl(), {
+
+  
+
+  return `/api/dashboard/metrics`
+}
+
+export const dashboardControllerGetMetrics = async ( options?: RequestInit): Promise<dashboardControllerGetMetricsResponse> => {
+  
+  return temisFetch<dashboardControllerGetMetricsResponse>(getDashboardControllerGetMetricsUrl(),
+  {      
     ...options,
-    method: "GET"
-  });
-};
+    method: 'GET'
+    
+    
+  }
+);}
+
+
 
 export type dashboardControllerSearchResponse200 = {
-  data: DashboardSearchResponseDto;
-  status: 200;
-};
-
-export type dashboardControllerSearchResponseSuccess = dashboardControllerSearchResponse200 & {
+  data: DashboardSearchResponseDto
+  status: 200
+}
+    
+export type dashboardControllerSearchResponseSuccess = (dashboardControllerSearchResponse200) & {
   headers: Headers;
 };
-export type dashboardControllerSearchResponse = dashboardControllerSearchResponseSuccess;
+;
+
+export type dashboardControllerSearchResponse = (dashboardControllerSearchResponseSuccess)
 
 export const getDashboardControllerSearchUrl = () => {
-  return `/api/dashboard/search`;
-};
 
-export const dashboardControllerSearch = async (
-  options?: RequestInit
-): Promise<dashboardControllerSearchResponse> => {
-  return temisFetch<dashboardControllerSearchResponse>(getDashboardControllerSearchUrl(), {
+
+  
+
+  return `/api/dashboard/search`
+}
+
+export const dashboardControllerSearch = async ( options?: RequestInit): Promise<dashboardControllerSearchResponse> => {
+  
+  return temisFetch<dashboardControllerSearchResponse>(getDashboardControllerSearchUrl(),
+  {      
     ...options,
-    method: "GET"
-  });
-};
+    method: 'GET'
+    
+    
+  }
+);}
+
+
 
 export type forumsControllerListResponse200 = {
-  data: ForumsListResponseDto;
-  status: 200;
-};
-
-export type forumsControllerListResponseSuccess = forumsControllerListResponse200 & {
+  data: ForumsListResponseDto
+  status: 200
+}
+    
+export type forumsControllerListResponseSuccess = (forumsControllerListResponse200) & {
   headers: Headers;
 };
-export type forumsControllerListResponse = forumsControllerListResponseSuccess;
+;
+
+export type forumsControllerListResponse = (forumsControllerListResponseSuccess)
 
 export const getForumsControllerListUrl = () => {
-  return `/api/forums`;
-};
 
-export const forumsControllerList = async (
-  options?: RequestInit
-): Promise<forumsControllerListResponse> => {
-  return temisFetch<forumsControllerListResponse>(getForumsControllerListUrl(), {
+
+  
+
+  return `/api/forums`
+}
+
+export const forumsControllerList = async ( options?: RequestInit): Promise<forumsControllerListResponse> => {
+  
+  return temisFetch<forumsControllerListResponse>(getForumsControllerListUrl(),
+  {      
     ...options,
-    method: "GET"
-  });
-};
+    method: 'GET'
+    
+    
+  }
+);}
+
+
 
 export type judicialCentersControllerListResponse200 = {
-  data: JudicialCentersListResponseDto;
-  status: 200;
+  data: JudicialCentersListResponseDto
+  status: 200
+}
+    
+export type judicialCentersControllerListResponseSuccess = (judicialCentersControllerListResponse200) & {
+  headers: Headers;
 };
+;
 
-export type judicialCentersControllerListResponseSuccess =
-  judicialCentersControllerListResponse200 & {
-    headers: Headers;
-  };
-export type judicialCentersControllerListResponse = judicialCentersControllerListResponseSuccess;
+export type judicialCentersControllerListResponse = (judicialCentersControllerListResponseSuccess)
 
 export const getJudicialCentersControllerListUrl = () => {
-  return `/api/judicial-centers`;
-};
 
-export const judicialCentersControllerList = async (
-  options?: RequestInit
-): Promise<judicialCentersControllerListResponse> => {
-  return temisFetch<judicialCentersControllerListResponse>(getJudicialCentersControllerListUrl(), {
+
+  
+
+  return `/api/judicial-centers`
+}
+
+export const judicialCentersControllerList = async ( options?: RequestInit): Promise<judicialCentersControllerListResponse> => {
+  
+  return temisFetch<judicialCentersControllerListResponse>(getJudicialCentersControllerListUrl(),
+  {      
     ...options,
-    method: "GET"
-  });
-};
+    method: 'GET'
+    
+    
+  }
+);}
+
+
 
 export type staffControllerListResponse200 = {
-  data: StaffListResponseDto;
-  status: 200;
-};
-
-export type staffControllerListResponseSuccess = staffControllerListResponse200 & {
+  data: StaffListResponseDto
+  status: 200
+}
+    
+export type staffControllerListResponseSuccess = (staffControllerListResponse200) & {
   headers: Headers;
 };
-export type staffControllerListResponse = staffControllerListResponseSuccess;
+;
+
+export type staffControllerListResponse = (staffControllerListResponseSuccess)
 
 export const getStaffControllerListUrl = () => {
-  return `/api/staff`;
-};
 
-export const staffControllerList = async (
-  options?: RequestInit
-): Promise<staffControllerListResponse> => {
-  return temisFetch<staffControllerListResponse>(getStaffControllerListUrl(), {
+
+  
+
+  return `/api/staff`
+}
+
+export const staffControllerList = async ( options?: RequestInit): Promise<staffControllerListResponse> => {
+  
+  return temisFetch<staffControllerListResponse>(getStaffControllerListUrl(),
+  {      
     ...options,
-    method: "GET"
-  });
-};
+    method: 'GET'
+    
+    
+  }
+);}
+
+
 
 export type staffControllerCreateResponse201 = {
-  data: StaffCreateResponseDto;
-  status: 201;
-};
-
-export type staffControllerCreateResponseSuccess = staffControllerCreateResponse201 & {
+  data: StaffCreateResponseDto
+  status: 201
+}
+    
+export type staffControllerCreateResponseSuccess = (staffControllerCreateResponse201) & {
   headers: Headers;
 };
-export type staffControllerCreateResponse = staffControllerCreateResponseSuccess;
+;
+
+export type staffControllerCreateResponse = (staffControllerCreateResponseSuccess)
 
 export const getStaffControllerCreateUrl = () => {
-  return `/api/staff`;
-};
 
-export const staffControllerCreate = async (
-  createStaffDto: CreateStaffDto,
-  options?: RequestInit
-): Promise<staffControllerCreateResponse> => {
-  return temisFetch<staffControllerCreateResponse>(getStaffControllerCreateUrl(), {
+
+  
+
+  return `/api/staff`
+}
+
+export const staffControllerCreate = async (createStaffDto: CreateStaffDto, options?: RequestInit): Promise<staffControllerCreateResponse> => {
+  
+  return temisFetch<staffControllerCreateResponse>(getStaffControllerCreateUrl(),
+  {      
     ...options,
-    method: "POST",
-    headers: { "Content-Type": "application/json", ...options?.headers },
-    body: JSON.stringify(createStaffDto)
-  });
-};
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      createStaffDto,)
+  }
+);}
+
+
 
 export type staffControllerParticipantOptionsResponse200 = {
-  data: ParticipantOptionsResponseDto;
-  status: 200;
+  data: ParticipantOptionsResponseDto
+  status: 200
+}
+    
+export type staffControllerParticipantOptionsResponseSuccess = (staffControllerParticipantOptionsResponse200) & {
+  headers: Headers;
 };
+;
 
-export type staffControllerParticipantOptionsResponseSuccess =
-  staffControllerParticipantOptionsResponse200 & {
-    headers: Headers;
-  };
-export type staffControllerParticipantOptionsResponse =
-  staffControllerParticipantOptionsResponseSuccess;
+export type staffControllerParticipantOptionsResponse = (staffControllerParticipantOptionsResponseSuccess)
 
 export const getStaffControllerParticipantOptionsUrl = () => {
-  return `/api/staff/participant-options`;
-};
 
-export const staffControllerParticipantOptions = async (
-  options?: RequestInit
-): Promise<staffControllerParticipantOptionsResponse> => {
-  return temisFetch<staffControllerParticipantOptionsResponse>(
-    getStaffControllerParticipantOptionsUrl(),
-    {
-      ...options,
-      method: "GET"
-    }
-  );
-};
+
+  
+
+  return `/api/staff/participant-options`
+}
+
+export const staffControllerParticipantOptions = async ( options?: RequestInit): Promise<staffControllerParticipantOptionsResponse> => {
+  
+  return temisFetch<staffControllerParticipantOptionsResponse>(getStaffControllerParticipantOptionsUrl(),
+  {      
+    ...options,
+    method: 'GET'
+    
+    
+  }
+);}
+
+
 
 export type staffControllerUpdateResponse200 = {
-  data: StaffUpdateResponseDto;
-  status: 200;
-};
-
-export type staffControllerUpdateResponseSuccess = staffControllerUpdateResponse200 & {
+  data: StaffUpdateResponseDto
+  status: 200
+}
+    
+export type staffControllerUpdateResponseSuccess = (staffControllerUpdateResponse200) & {
   headers: Headers;
 };
-export type staffControllerUpdateResponse = staffControllerUpdateResponseSuccess;
+;
 
-export const getStaffControllerUpdateUrl = (id: string) => {
-  return `/api/staff/${id}`;
-};
+export type staffControllerUpdateResponse = (staffControllerUpdateResponseSuccess)
 
-export const staffControllerUpdate = async (
-  id: string,
-  updateStaffDto: UpdateStaffDto,
-  options?: RequestInit
-): Promise<staffControllerUpdateResponse> => {
-  return temisFetch<staffControllerUpdateResponse>(getStaffControllerUpdateUrl(id), {
+export const getStaffControllerUpdateUrl = (id: string,) => {
+
+
+  
+
+  return `/api/staff/${id}`
+}
+
+export const staffControllerUpdate = async (id: string,
+    updateStaffDto: UpdateStaffDto, options?: RequestInit): Promise<staffControllerUpdateResponse> => {
+  
+  return temisFetch<staffControllerUpdateResponse>(getStaffControllerUpdateUrl(id),
+  {      
     ...options,
-    method: "PATCH",
-    headers: { "Content-Type": "application/json", ...options?.headers },
-    body: JSON.stringify(updateStaffDto)
-  });
-};
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      updateStaffDto,)
+  }
+);}
+
+
 
 export type staffControllerDeleteResponse200 = {
-  data: StaffDeleteResponseDto;
-  status: 200;
-};
-
-export type staffControllerDeleteResponseSuccess = staffControllerDeleteResponse200 & {
+  data: StaffDeleteResponseDto
+  status: 200
+}
+    
+export type staffControllerDeleteResponseSuccess = (staffControllerDeleteResponse200) & {
   headers: Headers;
 };
-export type staffControllerDeleteResponse = staffControllerDeleteResponseSuccess;
+;
 
-export const getStaffControllerDeleteUrl = (id: string) => {
-  return `/api/staff/${id}`;
-};
+export type staffControllerDeleteResponse = (staffControllerDeleteResponseSuccess)
 
-export const staffControllerDelete = async (
-  id: string,
-  options?: RequestInit
-): Promise<staffControllerDeleteResponse> => {
-  return temisFetch<staffControllerDeleteResponse>(getStaffControllerDeleteUrl(id), {
+export const getStaffControllerDeleteUrl = (id: string,) => {
+
+
+  
+
+  return `/api/staff/${id}`
+}
+
+export const staffControllerDelete = async (id: string, options?: RequestInit): Promise<staffControllerDeleteResponse> => {
+  
+  return temisFetch<staffControllerDeleteResponse>(getStaffControllerDeleteUrl(id),
+  {      
     ...options,
-    method: "DELETE"
-  });
+    method: 'DELETE'
+    
+    
+  }
+);}
+
+
+
+export type platformControllerMeResponse200 = {
+  data: PlatformMeDto
+  status: 200
+}
+    
+export type platformControllerMeResponseSuccess = (platformControllerMeResponse200) & {
+  headers: Headers;
 };
+;
+
+export type platformControllerMeResponse = (platformControllerMeResponseSuccess)
+
+export const getPlatformControllerMeUrl = () => {
+
+
+  
+
+  return `/api/platform/me`
+}
+
+export const platformControllerMe = async ( options?: RequestInit): Promise<platformControllerMeResponse> => {
+  
+  return temisFetch<platformControllerMeResponse>(getPlatformControllerMeUrl(),
+  {      
+    ...options,
+    method: 'GET'
+    
+    
+  }
+);}
+
+
+
+export type platformControllerAccountResponse200 = {
+  data: PlatformAccountDto
+  status: 200
+}
+    
+export type platformControllerAccountResponseSuccess = (platformControllerAccountResponse200) & {
+  headers: Headers;
+};
+;
+
+export type platformControllerAccountResponse = (platformControllerAccountResponseSuccess)
+
+export const getPlatformControllerAccountUrl = () => {
+
+
+  
+
+  return `/api/platform/account`
+}
+
+export const platformControllerAccount = async ( options?: RequestInit): Promise<platformControllerAccountResponse> => {
+  
+  return temisFetch<platformControllerAccountResponse>(getPlatformControllerAccountUrl(),
+  {      
+    ...options,
+    method: 'GET'
+    
+    
+  }
+);}
+
+
+
+export type platformControllerUpdateAccountProfileResponse200 = {
+  data: PlatformAccountDto
+  status: 200
+}
+    
+export type platformControllerUpdateAccountProfileResponseSuccess = (platformControllerUpdateAccountProfileResponse200) & {
+  headers: Headers;
+};
+;
+
+export type platformControllerUpdateAccountProfileResponse = (platformControllerUpdateAccountProfileResponseSuccess)
+
+export const getPlatformControllerUpdateAccountProfileUrl = () => {
+
+
+  
+
+  return `/api/platform/account/profile`
+}
+
+export const platformControllerUpdateAccountProfile = async (updatePlatformAccountProfileDto: UpdatePlatformAccountProfileDto, options?: RequestInit): Promise<platformControllerUpdateAccountProfileResponse> => {
+  
+  return temisFetch<platformControllerUpdateAccountProfileResponse>(getPlatformControllerUpdateAccountProfileUrl(),
+  {      
+    ...options,
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      updatePlatformAccountProfileDto,)
+  }
+);}
+
+
+
+export type platformControllerUpdateAccountPasswordResponse200 = {
+  data: void
+  status: 200
+}
+    
+export type platformControllerUpdateAccountPasswordResponseSuccess = (platformControllerUpdateAccountPasswordResponse200) & {
+  headers: Headers;
+};
+;
+
+export type platformControllerUpdateAccountPasswordResponse = (platformControllerUpdateAccountPasswordResponseSuccess)
+
+export const getPlatformControllerUpdateAccountPasswordUrl = () => {
+
+
+  
+
+  return `/api/platform/account/password`
+}
+
+export const platformControllerUpdateAccountPassword = async (updatePlatformAccountPasswordDto: UpdatePlatformAccountPasswordDto, options?: RequestInit): Promise<platformControllerUpdateAccountPasswordResponse> => {
+  
+  return temisFetch<platformControllerUpdateAccountPasswordResponse>(getPlatformControllerUpdateAccountPasswordUrl(),
+  {      
+    ...options,
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      updatePlatformAccountPasswordDto,)
+  }
+);}
+
+
+
+export type platformControllerSecurityResponse200 = {
+  data: void
+  status: 200
+}
+    
+export type platformControllerSecurityResponseSuccess = (platformControllerSecurityResponse200) & {
+  headers: Headers;
+};
+;
+
+export type platformControllerSecurityResponse = (platformControllerSecurityResponseSuccess)
+
+export const getPlatformControllerSecurityUrl = () => {
+
+
+  
+
+  return `/api/platform/security`
+}
+
+export const platformControllerSecurity = async ( options?: RequestInit): Promise<platformControllerSecurityResponse> => {
+  
+  return temisFetch<platformControllerSecurityResponse>(getPlatformControllerSecurityUrl(),
+  {      
+    ...options,
+    method: 'GET'
+    
+    
+  }
+);}
+
+
+
+export type platformControllerStartStepUpResponse201 = {
+  data: void
+  status: 201
+}
+    
+export type platformControllerStartStepUpResponseSuccess = (platformControllerStartStepUpResponse201) & {
+  headers: Headers;
+};
+;
+
+export type platformControllerStartStepUpResponse = (platformControllerStartStepUpResponseSuccess)
+
+export const getPlatformControllerStartStepUpUrl = () => {
+
+
+  
+
+  return `/api/platform/security/step-up/start`
+}
+
+export const platformControllerStartStepUp = async ( options?: RequestInit): Promise<platformControllerStartStepUpResponse> => {
+  
+  return temisFetch<platformControllerStartStepUpResponse>(getPlatformControllerStartStepUpUrl(),
+  {      
+    ...options,
+    method: 'POST'
+    
+    
+  }
+);}
+
+
+
+export type platformControllerFinishStepUpResponse201 = {
+  data: void
+  status: 201
+}
+    
+export type platformControllerFinishStepUpResponseSuccess = (platformControllerFinishStepUpResponse201) & {
+  headers: Headers;
+};
+;
+
+export type platformControllerFinishStepUpResponse = (platformControllerFinishStepUpResponseSuccess)
+
+export const getPlatformControllerFinishStepUpUrl = () => {
+
+
+  
+
+  return `/api/platform/security/step-up/finish`
+}
+
+export const platformControllerFinishStepUp = async (platformStepUpFinishDto: PlatformStepUpFinishDto, options?: RequestInit): Promise<platformControllerFinishStepUpResponse> => {
+  
+  return temisFetch<platformControllerFinishStepUpResponse>(getPlatformControllerFinishStepUpUrl(),
+  {      
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      platformStepUpFinishDto,)
+  }
+);}
+
+
+
+export type platformControllerPasswordStepUpResponse201 = {
+  data: void
+  status: 201
+}
+    
+export type platformControllerPasswordStepUpResponseSuccess = (platformControllerPasswordStepUpResponse201) & {
+  headers: Headers;
+};
+;
+
+export type platformControllerPasswordStepUpResponse = (platformControllerPasswordStepUpResponseSuccess)
+
+export const getPlatformControllerPasswordStepUpUrl = () => {
+
+
+  
+
+  return `/api/platform/security/step-up/password`
+}
+
+export const platformControllerPasswordStepUp = async (platformPasswordStepUpDto: PlatformPasswordStepUpDto, options?: RequestInit): Promise<platformControllerPasswordStepUpResponse> => {
+  
+  return temisFetch<platformControllerPasswordStepUpResponse>(getPlatformControllerPasswordStepUpUrl(),
+  {      
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      platformPasswordStepUpDto,)
+  }
+);}
+
+
+
+export type platformControllerRevokeSessionResponse200 = {
+  data: void
+  status: 200
+}
+    
+export type platformControllerRevokeSessionResponseSuccess = (platformControllerRevokeSessionResponse200) & {
+  headers: Headers;
+};
+;
+
+export type platformControllerRevokeSessionResponse = (platformControllerRevokeSessionResponseSuccess)
+
+export const getPlatformControllerRevokeSessionUrl = (id: string,) => {
+
+
+  
+
+  return `/api/platform/security/sessions/${id}`
+}
+
+export const platformControllerRevokeSession = async (id: string, options?: RequestInit): Promise<platformControllerRevokeSessionResponse> => {
+  
+  return temisFetch<platformControllerRevokeSessionResponse>(getPlatformControllerRevokeSessionUrl(id),
+  {      
+    ...options,
+    method: 'DELETE'
+    
+    
+  }
+);}
+
+
+
+export type platformControllerRevokeAuthenticatorResponse200 = {
+  data: void
+  status: 200
+}
+    
+export type platformControllerRevokeAuthenticatorResponseSuccess = (platformControllerRevokeAuthenticatorResponse200) & {
+  headers: Headers;
+};
+;
+
+export type platformControllerRevokeAuthenticatorResponse = (platformControllerRevokeAuthenticatorResponseSuccess)
+
+export const getPlatformControllerRevokeAuthenticatorUrl = (id: string,) => {
+
+
+  
+
+  return `/api/platform/security/authenticators/${id}`
+}
+
+export const platformControllerRevokeAuthenticator = async (id: string, options?: RequestInit): Promise<platformControllerRevokeAuthenticatorResponse> => {
+  
+  return temisFetch<platformControllerRevokeAuthenticatorResponse>(getPlatformControllerRevokeAuthenticatorUrl(id),
+  {      
+    ...options,
+    method: 'DELETE'
+    
+    
+  }
+);}
+
+
+
+export type platformControllerRevokeDeviceResponse200 = {
+  data: void
+  status: 200
+}
+    
+export type platformControllerRevokeDeviceResponseSuccess = (platformControllerRevokeDeviceResponse200) & {
+  headers: Headers;
+};
+;
+
+export type platformControllerRevokeDeviceResponse = (platformControllerRevokeDeviceResponseSuccess)
+
+export const getPlatformControllerRevokeDeviceUrl = (id: string,) => {
+
+
+  
+
+  return `/api/platform/security/devices/${id}`
+}
+
+export const platformControllerRevokeDevice = async (id: string, options?: RequestInit): Promise<platformControllerRevokeDeviceResponse> => {
+  
+  return temisFetch<platformControllerRevokeDeviceResponse>(getPlatformControllerRevokeDeviceUrl(id),
+  {      
+    ...options,
+    method: 'DELETE'
+    
+    
+  }
+);}
+
+
+
+export type platformControllerObservabilityResponse200 = {
+  data: PlatformObservabilitySummaryDto
+  status: 200
+}
+    
+export type platformControllerObservabilityResponseSuccess = (platformControllerObservabilityResponse200) & {
+  headers: Headers;
+};
+;
+
+export type platformControllerObservabilityResponse = (platformControllerObservabilityResponseSuccess)
+
+export const getPlatformControllerObservabilityUrl = () => {
+
+
+  
+
+  return `/api/platform/observability/summary`
+}
+
+export const platformControllerObservability = async ( options?: RequestInit): Promise<platformControllerObservabilityResponse> => {
+  
+  return temisFetch<platformControllerObservabilityResponse>(getPlatformControllerObservabilityUrl(),
+  {      
+    ...options,
+    method: 'GET'
+    
+    
+  }
+);}
+
+
+
+export type platformControllerObservabilityHistoryResponse200 = {
+  data: PlatformObservabilityHistoryDto
+  status: 200
+}
+    
+export type platformControllerObservabilityHistoryResponseSuccess = (platformControllerObservabilityHistoryResponse200) & {
+  headers: Headers;
+};
+;
+
+export type platformControllerObservabilityHistoryResponse = (platformControllerObservabilityHistoryResponseSuccess)
+
+export const getPlatformControllerObservabilityHistoryUrl = () => {
+
+
+  
+
+  return `/api/platform/observability/history`
+}
+
+export const platformControllerObservabilityHistory = async ( options?: RequestInit): Promise<platformControllerObservabilityHistoryResponse> => {
+  
+  return temisFetch<platformControllerObservabilityHistoryResponse>(getPlatformControllerObservabilityHistoryUrl(),
+  {      
+    ...options,
+    method: 'GET'
+    
+    
+  }
+);}
+
+
+
+export type platformControllerDashboardSummaryResponse200 = {
+  data: PlatformDashboardSummaryDto
+  status: 200
+}
+    
+export type platformControllerDashboardSummaryResponseSuccess = (platformControllerDashboardSummaryResponse200) & {
+  headers: Headers;
+};
+;
+
+export type platformControllerDashboardSummaryResponse = (platformControllerDashboardSummaryResponseSuccess)
+
+export const getPlatformControllerDashboardSummaryUrl = () => {
+
+
+  
+
+  return `/api/platform/dashboard/summary`
+}
+
+export const platformControllerDashboardSummary = async ( options?: RequestInit): Promise<platformControllerDashboardSummaryResponse> => {
+  
+  return temisFetch<platformControllerDashboardSummaryResponse>(getPlatformControllerDashboardSummaryUrl(),
+  {      
+    ...options,
+    method: 'GET'
+    
+    
+  }
+);}
+
+
+
+export type platformControllerUsersResponse200 = {
+  data: PlatformUsersListDto
+  status: 200
+}
+    
+export type platformControllerUsersResponseSuccess = (platformControllerUsersResponse200) & {
+  headers: Headers;
+};
+;
+
+export type platformControllerUsersResponse = (platformControllerUsersResponseSuccess)
+
+export const getPlatformControllerUsersUrl = () => {
+
+
+  
+
+  return `/api/platform/users`
+}
+
+export const platformControllerUsers = async ( options?: RequestInit): Promise<platformControllerUsersResponse> => {
+  
+  return temisFetch<platformControllerUsersResponse>(getPlatformControllerUsersUrl(),
+  {      
+    ...options,
+    method: 'GET'
+    
+    
+  }
+);}
+
+
+
+export type platformAnnouncementsControllerListResponse200 = {
+  data: PlatformAnnouncementsListDto
+  status: 200
+}
+    
+export type platformAnnouncementsControllerListResponseSuccess = (platformAnnouncementsControllerListResponse200) & {
+  headers: Headers;
+};
+;
+
+export type platformAnnouncementsControllerListResponse = (platformAnnouncementsControllerListResponseSuccess)
+
+export const getPlatformAnnouncementsControllerListUrl = () => {
+
+
+  
+
+  return `/api/platform/announcements`
+}
+
+export const platformAnnouncementsControllerList = async ( options?: RequestInit): Promise<platformAnnouncementsControllerListResponse> => {
+  
+  return temisFetch<platformAnnouncementsControllerListResponse>(getPlatformAnnouncementsControllerListUrl(),
+  {      
+    ...options,
+    method: 'GET'
+    
+    
+  }
+);}
+
+
+
+export type platformAnnouncementsControllerCreateResponse201 = {
+  data: PlatformAnnouncementListItemDto
+  status: 201
+}
+    
+export type platformAnnouncementsControllerCreateResponseSuccess = (platformAnnouncementsControllerCreateResponse201) & {
+  headers: Headers;
+};
+;
+
+export type platformAnnouncementsControllerCreateResponse = (platformAnnouncementsControllerCreateResponseSuccess)
+
+export const getPlatformAnnouncementsControllerCreateUrl = () => {
+
+
+  
+
+  return `/api/platform/announcements`
+}
+
+export const platformAnnouncementsControllerCreate = async (createPlatformAnnouncementDto: CreatePlatformAnnouncementDto, options?: RequestInit): Promise<platformAnnouncementsControllerCreateResponse> => {
+  
+  return temisFetch<platformAnnouncementsControllerCreateResponse>(getPlatformAnnouncementsControllerCreateUrl(),
+  {      
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      createPlatformAnnouncementDto,)
+  }
+);}
+
+
+
+export type platformAnnouncementsControllerSummaryResponse200 = {
+  data: PlatformAnnouncementsSummaryDto
+  status: 200
+}
+    
+export type platformAnnouncementsControllerSummaryResponseSuccess = (platformAnnouncementsControllerSummaryResponse200) & {
+  headers: Headers;
+};
+;
+
+export type platformAnnouncementsControllerSummaryResponse = (platformAnnouncementsControllerSummaryResponseSuccess)
+
+export const getPlatformAnnouncementsControllerSummaryUrl = () => {
+
+
+  
+
+  return `/api/platform/announcements/summary`
+}
+
+export const platformAnnouncementsControllerSummary = async ( options?: RequestInit): Promise<platformAnnouncementsControllerSummaryResponse> => {
+  
+  return temisFetch<platformAnnouncementsControllerSummaryResponse>(getPlatformAnnouncementsControllerSummaryUrl(),
+  {      
+    ...options,
+    method: 'GET'
+    
+    
+  }
+);}
+
+
+
+export type platformAnnouncementsControllerTenantOptionsResponse200 = {
+  data: PlatformAnnouncementTenantOptionsListDto
+  status: 200
+}
+    
+export type platformAnnouncementsControllerTenantOptionsResponseSuccess = (platformAnnouncementsControllerTenantOptionsResponse200) & {
+  headers: Headers;
+};
+;
+
+export type platformAnnouncementsControllerTenantOptionsResponse = (platformAnnouncementsControllerTenantOptionsResponseSuccess)
+
+export const getPlatformAnnouncementsControllerTenantOptionsUrl = () => {
+
+
+  
+
+  return `/api/platform/announcements/tenant-options`
+}
+
+export const platformAnnouncementsControllerTenantOptions = async ( options?: RequestInit): Promise<platformAnnouncementsControllerTenantOptionsResponse> => {
+  
+  return temisFetch<platformAnnouncementsControllerTenantOptionsResponse>(getPlatformAnnouncementsControllerTenantOptionsUrl(),
+  {      
+    ...options,
+    method: 'GET'
+    
+    
+  }
+);}
+
+
+
+export type platformAnnouncementsControllerDetailResponse200 = {
+  data: PlatformAnnouncementDetailDto
+  status: 200
+}
+    
+export type platformAnnouncementsControllerDetailResponseSuccess = (platformAnnouncementsControllerDetailResponse200) & {
+  headers: Headers;
+};
+;
+
+export type platformAnnouncementsControllerDetailResponse = (platformAnnouncementsControllerDetailResponseSuccess)
+
+export const getPlatformAnnouncementsControllerDetailUrl = (id: string,) => {
+
+
+  
+
+  return `/api/platform/announcements/${id}`
+}
+
+export const platformAnnouncementsControllerDetail = async (id: string, options?: RequestInit): Promise<platformAnnouncementsControllerDetailResponse> => {
+  
+  return temisFetch<platformAnnouncementsControllerDetailResponse>(getPlatformAnnouncementsControllerDetailUrl(id),
+  {      
+    ...options,
+    method: 'GET'
+    
+    
+  }
+);}
+
+
+
+export type platformAnnouncementsControllerUpdateResponse200 = {
+  data: PlatformAnnouncementListItemDto
+  status: 200
+}
+    
+export type platformAnnouncementsControllerUpdateResponseSuccess = (platformAnnouncementsControllerUpdateResponse200) & {
+  headers: Headers;
+};
+;
+
+export type platformAnnouncementsControllerUpdateResponse = (platformAnnouncementsControllerUpdateResponseSuccess)
+
+export const getPlatformAnnouncementsControllerUpdateUrl = (id: string,) => {
+
+
+  
+
+  return `/api/platform/announcements/${id}`
+}
+
+export const platformAnnouncementsControllerUpdate = async (id: string,
+    updatePlatformAnnouncementDto: UpdatePlatformAnnouncementDto, options?: RequestInit): Promise<platformAnnouncementsControllerUpdateResponse> => {
+  
+  return temisFetch<platformAnnouncementsControllerUpdateResponse>(getPlatformAnnouncementsControllerUpdateUrl(id),
+  {      
+    ...options,
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      updatePlatformAnnouncementDto,)
+  }
+);}
+
+
+
+export type platformAnnouncementsControllerPublishResponse201 = {
+  data: PlatformAnnouncementListItemDto
+  status: 201
+}
+    
+export type platformAnnouncementsControllerPublishResponseSuccess = (platformAnnouncementsControllerPublishResponse201) & {
+  headers: Headers;
+};
+;
+
+export type platformAnnouncementsControllerPublishResponse = (platformAnnouncementsControllerPublishResponseSuccess)
+
+export const getPlatformAnnouncementsControllerPublishUrl = (id: string,) => {
+
+
+  
+
+  return `/api/platform/announcements/${id}/publish`
+}
+
+export const platformAnnouncementsControllerPublish = async (id: string, options?: RequestInit): Promise<platformAnnouncementsControllerPublishResponse> => {
+  
+  return temisFetch<platformAnnouncementsControllerPublishResponse>(getPlatformAnnouncementsControllerPublishUrl(id),
+  {      
+    ...options,
+    method: 'POST'
+    
+    
+  }
+);}
+
+
+
+export type platformAnnouncementsControllerScheduleResponse201 = {
+  data: PlatformAnnouncementListItemDto
+  status: 201
+}
+    
+export type platformAnnouncementsControllerScheduleResponseSuccess = (platformAnnouncementsControllerScheduleResponse201) & {
+  headers: Headers;
+};
+;
+
+export type platformAnnouncementsControllerScheduleResponse = (platformAnnouncementsControllerScheduleResponseSuccess)
+
+export const getPlatformAnnouncementsControllerScheduleUrl = (id: string,) => {
+
+
+  
+
+  return `/api/platform/announcements/${id}/schedule`
+}
+
+export const platformAnnouncementsControllerSchedule = async (id: string, options?: RequestInit): Promise<platformAnnouncementsControllerScheduleResponse> => {
+  
+  return temisFetch<platformAnnouncementsControllerScheduleResponse>(getPlatformAnnouncementsControllerScheduleUrl(id),
+  {      
+    ...options,
+    method: 'POST'
+    
+    
+  }
+);}
+
+
+
+export type platformAnnouncementsControllerCancelResponse201 = {
+  data: PlatformAnnouncementListItemDto
+  status: 201
+}
+    
+export type platformAnnouncementsControllerCancelResponseSuccess = (platformAnnouncementsControllerCancelResponse201) & {
+  headers: Headers;
+};
+;
+
+export type platformAnnouncementsControllerCancelResponse = (platformAnnouncementsControllerCancelResponseSuccess)
+
+export const getPlatformAnnouncementsControllerCancelUrl = (id: string,) => {
+
+
+  
+
+  return `/api/platform/announcements/${id}/cancel`
+}
+
+export const platformAnnouncementsControllerCancel = async (id: string, options?: RequestInit): Promise<platformAnnouncementsControllerCancelResponse> => {
+  
+  return temisFetch<platformAnnouncementsControllerCancelResponse>(getPlatformAnnouncementsControllerCancelUrl(id),
+  {      
+    ...options,
+    method: 'POST'
+    
+    
+  }
+);}
+
+
+
+export type platformNewslettersControllerListResponse200 = {
+  data: NewsletterPageDto
+  status: 200
+}
+    
+export type platformNewslettersControllerListResponseSuccess = (platformNewslettersControllerListResponse200) & {
+  headers: Headers;
+};
+;
+
+export type platformNewslettersControllerListResponse = (platformNewslettersControllerListResponseSuccess)
+
+export const getPlatformNewslettersControllerListUrl = (params?: PlatformNewslettersControllerListParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : value.toString())
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/api/platform/newsletters?${stringifiedParams}` : `/api/platform/newsletters`
+}
+
+export const platformNewslettersControllerList = async (params?: PlatformNewslettersControllerListParams, options?: RequestInit): Promise<platformNewslettersControllerListResponse> => {
+  
+  return temisFetch<platformNewslettersControllerListResponse>(getPlatformNewslettersControllerListUrl(params),
+  {      
+    ...options,
+    method: 'GET'
+    
+    
+  }
+);}
+
+
+
+export type platformNewslettersControllerCreateResponse201 = {
+  data: NewsletterDto
+  status: 201
+}
+    
+export type platformNewslettersControllerCreateResponseSuccess = (platformNewslettersControllerCreateResponse201) & {
+  headers: Headers;
+};
+;
+
+export type platformNewslettersControllerCreateResponse = (platformNewslettersControllerCreateResponseSuccess)
+
+export const getPlatformNewslettersControllerCreateUrl = () => {
+
+
+  
+
+  return `/api/platform/newsletters`
+}
+
+export const platformNewslettersControllerCreate = async ( options?: RequestInit): Promise<platformNewslettersControllerCreateResponse> => {
+  
+  return temisFetch<platformNewslettersControllerCreateResponse>(getPlatformNewslettersControllerCreateUrl(),
+  {      
+    ...options,
+    method: 'POST'
+    
+    
+  }
+);}
+
+
+
+export type platformNewslettersControllerAssetResponse200 = {
+  data: void
+  status: 200
+}
+    
+export type platformNewslettersControllerAssetResponseSuccess = (platformNewslettersControllerAssetResponse200) & {
+  headers: Headers;
+};
+;
+
+export type platformNewslettersControllerAssetResponse = (platformNewslettersControllerAssetResponseSuccess)
+
+export const getPlatformNewslettersControllerAssetUrl = (assetId: string,) => {
+
+
+  
+
+  return `/api/platform/newsletters/assets/${assetId}`
+}
+
+export const platformNewslettersControllerAsset = async (assetId: string, options?: RequestInit): Promise<platformNewslettersControllerAssetResponse> => {
+  
+  return temisFetch<platformNewslettersControllerAssetResponse>(getPlatformNewslettersControllerAssetUrl(assetId),
+  {      
+    ...options,
+    method: 'GET'
+    
+    
+  }
+);}
+
+
+
+export type platformNewslettersControllerDetailResponse200 = {
+  data: NewsletterDto
+  status: 200
+}
+    
+export type platformNewslettersControllerDetailResponseSuccess = (platformNewslettersControllerDetailResponse200) & {
+  headers: Headers;
+};
+;
+
+export type platformNewslettersControllerDetailResponse = (platformNewslettersControllerDetailResponseSuccess)
+
+export const getPlatformNewslettersControllerDetailUrl = (id: string,) => {
+
+
+  
+
+  return `/api/platform/newsletters/${id}`
+}
+
+export const platformNewslettersControllerDetail = async (id: string, options?: RequestInit): Promise<platformNewslettersControllerDetailResponse> => {
+  
+  return temisFetch<platformNewslettersControllerDetailResponse>(getPlatformNewslettersControllerDetailUrl(id),
+  {      
+    ...options,
+    method: 'GET'
+    
+    
+  }
+);}
+
+
+
+export type platformNewslettersControllerUpdateResponse200 = {
+  data: NewsletterDto
+  status: 200
+}
+    
+export type platformNewslettersControllerUpdateResponseSuccess = (platformNewslettersControllerUpdateResponse200) & {
+  headers: Headers;
+};
+;
+
+export type platformNewslettersControllerUpdateResponse = (platformNewslettersControllerUpdateResponseSuccess)
+
+export const getPlatformNewslettersControllerUpdateUrl = (id: string,) => {
+
+
+  
+
+  return `/api/platform/newsletters/${id}`
+}
+
+export const platformNewslettersControllerUpdate = async (id: string,
+    updateNewsletterDto: UpdateNewsletterDto, options?: RequestInit): Promise<platformNewslettersControllerUpdateResponse> => {
+  
+  return temisFetch<platformNewslettersControllerUpdateResponse>(getPlatformNewslettersControllerUpdateUrl(id),
+  {      
+    ...options,
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      updateNewsletterDto,)
+  }
+);}
+
+
+
+export type platformNewslettersControllerPublishResponse201 = {
+  data: NewsletterDto
+  status: 201
+}
+    
+export type platformNewslettersControllerPublishResponseSuccess = (platformNewslettersControllerPublishResponse201) & {
+  headers: Headers;
+};
+;
+
+export type platformNewslettersControllerPublishResponse = (platformNewslettersControllerPublishResponseSuccess)
+
+export const getPlatformNewslettersControllerPublishUrl = (id: string,) => {
+
+
+  
+
+  return `/api/platform/newsletters/${id}/publish`
+}
+
+export const platformNewslettersControllerPublish = async (id: string, options?: RequestInit): Promise<platformNewslettersControllerPublishResponse> => {
+  
+  return temisFetch<platformNewslettersControllerPublishResponse>(getPlatformNewslettersControllerPublishUrl(id),
+  {      
+    ...options,
+    method: 'POST'
+    
+    
+  }
+);}
+
+
+
+export type platformNewslettersControllerScheduleResponse201 = {
+  data: NewsletterDto
+  status: 201
+}
+    
+export type platformNewslettersControllerScheduleResponseSuccess = (platformNewslettersControllerScheduleResponse201) & {
+  headers: Headers;
+};
+;
+
+export type platformNewslettersControllerScheduleResponse = (platformNewslettersControllerScheduleResponseSuccess)
+
+export const getPlatformNewslettersControllerScheduleUrl = (id: string,) => {
+
+
+  
+
+  return `/api/platform/newsletters/${id}/schedule`
+}
+
+export const platformNewslettersControllerSchedule = async (id: string, options?: RequestInit): Promise<platformNewslettersControllerScheduleResponse> => {
+  
+  return temisFetch<platformNewslettersControllerScheduleResponse>(getPlatformNewslettersControllerScheduleUrl(id),
+  {      
+    ...options,
+    method: 'POST'
+    
+    
+  }
+);}
+
+
+
+export type platformNewslettersControllerCancelResponse201 = {
+  data: NewsletterActionDto
+  status: 201
+}
+    
+export type platformNewslettersControllerCancelResponseSuccess = (platformNewslettersControllerCancelResponse201) & {
+  headers: Headers;
+};
+;
+
+export type platformNewslettersControllerCancelResponse = (platformNewslettersControllerCancelResponseSuccess)
+
+export const getPlatformNewslettersControllerCancelUrl = (id: string,) => {
+
+
+  
+
+  return `/api/platform/newsletters/${id}/cancel`
+}
+
+export const platformNewslettersControllerCancel = async (id: string, options?: RequestInit): Promise<platformNewslettersControllerCancelResponse> => {
+  
+  return temisFetch<platformNewslettersControllerCancelResponse>(getPlatformNewslettersControllerCancelUrl(id),
+  {      
+    ...options,
+    method: 'POST'
+    
+    
+  }
+);}
+
+
+
+export type platformNewslettersControllerUploadResponse201 = {
+  data: NewsletterAssetDto
+  status: 201
+}
+    
+export type platformNewslettersControllerUploadResponseSuccess = (platformNewslettersControllerUploadResponse201) & {
+  headers: Headers;
+};
+;
+
+export type platformNewslettersControllerUploadResponse = (platformNewslettersControllerUploadResponseSuccess)
+
+export const getPlatformNewslettersControllerUploadUrl = (id: string,) => {
+
+
+  
+
+  return `/api/platform/newsletters/${id}/assets`
+}
+
+export const platformNewslettersControllerUpload = async (id: string,
+    platformNewslettersControllerUploadBody: PlatformNewslettersControllerUploadBody, options?: RequestInit): Promise<platformNewslettersControllerUploadResponse> => {
+    const formData = new FormData();
+formData.append(`file`, platformNewslettersControllerUploadBody.file)
+
+  return temisFetch<platformNewslettersControllerUploadResponse>(getPlatformNewslettersControllerUploadUrl(id),
+  {      
+    ...options,
+    method: 'POST'
+    ,
+    body: 
+      formData,
+  }
+);}
+
+
+
+export type announcementsControllerActiveResponse200 = {
+  data: void
+  status: 200
+}
+    
+export type announcementsControllerActiveResponseSuccess = (announcementsControllerActiveResponse200) & {
+  headers: Headers;
+};
+;
+
+export type announcementsControllerActiveResponse = (announcementsControllerActiveResponseSuccess)
+
+export const getAnnouncementsControllerActiveUrl = () => {
+
+
+  
+
+  return `/api/announcements/active`
+}
+
+export const announcementsControllerActive = async ( options?: RequestInit): Promise<announcementsControllerActiveResponse> => {
+  
+  return temisFetch<announcementsControllerActiveResponse>(getAnnouncementsControllerActiveUrl(),
+  {      
+    ...options,
+    method: 'GET'
+    
+    
+  }
+);}
+
+
+
+export type announcementsControllerDismissResponse201 = {
+  data: void
+  status: 201
+}
+    
+export type announcementsControllerDismissResponseSuccess = (announcementsControllerDismissResponse201) & {
+  headers: Headers;
+};
+;
+
+export type announcementsControllerDismissResponse = (announcementsControllerDismissResponseSuccess)
+
+export const getAnnouncementsControllerDismissUrl = (id: string,) => {
+
+
+  
+
+  return `/api/announcements/${id}/dismiss`
+}
+
+export const announcementsControllerDismiss = async (id: string, options?: RequestInit): Promise<announcementsControllerDismissResponse> => {
+  
+  return temisFetch<announcementsControllerDismissResponse>(getAnnouncementsControllerDismissUrl(id),
+  {      
+    ...options,
+    method: 'POST'
+    
+    
+  }
+);}
+
+
+
+export type newslettersControllerSummaryResponse200 = {
+  data: NewsletterSummaryDto
+  status: 200
+}
+    
+export type newslettersControllerSummaryResponseSuccess = (newslettersControllerSummaryResponse200) & {
+  headers: Headers;
+};
+;
+
+export type newslettersControllerSummaryResponse = (newslettersControllerSummaryResponseSuccess)
+
+export const getNewslettersControllerSummaryUrl = () => {
+
+
+  
+
+  return `/api/announcements/newsletters/summary`
+}
+
+export const newslettersControllerSummary = async ( options?: RequestInit): Promise<newslettersControllerSummaryResponse> => {
+  
+  return temisFetch<newslettersControllerSummaryResponse>(getNewslettersControllerSummaryUrl(),
+  {      
+    ...options,
+    method: 'GET'
+    
+    
+  }
+);}
+
+
+
+export type newslettersControllerListResponse200 = {
+  data: NewsletterReaderPageDto
+  status: 200
+}
+    
+export type newslettersControllerListResponseSuccess = (newslettersControllerListResponse200) & {
+  headers: Headers;
+};
+;
+
+export type newslettersControllerListResponse = (newslettersControllerListResponseSuccess)
+
+export const getNewslettersControllerListUrl = (params?: NewslettersControllerListParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : value.toString())
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/api/announcements/newsletters?${stringifiedParams}` : `/api/announcements/newsletters`
+}
+
+export const newslettersControllerList = async (params?: NewslettersControllerListParams, options?: RequestInit): Promise<newslettersControllerListResponse> => {
+  
+  return temisFetch<newslettersControllerListResponse>(getNewslettersControllerListUrl(params),
+  {      
+    ...options,
+    method: 'GET'
+    
+    
+  }
+);}
+
+
+
+export type newslettersControllerAssetResponse200 = {
+  data: void
+  status: 200
+}
+    
+export type newslettersControllerAssetResponseSuccess = (newslettersControllerAssetResponse200) & {
+  headers: Headers;
+};
+;
+
+export type newslettersControllerAssetResponse = (newslettersControllerAssetResponseSuccess)
+
+export const getNewslettersControllerAssetUrl = (assetId: string,) => {
+
+
+  
+
+  return `/api/announcements/newsletters/assets/${assetId}`
+}
+
+export const newslettersControllerAsset = async (assetId: string, options?: RequestInit): Promise<newslettersControllerAssetResponse> => {
+  
+  return temisFetch<newslettersControllerAssetResponse>(getNewslettersControllerAssetUrl(assetId),
+  {      
+    ...options,
+    method: 'GET'
+    
+    
+  }
+);}
+
+
+
+export type newslettersControllerDetailResponse200 = {
+  data: NewsletterReaderDetailDto
+  status: 200
+}
+    
+export type newslettersControllerDetailResponseSuccess = (newslettersControllerDetailResponse200) & {
+  headers: Headers;
+};
+;
+
+export type newslettersControllerDetailResponse = (newslettersControllerDetailResponseSuccess)
+
+export const getNewslettersControllerDetailUrl = (id: string,) => {
+
+
+  
+
+  return `/api/announcements/newsletters/${id}`
+}
+
+export const newslettersControllerDetail = async (id: string, options?: RequestInit): Promise<newslettersControllerDetailResponse> => {
+  
+  return temisFetch<newslettersControllerDetailResponse>(getNewslettersControllerDetailUrl(id),
+  {      
+    ...options,
+    method: 'GET'
+    
+    
+  }
+);}
+
+
+
+export type newslettersControllerReadResponse201 = {
+  data: NewsletterActionDto
+  status: 201
+}
+    
+export type newslettersControllerReadResponseSuccess = (newslettersControllerReadResponse201) & {
+  headers: Headers;
+};
+;
+
+export type newslettersControllerReadResponse = (newslettersControllerReadResponseSuccess)
+
+export const getNewslettersControllerReadUrl = (id: string,) => {
+
+
+  
+
+  return `/api/announcements/newsletters/${id}/read`
+}
+
+export const newslettersControllerRead = async (id: string, options?: RequestInit): Promise<newslettersControllerReadResponse> => {
+  
+  return temisFetch<newslettersControllerReadResponse>(getNewslettersControllerReadUrl(id),
+  {      
+    ...options,
+    method: 'POST'
+    
+    
+  }
+);}
+
+
 
 export type healthControllerCheckResponse200 = {
-  data: void;
-  status: 200;
-};
-
-export type healthControllerCheckResponseSuccess = healthControllerCheckResponse200 & {
+  data: void
+  status: 200
+}
+    
+export type healthControllerCheckResponseSuccess = (healthControllerCheckResponse200) & {
   headers: Headers;
 };
-export type healthControllerCheckResponse = healthControllerCheckResponseSuccess;
+;
+
+export type healthControllerCheckResponse = (healthControllerCheckResponseSuccess)
 
 export const getHealthControllerCheckUrl = () => {
-  return `/api/health`;
+
+
+  
+
+  return `/api/health`
+}
+
+export const healthControllerCheck = async ( options?: RequestInit): Promise<healthControllerCheckResponse> => {
+  
+  return temisFetch<healthControllerCheckResponse>(getHealthControllerCheckUrl(),
+  {      
+    ...options,
+    method: 'GET'
+    
+    
+  }
+);}
+
+
+
+export type healthControllerAuthenticationResponse200 = {
+  data: PublicHealthResponseDto
+  status: 200
+}
+
+export type healthControllerAuthenticationResponse503 = {
+  data: PublicHealthResponseDto
+  status: 503
+}
+    
+export type healthControllerAuthenticationResponseSuccess = (healthControllerAuthenticationResponse200) & {
+  headers: Headers;
+};
+export type healthControllerAuthenticationResponseError = (healthControllerAuthenticationResponse503) & {
+  headers: Headers;
 };
 
-export const healthControllerCheck = async (
-  options?: RequestInit
-): Promise<healthControllerCheckResponse> => {
-  return temisFetch<healthControllerCheckResponse>(getHealthControllerCheckUrl(), {
+export type healthControllerAuthenticationResponse = (healthControllerAuthenticationResponseSuccess | healthControllerAuthenticationResponseError)
+
+export const getHealthControllerAuthenticationUrl = () => {
+
+
+  
+
+  return `/api/health/authentication`
+}
+
+export const healthControllerAuthentication = async ( options?: RequestInit): Promise<healthControllerAuthenticationResponse> => {
+  
+  return temisFetch<healthControllerAuthenticationResponse>(getHealthControllerAuthenticationUrl(),
+  {      
     ...options,
-    method: "GET"
-  });
+    method: 'GET'
+    
+    
+  }
+);}
+
+
+
+export type healthControllerDocumentsResponse200 = {
+  data: PublicHealthResponseDto
+  status: 200
+}
+
+export type healthControllerDocumentsResponse503 = {
+  data: PublicHealthResponseDto
+  status: 503
+}
+    
+export type healthControllerDocumentsResponseSuccess = (healthControllerDocumentsResponse200) & {
+  headers: Headers;
 };
+export type healthControllerDocumentsResponseError = (healthControllerDocumentsResponse503) & {
+  headers: Headers;
+};
+
+export type healthControllerDocumentsResponse = (healthControllerDocumentsResponseSuccess | healthControllerDocumentsResponseError)
+
+export const getHealthControllerDocumentsUrl = () => {
+
+
+  
+
+  return `/api/health/documents`
+}
+
+export const healthControllerDocuments = async ( options?: RequestInit): Promise<healthControllerDocumentsResponse> => {
+  
+  return temisFetch<healthControllerDocumentsResponse>(getHealthControllerDocumentsUrl(),
+  {      
+    ...options,
+    method: 'GET'
+    
+    
+  }
+);}
+
+
+
+export type healthControllerAsyncProcessingResponse200 = {
+  data: PublicHealthResponseDto
+  status: 200
+}
+
+export type healthControllerAsyncProcessingResponse503 = {
+  data: PublicHealthResponseDto
+  status: 503
+}
+    
+export type healthControllerAsyncProcessingResponseSuccess = (healthControllerAsyncProcessingResponse200) & {
+  headers: Headers;
+};
+export type healthControllerAsyncProcessingResponseError = (healthControllerAsyncProcessingResponse503) & {
+  headers: Headers;
+};
+
+export type healthControllerAsyncProcessingResponse = (healthControllerAsyncProcessingResponseSuccess | healthControllerAsyncProcessingResponseError)
+
+export const getHealthControllerAsyncProcessingUrl = () => {
+
+
+  
+
+  return `/api/health/async-processing`
+}
+
+export const healthControllerAsyncProcessing = async ( options?: RequestInit): Promise<healthControllerAsyncProcessingResponse> => {
+  
+  return temisFetch<healthControllerAsyncProcessingResponse>(getHealthControllerAsyncProcessingUrl(),
+  {      
+    ...options,
+    method: 'GET'
+    
+    
+  }
+);}

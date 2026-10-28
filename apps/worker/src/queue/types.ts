@@ -8,10 +8,23 @@ export type NotificationReminderDueMessage = QueuePayload & {
   tenantId: string;
 };
 
+export type NotificationEmailDeliveryMessage = QueuePayload & {
+  deliveryId: string;
+  tenantId: string;
+};
+
 export type DocumentCleanupRunMessage = QueuePayload & {
   jobId: string;
   nextRunAt: string;
   tenantId: string;
+};
+
+export type PlatformSecurityAlertMessage = QueuePayload & {
+  eventId: string;
+  eventType: string;
+  occurredAt: string;
+  outcome: string;
+  reason: string | null;
 };
 
 export type { GoogleCalendarSyncMessage } from "@temis/integration-contracts";

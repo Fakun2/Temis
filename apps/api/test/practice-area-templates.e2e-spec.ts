@@ -11,6 +11,10 @@ import { DEFAULT_PRACTICE_AREA_TEMPLATES } from "../src/practice-area-templates/
 import { PracticeAreaTemplatesModule } from "../src/practice-area-templates/practice-area-templates.module";
 
 class InMemoryPracticeAreaTemplatesPrismaService {
+  async $queryRaw() {
+    return [{ sessionVersion: 0, status: "active" }];
+  }
+
   readonly practiceAreaTemplate = {
     findMany: async ({
       where,
@@ -64,6 +68,7 @@ describe("Practice area template endpoints (e2e)", () => {
       sub: "00000000-0000-0000-0000-000000000999",
       email: "mateo@estudio.com",
       sessionVersion: 0,
+      sessionKind: "tenant",
       tenantAccess: []
     });
 

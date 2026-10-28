@@ -1,0 +1,28 @@
+{
+  "name": "@temis/status",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev --webpack --hostname 0.0.0.0 --port 3002",
+    "build": "next build --webpack",
+    "lint": "eslint app components lib next.config.ts",
+    "test:unit": "node ../../scripts/run-typescript-tests.cjs test \"\" \"\" test/tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "start": "next start --hostname 0.0.0.0 --port 3002"
+  },
+  "dependencies": {
+    "@temis/brand-ui": "0.1.0",
+    "lucide-react": "^0.468.0",
+    "next": "16.2.7",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "zod": "^3.25.0"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4.0.0",
+    "@types/node": "^24.0.0",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "tailwindcss": "^4.0.0"
+  }
+}

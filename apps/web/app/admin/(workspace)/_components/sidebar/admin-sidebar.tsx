@@ -9,7 +9,7 @@ import { adminNavSections } from "../../_constants/navigation";
 import type { AdminNavSection, AdminSidebarVariant } from "../../_types/admin";
 import { getAuthorizedNavSections } from "../../_utils/authorization";
 import { isAdminRouteActive } from "../../_utils/navigation";
-import type { TemisSession } from "@/lib/auth/session";
+import type { TenantSession } from "@/lib/auth/session";
 import { cn } from "@/lib/utils";
 import {
   Sidebar,
@@ -33,7 +33,7 @@ import { sidebarIconStrokeWidth } from "./sidebar-icon-constants";
 
 type AdminSidebarProps = {
   onClose?: () => void;
-  session: TemisSession | null;
+  session: TenantSession | null;
   variant?: AdminSidebarVariant;
 };
 

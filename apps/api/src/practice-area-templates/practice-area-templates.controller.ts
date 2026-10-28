@@ -1,13 +1,13 @@
-import { Controller, Get, UseGuards } from "@nestjs/common";
+import { Controller, Get } from "@nestjs/common";
 import { ApiBearerAuth, ApiOkResponse, ApiTags } from "@nestjs/swagger";
-import { JwtAuthGuard } from "../auth/jwt-auth.guard";
+import { TenantAuthenticated } from "../auth/tenant-endpoint.decorator";
 import { PracticeAreaTemplateDto } from "./practice-area-templates.schemas";
 import { PracticeAreaTemplatesService } from "./practice-area-templates.service";
 
 @ApiTags("practice-area-templates")
 @ApiBearerAuth()
 @Controller("practice-area-templates")
-@UseGuards(JwtAuthGuard)
+@TenantAuthenticated()
 export class PracticeAreaTemplatesController {
   constructor(private readonly practiceAreaTemplatesService: PracticeAreaTemplatesService) {}
 

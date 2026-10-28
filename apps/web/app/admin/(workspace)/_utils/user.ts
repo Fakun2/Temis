@@ -1,11 +1,11 @@
-import type { TemisSession } from "@/lib/auth/session";
+import type { TenantSession } from "@/lib/auth/session";
 
 export function getInitials(name: string) {
   const [first = "B", second = ""] = name.trim().split(/\s+/);
   return `${first[0] ?? "B"}${second[0] ?? ""}`.toUpperCase();
 }
 
-export function getSessionDisplayUser(session: TemisSession | null) {
+export function getSessionDisplayUser(session: TenantSession | null) {
   const user = session?.user;
 
   return {

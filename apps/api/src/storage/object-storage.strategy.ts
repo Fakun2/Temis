@@ -14,6 +14,7 @@ export type GetObjectResult = {
 };
 
 export interface ObjectStorageStrategy {
+  checkHealth(): Promise<void>;
   deleteObject(key: string): Promise<void>;
   getObject(key: string): Promise<GetObjectResult>;
   getProvider(): string;

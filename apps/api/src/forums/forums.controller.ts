@@ -1,10 +1,8 @@
-import { Controller, Get, Query, UseGuards } from "@nestjs/common";
+import { Controller, Get, Query } from "@nestjs/common";
 import { ApiBearerAuth, ApiOkResponse, ApiSecurity, ApiTags } from "@nestjs/swagger";
-import { JwtAuthGuard } from "../auth/jwt-auth.guard";
 import { Permissions } from "../auth/permissions.decorator";
-import { PermissionsGuard } from "../auth/permissions.guard";
+import { TenantEndpoint } from "../auth/tenant-endpoint.decorator";
 import { ActiveTenant } from "../tenancy/active-tenant.decorator";
-import { TenantGuard } from "../tenancy/tenant.guard";
 import { ForumsListResponseDto, ListForumsQueryDto } from "./forums.schemas";
 import { ForumsService } from "./forums.service";
 
@@ -12,7 +10,7 @@ import { ForumsService } from "./forums.service";
 @ApiBearerAuth()
 @ApiSecurity("tenant")
 @Controller("forums")
-@UseGuards(JwtAuthGuard, TenantGuard, PermissionsGuard)
+@TenantEndpoint()
 export class ForumsController {
   constructor(private readonly forumsService: ForumsService) {}
 

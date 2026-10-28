@@ -55,7 +55,7 @@ export function LoginForm({ firstLogin, initialEmail }: LoginFormProps) {
               <Checkbox className="size-3.5 rounded-[4px]" />
               {loginCopy.remember}
             </label>
-            <Link href="#" className="transition-colors hover:text-foreground">
+            <Link href="/forgot-password" className="transition-colors hover:text-foreground">
               {loginCopy.forgot}
             </Link>
           </div>

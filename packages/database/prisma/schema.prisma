@@ -23,6 +23,83 @@ enum MembershipStatus {
   suspended
 }
 
+enum PlatformRoleCode {
+  super_admin
+}
+
+enum PlatformRoleAssignmentStatus {
+  active
+  revoked
+}
+
+enum PlatformSecurityStatus {
+  pending
+  active
+  revoked
+}
+
+enum PlatformSecurityEventOutcome {
+  success
+  denied
+  error
+}
+
+enum PlatformSecurityMode {
+  disabled
+  required
+}
+
+enum PlatformHealthComponent {
+  api
+  postgresql
+  redis
+  rabbitmq
+  worker
+}
+
+enum PlatformHealthStatus {
+  healthy
+  degraded
+  unavailable
+}
+
+enum PlatformAnnouncementStatus {
+  draft
+  published
+  cancelled
+}
+
+enum PlatformAnnouncementChannel {
+  banner
+  newsletter
+}
+
+enum PlatformNewsletterCategory {
+  release
+  bugfix
+  policy
+  performance
+  general
+}
+
+enum PlatformAnnouncementCategory {
+  general
+  maintenance
+  deployment
+  incident
+}
+
+enum PlatformAnnouncementSeverity {
+  info
+  warning
+  critical
+}
+
+enum PlatformAnnouncementAudience {
+  all_tenants
+  selected_tenants
+}
+
 enum CaseNumberingMode {
   manual
   automatic
@@ -234,6 +311,14 @@ enum NotificationRecipientStatus {
   read
 }
 
+enum NotificationEmailDeliveryStatus {
+  pending
+  processing
+  delivered
+  skipped
+  failed
+}
+
 enum TenantOnboardingChecklistStatus {
   pending
   completed
@@ -319,55 +404,64 @@ enum GoogleCalendarSyncSource {
 }
 
 model Tenant {
-  id                         String                          @id @default(uuid()) @db.Uuid
-  name                       String
-  legalName                  String?                         @map("legal_name")
-  taxId                      String?                         @map("tax_id")
-  status                     TenantStatus                    @default(active)
-  profile                    TenantProfile?
-  settings                   TenantSettings?
-  memberships                TenantMembership[]
-  practiceAreas              PracticeArea[]
-  clients                    Client[]
-  cases                      Case[]
-  caseTasks                  CaseTask[]
-  caseExpenses               CaseExpense[]
-  caseExpenseCashboxSyncJobs CaseExpenseCashboxSyncJob[]
-  caseHearings               CaseHearing[]
-  caseExternalReferences     CaseExternalReference[]
-  expenseAttachments         CaseExpenseAttachment[]
-  documentFolders            DocumentFolder[]
-  documentCategories         DocumentCategory[]
-  documents                  Document[]
-  documentImportJobs         DocumentImportJob[]
-  documentImportItems        DocumentImportItem[]
-  documentStorageCleanupJobs DocumentStorageCleanupJob[]
-  aiChatRuns                 AiChatRun[]
-  aiLegalDocuments           AiLegalDocument[]
-  aiLegalVersions            AiLegalDocumentVersion[]
-  aiLegalNormUnits           AiLegalNormUnit[]
-  aiLegalNormChunks          AiLegalNormChunk[]
-  roles                      Role[]
-  tenantCurrencies           TenantCurrency[]
-  financeCategories          TenantFinanceCategory[]
-  cashboxMovements           CashboxMovement[]
-  notificationReminders      NotificationReminder[]
-  notificationRecipients     NotificationReminderRecipient[]
-  taskBoardViews             TaskBoardView[]
-  notionConnections          NotionConnection[]
-  notionTaskBoardMappings    NotionTaskBoardMapping[]
-  notionTaskLinks            NotionTaskLink[]
-  notionSyncJobs             NotionSyncJob[]
-  notionSyncConflicts        NotionSyncConflict[]
-  googleCalendarConnections  GoogleCalendarConnection[]
-  googleCalendarEventLinks   GoogleCalendarEventLink[]
-  caseHearingParticipants    CaseHearingParticipant[]
-  onboardingChecklistItems   TenantOnboardingChecklistItem[]
-  asyncOutboxEvents          AsyncOutboxEvent[]
-  createdAt                  DateTime                        @default(now()) @map("created_at") @db.Timestamptz(6)
-  updatedAt                  DateTime                        @updatedAt @map("updated_at") @db.Timestamptz(6)
+  id                          String                          @id @default(uuid()) @db.Uuid
+  createdByUserId             String?                         @map("created_by_user_id") @db.Uuid
+  createdByMembershipId       String?                         @unique @map("created_by_membership_id") @db.Uuid
+  name                        String
+  legalName                   String?                         @map("legal_name")
+  taxId                       String?                         @map("tax_id")
+  status                      TenantStatus                    @default(active)
+  profile                     TenantProfile?
+  settings                    TenantSettings?
+  memberships                 TenantMembership[]
+  practiceAreas               PracticeArea[]
+  clients                     Client[]
+  cases                       Case[]
+  caseTasks                   CaseTask[]
+  caseExpenses                CaseExpense[]
+  caseExpenseCashboxSyncJobs  CaseExpenseCashboxSyncJob[]
+  caseHearings                CaseHearing[]
+  caseExternalReferences      CaseExternalReference[]
+  expenseAttachments          CaseExpenseAttachment[]
+  documentFolders             DocumentFolder[]
+  documentCategories          DocumentCategory[]
+  documents                   Document[]
+  documentImportJobs          DocumentImportJob[]
+  documentImportItems         DocumentImportItem[]
+  documentStorageCleanupJobs  DocumentStorageCleanupJob[]
+  aiChatRuns                  AiChatRun[]
+  aiLegalDocuments            AiLegalDocument[]
+  aiLegalVersions             AiLegalDocumentVersion[]
+  aiLegalNormUnits            AiLegalNormUnit[]
+  aiLegalNormChunks           AiLegalNormChunk[]
+  roles                       Role[]
+  tenantCurrencies            TenantCurrency[]
+  financeCategories           TenantFinanceCategory[]
+  cashboxMovements            CashboxMovement[]
+  notificationReminders       NotificationReminder[]
+  notificationRecipients      NotificationReminderRecipient[]
+  notificationPreferences     NotificationChannelPreference[]
+  notificationEmailDeliveries NotificationEmailDelivery[]
+  taskBoardViews              TaskBoardView[]
+  notionConnections           NotionConnection[]
+  notionTaskBoardMappings     NotionTaskBoardMapping[]
+  notionTaskLinks             NotionTaskLink[]
+  notionSyncJobs              NotionSyncJob[]
+  notionSyncConflicts         NotionSyncConflict[]
+  googleCalendarConnections   GoogleCalendarConnection[]
+  googleCalendarEventLinks    GoogleCalendarEventLink[]
+  caseHearingParticipants     CaseHearingParticipant[]
+  onboardingChecklistItems    TenantOnboardingChecklistItem[]
+  asyncOutboxEvents           AsyncOutboxEvent[]
+  announcementTargets         PlatformAnnouncementTarget[]
+  createdByUser                User?                           @relation("TenantCreator", fields: [createdByUserId], references: [id], onDelete: Restrict)
+  createdByMembership          TenantMembership?               @relation("TenantCreatorMembership", fields: [id, createdByMembershipId, createdByUserId], references: [tenantId, id, userId], onDelete: Restrict)
+  createdAt                   DateTime                        @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt                   DateTime                        @updatedAt @map("updated_at") @db.Timestamptz(6)
 
   @@map("tenants")
+  @@unique([id, createdByMembershipId, createdByUserId])
+  @@index([createdByUserId, status])
 }
 
 model User {
@@ -383,6 +477,7 @@ model User {
   sessionVersion             Int                         @default(0) @map("session_version")
   status                     UserStatus                  @default(active)
   memberships                TenantMembership[]
+  createdTenants             Tenant[]                     @relation("TenantCreator")
   identities                 UserIdentity[]
   expenseAttachments         CaseExpenseAttachment[]
   documents                  Document[]
@@ -393,10 +488,273 @@ model User {
   createdAt                  DateTime                    @default(now()) @map("created_at") @db.Timestamptz(6)
   updatedAt                  DateTime                    @updatedAt @map("updated_at") @db.Timestamptz(6)
   caseExpenseCashboxSyncJobs CaseExpenseCashboxSyncJob[]
-  googleCalendarConnections GoogleCalendarConnection[]
+  googleCalendarConnections  GoogleCalendarConnection[]
+  passwordResetCodes         PasswordResetCode[]
+  platformRoleAssignment     PlatformRoleAssignment?
+  platformAuthenticators     PlatformAuthenticator[]
+  platformDevices            PlatformDevice[]
+  platformSessions           PlatformSession[]
+  platformSecurityEvents     PlatformSecurityEvent[]
+  platformBootstrapTokens    PlatformBootstrapToken[]
+  announcementDismissals     PlatformAnnouncementDismissal[]
+  announcementReads          PlatformAnnouncementRead[]
+  createdAnnouncements       PlatformAnnouncement[]          @relation("PlatformAnnouncementCreator")
+  announcementEvents         PlatformAnnouncementEvent[]     @relation("PlatformAnnouncementActor")
 
   @@index([dni])
+  @@index([createdAt, id])
+  @@index([fullName, id])
+  @@index([lastLoginAt, id])
+  @@index([status, id])
+  @@index([email(ops: raw("gin_trgm_ops"))], type: Gin, map: "users_email_trgm_idx")
+  @@index([fullName(ops: raw("gin_trgm_ops"))], type: Gin, map: "users_full_name_trgm_idx")
   @@map("users")
+}
+
+model PlatformRoleAssignment {
+  id            String                       @id @default(uuid()) @db.Uuid
+  userId        String                       @unique @map("user_id") @db.Uuid
+  roleCode      PlatformRoleCode             @default(super_admin) @map("role_code")
+  status        PlatformRoleAssignmentStatus @default(active)
+  provisionedAt DateTime                     @default(now()) @map("provisioned_at") @db.Timestamptz(6)
+  revokedAt     DateTime?                    @map("revoked_at") @db.Timestamptz(6)
+  createdAt     DateTime                     @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt     DateTime                     @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([status, roleCode])
+  @@map("platform_role_assignments")
+}
+
+model PlatformAuthenticator {
+  id           String                 @id @default(uuid()) @db.Uuid
+  userId       String                 @map("user_id") @db.Uuid
+  credentialId String                 @unique @map("credential_id")
+  publicKey    Bytes                  @map("public_key")
+  counter      BigInt                 @default(0)
+  aaguid       String
+  transports   String[]               @default([])
+  name         String
+  status       PlatformSecurityStatus @default(pending)
+  lastUsedAt   DateTime?              @map("last_used_at") @db.Timestamptz(6)
+  revokedAt    DateTime?              @map("revoked_at") @db.Timestamptz(6)
+  createdAt    DateTime               @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt    DateTime               @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, status])
+  @@map("platform_authenticators")
+}
+
+model PlatformDevice {
+  id                     String                 @id @default(uuid()) @db.Uuid
+  userId                 String                 @map("user_id") @db.Uuid
+  provider               String
+  externalDeviceId       String                 @map("external_device_id")
+  certificateFingerprint String                 @unique @map("certificate_fingerprint")
+  name                   String
+  platform               String
+  status                 PlatformSecurityStatus @default(pending)
+  lastCompliantAt        DateTime?              @map("last_compliant_at") @db.Timestamptz(6)
+  lastSeenAt             DateTime?              @map("last_seen_at") @db.Timestamptz(6)
+  revokedAt              DateTime?              @map("revoked_at") @db.Timestamptz(6)
+  createdAt              DateTime               @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt              DateTime               @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  user     User                    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  sessions PlatformSession[]
+  events   PlatformSecurityEvent[]
+
+  @@unique([provider, externalDeviceId])
+  @@index([userId, status])
+  @@map("platform_devices")
+}
+
+model PlatformSession {
+  id                    String                 @id @default(uuid()) @db.Uuid
+  userId                String                 @map("user_id") @db.Uuid
+  deviceId              String?                @map("device_id") @db.Uuid
+  refreshFamilyId       String                 @map("refresh_family_id") @db.Uuid
+  refreshTokenHash      String                 @map("refresh_token_hash")
+  previousTokenHash     String?                @map("previous_token_hash")
+  status                PlatformSecurityStatus @default(active)
+  securityMode          PlatformSecurityMode   @default(required) @map("security_mode")
+  authMethods           String[]               @default([]) @map("auth_methods")
+  authenticatedAt       DateTime               @map("authenticated_at") @db.Timestamptz(6)
+  stepUpAt              DateTime?              @map("step_up_at") @db.Timestamptz(6)
+  postureCheckedAt      DateTime?              @map("posture_checked_at") @db.Timestamptz(6)
+  lastActivityAt        DateTime               @map("last_activity_at") @db.Timestamptz(6)
+  absoluteExpiresAt     DateTime               @map("absolute_expires_at") @db.Timestamptz(6)
+  refreshTokenExpiresAt DateTime               @map("refresh_token_expires_at") @db.Timestamptz(6)
+  revokedAt             DateTime?              @map("revoked_at") @db.Timestamptz(6)
+  createdAt             DateTime               @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt             DateTime               @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  user   User                    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  device PlatformDevice?         @relation(fields: [deviceId], references: [id], onDelete: Cascade)
+  events PlatformSecurityEvent[]
+
+  @@index([userId, status])
+  @@index([deviceId, status])
+  @@index([refreshFamilyId])
+  @@index([absoluteExpiresAt])
+  @@map("platform_sessions")
+}
+
+model PlatformBootstrapToken {
+  id         String    @id @default(uuid()) @db.Uuid
+  userId     String    @map("user_id") @db.Uuid
+  tokenHash  String    @unique @map("token_hash")
+  expiresAt  DateTime  @map("expires_at") @db.Timestamptz(6)
+  consumedAt DateTime? @map("consumed_at") @db.Timestamptz(6)
+  createdAt  DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, expiresAt])
+  @@map("platform_bootstrap_tokens")
+}
+
+model PlatformSecurityEvent {
+  id            String                       @id @default(uuid()) @db.Uuid
+  userId        String?                      @map("user_id") @db.Uuid
+  deviceId      String?                      @map("device_id") @db.Uuid
+  sessionId     String?                      @map("session_id") @db.Uuid
+  eventType     String                       @map("event_type")
+  outcome       PlatformSecurityEventOutcome
+  reason        String?
+  ipAddress     String?                      @map("ip_address")
+  userAgentHash String?                      @map("user_agent_hash")
+  createdAt     DateTime                     @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  user    User?            @relation(fields: [userId], references: [id], onDelete: NoAction)
+  device  PlatformDevice?  @relation(fields: [deviceId], references: [id], onDelete: NoAction)
+  session PlatformSession? @relation(fields: [sessionId], references: [id], onDelete: NoAction)
+
+  @@index([userId, createdAt])
+  @@index([deviceId, createdAt])
+  @@index([eventType, outcome, createdAt])
+  @@map("platform_security_events")
+}
+
+model PlatformHealthSample {
+  id         String                  @id @default(uuid()) @db.Uuid
+  component  PlatformHealthComponent
+  status     PlatformHealthStatus
+  latencyMs  Int?                    @map("latency_ms")
+  sampledAt  DateTime                @map("sampled_at") @db.Timestamptz(6)
+  createdAt  DateTime                @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  @@unique([component, sampledAt])
+  @@index([sampledAt])
+  @@map("platform_health_samples")
+}
+
+model PlatformAnnouncement {
+  id          String                       @id @default(uuid()) @db.Uuid
+  channel     PlatformAnnouncementChannel  @default(banner)
+  newsletterCategory PlatformNewsletterCategory? @map("newsletter_category")
+  excerpt     String?
+  content     Json?
+  status      PlatformAnnouncementStatus   @default(draft)
+  category    PlatformAnnouncementCategory @default(general)
+  severity    PlatformAnnouncementSeverity @default(info)
+  audience    PlatformAnnouncementAudience @default(all_tenants)
+  title       String
+  body        String
+  linkUrl     String?                      @map("link_url")
+  linkLabel   String?                      @map("link_label")
+  startsAt    DateTime?                    @map("starts_at") @db.Timestamptz(6)
+  endsAt      DateTime?                    @map("ends_at") @db.Timestamptz(6)
+  revision    Int                          @default(1)
+  deletedAt   DateTime?                    @map("deleted_at") @db.Timestamptz(6)
+  createdById String                       @map("created_by_id") @db.Uuid
+  createdAt   DateTime                     @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt   DateTime                     @updatedAt @map("updated_at") @db.Timestamptz(6)
+  targets     PlatformAnnouncementTarget[]
+  dismissals  PlatformAnnouncementDismissal[]
+  events      PlatformAnnouncementEvent[]
+  reads       PlatformAnnouncementRead[]
+  assets      PlatformAnnouncementAsset[]
+  createdBy   User                         @relation("PlatformAnnouncementCreator", fields: [createdById], references: [id], onDelete: Restrict)
+
+  @@index([status, startsAt, endsAt])
+  @@index([channel, status, startsAt])
+  @@index([channel, deletedAt, createdAt, id])
+  @@index([audience, status])
+  @@index([createdAt, id])
+  @@index([category, createdAt, id])
+  @@index([severity, createdAt, id])
+  @@index([audience, createdAt, id])
+  @@index([title(ops: raw("gin_trgm_ops"))], type: Gin, map: "platform_announcements_title_trgm_idx")
+  @@index([body(ops: raw("gin_trgm_ops"))], type: Gin, map: "platform_announcements_body_trgm_idx")
+  @@map("platform_announcements")
+}
+
+model PlatformAnnouncementRead {
+  announcementId String @map("announcement_id") @db.Uuid
+  userId String @map("user_id") @db.Uuid
+  revision Int
+  firstViewedAt DateTime @default(now()) @map("first_viewed_at") @db.Timestamptz(6)
+  announcement PlatformAnnouncement @relation(fields: [announcementId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([announcementId, userId, revision])
+  @@index([userId])
+  @@map("platform_announcement_reads")
+}
+
+model PlatformAnnouncementAsset {
+  id String @id @default(uuid()) @db.Uuid
+  announcementId String @map("announcement_id") @db.Uuid
+  storageKey String @unique @map("storage_key")
+  mimeType String @map("mime_type")
+  size Int
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  announcement PlatformAnnouncement @relation(fields: [announcementId], references: [id], onDelete: Cascade)
+
+  @@index([announcementId])
+  @@map("platform_announcement_assets")
+}
+
+model PlatformAnnouncementTarget {
+  announcementId String               @map("announcement_id") @db.Uuid
+  tenantId       String               @map("tenant_id") @db.Uuid
+  announcement   PlatformAnnouncement @relation(fields: [announcementId], references: [id], onDelete: Cascade)
+  tenant         Tenant               @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@id([announcementId, tenantId])
+  @@index([tenantId])
+  @@map("platform_announcement_targets")
+}
+
+model PlatformAnnouncementDismissal {
+  announcementId String               @map("announcement_id") @db.Uuid
+  userId         String               @map("user_id") @db.Uuid
+  revision       Int
+  dismissedAt    DateTime             @default(now()) @map("dismissed_at") @db.Timestamptz(6)
+  announcement   PlatformAnnouncement @relation(fields: [announcementId], references: [id], onDelete: Cascade)
+  user           User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([announcementId, userId, revision])
+  @@index([userId])
+  @@map("platform_announcement_dismissals")
+}
+
+model PlatformAnnouncementEvent {
+  id             String               @id @default(uuid()) @db.Uuid
+  announcementId String               @map("announcement_id") @db.Uuid
+  actorUserId    String               @map("actor_user_id") @db.Uuid
+  action         String
+  revision       Int
+  createdAt      DateTime             @default(now()) @map("created_at") @db.Timestamptz(6)
+  announcement   PlatformAnnouncement @relation(fields: [announcementId], references: [id], onDelete: Cascade)
+  actor          User                 @relation("PlatformAnnouncementActor", fields: [actorUserId], references: [id], onDelete: Restrict)
+
+  @@index([announcementId, createdAt])
+  @@map("platform_announcement_events")
 }
 
 model UserIdentity {
@@ -707,14 +1065,14 @@ model DocumentCategory {
 }
 
 model DocumentFolder {
-  id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  tenantId  String   @map("tenant_id") @db.Uuid
-  parentId  String?  @map("parent_id") @db.Uuid
+  id        String        @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  tenantId  String        @map("tenant_id") @db.Uuid
+  parentId  String?       @map("parent_id") @db.Uuid
   name      String
-  notes     String?  @db.Text
+  notes     String?       @db.Text
   scope     DocumentScope @default(library)
-  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
-  updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz(6)
+  createdAt DateTime      @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt DateTime      @updatedAt @map("updated_at") @db.Timestamptz(6)
 
   tenant      Tenant               @relation(fields: [tenantId], references: [id], onDelete: Cascade)
   parent      DocumentFolder?      @relation("DocumentFolderHierarchy", fields: [tenantId, parentId], references: [tenantId, id], onDelete: Cascade)
@@ -1035,6 +1393,22 @@ model CaseTask {
   @@map("case_tasks")
 }
 
+model PasswordResetCode {
+  id            String    @id @default(uuid()) @db.Uuid
+  userId        String    @map("user_id") @db.Uuid
+  codeHash      String    @map("code_hash")
+  expiresAt     DateTime  @map("expires_at") @db.Timestamptz(6)
+  attempts      Int       @default(0)
+  consumedAt    DateTime? @map("consumed_at") @db.Timestamptz(6)
+  invalidatedAt DateTime? @map("invalidated_at") @db.Timestamptz(6)
+  createdAt     DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt])
+  @@index([userId, consumedAt, invalidatedAt, expiresAt])
+  @@map("password_reset_codes")
+}
+
 model TaskBoardView {
   id                    String   @id @default(uuid()) @db.Uuid
   tenantId              String   @map("tenant_id") @db.Uuid
@@ -1093,8 +1467,8 @@ model NotionTaskBoardMapping {
   createdAt           DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
   updatedAt           DateTime  @updatedAt @map("updated_at") @db.Timestamptz(6)
 
-  tenant     Tenant                  @relation(fields: [tenantId], references: [id], onDelete: Cascade)
-  connection NotionConnection        @relation(fields: [connectionId], references: [id], onDelete: Cascade)
+  tenant     Tenant               @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  connection NotionConnection     @relation(fields: [connectionId], references: [id], onDelete: Cascade)
   links      NotionTaskLink[]
   jobs       NotionSyncJob[]
   conflicts  NotionSyncConflict[]
@@ -1242,8 +1616,8 @@ model CaseHearing {
   createdAt            DateTime        @default(now()) @map("created_at") @db.Timestamptz(6)
   updatedAt            DateTime        @updatedAt @map("updated_at") @db.Timestamptz(6)
 
-  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
-  case   Case   @relation(fields: [caseId], references: [id], onDelete: Cascade)
+  tenant       Tenant                   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  case         Case                     @relation(fields: [caseId], references: [id], onDelete: Cascade)
   participants CaseHearingParticipant[]
 
   @@index([tenantId])
@@ -1461,22 +1835,25 @@ model TenantMembership {
   createdAt DateTime         @default(now()) @map("created_at") @db.Timestamptz(6)
   updatedAt DateTime         @updatedAt @map("updated_at") @db.Timestamptz(6)
 
-  tenant                   Tenant                          @relation(fields: [tenantId], references: [id], onDelete: Cascade)
-  user                     User                            @relation(fields: [userId], references: [id], onDelete: Cascade)
-  role                     Role?                           @relation(fields: [roleId], references: [id], onDelete: SetNull)
-  practiceAreas            TenantMembershipPracticeArea[]
-  responsibleCases         Case[]
-  assignedTasks            CaseTask[]                      @relation("CaseTaskAssignee")
-  taskBoardViews           TaskBoardView[]                  @relation("TaskBoardViewCreator")
-  notionConnections        NotionConnection[]               @relation("NotionConnectionConnector")
-  googleCalendarConnections GoogleCalendarConnection[]        @relation("GoogleCalendarConnectionMembership")
-  notificationRecipients   NotificationReminderRecipient[]
-  settings                 TenantMembershipSettings?
-  onboardingChecklistItems TenantOnboardingChecklistItem[]
-  hearingParticipations    CaseHearingParticipant[]
+  tenant                    Tenant                          @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  user                      User                            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  foundedTenant             Tenant?                         @relation("TenantCreatorMembership")
+  role                      Role?                           @relation(fields: [roleId], references: [id], onDelete: SetNull)
+  practiceAreas             TenantMembershipPracticeArea[]
+  responsibleCases          Case[]
+  assignedTasks             CaseTask[]                      @relation("CaseTaskAssignee")
+  taskBoardViews            TaskBoardView[]                 @relation("TaskBoardViewCreator")
+  notionConnections         NotionConnection[]              @relation("NotionConnectionConnector")
+  googleCalendarConnections GoogleCalendarConnection[]      @relation("GoogleCalendarConnectionMembership")
+  notificationRecipients    NotificationReminderRecipient[]
+  notificationPreferences   NotificationChannelPreference[]
+  settings                  TenantMembershipSettings?
+  onboardingChecklistItems  TenantOnboardingChecklistItem[]
+  hearingParticipations     CaseHearingParticipant[]
 
   @@unique([tenantId, userId])
   @@unique([tenantId, id])
+  @@unique([tenantId, id, userId])
   @@index([tenantId, status])
   @@index([tenantId, roleId])
   @@index([userId])
@@ -1505,9 +1882,9 @@ model GoogleCalendarConnection {
   createdAt             DateTime                       @default(now()) @map("created_at") @db.Timestamptz(6)
   updatedAt             DateTime                       @updatedAt @map("updated_at") @db.Timestamptz(6)
 
-  tenant           Tenant           @relation(fields: [tenantId], references: [id], onDelete: Cascade)
-  user             User             @relation(fields: [userId], references: [id], onDelete: Cascade)
-  tenantMembership TenantMembership @relation("GoogleCalendarConnectionMembership", fields: [tenantId, tenantMembershipId], references: [tenantId, id], onDelete: Cascade)
+  tenant           Tenant                    @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  user             User                      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tenantMembership TenantMembership          @relation("GoogleCalendarConnectionMembership", fields: [tenantId, tenantMembershipId], references: [tenantId, id], onDelete: Cascade)
   eventLinks       GoogleCalendarEventLink[]
 
   @@unique([tenantId, tenantMembershipId])
@@ -1518,15 +1895,15 @@ model GoogleCalendarConnection {
 }
 
 model CaseHearingParticipant {
-  id                   String          @id @default(uuid()) @db.Uuid
-  tenantId             String          @map("tenant_id") @db.Uuid
-  hearingId            String          @map("hearing_id") @db.Uuid
-  tenantMembershipId   String          @map("tenant_membership_id") @db.Uuid
-  createdAt            DateTime        @default(now()) @map("created_at") @db.Timestamptz(6)
+  id                 String   @id @default(uuid()) @db.Uuid
+  tenantId           String   @map("tenant_id") @db.Uuid
+  hearingId          String   @map("hearing_id") @db.Uuid
+  tenantMembershipId String   @map("tenant_membership_id") @db.Uuid
+  createdAt          DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
 
-  tenant       Tenant           @relation(fields: [tenantId], references: [id], onDelete: Cascade)
-  hearing      CaseHearing      @relation(fields: [hearingId], references: [id], onDelete: Cascade)
-  membership   TenantMembership @relation(fields: [tenantId, tenantMembershipId], references: [tenantId, id], onDelete: Cascade)
+  tenant     Tenant           @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  hearing    CaseHearing      @relation(fields: [hearingId], references: [id], onDelete: Cascade)
+  membership TenantMembership @relation(fields: [tenantId, tenantMembershipId], references: [tenantId, id], onDelete: Cascade)
 
   @@unique([hearingId, tenantMembershipId])
   @@index([tenantId, tenantMembershipId])
@@ -1549,7 +1926,7 @@ model GoogleCalendarEventLink {
   createdAt        DateTime                        @default(now()) @map("created_at") @db.Timestamptz(6)
   updatedAt        DateTime                        @updatedAt @map("updated_at") @db.Timestamptz(6)
 
-  tenant     Tenant                  @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  tenant     Tenant                   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
   connection GoogleCalendarConnection @relation(fields: [connectionId], references: [id], onDelete: Cascade)
 
   @@unique([connectionId, resourceType, resourceId])
@@ -1573,6 +1950,24 @@ model TenantMembershipSettings {
   tenantMembership TenantMembership @relation(fields: [tenantMembershipId], references: [id], onDelete: Cascade)
 
   @@map("tenant_membership_settings")
+}
+
+model NotificationChannelPreference {
+  id                 String                           @id @default(uuid()) @db.Uuid
+  tenantId           String                           @map("tenant_id") @db.Uuid
+  tenantMembershipId String                           @map("tenant_membership_id") @db.Uuid
+  resourceType       NotificationReminderResourceType @map("resource_type")
+  inAppEnabled       Boolean                          @default(true) @map("in_app_enabled")
+  emailEnabled       Boolean                          @default(false) @map("email_enabled")
+  createdAt          DateTime                         @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt          DateTime                         @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  tenant           Tenant           @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  tenantMembership TenantMembership @relation(fields: [tenantId, tenantMembershipId], references: [tenantId, id], onDelete: Cascade)
+
+  @@unique([tenantId, tenantMembershipId, resourceType])
+  @@index([tenantId, tenantMembershipId])
+  @@map("notification_channel_preferences")
 }
 
 model TenantOnboardingChecklistItem {
@@ -1641,15 +2036,39 @@ model NotificationReminderRecipient {
   createdAt             DateTime                    @default(now()) @map("created_at") @db.Timestamptz(6)
   updatedAt             DateTime                    @updatedAt @map("updated_at") @db.Timestamptz(6)
 
-  reminder            NotificationReminder @relation(fields: [tenantId, reminderId], references: [tenantId, id], onDelete: Cascade)
-  tenant              Tenant               @relation(fields: [tenantId], references: [id], onDelete: Cascade)
-  recipientMembership TenantMembership     @relation(fields: [tenantId, recipientMembershipId], references: [tenantId, id], onDelete: Cascade)
+  reminder            NotificationReminder        @relation(fields: [tenantId, reminderId], references: [tenantId, id], onDelete: Cascade)
+  tenant              Tenant                      @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  recipientMembership TenantMembership            @relation(fields: [tenantId, recipientMembershipId], references: [tenantId, id], onDelete: Cascade)
+  emailDeliveries     NotificationEmailDelivery[]
 
   @@unique([reminderId, recipientMembershipId])
+  @@unique([tenantId, id])
   @@index([tenantId, recipientMembershipId, readAt])
   @@index([tenantId, status])
   @@index([tenantId, reminderId])
   @@map("notification_reminder_recipients")
+}
+
+model NotificationEmailDelivery {
+  id                  String                          @id @default(uuid()) @db.Uuid
+  tenantId            String                          @map("tenant_id") @db.Uuid
+  reminderRecipientId String                          @map("reminder_recipient_id") @db.Uuid
+  status              NotificationEmailDeliveryStatus @default(pending)
+  attempts            Int                             @default(0)
+  nextRunAt           DateTime                        @default(now()) @map("next_run_at") @db.Timestamptz(6)
+  lastError           String?                         @map("last_error")
+  deliveredAt         DateTime?                       @map("delivered_at") @db.Timestamptz(6)
+  skippedAt           DateTime?                       @map("skipped_at") @db.Timestamptz(6)
+  createdAt           DateTime                        @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt           DateTime                        @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  tenant            Tenant                        @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  reminderRecipient NotificationReminderRecipient @relation(fields: [tenantId, reminderRecipientId], references: [tenantId, id], onDelete: Cascade)
+
+  @@unique([tenantId, reminderRecipientId])
+  @@index([status, nextRunAt])
+  @@index([tenantId, status])
+  @@map("notification_email_deliveries")
 }
 
 model AsyncOutboxEvent {

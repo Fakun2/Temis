@@ -1,5 +1,5 @@
 import { dashboardHttpClient } from "@/lib/http";
-import type { TemisSession } from "@/lib/auth/session";
+import type { TenantSession } from "@/lib/auth/session";
 
 export type AiModel = "temis-legal" | "reasoning" | "fast";
 export type AiTool = "general" | "case_summary" | "case_documents" | "case_deadlines";
@@ -39,7 +39,7 @@ export const aiKeys = {
   tools: () => [...aiKeys.all, "tools"] as const
 };
 
-export async function listAiTools(_context: { session: TemisSession; tenantId: string }) {
+export async function listAiTools(_context: { session: TenantSession; tenantId: string }) {
   void _context;
 
   return dashboardHttpClient.request<AiToolsResponse>({
@@ -56,7 +56,7 @@ export async function startAiChat({
     prompt: string;
     tool: AiTool;
   };
-  session: TemisSession;
+  session: TenantSession;
   tenantId: string;
 }) {
   return dashboardHttpClient.request<AiChatResponse>({

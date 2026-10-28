@@ -1,11 +1,27 @@
-import { Body, Controller, Delete, Get, Param, ParseUUIDPipe, Patch, Post, Query, Req, UnauthorizedException, UseGuards } from "@nestjs/common";
-import { ApiBearerAuth, ApiCreatedResponse, ApiOkResponse, ApiSecurity, ApiTags } from "@nestjs/swagger";
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  ParseUUIDPipe,
+  Patch,
+  Post,
+  Query,
+  Req,
+  UnauthorizedException
+} from "@nestjs/common";
+import {
+  ApiBearerAuth,
+  ApiCreatedResponse,
+  ApiOkResponse,
+  ApiSecurity,
+  ApiTags
+} from "@nestjs/swagger";
 import type { AuthenticatedRequest } from "../auth/auth.types";
-import { JwtAuthGuard } from "../auth/jwt-auth.guard";
 import { Permissions } from "../auth/permissions.decorator";
-import { PermissionsGuard } from "../auth/permissions.guard";
+import { TenantEndpoint } from "../auth/tenant-endpoint.decorator";
 import { ActiveTenant } from "../tenancy/active-tenant.decorator";
-import { TenantGuard } from "../tenancy/tenant.guard";
 import {
   CashboxMovementsListResponseDto,
   CashboxSummaryDto,
@@ -23,7 +39,7 @@ import { CashboxService } from "./cashbox.service";
 @ApiBearerAuth()
 @ApiSecurity("tenant")
 @Controller("cashbox")
-@UseGuards(JwtAuthGuard, TenantGuard, PermissionsGuard)
+@TenantEndpoint()
 export class CashboxController {
   constructor(private readonly cashboxService: CashboxService) {}
 
@@ -37,10 +53,7 @@ export class CashboxController {
   @Get("movements")
   @Permissions("finance:read")
   @ApiOkResponse({ type: CashboxMovementsListResponseDto })
-  listMovements(
-    @ActiveTenant() tenantId: string,
-    @Query() query: ListCashboxMovementsQueryDto
-  ) {
+  listMovements(@ActiveTenant() tenantId: string, @Query() query: ListCashboxMovementsQueryDto) {
     return this.cashboxService.listMovements(tenantId, query);
   }
 

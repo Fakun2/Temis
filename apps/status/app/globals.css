@@ -1,0 +1,56 @@
+@import "tailwindcss";
+@source "../../../packages/brand-ui/src";
+
+:root {
+  --background: #f5f7fa;
+  --foreground: #081a2b;
+  --card: #ffffff;
+  --card-foreground: #081a2b;
+  --primary: #073061;
+  --primary-foreground: #ffffff;
+  --muted: #e8edf3;
+  --muted-foreground: #5d6c7c;
+  --border: #d7dee7;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-border: var(--border);
+  --font-sans: "Inter", "Segoe UI", sans-serif;
+}
+
+* {
+  border-color: var(--border);
+}
+
+html {
+  background: var(--background);
+  color: var(--foreground);
+  scroll-behavior: smooth;
+}
+
+body {
+  min-height: 100vh;
+  margin: 0;
+  background:
+    radial-gradient(circle at 50% -14rem, rgba(7, 48, 97, 0.1), transparent 34rem),
+    var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans);
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+::selection {
+  background: rgba(7, 48, 97, 0.18);
+}

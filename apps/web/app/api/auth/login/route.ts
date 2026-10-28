@@ -1,8 +1,13 @@
 import { NextResponse } from "next/server";
 import type { LoginResponseDto } from "@temis/api-client";
 import { createAuthSessionResponse, toApiUrl, toClientSession } from "@/lib/api/server";
+import { toInvalidMutationOriginBody, validateMutationOrigin } from "@/lib/auth/platform-device-headers";
 
 export async function POST(request: Request) {
+  const originValidation = validateMutationOrigin(request);
+  if (!originValidation.valid) {
+    return NextResponse.json(toInvalidMutationOriginBody(originValidation), { status: 403 });
+  }
   const requestBody = await request.text();
   const response = await fetch(toApiUrl("/api/auth/login"), {
     body: requestBody,

@@ -1,5 +1,6 @@
 @import "tailwindcss";
 @import "tw-animate-css";
+@source "../../../packages/brand-ui/src";
 
 :root,
 .theme-navy-slate {
@@ -82,6 +83,12 @@
   --workspace-pill-selected: var(--btn-secondary);
   --workspace-pill-selected-foreground: var(--btn-secondary-foreground);
   --ring: #073061;
+  --announcement-general: var(--primary);
+  --announcement-maintenance: #9a4f12;
+  --announcement-deployment: #6046a3;
+  --announcement-incident: #bd2939;
+  --announcement-warning: #946000;
+  --announcement-critical: #bd2939;
 }
 
 .dark,
@@ -173,6 +180,12 @@
   --workspace-pill-selected: var(--btn-secondary);
   --workspace-pill-selected-foreground: var(--btn-secondary-foreground);
   --ring: #8998df;
+  --announcement-general: var(--primary);
+  --announcement-maintenance: #f0ad4e;
+  --announcement-deployment: #aa9af5;
+  --announcement-incident: #fb7185;
+  --announcement-warning: #f6c453;
+  --announcement-critical: #ff7185;
 }
 
 .theme-light-dark {
@@ -258,6 +271,12 @@
   --workspace-pill-selected: var(--primary);
   --workspace-pill-selected-foreground: var(--primary-foreground);
   --ring: var(--primary);
+  --announcement-general: var(--primary);
+  --announcement-maintenance: #f0ad4e;
+  --announcement-deployment: #aa9af5;
+  --announcement-incident: #fb7185;
+  --announcement-warning: #f6c453;
+  --announcement-critical: #ff7185;
 }
 
 .theme-light-dark.dark {
@@ -608,6 +627,75 @@ textarea {
 
 [data-admin-surface] {
   border-radius: var(--admin-card-radius) !important;
+}
+
+[data-platform-announcement] {
+  --announcement-tone: var(--announcement-general);
+  color: var(--foreground);
+  background:
+    radial-gradient(
+      circle at 3% 50%,
+      color-mix(in oklab, var(--announcement-tone) 13%, transparent),
+      transparent 32%
+    ),
+    linear-gradient(
+      180deg,
+      color-mix(in oklab, var(--card) 92%, var(--announcement-tone)),
+      color-mix(in oklab, var(--admin-sidebar-bg) 96%, var(--announcement-tone))
+    );
+  box-shadow:
+    inset 0 1px 0 color-mix(in oklab, var(--foreground) 5%, transparent),
+    0 14px 34px -30px color-mix(in oklab, var(--announcement-tone) 62%, transparent);
+}
+
+[data-platform-announcement][data-announcement-category="maintenance"] {
+  --announcement-tone: var(--announcement-maintenance);
+}
+
+[data-platform-announcement][data-announcement-category="deployment"] {
+  --announcement-tone: var(--announcement-deployment);
+}
+
+[data-platform-announcement][data-announcement-category="incident"] {
+  --announcement-tone: var(--announcement-incident);
+}
+
+[data-platform-announcement][data-announcement-severity="warning"] {
+  --announcement-tone: var(--announcement-warning);
+}
+
+[data-platform-announcement][data-announcement-severity="critical"] {
+  --announcement-tone: var(--announcement-critical);
+}
+
+[data-announcement-icon] {
+  color: color-mix(in oklab, var(--announcement-tone) 84%, var(--foreground));
+}
+
+[data-announcement-badge] {
+  color: color-mix(in oklab, var(--announcement-tone) 78%, var(--foreground));
+  background: color-mix(in oklab, var(--announcement-tone) 9%, var(--admin-sidebar-bg));
+}
+
+[data-announcement-body] {
+  color: color-mix(in oklab, var(--foreground) 76%, transparent);
+}
+
+[data-announcement-controls] {
+  background: color-mix(in oklab, var(--announcement-tone) 7%, var(--admin-sidebar-bg));
+}
+
+[data-announcement-button] {
+  color: color-mix(in oklab, var(--foreground) 72%, transparent);
+}
+
+[data-announcement-button]:hover {
+  color: var(--foreground);
+  background: color-mix(in oklab, var(--announcement-tone) 12%, transparent);
+}
+
+[data-announcement-button]:focus-visible {
+  --tw-ring-color: color-mix(in oklab, var(--announcement-tone) 72%, transparent);
 }
 
 .dark [data-slot="card"],
@@ -2199,9 +2287,7 @@ textarea {
 }
 
 .temis-account-organization-trigger:hover .temis-account-organization-icon-windows path,
-.temis-account-organization-trigger:focus-visible
-  .temis-account-organization-icon-windows
-  path {
+.temis-account-organization-trigger:focus-visible .temis-account-organization-icon-windows path {
   animation: temis-account-window-pulse 980ms cubic-bezier(0.22, 1, 0.36, 1) 440ms both;
 }
 
@@ -2213,23 +2299,19 @@ textarea {
 .temis-account-organization-trigger:hover .temis-account-organization-icon-window-two,
 .temis-account-organization-trigger:focus-visible .temis-account-organization-icon-window-two,
 .temis-account-organization-trigger:hover .temis-account-organization-icon-window-three,
-.temis-account-organization-trigger:focus-visible
-  .temis-account-organization-icon-window-three {
+.temis-account-organization-trigger:focus-visible .temis-account-organization-icon-window-three {
   animation-delay: 500ms;
 }
 
 .temis-account-organization-trigger:hover .temis-account-organization-icon-window-four,
-.temis-account-organization-trigger:focus-visible
-  .temis-account-organization-icon-window-four,
+.temis-account-organization-trigger:focus-visible .temis-account-organization-icon-window-four,
 .temis-account-organization-trigger:hover .temis-account-organization-icon-window-five,
-.temis-account-organization-trigger:focus-visible
-  .temis-account-organization-icon-window-five {
+.temis-account-organization-trigger:focus-visible .temis-account-organization-icon-window-five {
   animation-delay: 560ms;
 }
 
 .temis-account-organization-trigger:hover .temis-account-organization-icon-window-six,
-.temis-account-organization-trigger:focus-visible
-  .temis-account-organization-icon-window-six {
+.temis-account-organization-trigger:focus-visible .temis-account-organization-icon-window-six {
   animation-delay: 620ms;
 }
 

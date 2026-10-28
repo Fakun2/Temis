@@ -1,5 +1,6 @@
-import { Body, Controller, HttpCode, Post } from "@nestjs/common";
+import { Body, Controller, HttpCode, Post, Req } from "@nestjs/common";
 import { ApiCreatedResponse, ApiOkResponse, ApiTags } from "@nestjs/swagger";
+import type { Request } from "express";
 import { AuthService } from "./auth.service";
 import {
   CreateAccountDto,
@@ -8,6 +9,9 @@ import {
   LoginDto,
   LoginResponseDto,
   LogoutDto,
+  PasswordRecoveryConfirmDto,
+  PasswordRecoveryRequestDto,
+  PasswordRecoveryResponseDto,
   RefreshTokenDto,
   TokenPairDto
 } from "./auth.schemas";
@@ -35,6 +39,20 @@ export class AuthController {
   @ApiOkResponse({ type: LoginResponseDto })
   googleLogin(@Body() input: GoogleLoginDto) {
     return this.authService.googleLogin(input);
+  }
+
+  @Post("password-recovery/request")
+  @HttpCode(200)
+  @ApiOkResponse({ type: PasswordRecoveryResponseDto })
+  requestPasswordRecovery(@Body() input: PasswordRecoveryRequestDto, @Req() request: Request) {
+    return this.authService.requestPasswordRecovery(input, request.ip ?? "unknown");
+  }
+
+  @Post("password-recovery/confirm")
+  @HttpCode(200)
+  @ApiOkResponse({ type: PasswordRecoveryResponseDto })
+  confirmPasswordRecovery(@Body() input: PasswordRecoveryConfirmDto, @Req() request: Request) {
+    return this.authService.confirmPasswordRecovery(input, request.ip ?? "unknown");
   }
 
   @Post("refresh")

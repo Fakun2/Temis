@@ -1,13 +1,13 @@
 "use client";
 
 import { Plus } from "lucide-react";
-import type { TemisSession } from "@/lib/auth/session";
+import type { TenantSession } from "@/lib/auth/session";
 import { Avatar, AvatarFallback, AvatarGroup, AvatarGroupCount } from "@/components/ui/avatar";
 import { getInitials, getSessionDisplayUser } from "../../_utils/user";
 import { HeaderActionButton } from "./header-action-button";
 
 type HeaderAvatarGroupProps = {
-  session: TemisSession | null;
+  session: TenantSession | null;
 };
 
 export function HeaderAvatarGroup({ session }: HeaderAvatarGroupProps) {

@@ -14,7 +14,7 @@ services:
     expose:
       - "5432"
     healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}" ]
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
       interval: 10s
       timeout: 5s
       retries: 10
@@ -23,13 +23,13 @@ services:
     image: redis:7-alpine
     container_name: ${CONTAINER_PREFIX:-bogaap-prod}-redis
     restart: unless-stopped
-    command: [ "redis-server", "--appendonly", "yes" ]
+    command: ["redis-server", "--appendonly", "yes"]
     volumes:
       - redis_data:/data
     expose:
       - "6379"
     healthcheck:
-      test: [ "CMD", "redis-cli", "ping" ]
+      test: ["CMD", "redis-cli", "ping"]
       interval: 10s
       timeout: 5s
       retries: 10
@@ -49,7 +49,7 @@ services:
     volumes:
       - rabbitmq_data:/var/lib/rabbitmq
     healthcheck:
-      test: [ "CMD", "rabbitmq-diagnostics", "-q", "ping" ]
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
       interval: 10s
       timeout: 5s
       retries: 10
@@ -102,6 +102,19 @@ services:
       API_PORT: 3001
       API_PUBLIC_URL: ${API_PUBLIC_URL:?API_PUBLIC_URL is required}
       FRONTEND_PUBLIC_URL: ${FRONTEND_PUBLIC_URL:?FRONTEND_PUBLIC_URL is required}
+      PLATFORM_PUBLIC_URL: ${PLATFORM_PUBLIC_URL:?PLATFORM_PUBLIC_URL is required}
+      PLATFORM_SECURITY_MODE: ${PLATFORM_SECURITY_MODE:?PLATFORM_SECURITY_MODE is required}
+      PLATFORM_WEBAUTHN_RP_ID: ${PLATFORM_WEBAUTHN_RP_ID:?PLATFORM_WEBAUTHN_RP_ID is required}
+      PLATFORM_WEBAUTHN_ORIGINS: ${PLATFORM_WEBAUTHN_ORIGINS:?PLATFORM_WEBAUTHN_ORIGINS is required}
+      PLATFORM_WEBAUTHN_RP_NAME: ${PLATFORM_WEBAUTHN_RP_NAME:-Temis Platform}
+      PLATFORM_WEBAUTHN_AAGUID_ALLOWLIST: ${PLATFORM_WEBAUTHN_AAGUID_ALLOWLIST:-}
+      PLATFORM_SECURITY_ALERT_EMAIL: ${PLATFORM_SECURITY_ALERT_EMAIL:-}
+      PLATFORM_OBSERVABILITY_SAMPLER_ENABLED: ${PLATFORM_OBSERVABILITY_SAMPLER_ENABLED:-true}
+      OPSWAT_API_URL: ${OPSWAT_API_URL:-}
+      OPSWAT_TOKEN_URL: ${OPSWAT_TOKEN_URL:-}
+      OPSWAT_CLIENT_ID: ${OPSWAT_CLIENT_ID:-}
+      OPSWAT_CLIENT_SECRET: ${OPSWAT_CLIENT_SECRET:-}
+      OPSWAT_DEVICE_POSTURE_PATH: ${OPSWAT_DEVICE_POSTURE_PATH:-/devices/{deviceId}/posture}
       API_CORS_ALLOWED_ORIGINS: ${API_CORS_ALLOWED_ORIGINS:?API_CORS_ALLOWED_ORIGINS is required}
       DATABASE_URL: postgresql://${POSTGRES_USER:?POSTGRES_USER is required}:${POSTGRES_PASSWORD:?POSTGRES_PASSWORD is required}@postgres:5432/${POSTGRES_DB:?POSTGRES_DB is required}?schema=public&connection_limit=${API_DATABASE_CONNECTION_LIMIT:-5}&pool_timeout=${DATABASE_POOL_TIMEOUT:-20}
       REDIS_URL: redis://redis:6379
@@ -155,6 +168,7 @@ services:
       RABBITMQ_EXCHANGE: ${RABBITMQ_EXCHANGE:-bogaap.jobs}
       RABBITMQ_NOTIFICATIONS_QUEUE: ${RABBITMQ_NOTIFICATIONS_QUEUE:-bogaap.notifications}
       RABBITMQ_DOCUMENT_CLEANUP_QUEUE: ${RABBITMQ_DOCUMENT_CLEANUP_QUEUE:-bogaap.document-cleanup}
+      QUEUE_CONSUMERS_ENABLED: "false"
       ASYNC_OUTBOX_PUBLISHER_ENABLED: "false"
       DOCUMENT_CLEANUP_INLINE_PROCESSING_ENABLED: ${DOCUMENT_CLEANUP_INLINE_PROCESSING_ENABLED:-false}
       DOCUMENT_CLEANUP_SCHEDULER_ENABLED: ${DOCUMENT_CLEANUP_SCHEDULER_ENABLED:-false}
@@ -181,7 +195,6 @@ services:
       context: .
       dockerfile: Dockerfile.worker
     image: ${WORKER_IMAGE:-temis-worker:prod}
-    container_name: ${CONTAINER_PREFIX:-bogaap-prod}-worker
     restart: unless-stopped
     mem_limit: ${WORKER_MEMORY_LIMIT:-384m}
     cpus: ${WORKER_CPUS:-0.25}
@@ -194,6 +207,8 @@ services:
       RABBITMQ_URL: amqp://${RABBITMQ_USER:?Set RABBITMQ_USER in your environment file}:${RABBITMQ_PASSWORD:?Set RABBITMQ_PASSWORD in your environment file}@rabbitmq:5672
       RABBITMQ_EXCHANGE: ${RABBITMQ_EXCHANGE:-bogaap.jobs}
       RABBITMQ_NOTIFICATIONS_QUEUE: ${RABBITMQ_NOTIFICATIONS_QUEUE:-bogaap.notifications}
+      RABBITMQ_NOTIFICATION_EMAIL_QUEUE: ${RABBITMQ_NOTIFICATION_EMAIL_QUEUE:-bogaap.notification-emails}
+      RABBITMQ_PLATFORM_SECURITY_ALERT_QUEUE: ${RABBITMQ_PLATFORM_SECURITY_ALERT_QUEUE:-bogaap.platform-security-alerts}
       RABBITMQ_DOCUMENT_CLEANUP_QUEUE: ${RABBITMQ_DOCUMENT_CLEANUP_QUEUE:-bogaap.document-cleanup}
       RABBITMQ_PREFETCH: ${RABBITMQ_PREFETCH:-3}
       RABBITMQ_CONSUMER_RETRY_INTERVAL_MS: ${RABBITMQ_CONSUMER_RETRY_INTERVAL_MS:-5000}
@@ -202,10 +217,17 @@ services:
       ASYNC_OUTBOX_PUBLISHER_BATCH_SIZE: ${ASYNC_OUTBOX_PUBLISHER_BATCH_SIZE:-25}
       ASYNC_OUTBOX_DATABASE_RETRY_ATTEMPTS: ${ASYNC_OUTBOX_DATABASE_RETRY_ATTEMPTS:-5}
       ASYNC_OUTBOX_DATABASE_RETRY_BASE_DELAY_MS: ${ASYNC_OUTBOX_DATABASE_RETRY_BASE_DELAY_MS:-250}
+      QUEUE_CONSUMERS_ENABLED: "false"
+      # This worker owns reminder delivery, cleanup and integrations. Email is isolated below.
+      WORKER_ROLE: ${WORKER_ROLE:-integrations}
       DOCUMENT_CLEANUP_INLINE_PROCESSING_ENABLED: ${DOCUMENT_CLEANUP_INLINE_PROCESSING_ENABLED:-false}
       DOCUMENT_CLEANUP_SCHEDULER_ENABLED: ${DOCUMENT_CLEANUP_SCHEDULER_ENABLED:-false}
       DOCUMENT_CLEANUP_RECOVERY_INTERVAL_MS: ${DOCUMENT_CLEANUP_RECOVERY_INTERVAL_MS:-600000}
       NOTIFICATIONS_SCHEDULER_ENABLED: ${NOTIFICATIONS_SCHEDULER_ENABLED:-false}
+      FRONTEND_PUBLIC_URL: ${FRONTEND_PUBLIC_URL:?FRONTEND_PUBLIC_URL is required}
+      RESEND_API_KEY: ${RESEND_API_KEY:?RESEND_API_KEY is required}
+      EMAIL_FROM: ${EMAIL_FROM:?EMAIL_FROM is required}
+      PLATFORM_SECURITY_ALERT_EMAIL: ${PLATFORM_SECURITY_ALERT_EMAIL:-}
       GOOGLE_CALENDAR_ENABLED: ${GOOGLE_CALENDAR_ENABLED:-false}
       GOOGLE_CALENDAR_CLIENT_ID: ${GOOGLE_CALENDAR_CLIENT_ID:-}
       GOOGLE_CALENDAR_CLIENT_SECRET: ${GOOGLE_CALENDAR_CLIENT_SECRET:-}
@@ -228,6 +250,38 @@ services:
       minio-init:
         condition: service_completed_successfully
 
+  notification-email-worker:
+    build:
+      context: .
+      dockerfile: Dockerfile.worker
+    image: ${WORKER_IMAGE:-temis-worker:prod}
+    restart: unless-stopped
+    mem_limit: ${NOTIFICATION_EMAIL_WORKER_MEMORY_LIMIT:-384m}
+    cpus: ${NOTIFICATION_EMAIL_WORKER_CPUS:-0.25}
+    deploy:
+      replicas: ${NOTIFICATION_EMAIL_WORKER_REPLICAS:-1}
+    environment:
+      NODE_ENV: production
+      DATABASE_URL: postgresql://${POSTGRES_USER:?POSTGRES_USER is required}:${POSTGRES_PASSWORD:?POSTGRES_PASSWORD is required}@postgres:5432/${POSTGRES_DB:?POSTGRES_DB is required}?schema=public&connection_limit=${WORKER_DATABASE_CONNECTION_LIMIT:-2}&pool_timeout=${DATABASE_POOL_TIMEOUT:-20}
+      RABBITMQ_ENABLED: "true"
+      RABBITMQ_URL: amqp://${RABBITMQ_USER:?Set RABBITMQ_USER in your environment file}:${RABBITMQ_PASSWORD:?Set RABBITMQ_PASSWORD in your environment file}@rabbitmq:5672
+      RABBITMQ_EXCHANGE: ${RABBITMQ_EXCHANGE:-bogaap.jobs}
+      RABBITMQ_NOTIFICATION_EMAIL_QUEUE: ${RABBITMQ_NOTIFICATION_EMAIL_QUEUE:-bogaap.notification-emails}
+      RABBITMQ_PREFETCH: ${RABBITMQ_NOTIFICATION_EMAIL_PREFETCH:-10}
+      # A single publisher avoids duplicate polling; this worker only consumes email deliveries.
+      ASYNC_OUTBOX_PUBLISHER_ENABLED: "false"
+      FRONTEND_PUBLIC_URL: ${FRONTEND_PUBLIC_URL:?FRONTEND_PUBLIC_URL is required}
+      RESEND_API_KEY: ${RESEND_API_KEY:?RESEND_API_KEY is required}
+      EMAIL_FROM: ${EMAIL_FROM:?EMAIL_FROM is required}
+      PLATFORM_SECURITY_ALERT_EMAIL: ${PLATFORM_SECURITY_ALERT_EMAIL:-}
+      NOTIFICATION_EMAIL_MAX_ATTEMPTS: ${NOTIFICATION_EMAIL_MAX_ATTEMPTS:-5}
+      WORKER_ROLE: email
+    depends_on:
+      postgres:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+
   web:
     build:
       context: .
@@ -247,6 +301,7 @@ services:
       NODE_OPTIONS: ${WEB_NODE_OPTIONS:---max-old-space-size=384}
       FRONTEND_PUBLIC_URL: ${FRONTEND_PUBLIC_URL:?FRONTEND_PUBLIC_URL is required}
       NEXT_PUBLIC_APP_URL: ${FRONTEND_PUBLIC_URL:?FRONTEND_PUBLIC_URL is required}
+      PLATFORM_PUBLIC_URL: ${PLATFORM_PUBLIC_URL:?PLATFORM_PUBLIC_URL is required}
       AUTH_COOKIE_SECURE: "true"
       NEXT_PUBLIC_API_BASE_URL: ${NEXT_PUBLIC_API_BASE_URL:-/api}
       NEXT_PUBLIC_API_PROXY_ORIGIN: ${NEXT_PUBLIC_API_PROXY_ORIGIN:-http://api:3001}
@@ -270,6 +325,11 @@ services:
       - "443:443"
     volumes:
       - ./infra/nginx/nginx.prod.conf:/etc/nginx/nginx.conf:ro
+      - ./infra/nginx/tls-common.conf:/etc/nginx/tls-common.conf:ro
+      - ./infra/nginx/proxy-headers.conf:/etc/nginx/proxy-headers.conf:ro
+      - ./infra/nginx/proxy-common.conf:/etc/nginx/proxy-common.conf:ro
+      - ./infra/nginx/platform-${PLATFORM_SECURITY_MODE:?PLATFORM_SECURITY_MODE is required}.conf:/etc/nginx/platform-security.conf:ro
+      - ./infra/nginx/client-ca:/etc/nginx/client-ca:ro
       - certbot_www:/var/www/certbot
       - letsencrypt:/etc/letsencrypt:ro
     depends_on:

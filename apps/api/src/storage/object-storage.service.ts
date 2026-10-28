@@ -20,6 +20,10 @@ export class ObjectStorageService {
     return this.getStrategy().getBucket();
   }
 
+  checkHealth() {
+    return this.getStrategy().checkHealth();
+  }
+
   putObject(input: PutObjectInput) {
     return this.getStrategy().putObject(input);
   }

@@ -25,7 +25,7 @@ los modelos MVP esten completos.
 
 ## Entidades implementadas en Prisma
 
-- `Tenant` -> `tenants`
+- `Tenant` -> `tenants`; conserva el usuario y la membresía owner que lo fundaron.
 - `User` -> `users`
 - `TenantProfile` -> `tenant_profiles`
 - `TenantSettings` -> `tenant_settings`
@@ -50,6 +50,8 @@ los modelos MVP esten completos.
 - `CaseExpenseCashboxSyncJob` -> `case_expense_cashbox_sync_jobs`
 - `NotificationReminder` -> `notification_reminders`
 - `NotificationReminderRecipient` -> `notification_reminder_recipients`
+- `NotificationChannelPreference` -> `notification_channel_preferences`
+- `NotificationEmailDelivery` -> `notification_email_deliveries`
 - `AsyncOutboxEvent` -> `async_outbox_events`
 - `Currency` -> `currencies`
 - `GlobalFinanceCategory` -> `global_finance_categories`
@@ -59,6 +61,13 @@ los modelos MVP esten completos.
 - `Permission` -> `permissions`
 - `RolePermission` -> `role_permissions`
 - `TenantMembership` -> `tenant_memberships`
+- `PlatformRoleAssignment` -> `platform_role_assignments`
+- `PlatformAuthenticator` -> `platform_authenticators`
+- `PlatformDevice` -> `platform_devices`
+- `PlatformSession` -> `platform_sessions`
+- `PlatformBootstrapToken` -> `platform_bootstrap_tokens`
+- `PlatformSecurityEvent` -> `platform_security_events`
+- `PlatformHealthSample` -> `platform_health_samples`
 - `AiChatRun` -> `ai_chat_runs`
 - `AiLegalDocument` -> `ai_legal_documents`
 - `AiLegalDocumentVersion` -> `ai_legal_document_versions`
@@ -66,6 +75,18 @@ los modelos MVP esten completos.
 - `AiLegalNormChunk` -> `ai_legal_norm_chunks`
 - `GoogleCalendarConnection` -> `google_calendar_connections`
 - `GoogleCalendarEventLink` -> `google_calendar_event_links`
+- `PasswordResetCode` -> `password_reset_codes`
+
+`PlatformSession.securityMode` conserva el modo (`disabled` o `required`) con
+el que se emitió la sesión. `deviceId` y `postureCheckedAt` son nulos solamente
+para sesiones `disabled`; el guard rechaza una sesión si el modo almacenado no
+coincide con el modo vigente del despliegue.
+
+`platform_health_samples` conserva exclusivamente estados tecnicos globales de
+API, PostgreSQL, Redis, RabbitMQ y Worker en intervalos de cinco minutos. No
+incluye `tenant_id`, logs, errores crudos ni contenido de estudios. Las muestras
+se retienen durante 90 dias y alimentan el historial de disponibilidad observado
+del panel Super Admin; los intervalos ausentes se presentan como sin datos.
 
 Las conexiones de Google Calendar son tenant-scoped y pertenecen a una
 membership. Sus credenciales se almacenan solamente cifradas; los links
@@ -172,7 +193,15 @@ deleting` oculta documentos cuyo borrado definitivo esta esperando cleanup de
   en `ai_legal_norm_chunks`. La regla inicial es una unidad normativa por chunk
   cuando sea posible: no mezclar leyes, articulos ni versiones normativas dentro
   de un mismo chunk.
-- `users` es global y no lleva `tenant_id`.
+- `users` es global y no lleva `tenant_id`. El listado de Super Admin usa la
+  relacion explicita `tenants.created_by_user_id` para identificar founders;
+  se pagina por seek con el valor de orden y `id` como desempate. Los indices
+  B-tree compuestos cubren los ordenes soportados y los indices GIN trigram de
+  `full_name` y `email` cubren la busqueda parcial case-insensitive.
+- `password_reset_codes` pertenece a un usuario global y conserva solamente el
+  hash bcrypt de un código efímero; no es una entidad tenant-scoped ni guarda
+  el código en claro. El flujo invalida códigos anteriores, limita intentos y
+  consume el código de manera atómica al restablecer la contraseña.
 - `currencies` es global y no lleva `tenant_id`.
   El catalogo global guarda `name`, `code`, `symbol` y `active`; los tenants lo
   referencian desde configuraciones y futuros modulos financieros.
@@ -268,3 +297,12 @@ Post-MVP:
 - `npm run typecheck`: pasa.
 - `npm run lint`: pasa.
 - `npm run test:e2e`: pasa para 5 tests de auth.
+
+## Comunicados de plataforma
+
+- `platform_announcements` es una entidad global operada exclusivamente por Super Admin.
+- La audiencia segmentada se normaliza mediante `platform_announcement_targets`; los eventos y descartes conservan revisión para auditoría.
+- `platform_announcements.channel` distingue banners de newsletters; los registros previos conservan `banner`. El contenido editorial es JSON versionado validado por la API. `platform_announcement_reads` registra vistas por usuario y revisión, y `platform_announcement_assets` identifica imágenes globales asociadas a una publicación. La audiencia se verifica antes de servir cada imagen.
+- Las newsletters eliminadas se conservan con `deleted_at`, sus eventos y archivos; se excluyen de administración y lectura. El cursor del listado usa `created_at` e `id` con precisión de microsegundos. La migración correctiva restaura esa precisión para nuevos registros; los valores ya redondeados no pueden recuperarse.
+- La vigencia activa se deriva con `status = published`, `starts_at <= now` y `ends_at > now`; no se persiste un estado activo duplicado.
+- Los listados usan seek estable por `(created_at, id)` y búsquedas trigram sobre título y cuerpo.

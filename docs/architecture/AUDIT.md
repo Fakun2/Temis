@@ -107,3 +107,9 @@ Modelos:
 - Dominio objetivo: `docs/diagrams/temis-er.puml`.
 - Plan y alcance: `docs/product/ROADMAP.md` y `docs/product/MVP_SCOPE.md`.
 - Gaps: `docs/database/gaps.md`.
+
+## Comunicados de plataforma
+
+Las altas, ediciones, publicaciones, programaciones y cancelaciones de comunicados generan registros en `platform_announcement_events` con actor, revisión y fecha. Los cambios de audiencia se ejecutan en la misma transacción que el comunicado para impedir estados parciales. Los comunicados no se eliminan físicamente desde la consola.
+
+Las newsletters utilizan el mismo registro de eventos para creación, edición, carga de imágenes, programación, publicación y cancelación. Las lecturas se registran por usuario y revisión en `platform_announcement_reads`; la lectura no representa aceptación de políticas. Los archivos se asocian a un borrador global y se sirven a usuarios de estudios únicamente cuando la publicación está vigente, dirigida a su estudio y hace referencia al archivo.

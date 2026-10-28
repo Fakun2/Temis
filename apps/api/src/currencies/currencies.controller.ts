@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post, Query, UseGuards } from "@nestjs/common";
+import { Body, Controller, Delete, Get, Param, Patch, Post, Query } from "@nestjs/common";
 import {
   ApiBearerAuth,
   ApiCreatedResponse,
@@ -6,11 +6,9 @@ import {
   ApiSecurity,
   ApiTags
 } from "@nestjs/swagger";
-import { JwtAuthGuard } from "../auth/jwt-auth.guard";
 import { Permissions } from "../auth/permissions.decorator";
-import { PermissionsGuard } from "../auth/permissions.guard";
+import { TenantEndpoint } from "../auth/tenant-endpoint.decorator";
 import { ActiveTenant } from "../tenancy/active-tenant.decorator";
-import { TenantGuard } from "../tenancy/tenant.guard";
 import {
   AddTenantCurrenciesDto,
   AddTenantCurrenciesResponseDto,
@@ -31,7 +29,7 @@ import { CurrenciesService } from "./currencies.service";
 @ApiBearerAuth()
 @ApiSecurity("tenant")
 @Controller("currencies")
-@UseGuards(JwtAuthGuard, TenantGuard, PermissionsGuard)
+@TenantEndpoint()
 export class CurrenciesController {
   constructor(private readonly currenciesService: CurrenciesService) {}
 

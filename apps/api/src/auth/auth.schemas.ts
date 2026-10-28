@@ -36,6 +36,50 @@ export const refreshTokenSchema = z.object({
   refreshToken: z.string().min(1)
 });
 
+const webAuthnResponseSchema = z.record(z.unknown());
+
+export const platformLoginStartSchema = z.object({
+  email: emailSchema,
+  password: loginPasswordSchema
+});
+
+export const platformLoginFinishSchema = z.object({
+  transactionId: z.string().uuid(),
+  response: webAuthnResponseSchema
+});
+
+export const platformEnrollmentStartSchema = z.object({
+  bootstrapToken: z.string().min(32).max(512),
+  deviceName: z.string().trim().min(2).max(100),
+  email: emailSchema,
+  password: loginPasswordSchema
+});
+
+export const platformEnrollmentCredentialSchema = z.object({
+  authenticatorName: z.string().trim().min(2).max(100),
+  response: webAuthnResponseSchema,
+  transactionId: z.string().uuid()
+});
+
+export const platformStepUpFinishSchema = z.object({
+  response: webAuthnResponseSchema,
+  transactionId: z.string().uuid()
+});
+
+export const platformPasswordStepUpSchema = z.object({
+  password: loginPasswordSchema
+});
+
+export const passwordRecoveryRequestSchema = z.object({
+  email: emailSchema
+});
+
+export const passwordRecoveryConfirmSchema = z.object({
+  email: emailSchema,
+  code: z.string().regex(/^\d{6}$/, "Ingresá el código de 6 dígitos."),
+  newPassword: passwordSchema
+});
+
 export class CreateAccountDto extends createZodDto(createAccountSchema) {
   @ApiProperty({ example: "Mateo Alvarez" })
   fullName!: string;
@@ -83,7 +127,11 @@ export class AuthUserDto {
   @ApiProperty({ required: false, nullable: true, example: "+54 9 11 5555-5555" })
   phone!: string | null;
 
-  @ApiProperty({ required: false, nullable: true, example: "https://lh3.googleusercontent.com/a/..." })
+  @ApiProperty({
+    required: false,
+    nullable: true,
+    example: "https://lh3.googleusercontent.com/a/..."
+  })
   avatarUrl!: string | null;
 
   @ApiProperty({ example: "active" })
@@ -98,6 +146,83 @@ export class CreateAccountResponseDto {
 export class RefreshTokenDto extends createZodDto(refreshTokenSchema) {
   @ApiProperty()
   refreshToken!: string;
+}
+
+export class PlatformLoginStartDto extends createZodDto(platformLoginStartSchema) {
+  @ApiProperty()
+  email!: string;
+
+  @ApiProperty()
+  password!: string;
+}
+
+export class PlatformLoginFinishDto extends createZodDto(platformLoginFinishSchema) {
+  @ApiProperty({ format: "uuid" })
+  transactionId!: string;
+
+  @ApiProperty({ type: Object })
+  response!: Record<string, unknown>;
+}
+
+export class PlatformEnrollmentStartDto extends createZodDto(platformEnrollmentStartSchema) {
+  @ApiProperty()
+  bootstrapToken!: string;
+
+  @ApiProperty()
+  deviceName!: string;
+
+  @ApiProperty()
+  email!: string;
+
+  @ApiProperty()
+  password!: string;
+}
+
+export class PlatformEnrollmentCredentialDto extends createZodDto(
+  platformEnrollmentCredentialSchema
+) {
+  @ApiProperty()
+  authenticatorName!: string;
+
+  @ApiProperty({ type: Object })
+  response!: Record<string, unknown>;
+
+  @ApiProperty({ format: "uuid" })
+  transactionId!: string;
+}
+
+export class PlatformStepUpFinishDto extends createZodDto(platformStepUpFinishSchema) {
+  @ApiProperty({ type: Object })
+  response!: Record<string, unknown>;
+
+  @ApiProperty({ format: "uuid" })
+  transactionId!: string;
+}
+
+export class PlatformPasswordStepUpDto extends createZodDto(platformPasswordStepUpSchema) {
+  @ApiProperty()
+  password!: string;
+}
+
+export class PasswordRecoveryRequestDto extends createZodDto(passwordRecoveryRequestSchema) {
+  @ApiProperty({ example: "mateo@estudio.com" })
+  email!: string;
+}
+
+export class PasswordRecoveryConfirmDto extends createZodDto(passwordRecoveryConfirmSchema) {
+  @ApiProperty({ example: "mateo@estudio.com" })
+  email!: string;
+
+  @ApiProperty({ example: "123456", minLength: 6, maxLength: 6 })
+  code!: string;
+
+  @ApiProperty({ example: "password456", minLength: 8, maxLength: 72 })
+  newPassword!: string;
+}
+
+export class PasswordRecoveryResponseDto {
+  @ApiProperty({ example: "ok" })
+  status!: "ok";
 }
 
 export class TokenPairDto {
@@ -117,6 +242,28 @@ export class LoginResponseDto {
 
   @ApiProperty({ type: TokenPairDto })
   tokens!: TokenPairDto;
+}
+
+export class PlatformAccessGrantedDto extends LoginResponseDto {
+  @ApiProperty({ enum: ["disabled"] })
+  securityMode!: "disabled";
+
+  @ApiProperty({ enum: ["access_granted"] })
+  status!: "access_granted";
+}
+
+export class PlatformFidoRequiredDto {
+  @ApiProperty({ type: Object })
+  options!: Record<string, unknown>;
+
+  @ApiProperty({ enum: ["required"] })
+  securityMode!: "required";
+
+  @ApiProperty({ enum: ["fido_required"] })
+  status!: "fido_required";
+
+  @ApiProperty({ format: "uuid" })
+  transactionId!: string;
 }
 
 export class LogoutDto {

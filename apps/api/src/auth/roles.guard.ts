@@ -20,7 +20,7 @@ export class RolesGuard implements CanActivate {
     const request = context.switchToHttp().getRequest<AuthenticatedRequest>();
     const tenantId = request.activeTenantId;
 
-    if (!request.user || !tenantId) {
+    if (!request.user || request.user.sessionKind !== "tenant" || !tenantId) {
       return false;
     }
 

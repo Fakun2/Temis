@@ -40,6 +40,10 @@ class InMemoryLegalCatalogPrismaService {
   private forumTemplates: ForumTemplateRecord[] = [];
   private provinces: ProvinceRecord[] = [];
 
+  readonly tenantMembership = {
+    findFirst: async () => ({ id: "active-membership" })
+  };
+
   readonly forumTemplate = {
     findMany: async ({
       orderBy,
@@ -214,6 +218,7 @@ function makeToken(jwt: JwtService, permissions: string[], tenantId = "tenant-a"
     sub: "user-1",
     email: "mateo@estudio.com",
     sessionVersion: 0,
+    sessionKind: "tenant",
     tenantAccess: [
       {
         tenantId,

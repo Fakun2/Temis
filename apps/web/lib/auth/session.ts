@@ -1,14 +1,18 @@
 import type { AuthUserDto, TokenPairDto } from "@temis/api-client";
 import { decodeJwtPayload } from "./jwt";
+import { createSessionStore } from "./session-store";
 
 const sessionStorageKey = "bogaap.session";
-const sessionListeners = new Set<() => void>();
-let currentSession: TemisSession | null = null;
 
-export type TemisSession = {
+export type TenantSession = {
   tenantAccess?: SessionTenantAccess[];
   tokens?: Partial<TokenPairDto>;
   user: AuthUserDto;
+};
+
+export type TenantAuthContext = {
+  session: TenantSession | null;
+  clear: () => void;
 };
 
 export type SessionTenantAccess = {
@@ -17,7 +21,8 @@ export type SessionTenantAccess = {
   permissions: string[];
 };
 
-export type SessionJwtPayload = {
+export type TenantSessionJwtPayload = {
+  sessionKind: "tenant";
   sub?: string;
   email?: string;
   sessionVersion?: number;
@@ -32,56 +37,47 @@ export type SessionUserPatch = {
   status?: string;
 };
 
-export function saveSession(session: TemisSession) {
+const sessionStore = createSessionStore<TenantSession>();
+
+export function saveSession(session: TenantSession) {
   const tenantAccess =
     session.tenantAccess ??
-    (session.tokens?.accessToken ? decodeJwtPayload(session.tokens.accessToken).tenantAccess : []);
+    (session.tokens?.accessToken
+      ? (() => {
+          const payload = decodeJwtPayload(session.tokens.accessToken);
+          return payload?.sessionKind === "tenant" ? payload.tenantAccess : [];
+        })()
+      : []);
 
-  currentSession = {
+  sessionStore.save({
     tenantAccess,
     user: session.user
-  };
+  });
   removeStoredSession();
-  notifySessionListeners();
 }
 
 export function updateSessionUser(user: SessionUserPatch) {
-  if (!currentSession) {
-    return;
-  }
-
-  currentSession = {
-    ...currentSession,
+  sessionStore.update((session) => ({
+    ...session,
     user: {
-      ...currentSession.user,
+      ...session.user,
       ...user
-    } as TemisSession["user"]
-  };
-  notifySessionListeners();
+    } as TenantSession["user"]
+  }));
 }
 
-export function readSession(): TemisSession | null {
+export function readSession(): TenantSession | null {
   removeStoredSession();
-  return currentSession;
+  return sessionStore.read();
 }
 
 export function clearSession() {
-  currentSession = null;
+  sessionStore.clear();
   removeStoredSession();
-  notifySessionListeners();
 }
 
 export function subscribeSession(listener: () => void) {
-  sessionListeners.add(listener);
-  return () => {
-    sessionListeners.delete(listener);
-  };
-}
-
-function notifySessionListeners() {
-  for (const listener of sessionListeners) {
-    listener();
-  }
+  return sessionStore.subscribe(listener);
 }
 
 function removeStoredSession() {
@@ -90,15 +86,19 @@ function removeStoredSession() {
   }
 }
 
-export function readAccessTokenPayload(accessToken: string): SessionJwtPayload {
-  return decodeJwtPayload(accessToken);
+export function readAccessTokenPayload(accessToken: string): TenantSessionJwtPayload {
+  const payload = decodeJwtPayload(accessToken);
+  if (!payload || payload.sessionKind !== "tenant") {
+    throw new Error("Token tenant invalido.");
+  }
+  return payload;
 }
 
-export function hasTenantAccess(session: TemisSession) {
+export function hasTenantAccess(session: TenantSession) {
   return getSessionTenantAccess(session).length > 0;
 }
 
-export function getSessionTenantAccess(session: TemisSession | null) {
+export function getSessionTenantAccess(session: TenantSession | null) {
   if (!session) {
     return [];
   }
@@ -112,6 +112,6 @@ export function getSessionTenantAccess(session: TemisSession | null) {
     : [];
 }
 
-export function sessionHasPermission(session: TemisSession | null, permission: string) {
+export function sessionHasPermission(session: TenantSession | null, permission: string) {
   return getSessionTenantAccess(session)[0]?.permissions.includes(permission) ?? false;
 }

@@ -9,7 +9,7 @@ import {
 } from "@nestjs/common";
 import { Prisma } from "@prisma/client";
 import { compare, hash } from "bcryptjs";
-import type { JwtPayload } from "../auth/auth.types";
+import type { TenantJwtPayload } from "../auth/auth.types";
 import { PrismaService } from "../database/prisma.service";
 import { ObjectStorageService } from "../storage/object-storage.service";
 import type {
@@ -24,6 +24,7 @@ const studioManagePermissions = ["account:studio_manage"];
 const membershipManagePermissions = ["account:membership_manage"];
 const saeImportPermissions = ["integrations:sae_import"];
 const accountAvatarUrl = "/api/account/avatar";
+const notificationResourceTypes = ["case_task", "case_expense", "case_hearing", "meeting"] as const;
 const allowedAccountAvatarMimeTypes = new Set([
   "image/jpeg",
   "image/png",
@@ -39,17 +40,17 @@ export class AccountService {
     @Optional() private readonly storage?: ObjectStorageService
   ) {}
 
-  async getAccount(tenantId: string, user: JwtPayload) {
+  async getAccount(tenantId: string, user: TenantJwtPayload) {
     const context = await this.getAccountContext(tenantId, user.sub);
     return this.toAccountResponse(context, user);
   }
 
-  async getAiUsage(tenantId: string, user: JwtPayload) {
+  async getAiUsage(tenantId: string, user: TenantJwtPayload) {
     const context = await this.getAiUsageContext(tenantId, user.sub);
     return this.toAiUsageResponse(context);
   }
 
-  async updateProfile(tenantId: string, user: JwtPayload, input: UpdateAccountProfileInput) {
+  async updateProfile(tenantId: string, user: TenantJwtPayload, input: UpdateAccountProfileInput) {
     const fullName = toFullName(input.firstName, input.lastName);
 
     await this.prisma.user.update({
@@ -66,7 +67,7 @@ export class AccountService {
 
   async uploadAvatar(
     tenantId: string,
-    user: JwtPayload,
+    user: TenantJwtPayload,
     file: { buffer: Buffer; mimetype: string; originalname: string; size: number } | undefined
   ) {
     const avatarFile = validateAccountAvatarFile(file);
@@ -89,7 +90,7 @@ export class AccountService {
     return { avatarUrl };
   }
 
-  async getAvatar(tenantId: string, user: JwtPayload) {
+  async getAvatar(tenantId: string, user: TenantJwtPayload) {
     await this.findActiveMembershipOrThrow(tenantId, user.sub);
 
     const accountUser = await this.prisma.user.findUnique({
@@ -107,7 +108,7 @@ export class AccountService {
     return this.getStorage().getObject(getAccountAvatarObjectKey(tenantId, user.sub));
   }
 
-  async updateStudio(tenantId: string, user: JwtPayload, input: UpdateAccountStudioInput) {
+  async updateStudio(tenantId: string, user: TenantJwtPayload, input: UpdateAccountStudioInput) {
     assertAnyPermission(user, tenantId, studioManagePermissions);
 
     await this.prisma.runWithTenant(tenantId, async (tx) => {
@@ -149,34 +150,50 @@ export class AccountService {
 
   async updateNotifications(
     tenantId: string,
-    user: JwtPayload,
+    user: TenantJwtPayload,
     input: UpdateAccountNotificationsInput
   ) {
     const membership = await this.findActiveMembershipOrThrow(tenantId, user.sub);
 
-    await this.prisma.tenantMembershipSettings.upsert({
-      where: { tenantMembershipId: membership.id },
-      create: {
-        browserNotifications: input.browserNotifications,
-        dailyDigest: input.dailyDigest,
-        emailReminders: input.emailReminders,
-        inAppReminders: input.inAppReminders,
-        reminderLeadTime: input.reminderLeadTime,
-        tenantMembershipId: membership.id
-      },
-      update: {
-        browserNotifications: input.browserNotifications,
-        dailyDigest: input.dailyDigest,
-        emailReminders: input.emailReminders,
-        inAppReminders: input.inAppReminders,
-        reminderLeadTime: input.reminderLeadTime
+    await this.prisma.$transaction(async (tx) => {
+      await tx.tenantMembershipSettings.upsert({
+        where: { tenantMembershipId: membership.id },
+        create: {
+          browserNotifications: input.browserNotifications,
+          dailyDigest: input.dailyDigest,
+          emailReminders: input.emailReminders,
+          inAppReminders: input.inAppReminders,
+          reminderLeadTime: input.reminderLeadTime,
+          tenantMembershipId: membership.id
+        },
+        update: {
+          browserNotifications: input.browserNotifications,
+          dailyDigest: input.dailyDigest,
+          emailReminders: input.emailReminders,
+          inAppReminders: input.inAppReminders,
+          reminderLeadTime: input.reminderLeadTime
+        }
+      });
+
+      for (const preference of input.preferences) {
+        await (tx as any).notificationChannelPreference.upsert({
+          where: {
+            tenantId_tenantMembershipId_resourceType: {
+              resourceType: preference.resourceType,
+              tenantId,
+              tenantMembershipId: membership.id
+            }
+          },
+          create: { ...preference, tenantId, tenantMembershipId: membership.id },
+          update: { emailEnabled: preference.emailEnabled, inAppEnabled: preference.inAppEnabled }
+        });
       }
     });
 
     return this.getAccount(tenantId, user);
   }
 
-  async updateMembership(tenantId: string, user: JwtPayload, input: UpdateAccountMembershipInput) {
+  async updateMembership(tenantId: string, user: TenantJwtPayload, input: UpdateAccountMembershipInput) {
     assertAnyPermission(user, tenantId, membershipManagePermissions);
 
     await this.prisma.tenantSettings.update({
@@ -191,7 +208,7 @@ export class AccountService {
     return this.getAccount(tenantId, user);
   }
 
-  async updatePassword(tenantId: string, user: JwtPayload, input: UpdateAccountPasswordInput) {
+  async updatePassword(tenantId: string, user: TenantJwtPayload, input: UpdateAccountPasswordInput) {
     await this.assertValidPasswordChange(tenantId, user.sub, input);
 
     await this.prisma.user.update({
@@ -207,7 +224,7 @@ export class AccountService {
 
   async validatePasswordChange(
     tenantId: string,
-    user: JwtPayload,
+    user: TenantJwtPayload,
     input: UpdateAccountPasswordInput
   ) {
     await this.assertValidPasswordChange(tenantId, user.sub, input);
@@ -422,7 +439,7 @@ export class AccountService {
     return this.storage;
   }
 
-  private toAccountResponse(context: AccountContext, user: JwtPayload) {
+  private toAccountResponse(context: AccountContext, user: TenantJwtPayload) {
     const { firstName, lastName } = splitFullName(context.membership.user.fullName);
     const settings = context.membership.settings;
     const tenantSettings = context.tenant.settings;
@@ -445,7 +462,17 @@ export class AccountService {
         dailyDigest: settings?.dailyDigest ?? false,
         emailReminders: settings?.emailReminders ?? false,
         inAppReminders: settings?.inAppReminders ?? true,
-        reminderLeadTime: settings?.reminderLeadTime ?? 24
+        reminderLeadTime: settings?.reminderLeadTime ?? 24,
+        preferences: notificationResourceTypes.map((resourceType) => {
+          const preference = context.membership.notificationPreferences.find(
+            (item) => item.resourceType === resourceType
+          );
+          return {
+            resourceType,
+            inAppEnabled: preference?.inAppEnabled ?? true,
+            emailEnabled: preference?.emailEnabled ?? false
+          };
+        })
       },
       permissions: {
         canImportSae: hasAnyPermission(user, context.tenant.id, saeImportPermissions),
@@ -532,6 +559,13 @@ const accountMembershipSelect = {
       emailReminders: true,
       inAppReminders: true,
       reminderLeadTime: true
+    }
+  },
+  notificationPreferences: {
+    select: {
+      emailEnabled: true,
+      inAppEnabled: true,
+      resourceType: true
     }
   },
   status: true,
@@ -622,13 +656,13 @@ type AiUsageMetrics = {
   totalTokens: number;
 };
 
-function assertAnyPermission(user: JwtPayload, tenantId: string, permissions: string[]) {
+function assertAnyPermission(user: TenantJwtPayload, tenantId: string, permissions: string[]) {
   if (!hasAnyPermission(user, tenantId, permissions)) {
     throw new ForbiddenException("No tenes permisos para actualizar esta seccion de cuenta.");
   }
 }
 
-function hasAnyPermission(user: JwtPayload, tenantId: string, permissions: string[]) {
+function hasAnyPermission(user: TenantJwtPayload, tenantId: string, permissions: string[]) {
   const access = user.tenantAccess.find((tenantAccess) => tenantAccess.tenantId === tenantId);
   return Boolean(
     access && permissions.some((permission) => access.permissions.includes(permission))

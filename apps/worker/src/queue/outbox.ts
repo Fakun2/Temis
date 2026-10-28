@@ -1,6 +1,7 @@
 import { Prisma, PrismaClient } from "@prisma/client";
 import {
   documentCleanupRoutingKey,
+  notificationEmailRoutingKey,
   notificationReminderRoutingKey
 } from "./constants";
 import { withTransientDatabaseRetry } from "./retry";
@@ -100,6 +101,23 @@ export class AsyncOutbox {
       routingKey: notificationReminderRoutingKey,
       tenantId: input.tenantId,
       topic: "notification.reminder.scheduled"
+    });
+  }
+
+  async enqueueNotificationEmail(
+    tx: Prisma.TransactionClient,
+    input: { deliverAt: Date; deliveryId: string; tenantId: string }
+  ) {
+    await this.enqueue(tx, {
+      availableAt: input.deliverAt,
+      payload: {
+        deliverAt: input.deliverAt.toISOString(),
+        deliveryId: input.deliveryId,
+        tenantId: input.tenantId
+      },
+      routingKey: notificationEmailRoutingKey,
+      tenantId: input.tenantId,
+      topic: "notification.email.requested"
     });
   }
 

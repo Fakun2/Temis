@@ -3,11 +3,11 @@
 import { useMemo } from "react";
 import { useQuery, type QueryKey, type UseQueryOptions } from "@tanstack/react-query";
 import { getActiveTenantAccess, hasPermission } from "@/lib/auth/permissions";
-import type { TemisSession } from "@/lib/auth/session";
+import type { TenantSession } from "@/lib/auth/session";
 import { useSession } from "@/lib/auth/use-session";
 
 type DashboardQueryContext = {
-  session: TemisSession;
+  session: TenantSession;
   tenantId: string;
 };
 

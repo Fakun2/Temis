@@ -1,4 +1,4 @@
-import type { TemisSession } from "@/lib/auth/session";
+import type { TenantSession } from "@/lib/auth/session";
 
 export type CaseDetailPermissions = {
   canCreateExpense: boolean;
@@ -18,7 +18,7 @@ export type CaseDetailPermissions = {
   canUpdateTask: boolean;
 };
 
-export type CaseDetailSession = NonNullable<TemisSession>;
+export type CaseDetailSession = NonNullable<TenantSession>;
 
 export type CaseDetailCalendarFocus = "expense" | "hearing" | "task";
 

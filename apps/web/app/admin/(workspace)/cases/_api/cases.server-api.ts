@@ -1,6 +1,6 @@
 import { getServerAuthSession, toApiUrl } from "@/lib/api/server";
 import { getActiveTenantAccess } from "@/lib/auth/permissions";
-import type { TemisSession } from "@/lib/auth/session";
+import type { TenantSession } from "@/lib/auth/session";
 import type {
   CaseDetailDto,
   CaseExpensesListResponse,
@@ -10,10 +10,10 @@ import type {
   CasesQueryParams
 } from "../_types/cases.types";
 
-export async function getCasesServerSession(): Promise<TemisSession | null> {
+export async function getCasesServerSession(): Promise<TenantSession | null> {
   const session = await getServerAuthSession();
 
-  return session
+  return session?.sessionKind === "tenant"
     ? {
         tenantAccess: session.tenantAccess,
         user: session.user
@@ -85,7 +85,7 @@ export async function listCaseExpensesServer({
 
 async function requestCasesServer<TResponse>(path: string): Promise<TResponse> {
   const session = await getServerAuthSession();
-  if (!session) {
+  if (!session || session.sessionKind !== "tenant") {
     throw new Error("No hay sesion activa.");
   }
 

@@ -32,6 +32,22 @@ export const loginFormSchema = z.object({
   tenantId: z.string().uuid("Tenant invalido.").optional()
 });
 
+export const passwordRecoveryRequestFormSchema = z.object({
+  email: emailSchema
+});
+
+export const passwordRecoveryConfirmFormSchema = z
+  .object({
+    email: emailSchema,
+    code: z.string().regex(/^\d{6}$/, "Ingresa el código de 6 dígitos."),
+    newPassword: passwordSchema,
+    confirmPassword: z.string()
+  })
+  .refine((input) => input.newPassword === input.confirmPassword, {
+    message: "Las contraseñas no coinciden.",
+    path: ["confirmPassword"]
+  });
+
 export type CreateAccountFormValues = {
   fullName: string;
   email: string;
@@ -41,3 +57,5 @@ export type CreateAccountFormValues = {
 export type CreateAccountPayload = z.output<typeof createAccountFormSchema>;
 export type LoginFormValues = z.input<typeof loginFormSchema>;
 export type LoginPayload = z.output<typeof loginFormSchema>;
+export type PasswordRecoveryRequestFormValues = z.input<typeof passwordRecoveryRequestFormSchema>;
+export type PasswordRecoveryConfirmFormValues = z.input<typeof passwordRecoveryConfirmFormSchema>;

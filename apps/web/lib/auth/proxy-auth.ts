@@ -1,19 +1,19 @@
 import { NextRequest, NextResponse } from "next/server";
-import { clearAuthSessionCookies } from "./cookie-options";
-import { sessionCookieName } from "./cookies";
+import { platformSessionCookieName, sessionCookieName } from "./cookies";
 import { decodeSessionCookie } from "./session-cookie";
 
-export function getRequestSessionMeta(request: NextRequest) {
-  return decodeSessionCookie(request.cookies.get(sessionCookieName)?.value);
+export function getRequestSessionMeta(request: NextRequest, scope: "tenant" | "platform") {
+  const name = scope === "platform" ? platformSessionCookieName : sessionCookieName;
+  return decodeSessionCookie(request.cookies.get(name)?.value);
 }
 
-export function redirectToLogin(request: NextRequest, options?: { clearCookies?: boolean }) {
-  const loginUrl = new URL("/login", request.url);
+export function redirectToLogin(request: NextRequest, options?: { clearScope?: "tenant" | "platform"; loginPath?: string }) {
+  const loginUrl = new URL(options?.loginPath ?? "/login", request.url);
   loginUrl.searchParams.set("next", `${request.nextUrl.pathname}${request.nextUrl.search}`);
   const response = NextResponse.redirect(loginUrl);
 
-  if (options?.clearCookies) {
-    clearAuthSessionCookies(response);
+  if (options?.clearScope) {
+    response.cookies.delete(options.clearScope === "platform" ? platformSessionCookieName : sessionCookieName);
   }
 
   return response;

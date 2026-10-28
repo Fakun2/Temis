@@ -38,6 +38,10 @@ class InMemoryCurrenciesPrismaService {
   private tenantCurrencies: TenantCurrencyRecord[] = [];
   private tenantSettingsRecords: Array<{ defaultCurrencyCode: string; tenantId: string }> = [];
 
+  readonly tenantMembership = {
+    findFirst: async () => ({ id: "active-membership" })
+  };
+
   readonly currency = {
     count: async ({ where }: { where?: CurrencyWhere }) =>
       this.currencies.filter((currency) => this.matchesCurrency(currency, where)).length,
@@ -510,10 +514,10 @@ describe("Currencies endpoints (e2e)", () => {
       .set("x-tenant-id", "tenant-a")
       .expect(200);
 
-    assert.deepEqual(
-      response.body.items.map((currency: CurrencyRecord) => currency.code).sort(),
-      ["ARS", "USD"]
-    );
+    assert.deepEqual(response.body.items.map((currency: CurrencyRecord) => currency.code).sort(), [
+      "ARS",
+      "USD"
+    ]);
     assert.deepEqual(response.body.metrics, {
       active: 2,
       available: 0
@@ -551,10 +555,10 @@ describe("Currencies endpoints (e2e)", () => {
       .set("x-tenant-id", "tenant-a")
       .expect(200);
 
-    assert.deepEqual(
-      response.body.items.map((currency: CurrencyRecord) => currency.code).sort(),
-      ["ARS", "USD"]
-    );
+    assert.deepEqual(response.body.items.map((currency: CurrencyRecord) => currency.code).sort(), [
+      "ARS",
+      "USD"
+    ]);
     assert.deepEqual(response.body.metrics, {
       active: 1,
       available: 1
@@ -702,10 +706,10 @@ describe("Currencies endpoints (e2e)", () => {
       .set("x-tenant-id", "tenant-a")
       .expect(200);
 
-    assert.deepEqual(
-      response.body.items.map((currency: CurrencyRecord) => currency.code).sort(),
-      ["BRL", "USD"]
-    );
+    assert.deepEqual(response.body.items.map((currency: CurrencyRecord) => currency.code).sort(), [
+      "BRL",
+      "USD"
+    ]);
   });
 });
 
@@ -714,6 +718,7 @@ function makeToken(jwt: JwtService, permissions: string[], tenantId = "tenant-a"
     sub: "user-1",
     email: "mateo@estudio.com",
     sessionVersion: 0,
+    sessionKind: "tenant",
     tenantAccess: [
       {
         tenantId,

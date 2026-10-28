@@ -41,6 +41,10 @@ class InMemoryCasesPrismaService {
   executeRawCalls = 0;
   runWithTenantCalls: string[] = [];
 
+  readonly tenantMembership = {
+    findFirst: async () => ({ id: "active-membership" })
+  };
+
   readonly case = {
     findFirst: async ({ select, where }: { select?: unknown; where: Partial<CaseRecord> }) => {
       const record =
@@ -341,6 +345,7 @@ function makeToken(jwt: JwtService, permissions: string[], tenantId = tenantA) {
     sub: "user-1",
     email: "mateo@estudio.com",
     sessionVersion: 0,
+    sessionKind: "tenant",
     tenantAccess: [
       {
         tenantId,

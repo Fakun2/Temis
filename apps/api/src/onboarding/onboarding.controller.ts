@@ -6,8 +6,7 @@ import {
   Param,
   Patch,
   Post,
-  Req,
-  UseGuards
+  Req
 } from "@nestjs/common";
 import {
   ApiBearerAuth,
@@ -16,12 +15,10 @@ import {
   ApiSecurity,
   ApiTags
 } from "@nestjs/swagger";
-import { JwtAuthGuard } from "../auth/jwt-auth.guard";
-import { AuthenticatedRequest } from "../auth/auth.types";
+import { TenantAuthenticatedRequest } from "../auth/auth.types";
 import { Permissions } from "../auth/permissions.decorator";
-import { PermissionsGuard } from "../auth/permissions.guard";
+import { TenantAuthenticated, TenantEndpoint } from "../auth/tenant-endpoint.decorator";
 import { ActiveTenant } from "../tenancy/active-tenant.decorator";
-import { TenantGuard } from "../tenancy/tenant.guard";
 import {
   OnboardingStatusDto,
   OnboardingChecklistResponseDto,
@@ -39,16 +36,16 @@ export class OnboardingController {
 
   @Post("start")
   @ApiBearerAuth()
-  @UseGuards(JwtAuthGuard)
+  @TenantAuthenticated()
   @ApiCreatedResponse({ type: StartOnboardingResponseDto })
-  start(@Req() request: AuthenticatedRequest, @Body() input: StartOnboardingDto) {
+  start(@Req() request: TenantAuthenticatedRequest, @Body() input: StartOnboardingDto) {
     return this.onboardingService.start(request.user!.sub, input);
   }
 
   @Get("status")
   @ApiBearerAuth()
   @ApiSecurity("tenant")
-  @UseGuards(JwtAuthGuard, TenantGuard, PermissionsGuard)
+  @TenantEndpoint()
   @Permissions("admin:access")
   @ApiOkResponse({ type: OnboardingStatusDto })
   status(@ActiveTenant() tenantId: string) {
@@ -58,22 +55,22 @@ export class OnboardingController {
   @Get("checklist")
   @ApiBearerAuth()
   @ApiSecurity("tenant")
-  @UseGuards(JwtAuthGuard, TenantGuard, PermissionsGuard)
+  @TenantEndpoint()
   @Permissions("admin:access")
   @ApiOkResponse({ type: OnboardingChecklistResponseDto })
-  checklist(@ActiveTenant() tenantId: string, @Req() request: AuthenticatedRequest) {
+  checklist(@ActiveTenant() tenantId: string, @Req() request: TenantAuthenticatedRequest) {
     return this.onboardingService.checklist(tenantId, request.user!);
   }
 
   @Patch("checklist/:step")
   @ApiBearerAuth()
   @ApiSecurity("tenant")
-  @UseGuards(JwtAuthGuard, TenantGuard, PermissionsGuard)
+  @TenantEndpoint()
   @Permissions("admin:access")
   @ApiOkResponse({ type: OnboardingChecklistResponseDto })
   updateChecklistStep(
     @ActiveTenant() tenantId: string,
-    @Req() request: AuthenticatedRequest,
+    @Req() request: TenantAuthenticatedRequest,
     @Param("step") step: string,
     @Body() input: UpdateOnboardingChecklistStepDto
   ) {
