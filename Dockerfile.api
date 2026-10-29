@@ -25,7 +25,11 @@ RUN npm run db:generate
 RUN npm run build --workspace @temis/database
 RUN npm run build --workspace @temis/integration-contracts
 RUN npm run build --workspace @temis/api
-RUN npm prune --omit=dev
+RUN npm prune --omit=dev \
+  && npm install --omit=dev --no-save --package-lock=false --ignore-scripts \
+    @img/sharp-linuxmusl-x64@0.34.5 \
+    @img/sharp-libvips-linuxmusl-x64@1.2.4 \
+  && node -e "require('sharp')"
 
 FROM base AS runner
 ENV NODE_ENV=production

@@ -17,8 +17,8 @@ export function proxy(request: NextRequest) {
       : redirectToLogin(request, { clearScope: "platform", loginPath: "/superadmin/login" });
   }
 
-  if (isPathWithin(pathname, tenantPublicPaths) || pathname === "/login") return NextResponse.next();
-  if (pathname === "/" || pathname === "/admin" || pathname.startsWith("/admin/")) {
+  if (isPathWithin(pathname, tenantPublicPaths) || pathname === "/login" || pathname === "/") return NextResponse.next();
+  if (pathname === "/admin" || pathname.startsWith("/admin/")) {
     const session = getRequestSessionMeta(request, "tenant");
     return session ? NextResponse.next() : redirectToLogin(request, { clearScope: "tenant" });
   }
