@@ -8,6 +8,12 @@ const tenantSession = "10000000-0000-4000-8000-000000000001";
 const platformSession = "20000000-0000-4000-8000-000000000002";
 
 describe("proxy admin/superadmin URL isolation", () => {
+  it("serves the landing page without a session", () => {
+    const response = proxy(new NextRequest("http://localhost:3000/"));
+    assert.equal(response.status, 200);
+    assert.equal(response.headers.get("location"), null);
+  });
+
   it("uses only the tenant cookie for /admin even when both cookies exist", () => {
     assert.equal(proxy(request("http://localhost:3000/admin", "both")).status, 200);
     assert.equal(
